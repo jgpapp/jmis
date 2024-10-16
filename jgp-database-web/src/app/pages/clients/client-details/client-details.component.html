@@ -1,0 +1,258 @@
+@if (selectedParticipant | async; as selectedParticipant){
+    <app-content-header 
+        [icon]="'supervisor_account'" 
+        [title]="selectedParticipant.businessName" 
+        [desc]="'View information about the Selected Participant.'"
+        [hideBreadcrumb]="false"
+        [hasBgImage]="true" 
+        [class]="'pb-5'"></app-content-header>
+    
+       
+    <div fxLayout="column" class="p-2">
+        <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="end center" class="px-2 user-toolbar">
+            <div class="action-button" fxLayoutGap="25px">
+                <button mat-raised-button color="primary">
+                  <mat-icon>edit</mat-icon>&nbsp;&nbsp;Edit
+                </button>
+                <button mat-raised-button color="warn" >
+                    <mat-icon>lock</mat-icon>&nbsp;&nbsp;Ban Participant
+                  </button>
+              </div>
+        </mat-toolbar>
+       
+        <div fxLayout="column" class="p-2">
+          <h2 class="mat-h2" fxFlexFill fxLayoutAlign="center">{{ selectedParticipant.businessName }} Details</h2>
+          <div fxLayout="row wrap" fxLayout.lt-md="column" fxLayoutGap="2%" class="m-b-20">
+            <div fxFlex="49" class="p-2">
+              <mat-card class="custom-card">
+                  <mat-card-header class="bg-accent" fxLayoutAlign="space-between center">
+                      <mat-card-title class="m-0"><h3>Basic information</h3></mat-card-title>
+                  </mat-card-header>
+                  <mat-card-content class="py-3">
+                      <div fxLayout="column">
+                        <div fxFlexFill>
+                          <span fxFlex="40%">ID:</span>
+                          <span fxFlex="60%">{{ selectedParticipant.jgpId }}</span>
+                        </div>
+                
+                        <div fxFlexFill>
+                          <span fxFlex="40%">Phone Number:</span>
+                          <span fxFlex="60%">{{ selectedParticipant.phoneNumber }}</span>
+                        </div>
+
+                        <div fxFlexFill>
+                          <span fxFlex="40%">Owner Gender:</span>
+                          <span fxFlex="60%">{{ selectedParticipant.ownerGender }}</span>
+                        </div>
+
+                        <div fxFlexFill>
+                          <span fxFlex="40%">Owner Age:</span>
+                          <span fxFlex="60%">{{ selectedParticipant.ownerAge }} Years Old</span>
+                        </div>
+                      </div>
+                  </mat-card-content>
+                  <mat-divider></mat-divider>
+                  <mat-card-actions fxLayoutAlign="end center" class="secondary-text-color">
+                  </mat-card-actions>
+              </mat-card>
+          </div>
+          <div fxFlex="49" class="p-2">
+            <mat-card class="custom-card">
+                <mat-card-header class="bg-accent" fxLayoutAlign="space-between center">
+                    <mat-card-title class="m-0"><h3>Business Information</h3></mat-card-title>
+                </mat-card-header>
+                <mat-card-content class="py-3">
+                  <div fxLayout="column">
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Business Location:</span>
+                      <span fxFlex="60%">{{ selectedParticipant.businessLocation }}</span>
+                    </div>
+            
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Industry Sector:</span>
+                      <span fxFlex="60%">{{ selectedParticipant.industrySector }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Business Segment:</span>
+                      <span fxFlex="60%">{{ selectedParticipant.businessSegment }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Registration Number:</span>
+                      <span fxFlex="60%">{{ selectedParticipant.registrationNumber }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">BMO Membership:</span>
+                      <span fxFlex="60%">{{ selectedParticipant.bmoMembership }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Best Monthly Revenue:</span>
+                      <span fxFlex="60%">{{ selectedParticipant.bestMonthlyRevenue }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Worst Monthly Revenue:</span>
+                      <span fxFlex="60%">{{ selectedParticipant.worstMonthlyRevenue }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Total Regular Employees:</span>
+                      <span fxFlex="60%">{{ selectedParticipant.totalRegularEmployees }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Youth Regular Employees:</span>
+                      <span fxFlex="60%">{{ selectedParticipant.youthRegularEmployees }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Total Casual Employees:</span>
+                      <span fxFlex="60%">{{ selectedParticipant.totalCasualEmployees }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Youth Casual Employees:</span>
+                      <span fxFlex="60%">{{ selectedParticipant.youthCasualEmployees }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Sample Records:</span>
+                      <span fxFlex="60%">{{ selectedParticipant.sampleRecords }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Technical Assistance Needs:</span>
+                      <span fxFlex="60%">{{ selectedParticipant.taNeeds }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Person With Disability:</span>
+                      <span fxFlex="60%">{{ selectedParticipant.personWithDisability }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Refugee Status:</span>
+                      <span fxFlex="60%">{{ selectedParticipant.refugeeStatus }}</span>
+                    </div>
+                  </div>
+                </mat-card-content>
+                <mat-divider></mat-divider>
+                <mat-card-actions fxLayoutAlign="end center" class="secondary-text-color">
+                </mat-card-actions>
+            </mat-card>
+        </div>
+          </div>
+          <div fxLayout="column" fxLayoutGap="2%" class="m-b-20">
+            <div fxFlex="100" class="p-2">
+              <mat-card class="custom-card">
+                  <mat-card-header class="bg-accent" fxLayoutAlign="space-between center">
+                      <mat-card-title class="m-0"><h3>Technical Assistance</h3></mat-card-title>
+                  </mat-card-header>
+                  <mat-card-content class="py-3">
+                    <div fxLayout="column" class="p-2">
+                      <div class="p-2">
+                          <mat-table #table [dataSource]="selectedParticipant.bmoClientDtos" class="mat-elevation-z8">
+                              <ng-container matColumnDef="partnerName">
+                                  <mat-header-cell *matHeaderCellDef> Partner Name </mat-header-cell>
+                                  <mat-cell *matCellDef="let element"> {{element.partnerName}} </mat-cell>
+                              </ng-container>
+                              <ng-container matColumnDef="dateFormSubmitted">
+                                  <mat-header-cell *matHeaderCellDef> Date Form Submitted </mat-header-cell>
+                                  <mat-cell *matCellDef="let element"> {{element.dateFormSubmitted}} </mat-cell>
+                              </ng-container>
+                              <ng-container matColumnDef="isApplicantEligible">
+                                  <mat-header-cell *matHeaderCellDef> Is Applicant Eligible </mat-header-cell>
+                                  <mat-cell *matCellDef="let element"> {{element.isApplicantEligible}} </mat-cell>
+                              </ng-container>
+                              <ng-container matColumnDef="taSessionsAttended">
+                                  <mat-header-cell *matHeaderCellDef> TA Sessions Attended </mat-header-cell>
+                                  <mat-cell *matCellDef="let element"> {{element.taSessionsAttended}} </mat-cell>
+                              </ng-container>
+                              <ng-container matColumnDef="isRecommendedForFinance">
+                                  <mat-header-cell *matHeaderCellDef> Is Recommended ForFinance </mat-header-cell>
+                                  <mat-cell *matCellDef="let element"> {{element.isRecommendedForFinance}} </mat-cell>
+                              </ng-container>
+                              <ng-container matColumnDef="decisionDate">
+                                  <mat-header-cell *matHeaderCellDef> Decision Date </mat-header-cell>
+                                  <mat-cell *matCellDef="let element"> {{element.decisionDate}} </mat-cell>
+                              </ng-container>
+                              <ng-container matColumnDef="fiBusinessReferred">
+                                <mat-header-cell *matHeaderCellDef> FI Business Referred </mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.fiBusinessReferred}} </mat-cell>
+                            </ng-container>
+                              <mat-header-row *matHeaderRowDef="bmoDisplayedColumns"></mat-header-row>
+                              <mat-row *matRowDef="let row; columns: bmoDisplayedColumns;"></mat-row>
+                          </mat-table>
+                          <mat-paginator #paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"></mat-paginator>
+                      </div>
+                  </div>
+                  </mat-card-content>
+                  <mat-divider></mat-divider>
+                  <mat-card-actions fxLayoutAlign="end center" class="secondary-text-color">
+                  </mat-card-actions>
+              </mat-card>
+          </div>
+          <div fxFlex="100" class="p-2">
+            <mat-card class="custom-card">
+                <mat-card-header class="bg-accent" fxLayoutAlign="space-between center">
+                    <mat-card-title class="m-0"><h3>Loan Access</h3></mat-card-title>
+                </mat-card-header>
+                <mat-card-content class="py-3">
+                  <div fxLayout="column" class="p-2">
+                    <div class="p-2">
+                        <mat-table #table [dataSource]="selectedParticipant.loanDtos" class="mat-elevation-z8">
+                            <ng-container matColumnDef="partnerName">
+                                <mat-header-cell *matHeaderCellDef> Partner Name </mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.partnerName}} </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="loanNumber">
+                                <mat-header-cell *matHeaderCellDef> Loan Number </mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.loanNumber}} </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="pipeLineSource">
+                                <mat-header-cell *matHeaderCellDef> PipeLine Source </mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.pipeLineSource}} </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="loanAmountAccessed">
+                                <mat-header-cell *matHeaderCellDef> Loan Amount Accessed</mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.loanAmountAccessed}} </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="loanOutStandingAmount">
+                                <mat-header-cell *matHeaderCellDef> OutStanding Amount </mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.loanOutStandingAmount}} </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="loanDuration">
+                                <mat-header-cell *matHeaderCellDef> Loan Duration </mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.loanDuration}} </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="dateApplied">
+                              <mat-header-cell *matHeaderCellDef> Date Applied </mat-header-cell>
+                              <mat-cell *matCellDef="let element"> {{element.dateApplied}} </mat-cell>
+                          </ng-container>
+                          <ng-container matColumnDef="dateDisbursed">
+                            <mat-header-cell *matHeaderCellDef> Date Disbursed </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{element.dateDisbursed}} </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="loanStatus">
+                          <mat-header-cell *matHeaderCellDef> Loan Status </mat-header-cell>
+                          <mat-cell *matCellDef="let element"> {{element.loanStatus}} </mat-cell>
+                      </ng-container>
+                      <mat-header-row *matHeaderRowDef="loansDisplayedColumns"></mat-header-row>
+                      <mat-row *matRowDef="let row; columns: loansDisplayedColumns;"></mat-row>
+                        </mat-table>
+                        <mat-paginator #paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"></mat-paginator>
+                    </div>
+                </div>
+                </mat-card-content>
+                <mat-divider></mat-divider>
+                <mat-card-actions fxLayoutAlign="end center" class="secondary-text-color">
+                </mat-card-actions>
+            </mat-card>
+        </div>
+          </div>
+        </div>
+    </div>
+    }

@@ -1,0 +1,48 @@
+    
+    <app-content-header 
+    [icon]="'supervisor_account'" 
+    [title]="'Create User Role'" 
+    [desc]="'Provide information for all required fields to create a role.'"
+    [hideBreadcrumb]="false"
+    [hasBgImage]="true" 
+    [class]="'pb-5'"></app-content-header>
+
+   
+
+
+    <div fxLayout="column" fxLayout.gt-sm="row wrap" class="p-2" fxLayoutAlign="center">
+    <div fxFlex="70" class="p-2"> 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center">                
+                <mat-card-title>New User Role</mat-card-title>
+            </mat-card-header>
+            <mat-card-content fxLayoutAlign="center" class="pt-3">
+                <form [formGroup]="newUserRoleForm" class="partner-form"> 
+                    <div fxLayout="row wrap" fxLayoutGap="2%">        
+                        <mat-form-field fxFlex="97%">
+                            <mat-label>Role Name</mat-label>
+                            <input matInput formControlName="roleName">
+                        </mat-form-field>
+                        <mat-form-field fxFlex="97%">
+                            <mat-label>Description</mat-label>
+                            <input matInput formControlName="description">
+                        </mat-form-field>
+                        <mat-form-field appearance="fill" fxFlex="97%">
+                            <mat-label>Role Permissions</mat-label>
+                            <mat-select formControlName="permissions" multiple>
+                                @for (permission of allPermissions; track $index) {
+                                    <mat-option [value]="permission.code">{{ permission.code }}</mat-option>
+                                }
+                              
+                            </mat-select>
+                          </mat-form-field>
+                    <div fxLayout="row" fxLayoutAlign="end center" fxFlex="100%" fxLayoutGap="2%">
+                        <button mat-raised-button color="warn">Cancel</button>
+                        <button mat-raised-button color="primary" (click)="onSubmitCreateUserRole()" [mat-dialog-close]="newUserRoleForm.value" [disabled]="!newUserRoleForm.valid">Save</button>
+                    </div>
+                    </div>
+                </form>
+            </mat-card-content>
+        </mat-card>
+    </div>          
+</div>

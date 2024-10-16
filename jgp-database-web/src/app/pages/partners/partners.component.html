@@ -1,0 +1,40 @@
+@if(authService.hasPermission('PARTNERS_VIEW')){
+<app-content-header 
+    [icon]="'supervisor_account'" 
+    [title]="'Partners'" 
+    [desc]="'View information about the Partners, add, edit or delete any Partners.'"
+    [hideBreadcrumb]="false"
+    [hasBgImage]="true" 
+    [class]="'pb-5'"></app-content-header>
+
+   
+<div fxLayout="column" class="p-2">
+    <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="end center" class="px-2 user-toolbar">
+        <div class="action-button" fxLayoutGap="25px">
+            <button mat-raised-button color="primary" *jgpHasPermission="'PARTNERS_CREATE'" routerLink="new">
+              <mat-icon>person_add</mat-icon>&nbsp;&nbsp;Create Partner
+            </button>
+          </div>
+    </mat-toolbar>
+   
+    <div class="p-2">
+        <mat-table #table [dataSource]="dataSource" class="mat-elevation-z8">
+            <ng-container matColumnDef="partnerName">
+                <mat-header-cell *matHeaderCellDef> Partner Name </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.partnerName}} </mat-cell>
+            </ng-container>
+            
+            <ng-container matColumnDef="type">
+                <mat-header-cell *matHeaderCellDef> Type </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.type}} </mat-cell>
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;" [routerLink]="['/partners', row.id, 'details']"></mat-row>
+        </mat-table>
+        <mat-paginator #paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"></mat-paginator>
+    </div>
+</div>
+}
+@else {
+    <app-no-permission />
+}

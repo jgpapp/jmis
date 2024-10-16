@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import url('https://cdn.quilljs.com/1.2.2/quill.snow.css');
+@import url('https://cdn.quilljs.com/1.2.2/quill.bubble.css');
+
+// azure-blue, rose-red, magenta-violet and cyan-orange.
+@import '@angular/material/prebuilt-themes/azure-blue.css';
+ 
+@import "../node_modules/angular-calendar/css/angular-calendar.css";
+@import "../node_modules/dragula/dist/dragula.min.css";
+@import "../node_modules/@swimlane/ngx-datatable/themes/material.css";
+@import "../node_modules/@swimlane/ngx-datatable/assets/icons.css"; 
+@import "../node_modules/leaflet/dist/leaflet.css";
+
+@import "app/theme/styles/base";
+@import "app/theme/styles/spaces";
+@import "app/theme/styles/libs-override";
+@import "app/theme/styles/theme";
+@import "app/theme/styles/gradients";
+@import "app/theme/styles/rtl";
+
+.mat-mdc-row .mat-mdc-cell {
+    border: 1px solid transparent;
+    cursor: pointer;
+  }
+  
+  .mat-mdc-row:hover .mat-mdc-cell {
+    background-color: rgb(183, 187, 187);
+  }
+
+
+ /* Ensure the dialog takes full width and height of the viewport */
+.custom-dialog-container .mat-dialog-container {
+  height: 100vh;  /* Full viewport height */
+  width: 100vw;   /* Full viewport width */
+  max-height: 100vh;
+  max-width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Ensure the content inside the dialog stretches to fit */
+.full-dialog-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.content-div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  background-color: lightblue;
+}

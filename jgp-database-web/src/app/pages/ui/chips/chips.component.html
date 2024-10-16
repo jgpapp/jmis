@@ -1,0 +1,88 @@
+<app-content-header 
+    [icon]="'label'" 
+    [title]="'Chips'" 
+    [hideBreadcrumb]="false"
+    [hasBgImage]="true" 
+    [class]="'pb-4'"></app-content-header>
+
+<div fxLayout="column" class="p-2">
+    <div class="p-2">
+        <mat-card>
+            <mat-card-header>                
+                <mat-card-title>Basic chips</mat-card-title>
+            </mat-card-header>
+            <mat-card-content class="pt-3">
+                <mat-chip-listbox>
+                    <mat-chip-option>One fish</mat-chip-option>
+                    <mat-chip-option>Two fish</mat-chip-option>
+                    <mat-chip-option color="primary" selected="true">Primary fish</mat-chip-option>
+                    <mat-chip-option color="accent" selected="true">Accent fish</mat-chip-option>
+                    <mat-chip-option color="warn" selected="true">Warn fish</mat-chip-option>
+                </mat-chip-listbox>
+            </mat-card-content>
+        </mat-card>
+    </div>
+    <div class="p-2">
+        <mat-card>
+            <mat-card-header>
+                <mat-card-title>Chips avatar</mat-card-title>
+            </mat-card-header>
+            <mat-card-content class="pt-3">
+                <mat-chip-set aria-label="Dog selection">
+                    <mat-chip>
+                      <img matChipAvatar src="img/avatars/avatar-1.png" alt="Photo of a Shiba Inu"/>
+                      Dog one
+                    </mat-chip>
+                    <mat-chip color="primary">
+                      <img matChipAvatar src="img/avatars/avatar-5.png" alt="Photo of a Shiba Inu"/>
+                      Dog two
+                    </mat-chip>
+                    <mat-chip color="accent">
+                      <img matChipAvatar src="img/avatars/avatar-3.png" alt="Photo of a Shiba Inu"/>
+                      Dog three
+                    </mat-chip>
+                  </mat-chip-set>
+            </mat-card-content>
+        </mat-card>
+    </div>
+    <div class="p-2">
+        <mat-card>
+            <mat-card-header>
+                <mat-card-title>Chips with input</mat-card-title>
+            </mat-card-header>
+            <mat-card-content class="pt-3">
+                <mat-form-field class="w-100" appearance="fill">
+                    <mat-label>Favorite Fruits</mat-label>
+                    <mat-chip-grid #chipGrid aria-label="Enter fruits">
+                        @for (fruit of fruits; track fruit) {
+                            <mat-chip-row (removed)="remove(fruit)" [editable]="true" (edited)="edit(fruit, $event)"
+                                [aria-description]="'press enter to edit ' + fruit.name">
+                                {{fruit.name}}
+                                <button matChipRemove [attr.aria-label]="'remove ' + fruit.name">
+                                    <mat-icon>cancel</mat-icon>
+                                </button>
+                            </mat-chip-row>
+                        }
+                        <input placeholder="New fruit..." [matChipInputFor]="chipGrid"
+                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
+                            (matChipInputTokenEnd)="add($event)" />
+                    </mat-chip-grid>
+                </mat-form-field>
+            </mat-card-content>
+        </mat-card>
+    </div>
+    <div class="p-2">
+        <mat-card>
+            <mat-card-header>
+                <mat-card-title>Stacked chips</mat-card-title>
+            </mat-card-header>
+            <mat-card-content class="pt-3">
+                <mat-chip-listbox class="mat-mdc-chip-set-stacked example">
+                    @for (chip of availableColors; track chip) {
+                        <mat-chip-option selected [color]="chip.color">{{chip.name}}</mat-chip-option>
+                    }
+                </mat-chip-listbox>
+            </mat-card-content>
+        </mat-card>
+    </div> 
+</div>

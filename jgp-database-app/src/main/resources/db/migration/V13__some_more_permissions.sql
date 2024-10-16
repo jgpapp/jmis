@@ -1,0 +1,2 @@
+INSERT INTO permission (entity_name, action_name, code)VALUES('BMO_PARTICIPANTS_DATA', 'APPROVE', 'BMO_PARTICIPANTS_DATA_APPROVE');
+INSERT INTO permission (entity_name, action_name, code)VALUES('LOAN', 'APPROVE', 'LOAN_APPROVE');

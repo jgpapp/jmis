@@ -1,0 +1,184 @@
+<div fxLayout="row wrap" #resizedDiv>
+
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #loansDisbursedByGenderContentDiv (click)="expandLoansDisbursedByGenderDoughnut()"> 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{loansDisbursedByGenderChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                <app-pie-chart 
+                [data]="loansDisbursedByGender" 
+                [showLegend]="loansDisbursedByGenderShowLegend" 
+                [colorScheme]="chartSColorScheme" 
+                [showLabels]="loansDisbursedByGenderShowLabels" 
+                [explodeSlices]="loansDisbursedByGenderExplodeSlices" 
+                [doughnut]="loansDisbursedByGenderDoughnut"
+                />       
+            </div>
+        </mat-card>
+    </div> 
+    
+    
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #loansDisbursedByPipelineContentDiv (click)="expandLoansDisbursedByPipelinePieChart()"> 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{loansDisbursedByPipelineChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                <app-pie-chart 
+            [data]="loansDisbursedByPipeline" 
+            [showLegend]="loansDisbursedByPipelineShowLegend" 
+            [colorScheme]="chartSColorScheme" 
+            [showLabels]="loansDisbursedByPipelineShowLabels" 
+            [explodeSlices]="loansDisbursedByPipelineExplodeSlices" 
+            [doughnut]="loansDisbursedByPipelineDoughnut" 
+            />        
+            </div>
+        </mat-card>
+    </div> 
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #loansDisbursedByStatusContentDiv (click)="expandLoansDisbursedByStatusBarChart()"> 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{loansDisbursedByStatusChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                <ngx-charts-bar-vertical
+                    [scheme]="chartSColorScheme"
+                    [results]="loansDisbursedByStatus"
+                    [gradient]="gradient"
+                    [xAxis]="loansDisbursedByStatusShowXAxis"
+                    [yAxis]="loansDisbursedByStatusShowYAxis"
+                    [legend]="loansDisbursedByStatusShowLegend"
+                    [showXAxisLabel]="loansDisbursedByStatusShowXAxisLabel"
+                    [showYAxisLabel]="loansDisbursedByStatusShowYAxisLabel"
+                    [xAxisLabel]="loansDisbursedByStatusXAxisLabel"
+                    [yAxisLabel]="loansDisbursedByStatusYAxisLabel"
+                    (select)="onSelect($event)"
+                />         
+            </div>
+        </mat-card>
+    </div>    
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #taNeedsByGenderContentDiv (click)="expandTANeedsByGenderBarChart()"> 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{TANeedsByGenderChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                <ngx-charts-bar-vertical-2d
+                    [scheme]="chartSColorScheme"
+                    [results]="TANeedsByGender"
+                    [gradient]="gradient"
+                    [xAxis]="TANeedsByGenderShowXAxis"
+                    [yAxis]="TANeedsByGenderShowYAxis"
+                    [legend]="TANeedsByGenderShowLegend"
+                    [showXAxisLabel]="TANeedsByGenderShowXAxisLabel"
+                    [showYAxisLabel]="TANeedsByGenderShowYAxisLabel"
+                    [xAxisLabel]="TANeedsByGenderXAxisLabel"
+                    [yAxisLabel]="TANeedsByGenderYAxisLabel"
+                    (select)="onSelect($event)"
+                />        
+            </div>
+        </mat-card>
+    </div>   
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #trainingByPartnerByGenderContentDiv (click)="expandTrainingByPartnerByGenderBarChart()"> 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{trainingByPartnerByGenderChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                <ngx-charts-bar-vertical-2d
+                    [scheme]="chartSColorScheme"
+                    [results]="trainingByPartnerByGender"
+                    [gradient]="gradient"
+                    [xAxis]="trainingByPartnerByGenderShowXAxis"
+                    [yAxis]="trainingByPartnerByGenderShowYAxis"
+                    [legend]="trainingByPartnerByGenderShowLegend"
+                    [showXAxisLabel]="trainingByPartnerByGenderShowXAxisLabel"
+                    [showYAxisLabel]="trainingByPartnerByGenderShowYAxisLabel"
+                    [xAxisLabel]="trainingByPartnerByGenderXAxisLabel"
+                    [yAxisLabel]="trainingByPartnerByGenderYAxisLabel"
+                    (select)="onSelect($event)" 
+                />        
+            </div>
+        </mat-card>
+    </div> 
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #taTrainedBySectorContentDiv (click)="expandTaTrainedBySectorBarChart()"> 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{taTrainedBySectorChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                <ngx-charts-bar-horizontal
+                    [scheme]="chartSColorScheme"
+                    [results]="taTrainedBySector"
+                    [gradient]="gradient"
+                    [xAxis]="taTrainedBySectorShowXAxis"
+                    [yAxis]="taTrainedBySectorShowYAxis"
+                    [legend]="taTrainedBySectorShowLegend"
+                    [showXAxisLabel]="taTrainedBySectorShowXAxisLabel"
+                    [showYAxisLabel]="taTrainedBySectorShowYAxisLabel"
+                    [xAxisLabel]="taTrainedBySectorYAxisLabel"
+                    [yAxisLabel]="taTrainedBySectorXAxisLabel"
+                    (select)="onSelect($event)"
+                />         
+            </div>
+        </mat-card>
+    </div>  
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #accessedVSOutStandingAmountContentDiv (click)="expandAccessedVSOutStandingAmountBarChart()"> 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{accessedVSOutStandingAmountChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                <ngx-charts-bar-vertical-2d
+                    [scheme]="chartSColorScheme"
+                    [results]="accessedVSOutStandingAmount"
+                    [gradient]="gradient"
+                    [xAxis]="accessedVSOutStandingAmountShowXAxis"
+                    [yAxis]="accessedVSOutStandingAmountShowYAxis"
+                    [legend]="accessedVSOutStandingAmountShowLegend"
+                    [showXAxisLabel]="accessedVSOutStandingAmountShowXAxisLabel"
+                    [showYAxisLabel]="accessedVSOutStandingAmountShowYAxisLabel"
+                    [xAxisLabel]="accessedVSOutStandingAmountXAxisLabel"
+                    [yAxisLabel]="accessedVSOutStandingAmountYAxisLabel"
+                    (select)="onSelect($event)" 
+                />        
+            </div>
+        </mat-card>
+    </div> 
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #taTrainedBySegmentContentDiv (click)="expandTaTrainedBySegmentPieChart()"> 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{taTrainedBySegmentChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                <app-pie-chart 
+            [data]="taTrainedBySegment" 
+            [showLegend]="taTrainedBySegmentShowLegend" 
+            [colorScheme]="chartSColorScheme" 
+            [showLabels]="taTrainedBySegmentShowLabels" 
+            [explodeSlices]="taTrainedBySegmentExplodeSlices" 
+            [doughnut]="taTrainedBySegmentDoughnut" 
+            />        
+            </div>
+        </mat-card>
+    </div>  
+
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #countyTrainedBusinessesMapContentDiv > 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>Training By County</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                <app-kenyan-map 
+                [mapWidth]="450" 
+                [mapHeight]="350" 
+                [countyData]="countyData" 
+                [countyDataToBePicked]="'businessesTrained'"
+                />        
+            </div>
+        </mat-card>
+    </div>
+
+   
+</div>

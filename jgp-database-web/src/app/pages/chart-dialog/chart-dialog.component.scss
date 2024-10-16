@@ -1,0 +1,34 @@
+.chart-props {
+    height: 100% !important;
+    width: 100%;
+}
+
+.chart-container {
+    border: 2px solid rebeccapurple;
+    margin: 5px;
+    height: 100%;
+}
+
+.close-button{
+    float: right;
+    top:2px;
+    right:-10px;
+  }
+  
+  .close-icon {
+    transition: 1s ease-in-out;
+  }
+  
+  .close-icon:hover {
+    transform: rotate(180deg);
+  }
+  
+  ::ng-deep .icon-outside .close-button{
+    float: right;
+    top:-52px;
+    right:-52px;
+  }
+  
+  ::ng-deep .icon-outside .chart-container {
+   overflow: unset
+  }

@@ -1,0 +1,60 @@
+@if (selectedUserRole | async; as selectedUserRole){
+    <app-content-header 
+        [icon]="'supervisor_account'" 
+        [title]="selectedUserRole.roleName" 
+        [desc]="'View information about the Selected User Role and be able to edit or delete the Role.'"
+        [hideBreadcrumb]="false"
+        [hasBgImage]="true" 
+        [class]="'pb-5'"></app-content-header>
+    
+       
+    <div fxLayout="column" class="p-2">
+        <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="end center" class="px-2 user-toolbar">
+            <div class="action-button" fxLayoutGap="25px">
+                <button mat-raised-button color="primary" *jgpHasPermission="'USER_ROLE_UPDATE'" [routerLink]="['/user-roles', selectedUserRole.id, 'edit']">
+                  <mat-icon>edit</mat-icon>&nbsp;&nbsp;Edit
+                </button>
+                <button mat-raised-button color="warn" >
+                    <mat-icon>delete</mat-icon>&nbsp;&nbsp;Delete
+                  </button>
+              </div>
+        </mat-toolbar>
+       
+        <div class="p-2 container">
+            <mat-card>
+                <mat-card-content>
+                  <div fxLayout="row wrap" fxLayout.lt-md="column">
+                    <h2 class="mat-h2" fxFlexFill>{{ selectedUserRole.roleName }}</h2>
+            
+                    <mat-divider [inset]="true"></mat-divider>
+            
+                    <h3 class="mat-h3" fxFlexFill>Details</h3>
+            
+                    <mat-divider [inset]="true"></mat-divider>
+            
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Role Name:</span>
+                      <span fxFlex="60%">{{ selectedUserRole.roleName }}</span>
+                    </div>
+            
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Description:</span>
+                      <span fxFlex="60%">{{ selectedUserRole.description }}</span>
+                    </div>
+                    <mat-divider></mat-divider>
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Attached Permission:</span>
+                      <div fxFlex="60%">
+                        @for (permission of selectedUserRole.permissions; track $index) {
+                          <span>{{permission}}</span>
+                        <br>
+                        }
+
+                      </div>
+                    </div>
+                    </div>
+                    </mat-card-content>
+                    </mat-card>
+        </div>
+    </div>
+    }

@@ -1,0 +1,17 @@
+<mat-sidenav-container class="h-100">
+    <div fxLayout="row" fxLayoutAlign="center center" class="h-100">
+         <div fxFlex="80" fxFlex.gt-sm="30" fxFlex.sm="60" class="mat-elevation-z6">
+              <app-content-header 
+                  [icon]="'warning'" 
+                  [title]="'Unauthorized !!'" 
+                  [hideBreadcrumb]="true"
+                  [hasBgImage]="true" 
+                  [class]="'pt-4 pb-3'"></app-content-header>            
+              <div class="p-4 text-center">
+                  <h2 class="py-2 red-color">Access Denied</h2>
+                  <p class="pt-2">Opps, Looks like you do not have enough permissions.</p> 
+                  <p class="pt-2">Contact system admin if this is not expected.</p> 
+              </div>
+          </div>
+    </div>
+  </mat-sidenav-container>

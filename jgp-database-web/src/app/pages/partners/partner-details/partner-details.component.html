@@ -1,0 +1,49 @@
+@if (selectedPartner | async; as selectedPartner){
+<app-content-header 
+    [icon]="'supervisor_account'" 
+    [title]="selectedPartner.partnerName" 
+    [desc]="'View information about the Selected Partner and be able to edit or delete the Partner.'"
+    [hideBreadcrumb]="false"
+    [hasBgImage]="true" 
+    [class]="'pb-5'"></app-content-header>
+
+   
+<div fxLayout="column" class="p-2">
+    <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="end center" class="px-2 user-toolbar">
+        <div class="action-button" fxLayoutGap="25px">
+            <button mat-raised-button color="primary" *jgpHasPermission="'PARTNERS_UPDATE'" [routerLink]="['/partners',selectedPartner.id, 'edit']">
+              <mat-icon>edit</mat-icon>&nbsp;&nbsp;Edit
+            </button>
+            <button mat-raised-button color="warn" >
+                <mat-icon>delete</mat-icon>&nbsp;&nbsp;Delete
+              </button>
+          </div>
+    </mat-toolbar>
+   
+    <div class="p-2 container">
+        <mat-card>
+            <mat-card-content>
+              <div fxLayout="row wrap" fxLayout.lt-md="column">
+                <h2 class="mat-h2" fxFlexFill>{{ selectedPartner.partnerName }}</h2>
+        
+                <mat-divider [inset]="true"></mat-divider>
+        
+                <h3 class="mat-h3" fxFlexFill>Details</h3>
+        
+                <mat-divider [inset]="true"></mat-divider>
+        
+                <div fxFlexFill>
+                  <span fxFlex="40%">Partner Name:</span>
+                  <span fxFlex="60%">{{ selectedPartner.partnerName }}</span>
+                </div>
+        
+                <div fxFlexFill>
+                  <span fxFlex="40%">Partner Type:</span>
+                  <span fxFlex="60%">{{ selectedPartner.type }}</span>
+                </div>
+                </div>
+                </mat-card-content>
+                </mat-card>
+    </div>
+</div>
+}

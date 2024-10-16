@@ -1,0 +1,28 @@
+<div class="favorites-container" fxLayout="row" fxLayoutAlign="center center">
+  @if (favorites) {
+  <div fxLayout="row" fxLayoutAlign="center center" class="">
+    @for (favorite of favorites; track favorite) {
+    <div class="mx-1" [matTooltip]="favorite.title" matTooltipPosition="below">
+      @if (favorite.href) {
+      <a mat-icon-button [attr.href]="favorite.href"
+        [attr.target]="favorite.target"><mat-icon>{{favorite.icon}}</mat-icon></a>
+      }
+      @if (favorite.routerLink) {
+      <a mat-icon-button [routerLink]="[favorite.routerLink]"><mat-icon>{{favorite.icon}}</mat-icon></a>
+      }
+    </div>
+    }
+  </div>
+  }
+  <mat-form-field matTooltip="Click to add/remove shortcut" matTooltipPosition="below" class="hide-hint">
+    <mat-select placeholder="Select favorite" [(value)]="favorites" multiple>
+      @for (item of menuItems; track item.id) {
+      <mat-option [value]="item">
+        <div fxLayout="row" fxLayoutAlign="space-between center" [style.width.px]="250">
+          <span>{{item.title}}</span><mat-icon class="secondary-text-color">{{item.icon}}</mat-icon>
+        </div>
+      </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div>

@@ -1,0 +1,158 @@
+<app-content-header [title]="'Chat'" [hideBreadcrumb]="false" [hasBgImage]="true" [class]="'pb-5'"></app-content-header>
+
+<mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="space-between center" class="px-2 chat-toolbar">
+    <div fxLayout="row">
+        <button mat-icon-button (click)="sidenav.toggle()" class="default-contrast">
+            <mat-icon>list</mat-icon>
+        </button>
+    </div>
+    @if (currentChat) { 
+        <div fxLayout="row" fxLayoutAlign="center center">
+            <mat-list class="p-0">
+                <mat-list-item class="p-0">
+                    <img matListItemAvatar [src]="currentChat.image" class="author-img">
+                </mat-list-item>
+            </mat-list>
+            <span class="author-name">{{currentChat.author}}</span>
+            <button mat-icon-button [matMenuTriggerFor]="personMenu" #personMenuTrigger="matMenuTrigger" class="default-contrast">
+                <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #personMenu="matMenu" xPosition="before">
+                <span (mouseleave)="personMenuTrigger.closeMenu()">
+                    <button mat-menu-item (click)="personInfo.toggle()">
+                        <mat-icon>account_circle</mat-icon>
+                        <span>Contact info</span>
+                    </button>
+                    <button mat-menu-item>
+                        <mat-icon>volume_mute</mat-icon>
+                        <span>Mute</span>
+                    </button>
+                    <button mat-menu-item>
+                        <mat-icon>delete_forever</mat-icon>
+                        <span>Clear chat</span>
+                    </button>
+                </span>
+            </mat-menu>
+        </div>
+    }
+</mat-toolbar>
+
+<div fxLayout="row wrap">
+    <div fxFlex="100">
+        <mat-card class="p-0 chat">
+            <mat-drawer-container class="chat-container">
+                <mat-drawer #sidenav [opened]="sidenavOpen" [mode]="sidenavOpen ? 'side' : 'over'"
+                    class="chat-sidenav mat-elevation-z1" autoFocus="false">
+                    <mat-nav-list class="p-0 chat-sidenav-list">
+                        <ng-scrollbar orientation="vertical">
+                            @for (chat of chats; track chat) { 
+                                <mat-list-item (click)="getChat(chat)">
+                                    <img matListItemAvatar [src]="chat.image">
+                                    <h6 matListItemTitle> {{chat.author}} </h6>
+                                    <p matListItemLine fxLayout="row" fxLayoutAlign="none center" class="secondary-text-color pt-1">
+                                        <mat-icon class="chat-status-icon">
+                                            @switch (chat.authorStatus) {
+                                                @case ('Online') { 
+                                                    check_circle
+                                                }
+                                                @case ('Offline') { 
+                                                    highlight_off
+                                                }
+                                                @case ('Away') { 
+                                                    schedule 
+                                                }
+                                                @case ('Do not disturb') { 
+                                                    not_interested 
+                                                } 
+                                            } 
+                                        </mat-icon>
+                                        <span class="author-status">{{chat.authorStatus}}</span>
+                                    </p>
+                                </mat-list-item>
+                            }
+                        </ng-scrollbar>
+                    </mat-nav-list>
+                </mat-drawer>
+
+                <div>
+                    <div class="chat-content" [class.actions-visible]="talks">
+                        <ng-scrollbar orientation="vertical">
+                            @if (talks) {
+                                <mat-list class="p-0">
+                                    @for (talk of talks; track talk) {
+                                        <mat-list-item class="talk-item">
+                                            <img matListItemAvatar [src]="talk.image">
+                                            <p class="message">
+                                                <span [ngClass]="(talk.my) ? 'bg-primary' : 'bg-accent'">{{talk.text}}</span>
+                                            </p>
+                                            <p class="message-date">
+                                                <small>{{talk.date | date:"dd MMMM, yyyy 'at' HH:mm"}}</small>
+                                            </p>
+                                        </mat-list-item>
+                                    }
+                                </mat-list>
+                            } @else {
+                                <div fxLayout="column" fxLayoutAlign="center center" class="h-100 empty">
+                                    <mat-icon>chat</mat-icon>
+                                    <p>Select a interlocutor for talk</p>
+                                </div>
+                            } 
+                        </ng-scrollbar>
+                    </div>
+                    @if (talks) {
+                        <mat-card class="chat-actions">
+                            <div fxLayout="row" fxLayoutAlign="space-between start">
+                                <mat-form-field class="w-100">
+                                    <input matInput placeholder="Enter your text..." (keyup)="sendMessage($event)"
+                                        [(ngModel)]="newMessage">
+                                </mat-form-field>
+                                <div fxLayout="row" fxLayoutAlign="center center">
+                                    <button mat-icon-button type="button" class="mx-2">
+                                        <mat-icon>attach_file</mat-icon>
+                                    </button>
+                                    <button mat-mini-fab color="primary" type="button" (click)="sendMessage($event)">
+                                        <mat-icon>send</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </mat-card>
+                    }                   
+                </div>
+
+                <mat-drawer #personInfo mode="over" position="end" class="person-info-sidenav mat-elevation-z1"
+                    autoFocus="false">
+                    <ng-scrollbar pointerEventsMethod="scrollbar">
+                        <div class="p-0 h-100">
+                            <div class="bg-primary w-100 text-center">
+                                <div fxLayout="row" fxLayoutAlign="space-between center" class="p-2">
+                                    <h2>Contact Info</h2>
+                                    <button mat-icon-button
+                                        (click)="personInfo.toggle()"><mat-icon>close</mat-icon></button>
+                                </div>
+                                @if (currentChat) {
+                                    <img [src]="currentChat.image" class="py-2">
+                                    <h2 class="pb-3">{{currentChat.author}}</h2>
+                                }
+                            </div>
+                            <mat-list>
+                                <mat-list-item>
+                                    <mat-icon matListItemIcon class="secondary-text-color">mail_outline</mat-icon>
+                                    <div matListItemTitle>author&#64;gmail.com</div>
+                                </mat-list-item>
+                                <mat-list-item>
+                                    <mat-icon matListItemIcon class="secondary-text-color">call</mat-icon>
+                                    <div matListItemTitle>(202) 756-9756</div>
+                                </mat-list-item>
+                                <mat-list-item>
+                                    <mat-icon matListItemIcon class="secondary-text-color">location_on</mat-icon>
+                                    <div matListItemTitle>2903 Avenue Z, Brooklyn, NY</div>
+                                </mat-list-item>
+                            </mat-list>
+                        </div>
+                    </ng-scrollbar>
+                </mat-drawer>
+
+            </mat-drawer-container>
+        </mat-card>
+    </div>
+</div>

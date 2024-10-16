@@ -1,0 +1,46 @@
+<app-content-header [icon]="'view_array'" [title]="'NGX DataTable'" [hideBreadcrumb]="false" [hasBgImage]="true" [class]="'pb-4'"></app-content-header>
+
+<div fxLayout="column" class="p-2">
+    <div class="p-2">
+        <div fxLayout="column" class="mat-elevation-z8 p-1">
+            <mat-form-field class="w-100">
+                <input matInput placeholder="Type to filter the name column..." (keyup)="updateFilter($event)">
+            </mat-form-field>
+        </div>
+        <ngx-datatable #table class="material" [headerHeight]="50" [limit]="10" [columnMode]="'force'"
+            [footerHeight]="50" [rowHeight]="'auto'" [rows]="rows" [loadingIndicator]="loadingIndicator"
+            [selected]="selected" [selectionType]="selection" (activate)="onActivate($event)"
+            (select)='onSelect($event)'>
+            <ngx-datatable-column [width]="30" [sortable]="false" [canAutoResize]="false" [draggable]="true"
+                [resizeable]="false" [headerCheckboxable]="true" [checkboxable]="true">
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Name">
+                <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value" let-row="row">
+                    @if (editing[rowIndex + '-name']) {
+                    <input autofocus (blur)="updateValue($event, 'name', rowIndex)" type="text" [value]="value" />
+                    } @else {
+                    <span title="Double click to edit" (dblclick)="editing[rowIndex + '-name'] = true">{{value}}</span>
+                    }
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Gender">
+                <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row" let-value="value">
+                    @if (editing[rowIndex + '-gender']) {
+                    <select (change)="updateValue($event, 'gender', rowIndex)" [value]="value">
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                    } @else {
+                    <span title="Double click to edit"
+                        (dblclick)="editing[rowIndex + '-gender'] = true">{{value}}</span>
+                    }
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Company">
+                <ng-template ngx-datatable-cell-template let-value="value">
+                    {{value}}
+                </ng-template>
+            </ngx-datatable-column>
+        </ngx-datatable>
+    </div>
+</div>

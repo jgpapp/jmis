@@ -1,0 +1,44 @@
+
+    <form [formGroup]="dashFilterForm" fxLayout="row wrap" fxLayoutAlign="center center"> 
+        <mat-form-field appearance="outline" fxFlex="100" fxFlex.xl="20" fxFlex.lg="20" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
+            <mat-label>Select Partner</mat-label>
+            <mat-select formControlName="selectedPartnerId" (selectionChange)="filterFormChanged()">
+                @for (partner of partners; track partner) {
+                    <mat-option [value]="partner.id">{{partner.partnerName}}</mat-option>
+                  }
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" fxFlex="100" fxFlex.xl="20" fxFlex.lg="20" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
+            <mat-label>Select TA Needs</mat-label>
+            <mat-select formControlName="selectedTANeeds" (selectionChange)="filterFormChanged()">
+                <mat-option value="Financial literacy ">Financial literacy </mat-option>
+                <mat-option value="Record Keeping">Record Keeping</mat-option>
+                <mat-option value="Digitization">Digitization</mat-option>
+                <mat-option value="Market access">Market access</mat-option>
+                <mat-option value="Other">Other</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" fxFlex="100" fxFlex.xl="20" fxFlex.lg="20" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
+            <mat-label>Select Industry Sector</mat-label>
+            <mat-select formControlName="selectedSector" (selectionChange)="filterFormChanged()">
+                <mat-option value="Agriculture">Agriculture</mat-option>
+                <mat-option value="Artists/artisans">Artists/artisans</mat-option>
+                <mat-option value="Manufacturing">Manufacturing</mat-option>
+                <mat-option value="Trading and Retail">Trading and Retail</mat-option>
+                <mat-option value="Other">Other</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field fxFlex="100" fxFlex.xl="20" fxFlex.lg="20" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
+            <input matInput [matDatepicker]="dateFrom" placeholder="Date From" formControlName="selectedDateFrom" 
+            (dateInput)="filterFormChanged()" (dateChange)="filterFormChanged()">
+            <mat-datepicker-toggle matSuffix [for]="dateFrom"></mat-datepicker-toggle>
+            <mat-datepicker #dateFrom></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field fxFlex="100" fxFlex.xl="20" fxFlex.lg="20" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
+            <input matInput [matDatepicker]="dateTo" placeholder="Date To" formControlName="selectedDateTo" 
+            (dateInput)="filterFormChanged()" (dateChange)="filterFormChanged()">
+            <mat-datepicker-toggle matSuffix [for]="dateTo"></mat-datepicker-toggle>
+            <mat-datepicker #dateTo></mat-datepicker>
+        </mat-form-field>
+    </form>

@@ -1,0 +1,1 @@
+ALTER TABLE participants ADD COLUMN location_county_code VARCHAR(100) DEFAULT '999';

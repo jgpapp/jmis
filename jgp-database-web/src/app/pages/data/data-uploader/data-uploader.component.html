@@ -1,0 +1,69 @@
+@if(authService.hasPermission('LOAN_UPLOAD') || authService.hasPermission('BMO_PARTICIPANTS_DATA_UPLOAD')){
+<app-content-header 
+    [icon]="'supervisor_account'" 
+    [title]="'Data Upload'" 
+    [desc]="'Download template, upload filled template.'"
+    [hideBreadcrumb]="false"
+    [hasBgImage]="true" 
+    [class]="'pb-5'"></app-content-header>
+
+<div fxLayout="column" class="p-2">
+    <div class="p-2">
+        <div fxLayoutGap="2%" class="m-b-20">
+            <mat-card fxLayout="column" fxLayoutGap="2%" fxFlex="50%">
+              <h3>
+                <strong>Download Data Uploading Template</strong>
+              </h3>
+        
+              <form [formGroup]="bulkImportForm">
+                <mat-card-content>
+                  <div>
+                    <mat-form-field fxFlex>
+                      <mat-label>Legal Form</mat-label>
+                      <mat-select required formControlName="legalForm">
+                        @if (partnerType === 'BMO') {
+                          <mat-option value="BMO_IMPORT_TEMPLATE">BMO Data Template</mat-option>
+                      }@else if (partnerType === 'FI') {
+                        <mat-option value="LOAN_IMPORT_TEMPLATE">Loan Template</mat-option>
+                      }
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </mat-card-content>
+              </form>
+        
+              <div fxFlex="13%">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  (click)="downloadTemplate()">
+                  <mat-icon>cloud_download</mat-icon>&nbsp;&nbsp;Download
+                </button>
+              </div>
+            </mat-card>
+        
+            <mat-card fxLayout="column" fxLayoutGap="2%" fxFlex="50%">
+              <h3>
+                <strong>{{ bulkImport.name }}</strong>
+              </h3>
+        
+              <h4>Select Excel File</h4>
+        
+              <jgp-file-upload flex="75%" (change)="onFileSelect($event)"></jgp-file-upload>
+        
+              <mat-hint>Please <strong>DO NOT</strong> change the names of the data template as they were downloaded.</mat-hint>
+        
+              <div fxFlex="13%">
+                <button mat-raised-button color="primary" [disabled]="!template" (click)="uploadTemplate()">
+                  <mat-icon>cloud_upload</mat-icon>&nbsp;&nbsp;Upload
+                </button>
+              </div>
+        
+            </mat-card>
+          </div>
+    </div>
+</div>
+}
+@else {
+    <app-no-permission />
+}

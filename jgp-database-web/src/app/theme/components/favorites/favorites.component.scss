@@ -1,0 +1,24 @@
+.favorites-container{
+    position: relative;
+    &:after {
+        font-family: 'Material Icons';
+        content: "\e87d";
+        font-size: 24px;
+        position: absolute;
+        right: -14px;
+        top: 12px;
+        pointer-events: none;
+        cursor: pointer;       
+    }
+    .mat-mdc-form-field {
+        width: 0;
+        margin: 0 12px;
+        .mdc-text-field--filled:not(.mdc-text-field--disabled) {
+            background: transparent;
+        }
+        .mat-mdc-select-arrow {
+            display: none;
+        }
+    }
+ 
+}

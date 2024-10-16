@@ -1,0 +1,41 @@
+<mat-sidenav-container class="h-100">
+    <div fxLayout="row" fxLayoutAlign="center center" class="h-100">
+        <form [formGroup]="userloginForm" (ngSubmit)="onSubmit()" fxFlex="90" fxFlex.gt-sm="30" fxFlex.sm="60" class="mat-elevation-z6">
+            <app-content-header 
+                  [icon]="'exit_to_app'" 
+                  [title]="'Login'" 
+                  [hideBreadcrumb]="true"
+                  [hasBgImage]="true" 
+                  [class]="'py-4'"></app-content-header>            
+            <div class="p-3">
+                <mat-form-field class="w-100">
+                    <mat-label>User Name</mat-label>
+                    <mat-icon matPrefix class="secondary-text-color">mail</mat-icon>
+                    <input matInput formControlName="username">
+                    <mat-error>
+                        @if (userloginForm.controls.username.errors?.required) {
+                            User Name is required
+                        }
+                        @if (userloginForm.controls.username.hasError('invalidEmail')) {
+                            Invalid email address
+                        }
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field class="w-100">
+                    <mat-label>Password</mat-label>
+                    <mat-icon matPrefix class="secondary-text-color">lock</mat-icon>
+                    <input matInput formControlName="password" type="password">
+                    <mat-error>
+                        @if (userloginForm.controls.password.errors?.required) {
+                            Password is required
+                        }
+                        @if (userloginForm.controls.password.hasError('minlength')) {
+                            Password isn't long enough, minimum of 1 characters
+                        }
+                    </mat-error>
+                </mat-form-field>               
+                <button mat-raised-button color="primary" class="mat-elevation-z6 w-100 mt-3" type="submit" [disabled]="!userloginForm.valid">SIGN IN</button>
+            </div>
+        </form>
+    </div>
+</mat-sidenav-container>

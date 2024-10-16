@@ -1,0 +1,43 @@
+    
+    <app-content-header 
+    [icon]="'supervisor_account'" 
+    [title]="'Edit Partner'" 
+    [desc]="'Provide information for all required fields to edit a partner.'"
+    [hideBreadcrumb]="false"
+    [hasBgImage]="true" 
+    [class]="'pb-5'"></app-content-header>
+
+   
+
+
+    <div fxLayout="column" fxLayout.gt-sm="row wrap" class="p-2" fxLayoutAlign="center">
+    <div fxFlex="70" class="p-2"> 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center">                
+                <mat-card-title>Edit Partner</mat-card-title>
+            </mat-card-header>
+            <mat-card-content fxLayoutAlign="center" class="pt-3">
+                <form [formGroup]="editPartnerForm" class="partner-form"> 
+                    <div fxLayout="row wrap" fxLayoutGap="2%">  
+                        <mat-form-field fxFlex="97%">
+                            <mat-label>Partner Name</mat-label>
+                            <input matInput formControlName="partnerName">
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" fxFlex="97%">
+                            <mat-label>Type</mat-label>
+                            <mat-select formControlName="type" required>
+                                <mat-option value="BMO">BMO</mat-option>
+                                <mat-option value="FI">Financial Intermediary</mat-option>
+                                <mat-option value="JGP">JGP</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    <div fxLayout="row" fxLayoutAlign="end center" fxFlex="100%" fxLayoutGap="2%">
+                        <button mat-raised-button color="warn">Cancel</button>
+                        <button mat-raised-button color="primary" (click)="onSubmitEditPartner()" [mat-dialog-close]="editPartnerForm.value" [disabled]="!editPartnerForm.valid">Update</button>
+                    </div>
+                    </div>
+                </form>
+            </mat-card-content>
+        </mat-card>
+    </div>          
+</div>

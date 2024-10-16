@@ -1,0 +1,101 @@
+<app-content-header
+    icon="dashboard" 
+    [desc]="partnerName"
+    [hideBreadcrumb]="true"
+    [hasBgImage]="true" 
+    [class]="'py-3'"></app-content-header>
+
+<div class="p-2">
+    <div fxLayout="row wrap">
+        <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2">
+            <mat-card class="gradient-orange tile p-2">
+                <mat-icon>group</mat-icon>
+                <h2>38</h2>
+                <p>Businesses Trained</p>
+            </mat-card>
+        </div>
+        <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2">
+            <mat-card class="gradient-pink tile p-2">
+                <mat-icon>pie_chart</mat-icon>
+                <h2>76</h2>
+                <p>Businesses Loaned</p>
+            </mat-card>
+        </div>
+        <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2">
+            <mat-card class="gradient-gray tile p-2">
+                <mat-icon>monetization_on</mat-icon>
+                <h2>KES 77.5M</h2>
+                <p>Disbursed Loan Amount</p>
+            </mat-card>
+        </div>
+        <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2">
+            <mat-card class="gradient-brown tile p-2">
+                <mat-icon>monetization_on</mat-icon>
+                <h2>KES 34.8M</h2>
+                <p>Outstanding Loan Amount</p>
+            </mat-card>
+        </div>
+    </div>
+    <div fxLayout="row wrap" #resizedDiv>
+        <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
+            <mat-card>
+                <mat-card-header fxLayoutAlign="center center">                
+                    <mat-card-title>{{loansDisbursedByGenderChartTitle}}</mat-card-title>
+                </mat-card-header>
+                <div class="w-100 h-300p">
+                    <app-pie-chart 
+                    [data]="loansDisbursedByGender" 
+                    [showLegend]="loansDisbursedByGenderShowLegend" 
+                    [colorScheme]="chartSColorScheme" 
+                    [showLabels]="loansDisbursedByGenderShowLabels" 
+                    [explodeSlices]="loansDisbursedByGenderExplodeSlices" 
+                    [doughnut]="loansDisbursedByGenderDoughnut"
+                    />       
+                </div>
+            </mat-card>
+        </div>
+        <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
+            <mat-card>
+                <mat-card-header fxLayoutAlign="center center">                
+                    <mat-card-title>{{loansDisbursedByPipelineChartTitle}}</mat-card-title>
+                </mat-card-header>
+                <div class="w-100 h-300p">
+                    <app-pie-chart 
+                [data]="loansDisbursedByPipeline" 
+                [showLegend]="loansDisbursedByPipelineShowLegend" 
+                [colorScheme]="chartSColorScheme" 
+                [showLabels]="loansDisbursedByPipelineShowLabels" 
+                [explodeSlices]="loansDisbursedByPipelineExplodeSlices" 
+                [doughnut]="loansDisbursedByPipelineDoughnut" 
+                />        
+                </div>
+            </mat-card>
+        </div>
+        <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
+            <mat-card>
+                <mat-card-header fxLayoutAlign="center center">                
+                    <mat-card-title>Loans Disbursed By Status</mat-card-title>
+                </mat-card-header>
+                <div class="w-100 h-300p">
+                    <ngx-charts-bar-vertical
+                        [scheme]="chartSColorScheme"
+                        [results]="loansDisbursedByStatus"
+                        [gradient]="gradient"
+                        [xAxis]="loansDisbursedByStatusShowXAxis"
+                        [yAxis]="loansDisbursedByStatusShowYAxis"
+                        [legend]="loansDisbursedByStatusShowLegend"
+                        [showXAxisLabel]="loansDisbursedByStatusShowXAxisLabel"
+                        [showYAxisLabel]="loansDisbursedByStatusShowYAxisLabel"
+                        [xAxisLabel]="loansDisbursedByStatusYAxisLabel"
+                        [yAxisLabel]="loansDisbursedByStatusXAxisLabel"
+                        (select)="onSelect($event)"
+                    />         
+                </div>
+            </mat-card>
+        </div>    
+        
+  
+    </div>
+   
+
+</div>

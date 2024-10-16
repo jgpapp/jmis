@@ -1,0 +1,15 @@
+
+    <div class="pt-3 doughnut-chart-container" (window:resize)="onResize($event)">
+            <ngx-charts-pie-chart
+                [scheme]="colorScheme"
+                [results]="data"
+                [legend]="showLegend"
+                [explodeSlices]="explodeSlices"
+                [labels]="showLabels"
+                [doughnut]="doughnut"
+                [gradient]="gradient"
+                [view]="chartView"
+                [labelFormatting]="chartFormatLabel"
+                (select)="onSelect($event)">
+            </ngx-charts-pie-chart> 
+        </div>

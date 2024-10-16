@@ -1,0 +1,7 @@
+<div class="p-2"> 
+    <google-map [center]="center" [zoom]="zoom">
+        @for (markerPosition of markerPositions; track markerPosition) {
+            <map-marker [position]="markerPosition" [options]="markerOptions"></map-marker>
+        }        
+    </google-map>
+</div> 

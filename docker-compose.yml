@@ -1,0 +1,50 @@
+version: '3.9'
+services:
+  postgres_jgp_db:
+    container_name: postgres_jgp_db
+    image: postgres:15.4-alpine
+    environment:
+      - POSTGRES_PASSWORD=S3cretHptu
+      - POSTGRES_USER=jgp_user
+      - POSTGRES_DB=jgp_db
+    networks:
+      - jgp-app-network
+    volumes:
+      - /data/jgpData:/var/lib/postgresql/data
+  jgp_app:
+    container_name: jgp_app
+    build:
+      context: https://github.com/simiyu17/JGPDataApplication.git#:jgp-database-app
+      dockerfile: Dockerfile
+      args:
+        GITHUB_TOKEN: ${GITHUB_TOKEN}
+    restart: on-failure
+    networks:
+      - jgp-app-network
+    environment:
+      - POSTGRESQL_HOST=postgres_jgp_db
+      - POSTGRESQL_PORT=5432
+      - POSTGRESQL_USER=jgp_user
+      - POSTGRESQL_PASSWORD=S3cretHptu
+      - POSTGRESQL_DATABASE=jgp_db
+    depends_on:
+      - postgres_jgp_db
+    ports:
+      - "8082:8082"
+  jgp_app_ui:
+    container_name: jgp_app_ui
+    build:
+      context: https://github.com/simiyu17/JGPDataApplication.git#:jgp-database-web
+      dockerfile: Dockerfile
+      args:
+        GITHUB_TOKEN: ${GITHUB_TOKEN}
+    restart: on-failure
+    networks:
+      - jgp-app-network
+    depends_on:
+      - jgp_app
+    ports:
+      - "80:80"
+networks:
+  jgp-app-network:
+    driver: bridge

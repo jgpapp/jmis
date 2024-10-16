@@ -1,0 +1,1 @@
+INSERT INTO permission (entity_name, action_name, code)VALUES('USER_ROLE', 'READ', 'USER_ROLE_READ');

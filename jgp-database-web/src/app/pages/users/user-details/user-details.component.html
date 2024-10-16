@@ -1,0 +1,89 @@
+@if (selectedUser | async; as selectedUser){
+    <app-content-header 
+        [icon]="'supervisor_account'" 
+        title="{{selectedUser.firstName}} {{selectedUser.lastName}}" 
+        [desc]="'View information about the Selected User and be able to edit or block the User.'"
+        [hideBreadcrumb]="false"
+        [hasBgImage]="true" 
+        [class]="'pb-5'"></app-content-header>
+    
+       
+    <div fxLayout="column" class="p-2">
+        <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="end center" class="px-2 user-toolbar">
+            <div class="action-button" fxLayoutGap="25px">
+                <button mat-raised-button color="primary"  *jgpHasPermission="'USERS_UPDATE'" [routerLink]="['/users',selectedUser.id, 'edit']">
+                  <mat-icon>edit</mat-icon>&nbsp;&nbsp;Edit
+                </button>
+                <button mat-raised-button color="warn" >
+                    <mat-icon>lock</mat-icon>&nbsp;&nbsp;Lock
+                  </button>
+              </div>
+        </mat-toolbar>
+       
+        <div class="p-2 container">
+            <mat-card>
+                <mat-card-content>
+                  <div fxLayout="row wrap" fxLayout.lt-md="column">
+                    <h2 class="mat-h2" fxFlexFill>{{selectedUser.firstName}} {{selectedUser.lastName}}'s Details</h2>
+            
+                    <mat-divider [inset]="true"></mat-divider>            
+                    <mat-divider [inset]="true"></mat-divider>
+            
+                    <div fxFlexFill>
+                      <span fxFlex="40%">First Name:</span>
+                      <span fxFlex="60%">{{ selectedUser.firstName }}</span>
+                    </div>
+            
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Last Name:</span>
+                      <span fxFlex="60%">{{ selectedUser.lastName }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                        <span fxFlex="40%">Email:</span>
+                        <span fxFlex="60%">{{ selectedUser.username }}</span>
+                      </div>
+
+                      <div fxFlexFill>
+                        <span fxFlex="40%">Cell Phone:</span>
+                        <span fxFlex="60%">{{ selectedUser.cellPhone }}</span>
+                      </div>
+
+                    <div fxFlexFill>
+                        <span fxFlex="40%">Gender:</span>
+                        <span fxFlex="60%">{{ selectedUser.gender }}</span>
+                      </div>
+
+                      <div fxFlexFill>
+                        <span fxFlex="40%">Partner Name:</span>
+                        <span fxFlex="60%">{{ selectedUser.partnerName }}</span>
+                      </div>
+
+                      <div fxFlexFill>
+                        <span fxFlex="40%">Designation:</span>
+                        <span fxFlex="60%">{{ selectedUser.designation }}</span>
+                      </div>
+
+                      
+
+                      <div fxFlexFill>
+                        <span fxFlex="40%">Address:</span>
+                        <span fxFlex="60%">{{ selectedUser.town }}</span>
+                      </div>
+
+                      <div fxFlexFill>
+                        <span fxFlex="40%">Attached User Roles:</span>
+                        <div fxFlex="60%">
+                          @for (userRole of selectedUser.userRoles; track $index) {
+                            <span>{{userRole}}</span>
+                          <br>
+                          }
+  
+                        </div>
+                      </div>
+                    </div>
+                    </mat-card-content>
+                    </mat-card>
+        </div>
+    </div>
+    }

@@ -1,0 +1,1 @@
+ALTER TABLE participants ADD COLUMN gender_category VARCHAR(100) NULL;

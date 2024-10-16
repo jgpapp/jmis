@@ -1,0 +1,46 @@
+@if(authService.hasPermission('PARTICIPANTS_READ')){
+<app-content-header 
+    [icon]="'supervisor_account'" 
+    [title]="'Project Participants'" 
+    [desc]="'View information about the Project Participants.'"
+    [hideBreadcrumb]="false"
+    [hasBgImage]="true" 
+    [class]="'pb-5'"></app-content-header>
+
+<div fxLayout="column" class="p-2">
+    <div class="p-2">
+        <mat-table #table [dataSource]="dataSource" class="mat-elevation-z8">
+            <ng-container matColumnDef="businessName">
+                <mat-header-cell *matHeaderCellDef> Business Name </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.businessName}} </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="jgpId">
+                <mat-header-cell *matHeaderCellDef> JGP / National ID </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.jgpId}} </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="phoneNumber">
+                <mat-header-cell *matHeaderCellDef> Phone Number </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.phoneNumber}} </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="ownerGender">
+                <mat-header-cell *matHeaderCellDef> Owner Gender </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.ownerGender}} </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="businessLocation">
+                <mat-header-cell *matHeaderCellDef> Business Location </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.businessLocation}} </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="industrySector">
+                <mat-header-cell *matHeaderCellDef> Industry Sector </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.industrySector}} </mat-cell>
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;" [routerLink]="['/participants', row.id, 'details']"></mat-row>
+        </mat-table>
+        <mat-paginator #paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"></mat-paginator>
+    </div>
+</div>
+}
+@else {
+    <app-no-permission />
+}

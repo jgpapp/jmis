@@ -1,0 +1,26 @@
+  <div class="file-upload">
+    <button mat-raised-button color="primary" (click)="fileInput.click()">
+      Choose File
+    </button>
+    <input type="file" #fileInput (change)="onFileSelected($event)" hidden>
+  
+    @if (file) {
+      <span>{{ file.name }}</span>
+    }
+    
+  
+    <button mat-raised-button color="accent" (click)="uploadExcel()" [disabled]="!file">
+      Upload File
+    </button>
+
+  @if (uploadProgress !== null) {
+    <div>
+      <mat-progress-spinner [value]="uploadProgress" mode="determinate"></mat-progress-spinner>
+      <span>{{ uploadProgress }}%</span>
+    </div>
+  }
+  
+</div>
+
+  
+  
