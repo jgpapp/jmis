@@ -15,6 +15,8 @@ public interface DashboardService {
 
     List<DataPointDto> getLoanDisbursedByGenderSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
 
+    List<DataPointDto> getLoanDisbursedByIndustrySectorSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
+
     List<DataPointDto> getBusinessOwnersTrainedByGenderSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
 
     List<DataPointDto> getLoanDisbursedByPipelineSourceSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);

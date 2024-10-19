@@ -65,6 +65,20 @@ export class BmoDashboardComponent implements OnInit {
   public taTrainedBySectorYAxisLabel: string = 'Number Of Participants';
   public taTrainedBySectorChartTitle: string = 'TA Training By Industry Sector';
 
+  public taTrainedBySegment: any[];
+  public taTrainedBySegmentShowLegend: boolean = false;
+  public taTrainedBySegmentShowLabels: boolean = true;
+  public taTrainedBySegmentExplodeSlices: boolean = false;
+  public taTrainedBySegmentDoughnut: boolean = false;
+  public taTrainedBySegmentChartTitle: string = 'TA By Business Segment';
+
+  public businessesTainedByGender: any[];
+  public businessesTainedByGenderShowLegend: boolean = false;
+  public businessesTainedByGenderShowLabels: boolean = true;
+  public businessesTainedByGenderExplodeSlices: boolean = false;
+  public businessesTainedByGenderDoughnut: boolean = true;
+  public businessesTainedByGenderChartTitle: string = 'Business Trained By Gender';
+
   private unsubscribe$ = new Subject<void>();
   constructor(private authService: AuthService, private dashBoardService: DashboardService){
 
@@ -74,6 +88,8 @@ export class BmoDashboardComponent implements OnInit {
     this.partnerId = this.authService.currentUser()?.partnerId;
     this.getTaNeedsByGenderSummary();
     this.getTaTrainingBySectorSummary();
+    this.getTaTrainingBySegmentSummary();
+    this.getBusinessesTrainedByGenderSummary();
   }
 
 
@@ -98,6 +114,29 @@ export class BmoDashboardComponent implements OnInit {
         error: (error) => { }
       });
   }
+
+  getTaTrainingBySegmentSummary() {
+    this.dashBoardService.getTaTrainingBySegmentSummary(this.partnerId)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.taTrainedBySegment = response;
+        },
+        error: (error) => { }
+      });
+  }
+
+  getBusinessesTrainedByGenderSummary() {
+    this.dashBoardService.getBusinessesTrainedByGenderSummary(this.partnerId)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.businessesTainedByGender = response;
+        },
+        error: (error) => { }
+      });
+  }
+
 
   public onSelect(event: any) {
     console.log(event);

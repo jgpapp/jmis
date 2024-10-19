@@ -87,6 +87,24 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    public List<DataPointDto> getLoanDisbursedByIndustrySectorSummary(LocalDate fromDate, LocalDate toDate, Long partnerId) {
+        final DataPointMapper rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = getDefaultQueryDates().getLeft();
+            toDate = getDefaultQueryDates().getRight();
+        }
+        var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        if (Objects.nonNull(partnerId)){
+            parameters.addValue(PARTNER_ID_PARAM, partnerId);
+            loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
+        }
+        var sqlQuery = String.format(DataPointMapper.LOANS_DISBURSED_BY_SECTOR_SCHEMA, loanWhereClause);
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
     public List<DataPointDto> getBusinessOwnersTrainedByGenderSummary(LocalDate fromDate, LocalDate toDate, Long partnerId) {
         final DataPointMapper rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -306,10 +324,16 @@ public class DashboardServiceImpl implements DashboardService {
                 from loans l left join participants p on l.participant_id = p.id %s  group by 1;\s
                 """;
 
+        public static final String LOANS_DISBURSED_BY_SECTOR_SCHEMA = """
+                select p.industry_sector as dataKey, sum(l.loan_amount_accessed) as dataValue,\s
+                SUM(l.loan_amount_accessed) * 100.0 / SUM(SUM(l.loan_amount_accessed)) OVER () AS percentage\s
+                from loans l left join participants p on l.participant_id = p.id %s  group by 1;\s
+                """;
+
         public static final String BUSINESSES_TRAINED_BY_GENDER_SCHEMA = """
                 select p.gender_category as dataKey, count(p.id) as dataValue,\s
                 count(p.id) * 100.0 / count(count(p.id)) OVER () AS percentage\s
-                from bmo_participants_data bpd inner join participants p on bpd.participant_id = p.id\s
+                from participants p inner join bmo_participants_data bpd on bpd.participant_id = p.id\s
                 inner join partners p2 on p2.id = bpd.partner_id %s  group by 1;\s
                 """;
 
