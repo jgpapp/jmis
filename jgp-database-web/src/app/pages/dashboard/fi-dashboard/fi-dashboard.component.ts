@@ -69,6 +69,13 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   public loansDisbursedByStatusYAxisLabel: string = 'Amount Disbursed';
   public loansDisbursedByStatusChartTitle: string = 'Loan Disbursed by Pipeline Source';
 
+  public loansDisbursedBySector: any[];
+  public loansDisbursedBySectorShowLegend: boolean = false;
+  public loansDisbursedBySectorShowLabels: boolean = true;
+  public loansDisbursedBySectorExplodeSlices: boolean = false;
+  public loansDisbursedBySectorDoughnut: boolean = true;
+  public loansDisbursedBySectorChartTitle: string = 'Loan Disbursed by Industry Sector';
+
   private unsubscribe$ = new Subject<void>();
   constructor(private authService: AuthService, private dashBoardService: DashboardService){
 
@@ -80,6 +87,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
     this.getLoansDisbursedByGenderSummary();
     this.getLoansDisbursedByPipelineSummary();
     this.getLoansDisbursedByStatusSummary();
+    this.getLoanDisbursedByIndustrySectorSummary();
   }
 
   getLoansDisbursedByGenderSummary() {
@@ -110,6 +118,17 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           this.loansDisbursedByStatus = response;
+        },
+        error: (error) => { }
+      });
+  }
+
+  getLoanDisbursedByIndustrySectorSummary() {
+    this.dashBoardService.getLoanDisbursedByIndustrySectorSummary(this.partnerId)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.loansDisbursedBySector = response;
         },
         error: (error) => { }
       });

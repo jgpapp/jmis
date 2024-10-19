@@ -3,7 +3,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { customers, orders, products, refunds } from '@data/dashboard-data';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
-import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { BarVerticalStackedComponent, NgxChartsModule } from '@swimlane/ngx-charts';
 import { PieChartComponent } from "../pie-chart/pie-chart.component"; 
 import { DiskSpaceComponent } from "../disk-space/disk-space.component";
 import { multi, single } from '@data/charts.data';
@@ -12,7 +12,6 @@ import { Subject, takeUntil } from 'rxjs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ChartDialogComponent } from '../../chart-dialog/chart-dialog.component';
 import { KenyanMapComponent } from "../kenyan-map/kenyan-map.component";
-import { KenyanCountyMapComponent } from "../kenyan-county-map/kenyan-county-map.component";
 
 @Component({
   selector: 'app-info-cards',
@@ -25,8 +24,7 @@ import { KenyanCountyMapComponent } from "../kenyan-county-map/kenyan-county-map
     PieChartComponent,
     DiskSpaceComponent,
     MatDialogModule,
-    KenyanMapComponent,
-    KenyanCountyMapComponent
+    KenyanMapComponent
 ],
   templateUrl: './info-cards.component.html',
   styleUrl: './info-cards.component.scss'
@@ -42,12 +40,12 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
   public autoScale = true;
   @ViewChild('resizedDiv') resizedDiv: ElementRef;
   public previousWidthOfResizedDiv: number = 0;
-
-  public loansDisbursedByGender: any[];
-  public loansDisbursedByGenderShowLegend: boolean = false;
   public chartSColorScheme: any = {
     domain: ['#2F3E9E', '#D22E2E', '#378D3B', '#7f7f7f', '#c4a678', '#6a7b6a', '#191919', '#3d144c', '#f0e1dc', '#a04324', '#00ffff', '#0e5600', '#0e9697']
   };
+
+  public loansDisbursedByGender: any[];
+  public loansDisbursedByGenderShowLegend: boolean = false;
   public loansDisbursedByGenderShowLabels: boolean = true;
   public loansDisbursedByGenderExplodeSlices: boolean = false;
   public loansDisbursedByGenderDoughnut: boolean = true;
@@ -130,6 +128,23 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
   public taTrainedBySegmentExplodeSlices: boolean = false;
   public taTrainedBySegmentDoughnut: boolean = false;
   public taTrainedBySegmentChartTitle: string = 'TA By Business Segment';
+
+  public lastThreeYearLoansAccessedPerPartner: any[];
+  public lastThreeYearLoansAccessedPerPartnerShowXAxis = true;
+  public lastThreeYearLoansAccessedPerPartnerShowYAxis = true;
+  public lastThreeYearLoansAccessedPerPartnerShowLegend = false;
+  public lastThreeYearLoansAccessedPerPartnerShowXAxisLabel = true;
+  public lastThreeYearLoansAccessedPerPartnerXAxisLabel = 'Year';
+  public lastThreeYearLoansAccessedPerPartnerShowYAxisLabel = true;
+  public lastThreeYearLoansAccessedPerPartnerYAxisLabel = 'Accessed Loans';
+  public lastThreeYearLoansAccessedPerPartnerTitle = 'Loans Accessed Vs Last 2 Years';
+
+  public loansDisbursedBySector: any[];
+  public loansDisbursedBySectorShowLegend: boolean = false;
+  public loansDisbursedBySectorShowLabels: boolean = true;
+  public loansDisbursedBySectorExplodeSlices: boolean = false;
+  public loansDisbursedBySectorDoughnut: boolean = true;
+  public loansDisbursedBySectorChartTitle: string = 'Loan Disbursed by Industry Sector';
   
   public countyData: Map<number, any>;
   public businessesTrained: string;
@@ -160,6 +175,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.orders = this.addRandomValue('orders');
     this.customers = this.addRandomValue('customers');
     this.getLoansDisbursedByGenderSummary();
+    this.getLoanDisbursedByIndustrySectorSummary();
     this.getLoansDisbursedByPipelineSummary();
     this.getBusinessesTrainedByGenderSummary();
     this.getLoansDisbursedByStatusSummary();
@@ -169,6 +185,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.getTrainingByPartnerByGenderSummary();
     this.getLoansAccessedVsOutStandingByPartnerSummary();
     this.getCountySummaryMap();
+    this.getLastThreeYearsAccessedLoanPerPartnerSummary();
   }
 
   getLoansDisbursedByGenderSummary() {
@@ -177,6 +194,17 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
       .subscribe({
         next: (response) => {
           this.loansDisbursedByGender = response;
+        },
+        error: (error) => { }
+      });
+  }
+
+  getLoanDisbursedByIndustrySectorSummary() {
+    this.dashBoardService.getLoanDisbursedByIndustrySectorSummary()
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.loansDisbursedBySector = response;
         },
         error: (error) => { }
       });
@@ -276,6 +304,17 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
       .subscribe({
         next: (response) => {
           this.countyData = response;
+        },
+        error: (error) => { }
+      });
+  }
+
+  getLastThreeYearsAccessedLoanPerPartnerSummary() {
+    this.dashBoardService.getLastThreeYearsAccessedLoanPerPartnerSummary()
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.lastThreeYearLoansAccessedPerPartner = response;
         },
         error: (error) => { }
       });

@@ -22,6 +22,11 @@ export class DashboardService {
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-by-gender${queryParam}`);
     }
 
+    getLoanDisbursedByIndustrySectorSummary(partnerId: number | undefined = undefined): Observable<any> {
+      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-by-sector${queryParam}`);
+    }
+
     getBusinessesTrainedByGenderSummary(partnerId: number | undefined = undefined): Observable<any> {
       const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/businesses-trained-by-gender${queryParam}`);
