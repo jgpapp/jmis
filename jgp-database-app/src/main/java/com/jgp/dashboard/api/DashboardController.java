@@ -60,6 +60,20 @@ public class DashboardController {
         return new ResponseEntity<>(this.dashboardService.getLoanDisbursedTopFourSummary(fromDate, toDate), HttpStatus.OK);
     }
 
+    @GetMapping("loans-disbursed-top-four-counties")
+    public ResponseEntity<List<DataPointDto>> getLoanDisbursedTopFourCountiesSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                                     @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                                     @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        return new ResponseEntity<>(this.dashboardService.getLoanDisbursedTopFourCountiesSummary(fromDate, toDate, partnerId), HttpStatus.OK);
+    }
+
+    @GetMapping("businesses-trained-top-four-counties")
+    public ResponseEntity<List<DataPointDto>> getBusinessTrainedTopFourCountiesSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                                     @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                                     @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        return new ResponseEntity<>(this.dashboardService.getBusinessTrainedTopFourCountiesSummary(fromDate, toDate, partnerId), HttpStatus.OK);
+    }
+
     @GetMapping("businesses-trained-by-gender")
     public ResponseEntity<List<DataPointDto>> getBusinessesByGenderSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
                                                                            @RequestParam(value = "from-date", required = false) LocalDate fromDate,

@@ -79,6 +79,9 @@ export class BmoDashboardComponent implements OnInit {
   public businessesTainedByGenderDoughnut: boolean = true;
   public businessesTainedByGenderChartTitle: string = 'Business Trained By Gender';
 
+  public topFourCountiesBusinessesTrained: any[];
+  public topFourCountiesBusinessesTrainedChartTitle: string = 'Businesses Trained Top Four Counties';
+
   private unsubscribe$ = new Subject<void>();
   constructor(private authService: AuthService, private dashBoardService: DashboardService){
 
@@ -90,6 +93,7 @@ export class BmoDashboardComponent implements OnInit {
     this.getTaTrainingBySectorSummary();
     this.getTaTrainingBySegmentSummary();
     this.getBusinessesTrainedByGenderSummary();
+    this.getBusinessTrainedTopFourCountiesSummary();
   }
 
 
@@ -132,6 +136,17 @@ export class BmoDashboardComponent implements OnInit {
       .subscribe({
         next: (response) => {
           this.businessesTainedByGender = response;
+        },
+        error: (error) => { }
+      });
+  }
+
+  getBusinessTrainedTopFourCountiesSummary() {
+    this.dashBoardService.getBusinessTrainedTopFourCountiesSummary(this.partnerId)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.topFourCountiesBusinessesTrained = response;
         },
         error: (error) => { }
       });

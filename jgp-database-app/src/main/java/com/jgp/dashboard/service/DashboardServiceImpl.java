@@ -136,6 +136,43 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    public List<DataPointDto> getLoanDisbursedTopFourCountiesSummary(LocalDate fromDate, LocalDate toDate, Long partnerId) {
+        final DataPointMapper rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = getDefaultQueryDates().getLeft();
+            toDate = getDefaultQueryDates().getRight();
+        }
+        var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        if (Objects.nonNull(partnerId)){
+            parameters.addValue(PARTNER_ID_PARAM, partnerId);
+            loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
+        }
+        var sqlQuery = String.format(DataPointMapper.LOANS_DISBURSED_TOP_FOUR_LOCATIONS_SCHEMA, loanWhereClause);
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
+    public List<DataPointDto> getBusinessTrainedTopFourCountiesSummary(LocalDate fromDate, LocalDate toDate, Long partnerId) {
+        final DataPointMapper rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = getDefaultQueryDates().getLeft();
+            toDate = getDefaultQueryDates().getRight();
+        }
+        var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        if (Objects.nonNull(partnerId)){
+            parameters.addValue(PARTNER_ID_PARAM, partnerId);
+            whereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
+        }
+        var sqlQuery = String.format(DataPointMapper.BUSINESSES_TRAINED_TOP_FOUR_LOCATIONS_SCHEMA, whereClause);
+
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
     public List<DataPointDto> getBusinessOwnersTrainedByGenderSummary(LocalDate fromDate, LocalDate toDate, Long partnerId) {
         final DataPointMapper rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -390,6 +427,18 @@ public class DashboardServiceImpl implements DashboardService {
                 select p.partner_name as dataKey, sum(l.loan_amount_accessed) as dataValue,
                 sum(l.loan_amount_accessed) * 100.0 / sum(sum(l.loan_amount_accessed)) OVER () AS percentage
                 from loans l inner join partners p on l.partner_id = p.id %s group by 1 order by 2 DESC limit 4;
+                """;
+
+        public static final String LOANS_DISBURSED_TOP_FOUR_LOCATIONS_SCHEMA = """
+                select p.business_location as dataKey, sum(l.loan_amount_accessed) as dataValue,
+                sum(l.loan_amount_accessed) * 100.0 / sum(sum(l.loan_amount_accessed)) OVER () AS percentage
+                from loans l inner join participants p on l.participant_id = p.id %s group by 1 order by 2 DESC limit 4;
+                """;
+
+        public static final String BUSINESSES_TRAINED_TOP_FOUR_LOCATIONS_SCHEMA = """
+                select p.business_location as dataKey, count(p.id) as dataValue,
+                count(p.id) * 100.0 / sum(count(p.id)) OVER () AS percentage
+                from bmo_participants_data bpd inner join participants p on bpd.participant_id = p.id %s group by 1 order by 2 DESC limit 4;
                 """;
 
         public static final String BUSINESSES_TRAINED_BY_GENDER_SCHEMA = """
