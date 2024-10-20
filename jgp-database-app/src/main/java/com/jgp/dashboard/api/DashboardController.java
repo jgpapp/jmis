@@ -47,6 +47,19 @@ public class DashboardController {
         return new ResponseEntity<>(this.dashboardService.getLoanDisbursedByIndustrySectorSummary(fromDate, toDate, partnerId), HttpStatus.OK);
     }
 
+    @GetMapping("loans-disbursed-by-segment")
+    public ResponseEntity<List<DataPointDto>> getLoanDisbursedByIndustrySegmentSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                                      @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                                      @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        return new ResponseEntity<>(this.dashboardService.getLoanDisbursedByIndustrySegmentSummary(fromDate, toDate, partnerId), HttpStatus.OK);
+    }
+
+    @GetMapping("loans-disbursed-top-four-partners")
+    public ResponseEntity<List<DataPointDto>> getLoanDisbursedTopFourSummary(@RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                             @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        return new ResponseEntity<>(this.dashboardService.getLoanDisbursedTopFourSummary(fromDate, toDate), HttpStatus.OK);
+    }
+
     @GetMapping("businesses-trained-by-gender")
     public ResponseEntity<List<DataPointDto>> getBusinessesByGenderSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
                                                                            @RequestParam(value = "from-date", required = false) LocalDate fromDate,
@@ -105,6 +118,13 @@ public class DashboardController {
                                                                                                   @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                                                   @RequestParam(value = "to-date", required = false) LocalDate toDate){
         return new ResponseEntity<>(this.dashboardService.getLoansAccessedVsOutStandingByPartnerSummary(fromDate, toDate, partnerId), HttpStatus.OK);
+    }
+
+    @GetMapping("loans-accessed-vs-out-standing-per-gender")
+    public ResponseEntity<List<SeriesDataPointDto>> getLoansAccessedVsOutStandingByGenderSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                                                  @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                                                  @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        return new ResponseEntity<>(this.dashboardService.getLoansAccessedVsOutStandingByGenderSummary(fromDate, toDate, partnerId), HttpStatus.OK);
     }
 
     @GetMapping("county-summary")

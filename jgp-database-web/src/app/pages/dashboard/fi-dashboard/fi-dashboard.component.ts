@@ -76,6 +76,23 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   public loansDisbursedBySectorDoughnut: boolean = true;
   public loansDisbursedBySectorChartTitle: string = 'Loan Disbursed by Industry Sector';
 
+  public accessedVSOutStandingAmountByGender: any[]
+  public accessedVSOutStandingAmountByGenderShowXAxis = true;
+  public accessedVSOutStandingAmountByGenderShowYAxis = true;
+  public accessedVSOutStandingAmountByGenderShowLegend = false;
+  public accessedVSOutStandingAmountByGenderShowXAxisLabel = true;
+  public accessedVSOutStandingAmountByGenderXAxisLabel = 'Partners';
+  public accessedVSOutStandingAmountByGenderShowYAxisLabel = true;
+  public accessedVSOutStandingAmountByGenderYAxisLabel = 'Amount';
+  public accessedVSOutStandingAmountByGenderChartTitle: string = 'Accessed Vs OutStanding By Gender';
+
+  public loansDisbursedBySegment: any[];
+  public loansDisbursedBySegmentShowLegend: boolean = false;
+  public loansDisbursedBySegmentShowLabels: boolean = true;
+  public loansDisbursedBySegmentExplodeSlices: boolean = false;
+  public loansDisbursedBySegmentDoughnut: boolean = false;
+  public loansDisbursedBySegmentChartTitle: string = 'Disbursed By Business Segment';
+
   private unsubscribe$ = new Subject<void>();
   constructor(private authService: AuthService, private dashBoardService: DashboardService){
 
@@ -88,6 +105,8 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
     this.getLoansDisbursedByPipelineSummary();
     this.getLoansDisbursedByStatusSummary();
     this.getLoanDisbursedByIndustrySectorSummary();
+    this.getLoansAccessedVsOutStandingByGenderSummary();
+    this.getLoanDisbursedByIndustrySegmentSummary();
   }
 
   getLoansDisbursedByGenderSummary() {
@@ -129,6 +148,28 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           this.loansDisbursedBySector = response;
+        },
+        error: (error) => { }
+      });
+  }
+
+  getLoansAccessedVsOutStandingByGenderSummary() {
+    this.dashBoardService.getLoansAccessedVsOutStandingByGenderSummary(this.partnerId)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.accessedVSOutStandingAmountByGender = response;
+        },
+        error: (error) => { }
+      });
+  }
+
+  getLoanDisbursedByIndustrySegmentSummary() {
+    this.dashBoardService.getLoanDisbursedByIndustrySegmentSummary(this.partnerId)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.loansDisbursedBySegment = response;
         },
         error: (error) => { }
       });

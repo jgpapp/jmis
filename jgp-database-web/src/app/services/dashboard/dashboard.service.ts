@@ -27,6 +27,15 @@ export class DashboardService {
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-by-sector${queryParam}`);
     }
 
+    getLoanDisbursedByIndustrySegmentSummary(partnerId: number | undefined = undefined): Observable<any> {
+      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-by-segment${queryParam}`);
+    }
+
+    getLoanDisbursedTopFourSummary(): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-top-four-partners`);
+    }
+
     getBusinessesTrainedByGenderSummary(partnerId: number | undefined = undefined): Observable<any> {
       const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/businesses-trained-by-gender${queryParam}`);
@@ -70,6 +79,11 @@ export class DashboardService {
     getLoansAccessedVsOutStandingByPartnerSummary(partnerId: number | undefined = undefined): Observable<any> {
       const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-accessed-vs-out-standing-per-partner${queryParam}`);
+    }
+
+    getLoansAccessedVsOutStandingByGenderSummary(partnerId: number | undefined = undefined): Observable<any> {
+      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-accessed-vs-out-standing-per-gender${queryParam}`);
     }
 
     getCountySummaryMap(partnerId: number | undefined = undefined): Observable<any> {
