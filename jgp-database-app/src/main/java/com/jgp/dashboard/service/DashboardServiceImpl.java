@@ -105,6 +105,37 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    public List<DataPointDto> getLoanDisbursedByIndustrySegmentSummary(LocalDate fromDate, LocalDate toDate, Long partnerId) {
+        final DataPointMapper rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = getDefaultQueryDates().getLeft();
+            toDate = getDefaultQueryDates().getRight();
+        }
+        var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        if (Objects.nonNull(partnerId)){
+            parameters.addValue(PARTNER_ID_PARAM, partnerId);
+            loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
+        }
+        var sqlQuery = String.format(DataPointMapper.LOANS_DISBURSED_BY_SEGMENT_SCHEMA, loanWhereClause);
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
+    public List<DataPointDto> getLoanDisbursedTopFourSummary(LocalDate fromDate, LocalDate toDate) {
+        final DataPointMapper rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = getDefaultQueryDates().getLeft();
+            toDate = getDefaultQueryDates().getRight();
+        }
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        var sqlQuery = String.format(DataPointMapper.LOANS_DISBURSED_TOP_FOUR_PARTNERS_SCHEMA, LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM);
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
     public List<DataPointDto> getBusinessOwnersTrainedByGenderSummary(LocalDate fromDate, LocalDate toDate, Long partnerId) {
         final DataPointMapper rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -259,7 +290,26 @@ public class DashboardServiceImpl implements DashboardService {
             parameters.addValue(PARTNER_ID_PARAM, partnerId);
             loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
         }
-        var sqlQuery = String.format(SeriesDataPointMapper.LOAN_AMOUNT_ACCESSED_VS_OUTSTANDING_PER_PARTNER_BY_YEAR_SCHEMA, loanWhereClause);
+        var sqlQuery = String.format(SeriesDataPointMapper.LOAN_AMOUNT_ACCESSED_VS_OUTSTANDING_PER_PARTNER_BY_YEAR_SCHEMA, loanWhereClause, loanWhereClause);
+
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
+    public List<SeriesDataPointDto> getLoansAccessedVsOutStandingByGenderSummary(LocalDate fromDate, LocalDate toDate, Long partnerId) {
+        final SeriesDataPointMapper rm = new SeriesDataPointMapper();
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = getDefaultQueryDates().getLeft();
+            toDate = getDefaultQueryDates().getRight();
+        }
+        var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        if (Objects.nonNull(partnerId)){
+            parameters.addValue(PARTNER_ID_PARAM, partnerId);
+            loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
+        }
+        var sqlQuery = String.format(SeriesDataPointMapper.LOAN_AMOUNT_ACCESSED_VS_OUTSTANDING_PER_GENDER_SCHEMA, loanWhereClause, loanWhereClause);
 
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
     }
@@ -328,6 +378,18 @@ public class DashboardServiceImpl implements DashboardService {
                 select p.industry_sector as dataKey, sum(l.loan_amount_accessed) as dataValue,\s
                 SUM(l.loan_amount_accessed) * 100.0 / SUM(SUM(l.loan_amount_accessed)) OVER () AS percentage\s
                 from loans l left join participants p on l.participant_id = p.id %s  group by 1;\s
+                """;
+
+        public static final String LOANS_DISBURSED_BY_SEGMENT_SCHEMA = """
+                select p.business_segment as dataKey, sum(l.loan_amount_accessed) as dataValue,\s
+                SUM(l.loan_amount_accessed) * 100.0 / SUM(SUM(l.loan_amount_accessed)) OVER () AS percentage\s
+                from loans l left join participants p on l.participant_id = p.id %s  group by 1;\s
+                """;
+
+        public static final String LOANS_DISBURSED_TOP_FOUR_PARTNERS_SCHEMA = """
+                select p.partner_name as dataKey, sum(l.loan_amount_accessed) as dataValue,
+                sum(l.loan_amount_accessed) * 100.0 / sum(sum(l.loan_amount_accessed)) OVER () AS percentage
+                from loans l inner join partners p on l.partner_id = p.id %s group by 1 order by 2 DESC limit 4;
                 """;
 
         public static final String BUSINESSES_TRAINED_BY_GENDER_SCHEMA = """
@@ -414,7 +476,7 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
              SELECT p.partner_name AS name,\s
              'ACCESSED' as seriesName, SUM(l.loan_amount_accessed) AS value
               FROM loans l\s
-              inner join partners p on p.id  = l.partner_id
+              inner join partners p on p.id  = l.partner_id  %s
               group by 1, 2
               union\s
               SELECT p.partner_name AS name,\s
@@ -423,6 +485,20 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
               inner join partners p on p.id  = l.partner_id %s
               group by 1, 2;
             """;
+
+    public static final String LOAN_AMOUNT_ACCESSED_VS_OUTSTANDING_PER_GENDER_SCHEMA = """
+             SELECT p.owner_gender AS name,
+              'ACCESSED' as seriesName, SUM(l.loan_amount_accessed) AS value
+               FROM loans l
+               inner join participants p on p.id  = l.participant_id %s\s
+               group by 1, 2
+               union
+               SELECT p.owner_gender AS name,
+              'OUT-STANDING' as seriesName, SUM(l.loan_outstanding_amount) AS value
+               FROM loans l
+               inner join participants p on p.id  = l.participant_id %s\s
+               group by 1, 2;
+           \s""";
 
     @Override
     public List<SeriesDataPointDto> extractData(ResultSet rs) throws SQLException, DataAccessException {

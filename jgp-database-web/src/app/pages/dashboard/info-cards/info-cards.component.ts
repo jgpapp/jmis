@@ -1,9 +1,8 @@
 import { AfterViewChecked, AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { customers, orders, products, refunds } from '@data/dashboard-data';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
-import { BarVerticalStackedComponent, NgxChartsModule } from '@swimlane/ngx-charts';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { PieChartComponent } from "../pie-chart/pie-chart.component"; 
 import { DiskSpaceComponent } from "../disk-space/disk-space.component";
 import { multi, single } from '@data/charts.data';
@@ -30,10 +29,6 @@ import { KenyanMapComponent } from "../kenyan-map/kenyan-map.component";
   styleUrl: './info-cards.component.scss'
 })
 export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
-  public orders: any[];
-  public products: any[];
-  public customers: any[];
-  public refunds: any[];
   public colorScheme: any = {
     domain: ['rgba(255,255,255,0.8)']
   };
@@ -122,12 +117,29 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
   public accessedVSOutStandingAmountYAxisLabel = 'Amount';
   public accessedVSOutStandingAmountChartTitle: string = 'Accessed Vs OutStanding By Partner';
 
+  public accessedVSOutStandingAmountByGender: any[]
+  public accessedVSOutStandingAmountByGenderShowXAxis = true;
+  public accessedVSOutStandingAmountByGenderShowYAxis = true;
+  public accessedVSOutStandingAmountByGenderShowLegend = false;
+  public accessedVSOutStandingAmountByGenderShowXAxisLabel = true;
+  public accessedVSOutStandingAmountByGenderXAxisLabel = 'Partners';
+  public accessedVSOutStandingAmountByGenderShowYAxisLabel = true;
+  public accessedVSOutStandingAmountByGenderYAxisLabel = 'Amount';
+  public accessedVSOutStandingAmountByGenderChartTitle: string = 'Accessed Vs OutStanding By Gender';
+
   public taTrainedBySegment: any[];
   public taTrainedBySegmentShowLegend: boolean = false;
   public taTrainedBySegmentShowLabels: boolean = true;
   public taTrainedBySegmentExplodeSlices: boolean = false;
   public taTrainedBySegmentDoughnut: boolean = false;
   public taTrainedBySegmentChartTitle: string = 'TA By Business Segment';
+
+  public loansDisbursedBySegment: any[];
+  public loansDisbursedBySegmentShowLegend: boolean = false;
+  public loansDisbursedBySegmentShowLabels: boolean = true;
+  public loansDisbursedBySegmentExplodeSlices: boolean = false;
+  public loansDisbursedBySegmentDoughnut: boolean = false;
+  public loansDisbursedBySegmentChartTitle: string = 'Disbursed By Business Segment';
 
   public lastThreeYearLoansAccessedPerPartner: any[];
   public lastThreeYearLoansAccessedPerPartnerShowXAxis = true;
@@ -145,6 +157,9 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
   public loansDisbursedBySectorExplodeSlices: boolean = false;
   public loansDisbursedBySectorDoughnut: boolean = true;
   public loansDisbursedBySectorChartTitle: string = 'Loan Disbursed by Industry Sector';
+
+  public topFourPartnersloansDisbursed: any[];
+  public topSixPartnersloansDisbursedChartTitle: string = 'Loan Disbursed Top Four Partners';
   
   public countyData: Map<number, any>;
   public businessesTrained: string;
@@ -168,12 +183,6 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   ngOnInit() {
-    this.orders = orders;
-    this.products = products;
-    this.customers = customers;
-    this.refunds = refunds;
-    this.orders = this.addRandomValue('orders');
-    this.customers = this.addRandomValue('customers');
     this.getLoansDisbursedByGenderSummary();
     this.getLoanDisbursedByIndustrySectorSummary();
     this.getLoansDisbursedByPipelineSummary();
@@ -186,6 +195,9 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.getLoansAccessedVsOutStandingByPartnerSummary();
     this.getCountySummaryMap();
     this.getLastThreeYearsAccessedLoanPerPartnerSummary();
+    this.getLoansAccessedVsOutStandingByGenderSummary();
+    this.getLoanDisbursedByIndustrySegmentSummary();
+    this.getLoanDisbursedTopFourSummary();
   }
 
   getLoansDisbursedByGenderSummary() {
@@ -276,6 +288,17 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
       });
   }
 
+  getLoanDisbursedByIndustrySegmentSummary() {
+    this.dashBoardService.getLoanDisbursedByIndustrySegmentSummary()
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.loansDisbursedBySegment = response;
+        },
+        error: (error) => { }
+      });
+  }
+
   getTrainingByPartnerByGenderSummary() {
     this.dashBoardService.getTrainingByPartnerByGenderSummary()
     .pipe(takeUntil(this.unsubscribe$))
@@ -293,6 +316,17 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
       .subscribe({
         next: (response) => {
           this.accessedVSOutStandingAmount = response;
+        },
+        error: (error) => { }
+      });
+  }
+
+  getLoansAccessedVsOutStandingByGenderSummary() {
+    this.dashBoardService.getLoansAccessedVsOutStandingByGenderSummary()
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.accessedVSOutStandingAmountByGender = response;
         },
         error: (error) => { }
       });
@@ -320,42 +354,36 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
       });
   }
 
+  getLoanDisbursedTopFourSummary() {
+    this.dashBoardService.getLoanDisbursedTopFourSummary()
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.topFourPartnersloansDisbursed = response;
+        },
+        error: (error) => { }
+      });
+  }
+
+  // Custom formatting function to show percentages
+  percentageFormatting(value: number): string {
+    const total = this.topFourPartnersloansDisbursed.reduce((sum, current) => sum + current.value, 0);
+    const percentage = (value / total) * 100;
+    return `${percentage.toFixed(2)}%`;  // Returns percentage value formatted with 2 decimal places
+  }
+
 
   public onSelect(event: any) {
     console.log(event);
   }
 
-  public addRandomValue(param: string) {
-    switch (param) {
-      case 'orders':
-        for (let i = 1; i < 30; i++) {
-          this.orders[0].series.push({ "name": 1980 + i, "value": Math.ceil(Math.random() * 1000000) });
-        }
-        return this.orders;
-      case 'customers':
-        for (let i = 1; i < 15; i++) {
-          this.customers[0].series.push({ "name": 2000 + i, "value": Math.ceil(Math.random() * 1000000) });
-        }
-        return this.customers;
-      default:
-        return this.orders;
-    }
-  }
 
   ngOnDestroy() {
-    this.orders[0].series.length = 0;
-    this.customers[0].series.length = 0;
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
 
   ngAfterViewChecked() {
-    if (this.previousWidthOfResizedDiv != this.resizedDiv.nativeElement.clientWidth) {
-      setTimeout(() => this.orders = [...orders]);
-      setTimeout(() => this.products = [...products]);
-      setTimeout(() => this.customers = [...customers]);
-      setTimeout(() => this.refunds = [...refunds]);
-    }
     this.previousWidthOfResizedDiv = this.resizedDiv.nativeElement.clientWidth;
   }
 

@@ -57,7 +57,26 @@
                 />         
             </div>
         </mat-card>
-    </div>    
+    </div> 
+    
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{loansDisbursedBySegmentChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                <app-pie-chart 
+            [data]="loansDisbursedBySegment" 
+            [showLegend]="loansDisbursedBySegmentShowLegend" 
+            [colorScheme]="chartSColorScheme" 
+            [showLabels]="loansDisbursedBySegmentShowLabels" 
+            [explodeSlices]="loansDisbursedBySegmentExplodeSlices" 
+            [doughnut]="loansDisbursedBySegmentDoughnut" 
+            />        
+            </div>
+        </mat-card>
+    </div>
+
     <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #taNeedsByGenderContentDiv (click)="expandTANeedsByGenderBarChart()"> 
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
@@ -183,6 +202,29 @@
         </mat-card>
     </div>  
 
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{accessedVSOutStandingAmountByGenderChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                <ngx-charts-bar-vertical-2d
+                    [scheme]="chartSColorScheme"
+                    [results]="accessedVSOutStandingAmountByGender"
+                    [gradient]="gradient"
+                    [xAxis]="accessedVSOutStandingAmountByGenderShowXAxis"
+                    [yAxis]="accessedVSOutStandingAmountByGenderShowYAxis"
+                    [legend]="accessedVSOutStandingAmountByGenderShowLegend"
+                    [showXAxisLabel]="accessedVSOutStandingAmountByGenderShowXAxisLabel"
+                    [showYAxisLabel]="accessedVSOutStandingAmountByGenderShowYAxisLabel"
+                    [xAxisLabel]="accessedVSOutStandingAmountByGenderXAxisLabel"
+                    [yAxisLabel]="accessedVSOutStandingAmountByGenderYAxisLabel"
+                    (select)="onSelect($event)" 
+                />        
+            </div>
+        </mat-card>
+    </div> 
+
 
     <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #loansDisbursedByGenderContentDiv (click)="expandLoansDisbursedByGenderDoughnut()"> 
         <mat-card>
@@ -197,6 +239,21 @@
                 [showLabels]="loansDisbursedBySectorShowLabels" 
                 [explodeSlices]="loansDisbursedBySectorExplodeSlices" 
                 [doughnut]="loansDisbursedBySectorDoughnut"
+                />       
+            </div>
+        </mat-card>
+    </div> 
+
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{topSixPartnersloansDisbursedChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                <ngx-charts-pie-grid 
+                [results]="topFourPartnersloansDisbursed" 
+                [scheme]="chartSColorScheme"
+                [animations]="true"
                 />       
             </div>
         </mat-card>

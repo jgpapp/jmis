@@ -17,6 +17,10 @@ public interface DashboardService {
 
     List<DataPointDto> getLoanDisbursedByIndustrySectorSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
 
+    List<DataPointDto> getLoanDisbursedByIndustrySegmentSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
+
+    List<DataPointDto> getLoanDisbursedTopFourSummary(LocalDate fromDate, LocalDate toDate);
+
     List<DataPointDto> getBusinessOwnersTrainedByGenderSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
 
     List<DataPointDto> getLoanDisbursedByPipelineSourceSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
@@ -34,6 +38,8 @@ public interface DashboardService {
     List<SeriesDataPointDto> getLastThreeYearsAccessedLoanPerPartnerSummary(Long partnerId);
 
     List<SeriesDataPointDto> getLoansAccessedVsOutStandingByPartnerSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
+
+    List<SeriesDataPointDto> getLoansAccessedVsOutStandingByGenderSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
 
     List<CountySummaryDto> getCountySummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
 
