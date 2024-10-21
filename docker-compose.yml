@@ -14,7 +14,7 @@ services:
   jgp_app:
     container_name: jgp_app
     build:
-      context: https://github.com/simiyu17/JGPDataApplication.git#:jgp-database-app
+      context: https://github.com/jgpapp/jmis.git#main:jgp-database-app
       dockerfile: Dockerfile
       args:
         GITHUB_TOKEN: ${GITHUB_TOKEN}
@@ -34,7 +34,7 @@ services:
   jgp_app_ui:
     container_name: jgp_app_ui
     build:
-      context: https://github.com/simiyu17/JGPDataApplication.git#:jgp-database-web
+      context: https://github.com/jgpapp/jmis.git#main:jgp-database-web
       dockerfile: Dockerfile
       args:
         GITHUB_TOKEN: ${GITHUB_TOKEN}
