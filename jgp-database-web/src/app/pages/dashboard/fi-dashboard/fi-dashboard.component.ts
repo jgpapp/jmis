@@ -93,6 +93,9 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   public loansDisbursedBySegmentDoughnut: boolean = false;
   public loansDisbursedBySegmentChartTitle: string = 'Disbursed By Business Segment';
 
+  public topFourCountiesloansDisbursed: any[];
+  public topFourCountiesloansDisbursedChartTitle: string = 'Loan Disbursed Top Four Counties';
+
   private unsubscribe$ = new Subject<void>();
   constructor(private authService: AuthService, private dashBoardService: DashboardService){
 
@@ -107,6 +110,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
     this.getLoanDisbursedByIndustrySectorSummary();
     this.getLoansAccessedVsOutStandingByGenderSummary();
     this.getLoanDisbursedByIndustrySegmentSummary();
+    this.getLoanDisbursedTopFourCountiesSummary();
   }
 
   getLoansDisbursedByGenderSummary() {
@@ -170,6 +174,17 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           this.loansDisbursedBySegment = response;
+        },
+        error: (error) => { }
+      });
+  }
+
+  getLoanDisbursedTopFourCountiesSummary() {
+    this.dashBoardService.getLoanDisbursedTopFourCountiesSummary(this.partnerId)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.topFourCountiesloansDisbursed = response;
         },
         error: (error) => { }
       });

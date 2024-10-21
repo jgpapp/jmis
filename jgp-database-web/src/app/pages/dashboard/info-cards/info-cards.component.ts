@@ -159,7 +159,13 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
   public loansDisbursedBySectorChartTitle: string = 'Loan Disbursed by Industry Sector';
 
   public topFourPartnersloansDisbursed: any[];
-  public topSixPartnersloansDisbursedChartTitle: string = 'Loan Disbursed Top Four Partners';
+  public topFourPartnersloansDisbursedChartTitle: string = 'Loan Disbursed Top Four Partners';
+
+  public topFourCountiesloansDisbursed: any[];
+  public topFourCountiesloansDisbursedChartTitle: string = 'Loan Disbursed Top Four Counties';
+
+  public topFourCountiesBusinessesTrained: any[];
+  public topFourCountiesBusinessesTrainedChartTitle: string = 'Businesses Trained Top Four Counties';
   
   public countyData: Map<number, any>;
   public businessesTrained: string;
@@ -198,6 +204,8 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.getLoansAccessedVsOutStandingByGenderSummary();
     this.getLoanDisbursedByIndustrySegmentSummary();
     this.getLoanDisbursedTopFourSummary();
+    this.getLoanDisbursedTopFourCountiesSummary();
+    this.getBusinessTrainedTopFourCountiesSummary();
   }
 
   getLoansDisbursedByGenderSummary() {
@@ -365,12 +373,28 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
       });
   }
 
-  // Custom formatting function to show percentages
-  percentageFormatting(value: number): string {
-    const total = this.topFourPartnersloansDisbursed.reduce((sum, current) => sum + current.value, 0);
-    const percentage = (value / total) * 100;
-    return `${percentage.toFixed(2)}%`;  // Returns percentage value formatted with 2 decimal places
+  getLoanDisbursedTopFourCountiesSummary() {
+    this.dashBoardService.getLoanDisbursedTopFourCountiesSummary()
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.topFourCountiesloansDisbursed = response;
+        },
+        error: (error) => { }
+      });
   }
+
+  getBusinessTrainedTopFourCountiesSummary() {
+    this.dashBoardService.getBusinessTrainedTopFourCountiesSummary()
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.topFourCountiesBusinessesTrained = response;
+        },
+        error: (error) => { }
+      });
+  }
+  
 
 
   public onSelect(event: any) {

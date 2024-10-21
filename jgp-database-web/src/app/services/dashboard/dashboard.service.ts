@@ -36,6 +36,16 @@ export class DashboardService {
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-top-four-partners`);
     }
 
+    getLoanDisbursedTopFourCountiesSummary(partnerId: number | undefined = undefined): Observable<any> {
+      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-top-four-counties${queryParam}`);
+    }
+
+    getBusinessTrainedTopFourCountiesSummary(partnerId: number | undefined = undefined): Observable<any> {
+      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/businesses-trained-top-four-counties${queryParam}`);
+    }
+
     getBusinessesTrainedByGenderSummary(partnerId: number | undefined = undefined): Observable<any> {
       const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/businesses-trained-by-gender${queryParam}`);
