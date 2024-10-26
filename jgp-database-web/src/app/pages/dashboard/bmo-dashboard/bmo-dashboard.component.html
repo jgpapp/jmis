@@ -5,7 +5,12 @@
     [hasBgImage]="true" 
     [class]="'py-3'"></app-content-header>
 
-<div class="p-2">
+    <div class="p-2">
+        <app-dashboard-filters 
+        (dashBoardFilters)="setDashBoardFilters($event)" 
+        [isPartnerDashBoard]="true" 
+        [partnerId]="partnerId"
+        />
     <div fxLayout="row wrap">
         <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2">
             <mat-card class="gradient-orange tile p-2">

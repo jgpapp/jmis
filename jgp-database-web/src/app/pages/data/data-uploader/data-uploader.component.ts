@@ -82,7 +82,6 @@ export class DataUploaderComponent implements OnDestroy {
     let legalFormType = '';
     /** Only for Client Bulk Imports */
     if(this.authService.currentUser()?.partnerId){
-      console.log(this.authService.currentUser()?.partnerId )
       if (this.template.name.toLowerCase().includes('loan')) {
         legalFormType = 'LOAN';
       } else if (this.template.name.toLowerCase().includes('bmo')) {
@@ -109,7 +108,6 @@ export class DataUploaderComponent implements OnDestroy {
 
   
   downloadTemplate() {
-    console.log(this.bulkImportForm.value.legalForm)
     if(this.bulkImportForm.valid){
     this.dataUploadService.downloadDataTemplate(this.bulkImportForm.value.legalForm)
       .pipe(takeUntil(this.unsubscribe$))

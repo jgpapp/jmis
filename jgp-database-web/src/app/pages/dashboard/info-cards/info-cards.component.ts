@@ -1,4 +1,4 @@
-import { AfterViewChecked, AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
@@ -28,7 +28,8 @@ import { KenyanMapComponent } from "../kenyan-map/kenyan-map.component";
   templateUrl: './info-cards.component.html',
   styleUrl: './info-cards.component.scss'
 })
-export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
+export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, OnDestroy {
+  @Input('dashBoardFilters') dashBoardFilters: any;
   public colorScheme: any = {
     domain: ['rgba(255,255,255,0.8)']
   };
@@ -188,7 +189,16 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
     Object.assign(this, { single, multi });
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    this.dashBoardFilters = changes['dashBoardFilters']['currentValue']
+    this.reloadData();
+  }
+
   ngOnInit() {
+    this.reloadData();
+  }
+
+  reloadData(){
     this.getLoansDisbursedByGenderSummary();
     this.getLoanDisbursedByIndustrySectorSummary();
     this.getLoansDisbursedByPipelineSummary();
@@ -203,13 +213,13 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.getLastThreeYearsAccessedLoanPerPartnerSummary();
     this.getLoansAccessedVsOutStandingByGenderSummary();
     this.getLoanDisbursedByIndustrySegmentSummary();
-    this.getLoanDisbursedTopFourSummary();
+    this.getLoanDisbursedTopFourPartnersSummary();
     this.getLoanDisbursedTopFourCountiesSummary();
     this.getBusinessTrainedTopFourCountiesSummary();
   }
 
   getLoansDisbursedByGenderSummary() {
-    this.dashBoardService.getLoansDisbursedByGenderSummary()
+    this.dashBoardService.getLoansDisbursedByGenderSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -220,7 +230,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   getLoanDisbursedByIndustrySectorSummary() {
-    this.dashBoardService.getLoanDisbursedByIndustrySectorSummary()
+    this.dashBoardService.getLoanDisbursedByIndustrySectorSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -231,7 +241,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   getLoansDisbursedByPipelineSummary() {
-    this.dashBoardService.getLoansDisbursedByPipelineSummary()
+    this.dashBoardService.getLoansDisbursedByPipelineSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -242,7 +252,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   getLoansDisbursedByStatusSummary() {
-    this.dashBoardService.getLoansDisbursedByStatusSummary()
+    this.dashBoardService.getLoansDisbursedByStatusSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -253,7 +263,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   getBusinessesTrainedByGenderSummary() {
-    this.dashBoardService.getBusinessesTrainedByGenderSummary()
+    this.dashBoardService.getBusinessesTrainedByGenderSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -264,7 +274,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   getTaNeedsByGenderSummary() {
-    this.dashBoardService.getTaNeedsByGenderSummary()
+    this.dashBoardService.getTaNeedsByGenderSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -275,7 +285,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   getTaTrainingBySectorSummary() {
-    this.dashBoardService.getTaTrainingBySectorSummary()
+    this.dashBoardService.getTaTrainingBySectorSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -286,7 +296,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   getTaTrainingBySegmentSummary() {
-    this.dashBoardService.getTaTrainingBySegmentSummary()
+    this.dashBoardService.getTaTrainingBySegmentSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -297,7 +307,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   getLoanDisbursedByIndustrySegmentSummary() {
-    this.dashBoardService.getLoanDisbursedByIndustrySegmentSummary()
+    this.dashBoardService.getLoanDisbursedByIndustrySegmentSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -308,7 +318,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   getTrainingByPartnerByGenderSummary() {
-    this.dashBoardService.getTrainingByPartnerByGenderSummary()
+    this.dashBoardService.getTrainingByPartnerByGenderSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -319,7 +329,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   getLoansAccessedVsOutStandingByPartnerSummary() {
-    this.dashBoardService.getLoansAccessedVsOutStandingByPartnerSummary()
+    this.dashBoardService.getLoansAccessedVsOutStandingByPartnerSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -330,7 +340,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   getLoansAccessedVsOutStandingByGenderSummary() {
-    this.dashBoardService.getLoansAccessedVsOutStandingByGenderSummary()
+    this.dashBoardService.getLoansAccessedVsOutStandingByGenderSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -352,7 +362,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   getLastThreeYearsAccessedLoanPerPartnerSummary() {
-    this.dashBoardService.getLastThreeYearsAccessedLoanPerPartnerSummary()
+    this.dashBoardService.getLastThreeYearsAccessedLoanPerPartnerSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -362,8 +372,8 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
       });
   }
 
-  getLoanDisbursedTopFourSummary() {
-    this.dashBoardService.getLoanDisbursedTopFourSummary()
+  getLoanDisbursedTopFourPartnersSummary() {
+    this.dashBoardService.getLoanDisbursedTopFourPartnersSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -374,7 +384,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   getLoanDisbursedTopFourCountiesSummary() {
-    this.dashBoardService.getLoanDisbursedTopFourCountiesSummary()
+    this.dashBoardService.getLoanDisbursedTopFourCountiesSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -385,7 +395,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   getBusinessTrainedTopFourCountiesSummary() {
-    this.dashBoardService.getBusinessTrainedTopFourCountiesSummary()
+    this.dashBoardService.getBusinessTrainedTopFourCountiesSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {

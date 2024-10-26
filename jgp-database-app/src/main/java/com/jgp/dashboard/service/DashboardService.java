@@ -1,6 +1,7 @@
 package com.jgp.dashboard.service;
 
 import com.jgp.dashboard.dto.CountySummaryDto;
+import com.jgp.dashboard.dto.DashboardSearchCriteria;
 import com.jgp.dashboard.dto.DataPointDto;
 import com.jgp.dashboard.dto.HighLevelSummaryDto;
 import com.jgp.dashboard.dto.SeriesDataPointDto;
@@ -11,39 +12,39 @@ import java.util.Map;
 
 public interface DashboardService {
 
-    HighLevelSummaryDto getHighLevelSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
+    HighLevelSummaryDto getHighLevelSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
-    List<DataPointDto> getLoanDisbursedByGenderSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
+    List<DataPointDto> getLoanDisbursedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
-    List<DataPointDto> getLoanDisbursedByIndustrySectorSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
+    List<DataPointDto> getLoanDisbursedByIndustrySectorSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
-    List<DataPointDto> getLoanDisbursedByIndustrySegmentSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
+    List<DataPointDto> getLoanDisbursedByIndustrySegmentSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
-    List<DataPointDto> getLoanDisbursedTopFourSummary(LocalDate fromDate, LocalDate toDate);
+    List<DataPointDto> getLoanDisbursedTopFourPartnersSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
-    List<DataPointDto> getLoanDisbursedTopFourCountiesSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
+    List<DataPointDto> getLoanDisbursedTopFourCountiesSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
-    List<DataPointDto> getBusinessTrainedTopFourCountiesSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
+    List<DataPointDto> getBusinessTrainedTopFourCountiesSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
-    List<DataPointDto> getBusinessOwnersTrainedByGenderSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
+    List<DataPointDto> getBusinessOwnersTrainedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
-    List<DataPointDto> getLoanDisbursedByPipelineSourceSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
+    List<DataPointDto> getLoanDisbursedByPipelineSourceSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
-    List<DataPointDto> getLoansDisbursedByQualitySummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
+    List<DataPointDto> getLoansDisbursedByQualitySummary(DashboardSearchCriteria dashboardSearchCriteria);
 
-    List<SeriesDataPointDto> getTaNeedsByGenderSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
+    List<SeriesDataPointDto> getTaNeedsByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
-    List<DataPointDto> getTaTrainingBySectorSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
+    List<DataPointDto> getTaTrainingBySectorSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
-    List<DataPointDto> getTaTrainingBySegmentSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
+    List<DataPointDto> getTaTrainingBySegmentSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
-    List<SeriesDataPointDto> getTrainingByPartnerByGenderSummary(LocalDate fromDate, LocalDate toDate);
+    List<SeriesDataPointDto> getTrainingByPartnerByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
-    List<SeriesDataPointDto> getLastThreeYearsAccessedLoanPerPartnerSummary(Long partnerId);
+    List<SeriesDataPointDto> getLastThreeYearsAccessedLoanPerPartnerSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
-    List<SeriesDataPointDto> getLoansAccessedVsOutStandingByPartnerSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
+    List<SeriesDataPointDto> getLoansAccessedVsOutStandingByPartnerSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
-    List<SeriesDataPointDto> getLoansAccessedVsOutStandingByGenderSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
+    List<SeriesDataPointDto> getLoansAccessedVsOutStandingByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
     List<CountySummaryDto> getCountySummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
 

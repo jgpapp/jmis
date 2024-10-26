@@ -12,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { PieChartComponent } from '../pie-chart/pie-chart.component';
 import { Subject, takeUntil } from 'rxjs';
+import { DashboardFiltersComponent } from "../dashboard-filters/dashboard-filters.component";
 @Component({
   selector: 'app-fi-dashboard',
   standalone: true,
@@ -27,13 +28,15 @@ import { Subject, takeUntil } from 'rxjs';
     MatCardModule,
     MatIconModule,
     NgxChartsModule,
-    PieChartComponent
-  ],
+    PieChartComponent,
+    DashboardFiltersComponent
+],
   templateUrl: './fi-dashboard.component.html',
   styleUrl: './fi-dashboard.component.scss'
 })
 export class FiDashboardComponent implements OnInit, OnDestroy {
 
+  dashBoardFilters: any;
   partnerName: string = '';
   partnerId: any;
   public gradient = false;
@@ -101,7 +104,17 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
 
   }
 
+  setDashBoardFilters(currentDashBoardFilters: any){
+    this.dashBoardFilters = currentDashBoardFilters;
+    this.reloadData();
+  }
+
   ngOnInit() {
+    this.dashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId}
+    this.reloadData();
+  }
+
+  reloadData(){
     this.partnerName = `${this.authService.currentUser()?.partnerName} Dashboard !`;
     this.partnerId = this.authService.currentUser()?.partnerId;
     this.getLoansDisbursedByGenderSummary();
@@ -113,8 +126,9 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
     this.getLoanDisbursedTopFourCountiesSummary();
   }
 
+
   getLoansDisbursedByGenderSummary() {
-    this.dashBoardService.getLoansDisbursedByGenderSummary(this.partnerId)
+    this.dashBoardService.getLoansDisbursedByGenderSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -125,7 +139,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   }
 
   getLoansDisbursedByPipelineSummary() {
-    this.dashBoardService.getLoansDisbursedByPipelineSummary(this.partnerId)
+    this.dashBoardService.getLoansDisbursedByPipelineSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -136,7 +150,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   }
 
   getLoansDisbursedByStatusSummary() {
-    this.dashBoardService.getLoansDisbursedByStatusSummary(this.partnerId)
+    this.dashBoardService.getLoansDisbursedByStatusSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -147,7 +161,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   }
 
   getLoanDisbursedByIndustrySectorSummary() {
-    this.dashBoardService.getLoanDisbursedByIndustrySectorSummary(this.partnerId)
+    this.dashBoardService.getLoanDisbursedByIndustrySectorSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -158,7 +172,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   }
 
   getLoansAccessedVsOutStandingByGenderSummary() {
-    this.dashBoardService.getLoansAccessedVsOutStandingByGenderSummary(this.partnerId)
+    this.dashBoardService.getLoansAccessedVsOutStandingByGenderSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -169,7 +183,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   }
 
   getLoanDisbursedByIndustrySegmentSummary() {
-    this.dashBoardService.getLoanDisbursedByIndustrySegmentSummary(this.partnerId)
+    this.dashBoardService.getLoanDisbursedByIndustrySegmentSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -180,7 +194,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   }
 
   getLoanDisbursedTopFourCountiesSummary() {
-    this.dashBoardService.getLoanDisbursedTopFourCountiesSummary(this.partnerId)
+    this.dashBoardService.getLoanDisbursedTopFourCountiesSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {

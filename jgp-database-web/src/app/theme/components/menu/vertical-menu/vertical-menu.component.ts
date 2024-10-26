@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewEncapsulation, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input, ViewEncapsulation } from '@angular/core';
 import { MenuService } from '@services/menu.service';
 import { Settings, SettingsService } from '@services/settings.service';
 import { Menu } from '../../../../common/models/menu.model';

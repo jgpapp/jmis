@@ -12,6 +12,7 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { PieChartComponent } from '../pie-chart/pie-chart.component';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { Subject, takeUntil } from 'rxjs';
+import { DashboardFiltersComponent } from '../dashboard-filters/dashboard-filters.component';
 
 @Component({
   selector: 'app-bmo-dashboard',
@@ -27,12 +28,14 @@ import { Subject, takeUntil } from 'rxjs';
     MatIconModule,
     NgxChartsModule,
     PieChartComponent,
+    DashboardFiltersComponent
   ],
   templateUrl: './bmo-dashboard.component.html',
   styleUrl: './bmo-dashboard.component.scss'
 })
 export class BmoDashboardComponent implements OnInit {
 
+  dashBoardFilters: any;
   partnerName: string = '';
   partnerId: any;
   public autoScale = true;
@@ -86,7 +89,18 @@ export class BmoDashboardComponent implements OnInit {
   constructor(private authService: AuthService, private dashBoardService: DashboardService){
 
   }
+
+  setDashBoardFilters(currentDashBoardFilters: any){
+    this.dashBoardFilters = currentDashBoardFilters;
+    this.reloadData();
+  }
+
   ngOnInit(): void {
+    this.dashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId}
+    this.reloadData();
+  }
+
+  reloadData(): void {
     this.partnerName = `${this.authService.currentUser()?.partnerName} Dashboard !`;
     this.partnerId = this.authService.currentUser()?.partnerId;
     this.getTaNeedsByGenderSummary();
@@ -98,7 +112,7 @@ export class BmoDashboardComponent implements OnInit {
 
 
   getTaNeedsByGenderSummary() {
-    this.dashBoardService.getTaNeedsByGenderSummary(this.partnerId)
+    this.dashBoardService.getTaNeedsByGenderSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -109,7 +123,7 @@ export class BmoDashboardComponent implements OnInit {
   }
 
   getTaTrainingBySectorSummary() {
-    this.dashBoardService.getTaTrainingBySectorSummary(this.partnerId)
+    this.dashBoardService.getTaTrainingBySectorSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -120,7 +134,7 @@ export class BmoDashboardComponent implements OnInit {
   }
 
   getTaTrainingBySegmentSummary() {
-    this.dashBoardService.getTaTrainingBySegmentSummary(this.partnerId)
+    this.dashBoardService.getTaTrainingBySegmentSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -131,7 +145,7 @@ export class BmoDashboardComponent implements OnInit {
   }
 
   getBusinessesTrainedByGenderSummary() {
-    this.dashBoardService.getBusinessesTrainedByGenderSummary(this.partnerId)
+    this.dashBoardService.getBusinessesTrainedByGenderSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -142,7 +156,7 @@ export class BmoDashboardComponent implements OnInit {
   }
 
   getBusinessTrainedTopFourCountiesSummary() {
-    this.dashBoardService.getBusinessTrainedTopFourCountiesSummary(this.partnerId)
+    this.dashBoardService.getBusinessTrainedTopFourCountiesSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
