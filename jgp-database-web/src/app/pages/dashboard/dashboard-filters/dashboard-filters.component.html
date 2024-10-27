@@ -21,15 +21,15 @@
         </mat-form-field>
         <mat-form-field fxFlex="100" fxFlex.xl="20" fxFlex.lg="20" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
             <input matInput [matDatepicker]="dateFrom" placeholder="Date From" formControlName="selectedDateFrom" 
-            (dateInput)="filterFormChanged()" (dateChange)="filterFormChanged()">
+            (dateInput)="filterFromDateChanged()" (dateChange)="filterFromDateChanged()" [max]="maxDate">
             <mat-datepicker-toggle matSuffix [for]="dateFrom"></mat-datepicker-toggle>
             <mat-datepicker #dateFrom></mat-datepicker>
         </mat-form-field>
 
         <mat-form-field fxFlex="100" fxFlex.xl="20" fxFlex.lg="20" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
             <input matInput [matDatepicker]="dateTo" placeholder="Date To" formControlName="selectedDateTo" 
-            (dateInput)="filterFormChanged()" (dateChange)="filterFormChanged()">
+            (dateInput)="filterFormChanged()" (dateChange)="filterFormChanged()" [min]="toDateMinValue" [max]="maxDate">
             <mat-datepicker-toggle matSuffix [for]="dateTo"></mat-datepicker-toggle>
-            <mat-datepicker #dateTo></mat-datepicker>
+            <mat-datepicker #dateTo  [disabled]="disableToDate"></mat-datepicker>
         </mat-form-field>
     </form>

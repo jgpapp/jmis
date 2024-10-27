@@ -33,6 +33,9 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit {
   @Output() dashBoardFilters: EventEmitter<any> = new EventEmitter();
   @Input({required: true, alias: 'isPartnerDashBoard'}) isPartnerDashBoard: boolean;
   @Input('partnerId') partnerId: number;
+  public disableToDate: boolean = true;
+  maxDate: Date = new Date();
+  toDateMinValue = new Date();
   public dashFilterForm: FormGroup;
   partners: PartnerDto[] = [];
   counties: any[]
@@ -83,6 +86,14 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit {
             this.gs.openSnackBar(`An error occured ${error.error.detail}`, "Dismiss");
           }
         });
+  }
+
+  filterFromDateChanged() {
+    this.disableToDate = false;
+    this.toDateMinValue = this.dashFilterForm.controls['selectedDateFrom'].value
+    if(this.dashFilterForm.controls['selectedDateTo'].value){
+      this.filterFormChanged();
+    }
   }
 
   filterFormChanged() {
