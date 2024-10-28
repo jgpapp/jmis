@@ -5,6 +5,7 @@ import { AuthService } from '@services/users/auth.service';
 import { DashboardComponent } from "../dashboard.component";
 import { NoPermissionComponent } from '../../errors/no-permission/no-permission.component';
 import { DashboardFiltersComponent } from "../dashboard-filters/dashboard-filters.component";
+import { BmoFiDashboardComponent } from '../bmo-fi-dashboard/bmo-fi-dashboard.component';
 
 @Component({
   selector: 'app-my-dashboard',
@@ -12,6 +13,7 @@ import { DashboardFiltersComponent } from "../dashboard-filters/dashboard-filter
   imports: [
     FiDashboardComponent,
     BmoDashboardComponent,
+    BmoFiDashboardComponent,
     DashboardComponent,
     NoPermissionComponent,
     DashboardFiltersComponent

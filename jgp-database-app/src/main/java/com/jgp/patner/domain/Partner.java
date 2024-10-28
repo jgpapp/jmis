@@ -51,8 +51,9 @@ public class Partner extends BaseEntity {
     @Getter
     public enum PartnerType {
 
-        BMO("BMO"),
+        TA("Technical Assistance"),
         FI("Financial Intermediary"),
+        FI_TA("Financial Intermediary & Technical Assistance"),
         JGP("JGP");
 
         private final String name;

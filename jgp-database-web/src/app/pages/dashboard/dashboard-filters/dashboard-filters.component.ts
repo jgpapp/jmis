@@ -33,6 +33,7 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit {
   @Output() dashBoardFilters: EventEmitter<any> = new EventEmitter();
   @Input({required: true, alias: 'isPartnerDashBoard'}) isPartnerDashBoard: boolean;
   @Input('partnerId') partnerId: number;
+  @Input({required: true, alias: 'fieldFlex'}) fieldFlex: number;
   public disableToDate: boolean = true;
   maxDate: Date = new Date();
   toDateMinValue = new Date();

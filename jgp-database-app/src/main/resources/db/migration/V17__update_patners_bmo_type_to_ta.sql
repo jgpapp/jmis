@@ -1,0 +1,1 @@
+UPDATE partners set type = 'TA' where type = 'BMO';

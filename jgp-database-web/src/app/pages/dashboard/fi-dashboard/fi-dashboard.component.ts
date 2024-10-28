@@ -13,6 +13,7 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { PieChartComponent } from '../pie-chart/pie-chart.component';
 import { Subject, takeUntil } from 'rxjs';
 import { DashboardFiltersComponent } from "../dashboard-filters/dashboard-filters.component";
+import { HighLevelSummaryDto } from '../dto/highLevelSummaryDto';
 @Component({
   selector: 'app-fi-dashboard',
   standalone: true,
@@ -99,6 +100,8 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   public topFourCountiesloansDisbursed: any[];
   public topFourCountiesloansDisbursedChartTitle: string = 'Loan Disbursed Top Four Counties';
 
+  highLevelSummary: HighLevelSummaryDto = {businessesTrained: 0, businessesLoaned: 0, amountDisbursed: 0, outStandingAmount: 0}
+
   private unsubscribe$ = new Subject<void>();
   constructor(private authService: AuthService, private dashBoardService: DashboardService){
 
@@ -117,6 +120,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   reloadData(){
     this.partnerName = `${this.authService.currentUser()?.partnerName} Dashboard !`;
     this.partnerId = this.authService.currentUser()?.partnerId;
+    this.getHighLevelSummary();
     this.getLoansDisbursedByGenderSummary();
     this.getLoansDisbursedByPipelineSummary();
     this.getLoansDisbursedByStatusSummary();
@@ -124,6 +128,17 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
     this.getLoansAccessedVsOutStandingByGenderSummary();
     this.getLoanDisbursedByIndustrySegmentSummary();
     this.getLoanDisbursedTopFourCountiesSummary();
+  }
+
+  getHighLevelSummary() {
+    this.dashBoardService.getHighLevelSummary(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.highLevelSummary = response;
+        },
+        error: (error) => { }
+      });
   }
 
 

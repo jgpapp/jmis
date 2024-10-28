@@ -13,6 +13,7 @@ import { PieChartComponent } from '../pie-chart/pie-chart.component';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { Subject, takeUntil } from 'rxjs';
 import { DashboardFiltersComponent } from '../dashboard-filters/dashboard-filters.component';
+import { HighLevelSummaryDto } from '../dto/highLevelSummaryDto';
 
 @Component({
   selector: 'app-bmo-dashboard',
@@ -85,6 +86,8 @@ export class BmoDashboardComponent implements OnInit {
   public topFourCountiesBusinessesTrained: any[];
   public topFourCountiesBusinessesTrainedChartTitle: string = 'Businesses Trained Top Four Counties';
 
+  highLevelSummary: HighLevelSummaryDto = {businessesTrained: 0, businessesLoaned: 0, amountDisbursed: 0, outStandingAmount: 0}
+
   private unsubscribe$ = new Subject<void>();
   constructor(private authService: AuthService, private dashBoardService: DashboardService){
 
@@ -103,11 +106,23 @@ export class BmoDashboardComponent implements OnInit {
   reloadData(): void {
     this.partnerName = `${this.authService.currentUser()?.partnerName} Dashboard !`;
     this.partnerId = this.authService.currentUser()?.partnerId;
+    this.getHighLevelSummary();
     this.getTaNeedsByGenderSummary();
     this.getTaTrainingBySectorSummary();
     this.getTaTrainingBySegmentSummary();
     this.getBusinessesTrainedByGenderSummary();
     this.getBusinessTrainedTopFourCountiesSummary();
+  }
+
+  getHighLevelSummary() {
+    this.dashBoardService.getHighLevelSummary(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.highLevelSummary = response;
+        },
+        error: (error) => { }
+      });
   }
 
 
