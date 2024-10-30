@@ -57,7 +57,6 @@ export class AuthService {
         userFullName: this.decodeAuthToken()[this.USER_FULL_NAME],
         forceChangePassword: this.decodeAuthToken()[this.FORCE_PASS_CHANGE]
       }
-      console.log(userCredentials)
       this.setLocalStorageValue(this.CURRENT_USER_CREDENTIALS, JSON.stringify(userCredentials));
     }
   };

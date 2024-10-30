@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -10,6 +10,7 @@ import { PartnerDto } from '../../../dto/Partner';
 import { PartnerService } from '@services/data-management/partners.service';
 import { Subject, takeUntil } from 'rxjs';
 import { GlobalService } from '@services/shared/global.service';
+import { DashboardService } from '@services/dashboard/dashboard.service';
 
 @Component({
   selector: 'app-dashboard-filters',
@@ -27,26 +28,35 @@ import { GlobalService } from '@services/shared/global.service';
   templateUrl: './dashboard-filters.component.html',
   styleUrl: './dashboard-filters.component.scss'
 })
-export class DashboardFiltersComponent implements OnDestroy, OnInit{
+export class DashboardFiltersComponent implements OnDestroy, OnInit {
 
+  @Output() dashBoardFilters: EventEmitter<any> = new EventEmitter();
+  @Input({required: true, alias: 'isPartnerDashBoard'}) isPartnerDashBoard: boolean;
+  @Input('partnerId') partnerId: number;
+  @Input({required: true, alias: 'fieldFlex'}) fieldFlex: number;
+  public disableToDate: boolean = true;
+  maxDate: Date = new Date();
+  toDateMinValue = new Date();
   public dashFilterForm: FormGroup;
   partners: PartnerDto[] = [];
+  counties: any[]
   private unsubscribe$ = new Subject<void>();
   constructor(
     public fb: FormBuilder, 
     private partnerService: PartnerService,
-    private gs: GlobalService){
+    private gs: GlobalService,
+    private dashBoardService: DashboardService){
 
     this.dashFilterForm = this.fb.group({
       selectedPartnerId: [null],
-      selectedTANeeds: [null],
-      selectedSector: [null],
+      selectedCountyCode: [null],
       selectedDateFrom: [null],
       selectedDateTo: [null]
       });
   }
   ngOnInit(): void {
     this.getAvailablePartners();
+    this.getAvailableCounties();
   }
   ngOnDestroy(): void {
     this.unsubscribe$.next();
@@ -66,7 +76,33 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit{
         });
   }
 
+  getAvailableCounties() {
+    this.dashBoardService.getKenyanCounties()
+    .pipe(takeUntil(this.unsubscribe$))
+        .subscribe({
+          next: (response) => {
+            this.counties = response
+          },
+          error: (error) => {
+            this.gs.openSnackBar(`An error occured ${error.error.detail}`, "Dismiss");
+          }
+        });
+  }
+
+  filterFromDateChanged() {
+    this.disableToDate = false;
+    this.toDateMinValue = this.dashFilterForm.controls['selectedDateFrom'].value
+    if(this.dashFilterForm.controls['selectedDateTo'].value){
+      this.filterFormChanged();
+    }
+  }
+
   filterFormChanged() {
-    console.log(this.dashFilterForm.value);
+    if(this.isPartnerDashBoard){
+      this.dashFilterForm.patchValue({
+        'selectedPartnerId': this.partnerId
+      });
+    }
+    this.dashBoardFilters.emit(this.dashFilterForm.value);
   }
 }

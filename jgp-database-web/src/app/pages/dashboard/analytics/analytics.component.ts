@@ -1,11 +1,11 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
 import { analytics } from '@data/dashboard-data';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { GlobalService } from '@services/shared/global.service';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
-import { Subject, takeUntil, takeWhile } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-analytics',
@@ -17,7 +17,8 @@ import { Subject, takeUntil, takeWhile } from 'rxjs';
   templateUrl: './analytics.component.html',
   styleUrl: './analytics.component.scss'
 })
-export class AnalyticsComponent implements OnInit, OnDestroy {
+export class AnalyticsComponent implements OnInit, OnChanges, OnDestroy {
+  @Input('dashBoardFilters') dashBoardFilters: any;
   public chartSColorScheme: any = {
     domain: ['#2F3E9E', '#D22E2E', '#378D3B', '#7f7f7f', '#c4a678', '#6a7b6a', '#191919', '#3d144c', '#f0e1dc', '#a04324', '#00ffff', '#0e5600', '#0e9697']
   };
@@ -60,13 +61,22 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
     this.unsubscribe$.complete();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    this.dashBoardFilters = changes['dashBoardFilters']['currentValue']
+    this.reloadData();
+  }
+
   ngOnInit() {
+    this.reloadData();
+  }
+
+  reloadData() {
     this.analytics = analytics;
     this.getLastThreeYearsAccessedLoanPerPartnerSummary();
   }
 
   getLastThreeYearsAccessedLoanPerPartnerSummary() {
-    this.dashBoardService.getLastThreeYearsAccessedLoanPerPartnerSummary()
+    this.dashBoardService.getLastThreeYearsAccessedLoanPerPartnerSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {

@@ -1,18 +1,18 @@
 @if(authService.hasPermission('DASHBOARD_VIEW')){
 <app-content-header
     icon="dashboard" 
-    desc="Overview !"
+    desc="Main Dashboard !"
     [hideBreadcrumb]="true"
     [hasBgImage]="true" 
-    [class]="'py-3'"></app-content-header>
+    [class]="'py-3'"/>
 
 <div class="p-2">
-    <app-dashboard-filters></app-dashboard-filters>
-    <app-tiles></app-tiles>
-    <app-info-cards></app-info-cards>
+    <app-dashboard-filters (dashBoardFilters)="setDashBoardFilters($event)" [isPartnerDashBoard]="false" [fieldFlex]="25"/>
+    <app-tiles [dashBoardFilters]="dashBoardFilters"/>
+    <app-info-cards [dashBoardFilters]="dashBoardFilters"/>
     <div fxLayout="row wrap">
         <div fxFlex="100" fxFlex.gt-sm="70" class="p-2"> 
-            <app-analytics></app-analytics>
+            <app-analytics [dashBoardFilters]="dashBoardFilters"/>
         </div>
         <div fxFlex="100" fxFlex.gt-sm="30" fxLayout="column">
             <div fxFlex="100" class="p-2">
@@ -47,9 +47,6 @@
             </div>
         </div>
     </div>
-    
-    <!-- <app-team></app-team> -->
-
 </div>
 
 }

@@ -12,88 +12,72 @@ export class DashboardService {
     constructor(private httpClient: HttpClient, private globalService: GlobalService, private router: Router) { }
 
 
-    getHighLevelSummary(partnerId: number | undefined = undefined): Observable<any> {
-      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/high-level-summary${queryParam}`);
+    getHighLevelSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/high-level-summary?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
-    getLoansDisbursedByGenderSummary(partnerId: number | undefined = undefined): Observable<any> {
-      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-by-gender${queryParam}`);
+    getLoansDisbursedByGenderSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-by-gender?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
-    getLoanDisbursedByIndustrySectorSummary(partnerId: number | undefined = undefined): Observable<any> {
-      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-by-sector${queryParam}`);
+    getLoanDisbursedByIndustrySectorSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-by-sector?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
-    getLoanDisbursedByIndustrySegmentSummary(partnerId: number | undefined = undefined): Observable<any> {
-      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-by-segment${queryParam}`);
+    getLoanDisbursedByIndustrySegmentSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-by-segment?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
-    getLoanDisbursedTopFourSummary(): Observable<any> {
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-top-four-partners`);
+    getLoanDisbursedTopFourPartnersSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-top-four-partners?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
-    getLoanDisbursedTopFourCountiesSummary(partnerId: number | undefined = undefined): Observable<any> {
-      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-top-four-counties${queryParam}`);
+    getLoanDisbursedTopFourCountiesSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-top-four-counties?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
-    getBusinessTrainedTopFourCountiesSummary(partnerId: number | undefined = undefined): Observable<any> {
-      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/businesses-trained-top-four-counties${queryParam}`);
+    getBusinessTrainedTopFourCountiesSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/businesses-trained-top-four-counties?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
-    getBusinessesTrainedByGenderSummary(partnerId: number | undefined = undefined): Observable<any> {
-      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/businesses-trained-by-gender${queryParam}`);
+    getBusinessesTrainedByGenderSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/businesses-trained-by-gender?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
-    getLoansDisbursedByPipelineSummary(partnerId: number | undefined = undefined): Observable<any> {
-      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-by-pipeline${queryParam}`);
+    getLoansDisbursedByPipelineSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-by-pipeline?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
-    getLoansDisbursedByStatusSummary(partnerId: number | undefined = undefined): Observable<any> {
-      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-by-quality${queryParam}`);
+    getLoansDisbursedByStatusSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-by-quality?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
-    getTaNeedsByGenderSummary(partnerId: number | undefined = undefined): Observable<any> {
-      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/ta-needs-by-gender${queryParam}`);
+    getTaNeedsByGenderSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/ta-needs-by-gender?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
-    getTaTrainingBySectorSummary(partnerId: number | undefined = undefined): Observable<any> {
-      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/ta-training-by-sector${queryParam}`);
+    getTaTrainingBySectorSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/ta-training-by-sector?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
-    getTaTrainingBySegmentSummary(partnerId: number | undefined = undefined): Observable<any> {
-      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/ta-training-by-segment${queryParam}`);
+    getTaTrainingBySegmentSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/ta-training-by-segment?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
-    getTrainingByPartnerByGenderSummary(partnerId: number | undefined = undefined): Observable<any> {
-      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/training-by-partner-by-gender${queryParam}`);
+    getTrainingByPartnerByGenderSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/training-by-partner-by-gender?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
-    getLastThreeYearsAccessedLoanPerPartnerSummary(partnerId: number | undefined = undefined): Observable<any> {
-      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loan-accessed-per-partner-for-last-three-years${queryParam}`);
+    getLastThreeYearsAccessedLoanPerPartnerSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loan-accessed-per-partner-for-last-three-years?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
-    getLoansAccessedVsOutStandingByPartnerSummary(partnerId: number | undefined = undefined): Observable<any> {
-      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-accessed-vs-out-standing-per-partner${queryParam}`);
+    getLoansAccessedVsOutStandingByPartnerSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-accessed-vs-out-standing-per-partner?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
-    getLoansAccessedVsOutStandingByGenderSummary(partnerId: number | undefined = undefined): Observable<any> {
-      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-accessed-vs-out-standing-per-gender${queryParam}`);
+    getLoansAccessedVsOutStandingByGenderSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-accessed-vs-out-standing-per-gender?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
     getCountySummaryMap(partnerId: number | undefined = undefined): Observable<any> {
@@ -101,4 +85,32 @@ export class DashboardService {
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/county-summary-map${queryParam}`);
     }
 
+    getKenyanCounties(): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/kenyan-counties`);
+    }
+
+
+    getDashBoardQueryParams(dashBoardFilters: any): string {
+      const currentDate = new Date();
+      let dateFrom = new Date(`${currentDate.getFullYear()}-01-01`);
+      let dateTo = new Date(`${currentDate.getFullYear()}-12-31`);
+      let queryParam = `from-date=${dateFrom.toISOString().split('T')[0]}&to-date=${dateTo.toISOString().split('T')[0]}`
+      if(!dashBoardFilters){
+        return queryParam;
+      }
+      
+      if(dashBoardFilters.selectedDateFrom && dashBoardFilters.selectedDateTo) {
+        const currentDate = new Date();
+        dateFrom = dashBoardFilters.selectedDateFrom;
+        dateTo = dashBoardFilters.selectedDateTo;
+      }
+      queryParam = `from-date=${dateFrom.toISOString().split('T')[0]}&to-date=${dateTo.toISOString().split('T')[0]}`
+      if(dashBoardFilters.selectedPartnerId){
+        queryParam = `${queryParam}&partner-id=${dashBoardFilters.selectedPartnerId}`
+      }
+      if(dashBoardFilters.selectedCountyCode){
+        queryParam = `${queryParam}&county-code=${dashBoardFilters.selectedCountyCode}`
+      }
+        return queryParam;
+    }
 }

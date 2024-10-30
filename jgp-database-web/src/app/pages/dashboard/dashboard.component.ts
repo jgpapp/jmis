@@ -30,7 +30,10 @@ import { DashboardFiltersComponent } from './dashboard-filters/dashboard-filters
 })
 export class DashboardComponent {
 
-  constructor(private dashBoardService: DashboardService, public authService: AuthService){
-    
+  dashBoardFilters: any;
+  constructor(private dashBoardService: DashboardService, public authService: AuthService){}
+
+  setDashBoardFilters(currentDashBoardFilters: any){
+    this.dashBoardFilters = currentDashBoardFilters;
   }
 }

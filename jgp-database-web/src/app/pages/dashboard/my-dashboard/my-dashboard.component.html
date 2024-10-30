@@ -1,8 +1,10 @@
 @if(authService.hasPermission('MY_PARTNER_DASHBOARD_VIEW')){
-@if (partnerType === 'BMO') {
+@if (partnerType === 'TA') {
     <app-bmo-dashboard />
 }@else if (partnerType === 'FI') {
     <app-fi-dashboard />
+}@else if (partnerType === 'FI_TA') {
+    <app-bmo-fi-dashboard />
 }@else {
     <app-dashboard />
 }

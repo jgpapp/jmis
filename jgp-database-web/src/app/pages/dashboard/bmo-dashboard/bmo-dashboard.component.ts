@@ -12,6 +12,8 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { PieChartComponent } from '../pie-chart/pie-chart.component';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { Subject, takeUntil } from 'rxjs';
+import { DashboardFiltersComponent } from '../dashboard-filters/dashboard-filters.component';
+import { HighLevelSummaryDto } from '../dto/highLevelSummaryDto';
 
 @Component({
   selector: 'app-bmo-dashboard',
@@ -27,12 +29,14 @@ import { Subject, takeUntil } from 'rxjs';
     MatIconModule,
     NgxChartsModule,
     PieChartComponent,
+    DashboardFiltersComponent
   ],
   templateUrl: './bmo-dashboard.component.html',
   styleUrl: './bmo-dashboard.component.scss'
 })
 export class BmoDashboardComponent implements OnInit {
 
+  dashBoardFilters: any;
   partnerName: string = '';
   partnerId: any;
   public autoScale = true;
@@ -82,13 +86,27 @@ export class BmoDashboardComponent implements OnInit {
   public topFourCountiesBusinessesTrained: any[];
   public topFourCountiesBusinessesTrainedChartTitle: string = 'Businesses Trained Top Four Counties';
 
+  highLevelSummary: HighLevelSummaryDto = {businessesTrained: 0, businessesLoaned: 0, amountDisbursed: 0, outStandingAmount: 0}
+
   private unsubscribe$ = new Subject<void>();
   constructor(private authService: AuthService, private dashBoardService: DashboardService){
 
   }
+
+  setDashBoardFilters(currentDashBoardFilters: any){
+    this.dashBoardFilters = currentDashBoardFilters;
+    this.reloadData();
+  }
+
   ngOnInit(): void {
+    this.dashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId}
+    this.reloadData();
+  }
+
+  reloadData(): void {
     this.partnerName = `${this.authService.currentUser()?.partnerName} Dashboard !`;
     this.partnerId = this.authService.currentUser()?.partnerId;
+    this.getHighLevelSummary();
     this.getTaNeedsByGenderSummary();
     this.getTaTrainingBySectorSummary();
     this.getTaTrainingBySegmentSummary();
@@ -96,9 +114,20 @@ export class BmoDashboardComponent implements OnInit {
     this.getBusinessTrainedTopFourCountiesSummary();
   }
 
+  getHighLevelSummary() {
+    this.dashBoardService.getHighLevelSummary(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.highLevelSummary = response;
+        },
+        error: (error) => { }
+      });
+  }
+
 
   getTaNeedsByGenderSummary() {
-    this.dashBoardService.getTaNeedsByGenderSummary(this.partnerId)
+    this.dashBoardService.getTaNeedsByGenderSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -109,7 +138,7 @@ export class BmoDashboardComponent implements OnInit {
   }
 
   getTaTrainingBySectorSummary() {
-    this.dashBoardService.getTaTrainingBySectorSummary(this.partnerId)
+    this.dashBoardService.getTaTrainingBySectorSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -120,7 +149,7 @@ export class BmoDashboardComponent implements OnInit {
   }
 
   getTaTrainingBySegmentSummary() {
-    this.dashBoardService.getTaTrainingBySegmentSummary(this.partnerId)
+    this.dashBoardService.getTaTrainingBySegmentSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -131,7 +160,7 @@ export class BmoDashboardComponent implements OnInit {
   }
 
   getBusinessesTrainedByGenderSummary() {
-    this.dashBoardService.getBusinessesTrainedByGenderSummary(this.partnerId)
+    this.dashBoardService.getBusinessesTrainedByGenderSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -142,7 +171,7 @@ export class BmoDashboardComponent implements OnInit {
   }
 
   getBusinessTrainedTopFourCountiesSummary() {
-    this.dashBoardService.getBusinessTrainedTopFourCountiesSummary(this.partnerId)
+    this.dashBoardService.getBusinessTrainedTopFourCountiesSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
