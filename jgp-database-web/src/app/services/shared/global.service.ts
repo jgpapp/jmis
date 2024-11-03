@@ -15,6 +15,7 @@ export class GlobalService {
   HTTP_OPTIONS = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   };
+  
   constructor(public _snackBar: MatSnackBar) { }
 
   openSnackBar(message: string, action: string) {

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { ContentHeaderComponent } from '../../theme/components/content-header/content-header.component';
@@ -23,24 +23,27 @@ import { Subject, takeUntil } from 'rxjs';
   styleUrl: './clients.component.scss'
  
 })
-export class ClientsComponent implements OnInit, OnDestroy{
+export class ClientsComponent implements OnInit, AfterViewInit, OnDestroy{
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   public displayedColumns = ['businessName', 'jgpId', 'phoneNumber', 'ownerGender', 'businessLocation'];
   public dataSource: any;
 
-  clients: any
+  participants: any
+  totalItems = 0;
   private unsubscribe$ = new Subject<void>();
   constructor(private clientService: ClientService, public authService: AuthService) { }
 
-  getAvailableClients() {
-    this.clientService.getAvailableClients()
+  getAvailableClients(page: number, size: number) {
+    this.clientService.getAvailableClients(page, size)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
-          this.clients = response;
-          this.dataSource = new MatTableDataSource(this.clients);
+          console.log(response)
+          this.participants = response.content;
+          this.dataSource = new MatTableDataSource(this.participants);
+          this.totalItems = response.totalElements;
         },
         error: (error) => { }
       });
@@ -51,12 +54,15 @@ export class ClientsComponent implements OnInit, OnDestroy{
     if(this.dataSource){
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
+      this.paginator.page.subscribe(() => {
+        this.getAvailableClients(this.paginator.pageIndex, this.paginator.pageSize);
+      });
     }
     
   }
 
   ngOnInit(): void {
-    this.getAvailableClients();
+    this.getAvailableClients(0, 10);
   }
 
   ngOnDestroy(): void {

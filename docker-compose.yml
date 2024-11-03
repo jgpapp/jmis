@@ -1,16 +1,18 @@
-version: '3.9'
+version: '3.9'  
 services:
   postgres_jgp_db:
     container_name: postgres_jgp_db
     image: postgres:15.4-alpine
-    environment:
-      - POSTGRES_PASSWORD=S3cretHptu
+    environment:  
+      - POSTGRES_PASSWORD=S3cretJmIs@#321
       - POSTGRES_USER=jgp_user
       - POSTGRES_DB=jgp_db
     networks:
       - jgp-app-network
+    ports:
+      - "5433:5432"
     volumes:
-      - /data/jgpData:/var/lib/postgresql/data
+      - jgp_data:/var/lib/postgresql/data
   jgp_app:
     container_name: jgp_app
     build:
@@ -25,7 +27,7 @@ services:
       - POSTGRESQL_HOST=postgres_jgp_db
       - POSTGRESQL_PORT=5432
       - POSTGRESQL_USER=jgp_user
-      - POSTGRESQL_PASSWORD=S3cretHptu
+      - POSTGRESQL_PASSWORD=S3cretJmIs@#321
       - POSTGRESQL_DATABASE=jgp_db
     depends_on:
       - postgres_jgp_db
@@ -48,3 +50,6 @@ services:
 networks:
   jgp-app-network:
     driver: bridge
+volumes:
+  jgp_data:
+    driver: local

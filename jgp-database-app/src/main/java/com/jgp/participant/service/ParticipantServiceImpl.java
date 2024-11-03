@@ -11,6 +11,7 @@ import com.jgp.participant.dto.ParticipantResponseDto;
 import com.jgp.participant.exception.ParticipantNotFoundException;
 import com.jgp.participant.mapper.ParticipantMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -53,7 +54,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public List<Participant> availableClients(Pageable pageable) {
-        return this.participantRepository.findAll(pageable).stream().filter(Participant::getIsActive).toList();
+    public Page<Participant> availableClients(Pageable pageable) {
+        return this.participantRepository.findAll(pageable);
     }
 }
