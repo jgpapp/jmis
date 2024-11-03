@@ -5,6 +5,7 @@ import com.jgp.participant.dto.ParticipantDto;
 import com.jgp.participant.dto.ParticipantResponseDto;
 import com.jgp.participant.service.ParticipantService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -27,10 +28,10 @@ public class ParticipantController {
     private final ParticipantService participantService;
 
     @GetMapping
-    public ResponseEntity<List<Participant>> getAvailableClients(@RequestParam(name = "pageNumber", defaultValue = "1") Integer pageNumber,
-                                                                 @RequestParam(name = "pageSize", defaultValue = "200") Integer pageSize){
+    public ResponseEntity<Page<Participant>> getAvailableClients(@RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
+                                                                 @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
         final var sortedByDateCreated =
-                PageRequest.of(pageNumber - 1, pageSize, Sort.by("dateCreated").descending());
+                PageRequest.of(pageNumber, pageSize, Sort.by("dateCreated").descending());
         return new ResponseEntity<>(this.participantService.availableClients(sortedByDateCreated), HttpStatus.OK);
     }
 
