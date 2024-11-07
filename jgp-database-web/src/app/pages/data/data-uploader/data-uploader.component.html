@@ -21,7 +21,7 @@
                     <mat-form-field fxFlex>
                       <mat-label>Legal Form</mat-label>
                       <mat-select required formControlName="legalForm">
-                        @if (partnerType === 'BMO') {
+                        @if (partnerType === 'TA') {
                           <mat-option value="BMO_IMPORT_TEMPLATE">BMO Data Template</mat-option>
                       }@else if (partnerType === 'FI') {
                         <mat-option value="LOAN_IMPORT_TEMPLATE">Loan Template</mat-option>
