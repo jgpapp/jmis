@@ -14,21 +14,22 @@ export class DataUploadService {
     uploadDataTemplate(file: File, templateName: string): Observable<any> {
         const formData = new FormData();
         formData.append('excelFile', file, file.name);
-        if(templateName.toLowerCase().includes('bmo_import')){
+        console.log(templateName)
+        if(templateName.toUpperCase().includes('TA_IMPORT_TEMPLATE')){
             return this.httpClient.post(`${this.gs.BASE_API_URL}/bmos/upload-template`, formData);
-        }else if(templateName.toLowerCase().includes('loan_import')){
+        }else if(templateName.toUpperCase().includes('LOAN_IMPORT_TEMPLATE')){
             return this.httpClient.post(`${this.gs.BASE_API_URL}/loans/upload-template`, formData);
         }
         return of(null);
       }
 
       downloadDataTemplate(templateName: string): Observable<any> {
-        if(templateName.toLowerCase().includes('bmo_import')){
+        if(templateName.toUpperCase().includes('TA_IMPORT_TEMPLATE')){
             return this.httpClient.get(`${this.gs.BASE_API_URL}/bmos/template/download`, {
               responseType: 'arraybuffer',
               observe: 'response',
             });
-        }else if(templateName.toLowerCase().includes('loan_import')){
+        }else if(templateName.toUpperCase().includes('LOAN_IMPORT_TEMPLATE')){
             return this.httpClient.get(`${this.gs.BASE_API_URL}/loans/template/download`, {
               responseType: 'arraybuffer',
               observe: 'response',
@@ -47,8 +48,7 @@ export class DataUploadService {
     const headers = res.headers;
     const contentType = headers.get('Content-Type');
     const blob = new Blob([res.body], { type: contentType });
-    const dateToday = new Date()
-    const fileName = `${downloadFileName}_${dateToday.toISOString().split('T')[0]}.xlsx`;//this.getFileNameFromHttpHeaders(headers);
+    const fileName = this.getFileNameFromHttpHeaders(headers);
     let fileLink = document.createElement('a');
     document.body.appendChild(fileLink);
     fileLink.style.display = 'none';
@@ -68,7 +68,6 @@ export class DataUploadService {
    * @returns the file name found in the headers
    */
   getFileNameFromHttpHeaders(headers: any): string {
-    console.log(headers)
     const contentDispositionHeader = headers.get('Content-Disposition');
     let result = contentDispositionHeader.split(';')[1].trim().split('=')[1];
     return result.replace(/"/g, '');

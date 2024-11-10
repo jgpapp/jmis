@@ -82,10 +82,10 @@ export class DataUploaderComponent implements OnDestroy {
     let legalFormType = '';
     /** Only for Client Bulk Imports */
     if(this.authService.currentUser()?.partnerId){
-      if (this.template.name.toLowerCase().includes('loan')) {
-        legalFormType = 'LOAN';
-      } else if (this.template.name.toLowerCase().includes('bmo')) {
-        legalFormType = 'BMO';
+      if (this.template.name.toUpperCase().includes('LOAN_IMPORT_TEMPLATE')) {
+        legalFormType = 'LOAN_IMPORT_TEMPLATE';
+      } else if (this.template.name.toUpperCase().includes('TA_IMPORT_TEMPLATE')) {
+        legalFormType = 'TA_IMPORT_TEMPLATE';
       }else {
         this.gs.openSnackBar('Invalid Template', "Dismiss");
       }

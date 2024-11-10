@@ -56,7 +56,7 @@ public class BMOClientController {
 
     @GetMapping("template/download")
     public ResponseEntity<?> downloadDataTemplate(HttpServletResponse response) {
-        return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.BMO_IMPORT_TEMPLATE.toString(), response);
+        return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.TA_IMPORT_TEMPLATE.toString(), response);
     }
 
     @GetMapping("{bmoId}")
