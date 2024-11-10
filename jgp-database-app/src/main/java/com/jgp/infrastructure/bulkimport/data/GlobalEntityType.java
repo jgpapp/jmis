@@ -7,7 +7,7 @@ public enum GlobalEntityType {
 
     INVALID(0, "invalid"),
     LOAN_IMPORT_TEMPLATE(1, "Loans Template"),
-    BMO_IMPORT_TEMPLATE(2, "BMO Template");
+    TA_IMPORT_TEMPLATE(2, "BMO Template");
 
     private final Integer value;
     private final String code;

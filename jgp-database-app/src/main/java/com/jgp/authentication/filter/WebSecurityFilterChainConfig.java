@@ -38,6 +38,7 @@ public class WebSecurityFilterChainConfig {
                     configuration.setAllowedOrigins(List.of("*"));
                     configuration.setAllowedMethods(List.of("*"));
                     configuration.setAllowedHeaders(List.of("*"));
+                    configuration.setExposedHeaders(List.of("Content-Disposition"));
                     return configuration;
                 })).csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request.requestMatchers("/api/v1/users/authenticate")

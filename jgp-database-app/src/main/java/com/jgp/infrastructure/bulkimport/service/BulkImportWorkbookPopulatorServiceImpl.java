@@ -8,7 +8,9 @@ import com.jgp.shared.exception.ResourceNotFound;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ooxml.POIXMLProperties;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,11 +29,11 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
     @Override
     public ResponseEntity<?> getTemplate(String entityType, HttpServletResponse response) {
         WorkbookPopulator populator = null;
-        final Workbook workbook = new HSSFWorkbook();
+        final XSSFWorkbook workbook = new XSSFWorkbook();
         if (entityType != null) {
             if (entityType.trim().equalsIgnoreCase(GlobalEntityType.LOAN_IMPORT_TEMPLATE.toString())) {
                 populator = new LoanEntityWorkbookPopulator();
-            } else if (entityType.trim().equalsIgnoreCase(GlobalEntityType.BMO_IMPORT_TEMPLATE.toString())) {
+            } else if (entityType.trim().equalsIgnoreCase(GlobalEntityType.TA_IMPORT_TEMPLATE.toString())) {
                 populator = new BMOEntityWorkbookPopulator();
             }  else {
                 throw new ResourceNotFound(HttpStatus.NOT_FOUND);
@@ -43,7 +45,7 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
         }
     }
 
-    private ResponseEntity<?> buildResponse(final Workbook workbook, final String entity, HttpServletResponse response) {
+    private ResponseEntity<?> buildResponse(final XSSFWorkbook workbook, final String entity, HttpServletResponse response) {
         String filename = String.format("%s_%s.xlsx", entity, LocalDate.now());
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
@@ -54,8 +56,7 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
 
         // Set response headers
         HttpHeaders headers = new HttpHeaders();
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
-        headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.add("Content-Disposition", "attachment; filename=\"" + filename + "\"");
 
         return ResponseEntity.ok()
