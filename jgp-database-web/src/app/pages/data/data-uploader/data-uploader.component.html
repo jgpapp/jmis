@@ -22,7 +22,7 @@
                       <mat-label>Legal Form</mat-label>
                       <mat-select required formControlName="legalForm">
                         @if (partnerType === 'TA' || partnerType === 'FI_TA') {
-                          <mat-option value="BMO_IMPORT_TEMPLATE">TA Data Template</mat-option>
+                          <mat-option value="TA_IMPORT_TEMPLATE">TA Data Template</mat-option>
                       }@if (partnerType === 'FI' || partnerType === 'FI_TA') {
                         <mat-option value="LOAN_IMPORT_TEMPLATE">Loan Template</mat-option>
                       }
