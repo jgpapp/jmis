@@ -1,7 +1,6 @@
 package com.jgp.participant.api;
 
 import com.jgp.participant.domain.Participant;
-import com.jgp.participant.dto.ParticipantDto;
 import com.jgp.participant.dto.ParticipantResponseDto;
 import com.jgp.participant.service.ParticipantService;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @Validated
@@ -29,10 +26,11 @@ public class ParticipantController {
 
     @GetMapping
     public ResponseEntity<Page<Participant>> getAvailableClients(@RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
-                                                                 @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
+                                                                 @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                                                 @RequestParam(name = "searchText", required = false) String searchText){
         final var sortedByDateCreated =
                 PageRequest.of(pageNumber, pageSize, Sort.by("dateCreated").descending());
-        return new ResponseEntity<>(this.participantService.availableClients(sortedByDateCreated), HttpStatus.OK);
+        return new ResponseEntity<>(this.participantService.availableClients(searchText, sortedByDateCreated), HttpStatus.OK);
     }
 
     @GetMapping("{participantId}")

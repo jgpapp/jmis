@@ -1,8 +1,8 @@
 package com.jgp.patner.service;
 
 import com.jgp.patner.dto.PartnerDto;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface PartnerService {
 
@@ -12,6 +12,6 @@ public interface PartnerService {
 
     PartnerDto findPartnerById(Long userId);
 
-    List<PartnerDto> getAllPartners();
+    Page<PartnerDto> getAllPartners(Pageable pageable);
 
 }

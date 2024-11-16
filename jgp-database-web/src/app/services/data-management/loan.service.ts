@@ -25,11 +25,11 @@ export class LoanService {
         return this.httpClient.get(`${this.gs.BASE_API_URL}/loans?approvedByPartner=${approvedByPartner}`);
       }
 
-      approveLoansData(bmoIds: number[]): Observable<any> {
-        return this.httpClient.post(`${this.gs.BASE_API_URL}/loans/approve-or-reject?approved=true`, JSON.stringify(bmoIds));
+      approveLoansData(loanIds: number[]): Observable<any> {
+        return this.httpClient.post(`${this.gs.BASE_API_URL}/loans/approve-or-reject?approved=true`, JSON.stringify(loanIds));
       }
 
-      disapproveLoansData(bmoIds: number[]): Observable<any> {
-        return this.httpClient.post(`${this.gs.BASE_API_URL}/loans/approve-or-reject?approved=false`, JSON.stringify(bmoIds));
+      disapproveLoansData(loanIds: number[]): Observable<any> {
+        return this.httpClient.post(`${this.gs.BASE_API_URL}/loans/approve-or-reject?approved=false`, JSON.stringify(loanIds));
       }
 }

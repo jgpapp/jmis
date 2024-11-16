@@ -6,6 +6,9 @@ import com.jgp.shared.dto.ApiResponseDto;
 import com.jgp.util.CommonUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -28,8 +32,11 @@ public class PartnerController {
     private final PartnerService partnerService;
 
     @GetMapping
-    public ResponseEntity<List<PartnerDto>> getAvailablePartners(){
-        return new ResponseEntity<>(this.partnerService.getAllPartners(), HttpStatus.OK);
+    public ResponseEntity<Page<PartnerDto>> getAvailablePartners(@RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
+                                                                 @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
+        final var sortedByDateCreated =
+                PageRequest.of(pageNumber, pageSize, Sort.by("dateCreated").descending());
+        return new ResponseEntity<>(this.partnerService.getAllPartners(sortedByDateCreated), HttpStatus.OK);
     }
 
     @PostMapping

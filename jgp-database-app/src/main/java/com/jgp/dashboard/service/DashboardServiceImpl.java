@@ -44,8 +44,8 @@ public class DashboardServiceImpl implements DashboardService {
     private static final String COUNTY_CODE_PARAM = "countyCode";
     private static final String DATA_VALUE_PARAM = "dataValue";
     private static final String DATA_PERCENTAGE_VALUE_PARAM = "percentage";
-    private static final String LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM = "WHERE l.date_disbursed between :fromDate and :toDate  ";
-    private static final String BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM = "WHERE bpd.date_partner_recorded between :fromDate and :toDate ";
+    private static final String LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM = "WHERE l.date_disbursed between :fromDate and :toDate  and l.data_is_approved = true ";
+    private static final String BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM = "WHERE bpd.date_partner_recorded between :fromDate and :toDate and bpd.data_is_approved = true ";
     private static final String LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and l.partner_id = :partnerId ";
     private static final String BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and bpd.partner_id = :partnerId ";
     private static final String WHERE_CLAUSE_BY_COUNTY_CODE_PARAM = "and cl.location_county_code = :countyCode";
@@ -494,6 +494,41 @@ public class DashboardServiceImpl implements DashboardService {
                     )
                     select sum(businessesTrained) as businessesTrained, sum(businessesLoaned) as businessesLoaned,\s
                     sum(amountDisbursed) as amountDisbursed, sum(outStandingAmount) as outStandingAmount
+                    from highLevelSummary;
+                   \s""";
+
+        public static final String SCHEMA2 = """
+                    with highLevelSummary as (\s
+                    select count(*) as businessesTrained,\s
+                    0 as businessesLoaned, 0 as amountDisbursed,\s
+                    0 as outStandingAmount from bmo_participants_data bpd\s
+                    inner join participants cl on bpd.participant_id = cl.id %s \s
+                    union
+                    select 0 as businessesTrained, count(*) as businessesLoaned,\s
+                    sum(loan_amount_accessed) as amountDisbursed, sum(loan_outstanding_amount) as outStandingAmount from loans l\s
+                    inner join participants cl on l.participant_id = cl.id %s\s
+                    )
+                    select \s
+                    CASE
+                         WHEN sum(businessesTrained) >= 1000000000 THEN ROUND(sum(businessesTrained) / 1000000000.0, 2) || 'B'
+                         WHEN sum(businessesTrained) >= 1000000 THEN ROUND(sum(businessesTrained) / 1000000.0, 2) || 'M'
+                         ELSE amount::TEXT
+                     END AS businessesTrained,
+                      CASE
+                         WHEN sum(businessesLoaned) >= 1000000000 THEN ROUND(sum(businessesLoaned) / 1000000000.0, 1) || 'B'
+                         WHEN sum(businessesLoaned) >= 1000000 THEN ROUND(sum(businessesLoaned) / 1000000.0, 1) || 'M'
+                         ELSE amount::TEXT
+                     END AS businessesLoaned,\s
+                     CASE
+                         WHEN sum(amountDisbursed) >= 1000000000 THEN ROUND(sum(amountDisbursed) / 1000000000.0, 1) || 'B'
+                         WHEN sum(amountDisbursed) >= 1000000 THEN ROUND(sum(amountDisbursed) / 1000000.0, 1) || 'M'
+                         ELSE amount::TEXT
+                     END AS amountDisbursed,
+                     CASE
+                         WHEN sum(outStandingAmount) >= 1000000000 THEN ROUND(sum(outStandingAmount) / 1000000000.0, 1) || 'B'
+                         WHEN sum(outStandingAmount) >= 1000000 THEN ROUND(sum(outStandingAmount) / 1000000.0, 1) || 'M'
+                         ELSE amount::TEXT
+                     END AS outStandingAmount
                     from highLevelSummary;
                    \s""";
 

@@ -31,7 +31,14 @@
             <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
             <mat-row *matRowDef="let row; columns: displayedColumns;" [routerLink]="['/partners', row.id, 'details']"></mat-row>
         </mat-table>
-        <mat-paginator #paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"></mat-paginator>
+        <mat-paginator 
+        #paginator 
+        [length]="totalItems" 
+        [pageSize]="pageSize" 
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="[2, 3, 5, 10, 20]" 
+        (page)="onPageChange($event)"
+        />
     </div>
 </div>
 }

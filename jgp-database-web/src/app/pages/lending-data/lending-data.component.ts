@@ -91,8 +91,8 @@ export class LendingDataComponent implements OnDestroy, OnInit {
       this.dataSource.data.forEach((row: any) => this.selection.select(row));
   }
 
-  approveSelectedRows(){
-    this.loanService.approveLoansData(this.selection.selected.map(row => row.id))
+  approveLoansData(loanIds: number[]){
+    this.loanService.approveLoansData(loanIds)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -101,6 +101,14 @@ export class LendingDataComponent implements OnDestroy, OnInit {
         },
         error: (error) => { }
       });
+  }
+
+  approveSelectedRows(){
+    this.approveLoansData(this.selection.selected.map(row => row.id));
+  }
+
+  approveAllPartnerLoansData(){
+    this.approveLoansData([]);
   }
 
 

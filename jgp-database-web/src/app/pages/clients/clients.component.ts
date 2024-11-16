@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { ContentHeaderComponent } from '../../theme/components/content-header/content-header.component';
 import { ClientService } from '@services/data-management/clients.service';
@@ -8,6 +8,9 @@ import { RouterModule } from '@angular/router';
 import { NoPermissionComponent } from '../errors/no-permission/no-permission.component';
 import { AuthService } from '@services/users/auth.service';
 import { Subject, takeUntil } from 'rxjs';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-clients',
@@ -17,13 +20,16 @@ import { Subject, takeUntil } from 'rxjs';
     MatPaginatorModule,
     ContentHeaderComponent,
     RouterModule,
-    NoPermissionComponent
+    NoPermissionComponent,
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule
   ],
   templateUrl: './clients.component.html',
   styleUrl: './clients.component.scss'
  
 })
-export class ClientsComponent implements OnInit, AfterViewInit, OnDestroy{
+export class ClientsComponent implements OnInit, OnDestroy{
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -31,16 +37,18 @@ export class ClientsComponent implements OnInit, AfterViewInit, OnDestroy{
   public dataSource: any;
 
   participants: any
+  public searchText: string | null;
+  pageSize = 10;
+  pageIndex = 0;
   totalItems = 0;
   private unsubscribe$ = new Subject<void>();
   constructor(private clientService: ClientService, public authService: AuthService) { }
 
-  getAvailableClients(page: number, size: number) {
-    this.clientService.getAvailableClients(page, size)
+  getAvailableClients() {
+    this.clientService.getAvailableClients(this.searchText, this.pageIndex, this.pageSize)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
-          console.log(response)
           this.participants = response.content;
           this.dataSource = new MatTableDataSource(this.participants);
           this.totalItems = response.totalElements;
@@ -49,20 +57,26 @@ export class ClientsComponent implements OnInit, AfterViewInit, OnDestroy{
       });
   }
 
-  
-  ngAfterViewInit() {
-    if(this.dataSource){
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
-      this.paginator.page.subscribe(() => {
-        this.getAvailableClients(this.paginator.pageIndex, this.paginator.pageSize);
-      });
+  onChange(event: Event) {
+    const newValue = (event.target as HTMLInputElement).value;
+    if(newValue.length > 2){
+      this.searchText = newValue;
+      this.getAvailableClients();
+    }else {
+      this.searchText = null;
+      this.getAvailableClients();
     }
-    
+    console.log('Input value changed:', newValue);
+  }
+
+  onPageChange(event: PageEvent) {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.getAvailableClients();
   }
 
   ngOnInit(): void {
-    this.getAvailableClients(0, 10);
+    this.getAvailableClients();
   }
 
   ngOnDestroy(): void {

@@ -1,5 +1,6 @@
 package com.jgp.bmo.service;
 
+import com.jgp.authentication.service.PlatformSecurityContext;
 import com.jgp.bmo.domain.BMOParticipantData;
 import com.jgp.bmo.domain.BMOClientDataRepository;
 import com.jgp.bmo.domain.predicate.BMOPredicateBuilder;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,7 @@ public class BMOClientDataServiceImpl implements BMOClientDataService {
     private final BMOClientMapper bmoClientMapper;
     private final BMOPredicateBuilder bmoPredicateBuilder;
     private final ParticipantRepository participantRepository;
+    private final PlatformSecurityContext platformSecurityContext;
 
     @Override
     public void createBMOData(List<BMOParticipantData> bmoDataListRequest) {
@@ -38,7 +41,14 @@ public class BMOClientDataServiceImpl implements BMOClientDataService {
     @Transactional
     @Override
     public void approvedBMOParticipantsData(List<Long> dataIds, Boolean approval) {
-        final var bmoData = this.bmoDataRepository.findAllById(dataIds);
+        var bmoData = this.bmoDataRepository.findAllById(dataIds);
+        if (dataIds.isEmpty()) {
+            var currentUser = this.platformSecurityContext.getAuthenticatedUserIfPresent();
+            var currentUserPartner = Objects.nonNull(currentUser) ? currentUser.getPartner() : null;
+            if(Objects.nonNull(currentUserPartner)) {
+                bmoData = this.bmoDataRepository.findAll(this.bmoPredicateBuilder.buildPredicateForSearchTAData(new BMOParticipantSearchCriteria(currentUserPartner.getId(), null, false)), Pageable.unpaged()).getContent();
+            }
+        }
         bmoData.forEach(bmo -> {
             bmo.approveData(approval);
             var participant = bmo.getParticipant();
@@ -61,7 +71,7 @@ public class BMOClientDataServiceImpl implements BMOClientDataService {
 
     @Override
     public List<BMOClientDto> getBMODataRecords(BMOParticipantSearchCriteria searchCriteria, Pageable pageable) {
-        return this.bmoClientMapper.toDto(this.bmoDataRepository.findAll(this.bmoPredicateBuilder.buildPredicateForSearchLoans(searchCriteria), pageable).stream().toList());
+        return this.bmoClientMapper.toDto(this.bmoDataRepository.findAll(this.bmoPredicateBuilder.buildPredicateForSearchTAData(searchCriteria), pageable).stream().toList());
     }
 
     @Override

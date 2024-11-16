@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { ContentHeaderComponent } from '../../theme/components/content-header/content-header.component';
 import { MatSort } from '@angular/material/sort';
@@ -40,6 +40,9 @@ import { Subject, takeUntil } from 'rxjs';
 export class PartnersComponent implements OnInit, OnDestroy{
   public searchText: string;
   public page: any;
+  pageSize = 10;
+  pageIndex = 0;
+  totalItems = 0;
   public showSearch: boolean = false;
   public viewType: string = 'grid';
   
@@ -53,15 +56,21 @@ export class PartnersComponent implements OnInit, OnDestroy{
   constructor(public dialog: MatDialog, private partnerService: PartnerService, public authService: AuthService) { }
 
   getAvailablePartners() {
-    this.partnerService.getAvailablePartners()
+    this.partnerService.getAvailablePartners(this.pageIndex, this.pageSize)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
-          this.partners = response;
+          this.partners = response.content;
           this.dataSource = new MatTableDataSource(this.partners);
         },
         error: (error) => { }
       });
+  }
+
+  onPageChange(event: PageEvent) {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.getAvailablePartners();
   }
 
   
