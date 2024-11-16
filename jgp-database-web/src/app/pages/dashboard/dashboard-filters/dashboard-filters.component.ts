@@ -64,11 +64,11 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit {
   }
 
   getAvailablePartners() {
-    this.partnerService.getAvailablePartners()
+    this.partnerService.getAvailablePartners(0, 400)
     .pipe(takeUntil(this.unsubscribe$))
         .subscribe({
           next: (response) => {
-            this.partners = response
+            this.partners = response.content
           },
           error: (error) => {
             this.gs.openSnackBar(`An error occured ${error.error.detail}`, "Dismiss");

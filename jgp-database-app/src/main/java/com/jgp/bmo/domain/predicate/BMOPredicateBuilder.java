@@ -2,8 +2,6 @@ package com.jgp.bmo.domain.predicate;
 
 import com.jgp.bmo.domain.QBMOParticipantData;
 import com.jgp.bmo.dto.BMOParticipantSearchCriteria;
-import com.jgp.finance.domain.QLoan;
-import com.jgp.finance.dto.LoanSearchCriteria;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import org.springframework.stereotype.Component;
@@ -15,12 +13,12 @@ import java.util.List;
 public class BMOPredicateBuilder {
 
     /**
-     * Build predicate for search users
+     * Build predicate for search ta data
      *
      * @param searchCriteria searchCriteria
      * @return {@link BooleanBuilder}
      */
-    public BooleanBuilder buildPredicateForSearchLoans(BMOParticipantSearchCriteria searchCriteria) {
+    public BooleanBuilder buildPredicateForSearchTAData(BMOParticipantSearchCriteria searchCriteria) {
 
         QBMOParticipantData qbmoParticipantData = QBMOParticipantData.bMOParticipantData;
         BooleanBuilder builder = new BooleanBuilder();

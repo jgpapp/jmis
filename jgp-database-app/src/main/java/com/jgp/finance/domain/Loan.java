@@ -135,7 +135,7 @@ public class Loan extends BaseEntity {
 
         NORMAL("Normal"),
         WATCH("Watch"),
-        SUB_STANDARD("Substandard"),
+        SUBSTANDARD("Substandard"),
         DOUBTFUL("Doubtful"),
         LOSS("Loss");
 

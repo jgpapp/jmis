@@ -87,7 +87,7 @@ export class UserDialogComponent implements OnInit {
   }
 
   getAvailablePartners() {
-    this.partnerService.getAvailablePartners()
+    this.partnerService.getAvailablePartners(0, 400)
         .subscribe({
           next: (response) => {
             this.partners = response

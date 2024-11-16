@@ -1,11 +1,13 @@
 package com.jgp.participant.service;
 
+import com.jgp.bmo.domain.predicate.BMOPredicateBuilder;
 import com.jgp.bmo.dto.BMOParticipantSearchCriteria;
 import com.jgp.bmo.service.BMOClientDataService;
 import com.jgp.finance.dto.LoanSearchCriteria;
 import com.jgp.finance.service.LoanService;
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.domain.ParticipantRepository;
+import com.jgp.participant.domain.predicate.ParticipantsPredicateBuilder;
 import com.jgp.participant.dto.ParticipantDto;
 import com.jgp.participant.dto.ParticipantResponseDto;
 import com.jgp.participant.exception.ParticipantNotFoundException;
@@ -28,6 +30,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final ParticipantMapper participantMapper;
     private final LoanService loanService;
     private final BMOClientDataService bmoClientDataService;
+    private final ParticipantsPredicateBuilder participantsPredicateBuilder;
 
     @Override
     public Participant createClient(ParticipantDto clientDto) {
@@ -54,7 +57,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public Page<Participant> availableClients(Pageable pageable) {
-        return this.participantRepository.findAll(pageable);
+    public Page<Participant> availableClients(String searchText, Pageable pageable) {
+        return this.participantRepository.findAll(this.participantsPredicateBuilder.buildPredicateForSearchParticipants(searchText), pageable);
     }
 }

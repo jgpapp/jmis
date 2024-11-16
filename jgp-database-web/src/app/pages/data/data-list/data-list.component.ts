@@ -86,8 +86,8 @@ export class DataListComponent implements OnDestroy{
       this.dataSource.data.forEach((row: any) => this.selection.select(row));
   }
 
-  approveSelectedRows(){
-    this.bmoClientDataService.approveBMOClientData(this.selection.selected.map(row => row.id))
+  approveTAData(bmoIds: number[]){
+    this.bmoClientDataService.approveBMOClientData(bmoIds)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -96,6 +96,14 @@ export class DataListComponent implements OnDestroy{
         },
         error: (error) => { }
       });
+  }
+
+  approveSelectedRows(){
+    this.approveTAData(this.selection.selected.map(row => row.id));
+  }
+
+  approveAllPartnerTAData(){
+    this.approveTAData([]);
   }
 
   ngOnDestroy(): void {

@@ -12,10 +12,17 @@ export class ClientService {
     constructor(private httpClient: HttpClient, private globalService: GlobalService, private router: Router) { }
 
 
-    getAvailableClients(page: number, size: number): Observable<any> {
-      const params = new HttpParams()
+    getAvailableClients(searchText: string | null, page: number, size: number): Observable<any> {
+      console.log(searchText)
+      let params = new HttpParams()
       .set('pageNumber', page.toString())
       .set('pageSize', size.toString());
+      if(searchText && null !== searchText){
+        params = new HttpParams()
+        .set('pageNumber', page.toString())
+        .set('pageSize', size.toString())
+        .set('searchText', searchText);
+      }
         return this.httpClient.get(`${this.globalService.BASE_API_URL}/participants`, { params });
     }
 

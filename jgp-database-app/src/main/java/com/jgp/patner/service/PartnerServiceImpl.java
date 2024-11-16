@@ -7,6 +7,9 @@ import com.jgp.patner.dto.PartnerDto;
 import com.jgp.patner.exception.PartnerNotFoundException;
 import com.jgp.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,8 +55,8 @@ public class PartnerServiceImpl implements PartnerService {
     }
 
     @Override
-    public List<PartnerDto> getAllPartners() {
-        return this.partnerRepository.findAll().stream().map(p -> new PartnerDto(p.getId(), p.getPartnerName(), p.getType().getName(), p.getType().name())).toList();
+    public Page<PartnerDto> getAllPartners(Pageable pageable) {
+        return new PageImpl<>(this.partnerRepository.findAll(pageable).stream().map(p -> new PartnerDto(p.getId(), p.getPartnerName(), p.getType().getName(), p.getType().name())).toList());
     }
 
 }

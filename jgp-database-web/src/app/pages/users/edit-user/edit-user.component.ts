@@ -86,7 +86,7 @@ export class EditUserComponent implements OnDestroy{
     }
     
     getAvailablePartners() {
-      this.partnerService.getAvailablePartners()
+      this.partnerService.getAvailablePartners(0, 400)
       .pipe(takeUntil(this.unsubscribe$))
           .subscribe({
             next: (response) => {
