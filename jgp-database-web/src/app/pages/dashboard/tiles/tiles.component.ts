@@ -20,7 +20,7 @@ import { Subject, takeUntil } from 'rxjs';
 export class TilesComponent implements OnInit, OnDestroy, OnChanges {
 
   @Input('dashBoardFilters') dashBoardFilters: any;
-  highLevelSummary: HighLevelSummaryDto = {businessesTrained: 0, businessesLoaned: 0, amountDisbursed: 0, outStandingAmount: 0}
+  highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', outStandingAmount: '0'}
   private unsubscribe$ = new Subject<void>();
   constructor(private dashBoardService: DashboardService){
 
@@ -36,7 +36,7 @@ export class TilesComponent implements OnInit, OnDestroy, OnChanges {
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
-          this.highLevelSummary = response;
+          this.highLevelSummary = this.dashBoardService.getFormattedTileData(response);
         },
         error: (error) => { }
       });
@@ -50,4 +50,5 @@ export class TilesComponent implements OnInit, OnDestroy, OnChanges {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
+
 }

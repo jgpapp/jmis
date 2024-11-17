@@ -497,41 +497,6 @@ public class DashboardServiceImpl implements DashboardService {
                     from highLevelSummary;
                    \s""";
 
-        public static final String SCHEMA2 = """
-                    with highLevelSummary as (\s
-                    select count(*) as businessesTrained,\s
-                    0 as businessesLoaned, 0 as amountDisbursed,\s
-                    0 as outStandingAmount from bmo_participants_data bpd\s
-                    inner join participants cl on bpd.participant_id = cl.id %s \s
-                    union
-                    select 0 as businessesTrained, count(*) as businessesLoaned,\s
-                    sum(loan_amount_accessed) as amountDisbursed, sum(loan_outstanding_amount) as outStandingAmount from loans l\s
-                    inner join participants cl on l.participant_id = cl.id %s\s
-                    )
-                    select \s
-                    CASE
-                         WHEN sum(businessesTrained) >= 1000000000 THEN ROUND(sum(businessesTrained) / 1000000000.0, 2) || 'B'
-                         WHEN sum(businessesTrained) >= 1000000 THEN ROUND(sum(businessesTrained) / 1000000.0, 2) || 'M'
-                         ELSE amount::TEXT
-                     END AS businessesTrained,
-                      CASE
-                         WHEN sum(businessesLoaned) >= 1000000000 THEN ROUND(sum(businessesLoaned) / 1000000000.0, 1) || 'B'
-                         WHEN sum(businessesLoaned) >= 1000000 THEN ROUND(sum(businessesLoaned) / 1000000.0, 1) || 'M'
-                         ELSE amount::TEXT
-                     END AS businessesLoaned,\s
-                     CASE
-                         WHEN sum(amountDisbursed) >= 1000000000 THEN ROUND(sum(amountDisbursed) / 1000000000.0, 1) || 'B'
-                         WHEN sum(amountDisbursed) >= 1000000 THEN ROUND(sum(amountDisbursed) / 1000000.0, 1) || 'M'
-                         ELSE amount::TEXT
-                     END AS amountDisbursed,
-                     CASE
-                         WHEN sum(outStandingAmount) >= 1000000000 THEN ROUND(sum(outStandingAmount) / 1000000000.0, 1) || 'B'
-                         WHEN sum(outStandingAmount) >= 1000000 THEN ROUND(sum(outStandingAmount) / 1000000.0, 1) || 'M'
-                         ELSE amount::TEXT
-                     END AS outStandingAmount
-                    from highLevelSummary;
-                   \s""";
-
         @Override
         public HighLevelSummaryDto mapRow(ResultSet rs, int rowNum) throws SQLException {
             final var businessesTrained = rs.getInt("businessesTrained");

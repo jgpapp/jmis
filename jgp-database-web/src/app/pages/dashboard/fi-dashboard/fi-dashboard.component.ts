@@ -100,7 +100,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   public topFourCountiesloansDisbursed: any[];
   public topFourCountiesloansDisbursedChartTitle: string = 'Loan Disbursed Top Four Counties';
 
-  highLevelSummary: HighLevelSummaryDto = {businessesTrained: 0, businessesLoaned: 0, amountDisbursed: 0, outStandingAmount: 0}
+  highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', outStandingAmount: '0'}
 
   private unsubscribe$ = new Subject<void>();
   constructor(private authService: AuthService, private dashBoardService: DashboardService){
@@ -135,7 +135,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
-          this.highLevelSummary = response;
+          this.highLevelSummary = this.dashBoardService.getFormattedTileData(response);
         },
         error: (error) => { }
       });

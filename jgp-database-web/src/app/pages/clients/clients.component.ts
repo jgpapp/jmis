@@ -51,7 +51,7 @@ export class ClientsComponent implements OnInit, OnDestroy{
         next: (response) => {
           this.participants = response.content;
           this.dataSource = new MatTableDataSource(this.participants);
-          this.totalItems = response.totalElements;
+          this.totalItems = response.page.totalElements;
         },
         error: (error) => { }
       });
@@ -66,7 +66,6 @@ export class ClientsComponent implements OnInit, OnDestroy{
       this.searchText = null;
       this.getAvailableClients();
     }
-    console.log('Input value changed:', newValue);
   }
 
   onPageChange(event: PageEvent) {
