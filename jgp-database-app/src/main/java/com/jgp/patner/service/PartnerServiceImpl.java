@@ -56,7 +56,7 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     public Page<PartnerDto> getAllPartners(Pageable pageable) {
-        return new PageImpl<>(this.partnerRepository.findAll(pageable).stream().map(p -> new PartnerDto(p.getId(), p.getPartnerName(), p.getType().getName(), p.getType().name())).toList());
+        return new PageImpl<>(this.partnerRepository.findAll(pageable).stream().map(p -> new PartnerDto(p.getId(), p.getPartnerName(), p.getType().getName(), p.getType().name())).toList(), pageable, this.partnerRepository.findAll().size());
     }
 
 }

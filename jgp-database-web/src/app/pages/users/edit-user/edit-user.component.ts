@@ -90,7 +90,7 @@ export class EditUserComponent implements OnDestroy{
       .pipe(takeUntil(this.unsubscribe$))
           .subscribe({
             next: (response) => {
-              this.partners = response
+              this.partners = response.content
             },
             error: (error) => {
               this.gs.openSnackBar(`An error occured ${error.error.detail}`, "Dismiss");

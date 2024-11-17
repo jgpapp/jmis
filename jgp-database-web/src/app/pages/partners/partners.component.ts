@@ -62,6 +62,7 @@ export class PartnersComponent implements OnInit, OnDestroy{
         next: (response) => {
           this.partners = response.content;
           this.dataSource = new MatTableDataSource(this.partners);
+          this.totalItems = response.page.totalElements;
         },
         error: (error) => { }
       });

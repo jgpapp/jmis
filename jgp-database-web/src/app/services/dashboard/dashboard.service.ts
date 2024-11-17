@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { GlobalService } from '@services/shared/global.service';
 import { Observable } from 'rxjs';
+import { HighLevelSummaryDto } from '../../pages/dashboard/dto/highLevelSummaryDto';
 
 @Injectable({
   providedIn: 'root'
@@ -126,6 +127,15 @@ export class DashboardService {
         notation: 'compact',
         compactDisplay: 'short'
       });
+    }
+
+    getFormattedTileData(highLevelSummary: any): HighLevelSummaryDto{
+      return {
+        businessesTrained: this.formatNumberToShortForm(highLevelSummary.businessesTrained), 
+        businessesLoaned: this.formatNumberToShortForm(highLevelSummary.businessesLoaned), 
+        amountDisbursed: this.formatNumberToShortForm(highLevelSummary.amountDisbursed), 
+        outStandingAmount: this.formatNumberToShortForm(highLevelSummary.outStandingAmount)
+      }
     }
 
 
