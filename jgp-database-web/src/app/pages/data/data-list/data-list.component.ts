@@ -5,7 +5,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { DataUploadComponent } from "../data-upload/data-upload.component";
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
@@ -17,6 +16,9 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { HasPermissionDirective } from '../../../directives/has-permission.directive';
 import { GlobalService } from '@services/shared/global.service';
 import { Subject, takeUntil } from 'rxjs';
+import { ConfirmDialogModel } from '../../../dto/confirm-dialog-model';
+import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-data-list',
@@ -28,7 +30,6 @@ import { Subject, takeUntil } from 'rxjs';
     MatButtonModule,
     MatButtonToggleModule,
     MatIconModule,
-    DataUploadComponent,
     MatTableModule,
     MatPaginatorModule,
     NoPermissionComponent,
@@ -48,7 +49,7 @@ export class DataListComponent implements OnDestroy{
   public selection = new SelectionModel<any>(true, []);
 
   private unsubscribe$ = new Subject<void>();
-  constructor(private bmoClientDataService: BMOClientDataService, public authService: AuthService, private gs: GlobalService) { }
+  constructor(private bmoClientDataService: BMOClientDataService, public authService: AuthService, private gs: GlobalService, private dialog: MatDialog) { }
 
   getAvailableBMOClientData() {
     this.bmoClientDataService.getAvailableBMOClientData(false, this.authService.currentUser()?.partnerId)
@@ -86,7 +87,30 @@ export class DataListComponent implements OnDestroy{
       this.dataSource.data.forEach((row: any) => this.selection.select(row));
   }
 
-  approveTAData(bmoIds: number[]){
+  approveTAData(bmoIds: number[]): void {
+    const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to approve TA data?`);
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      maxWidth: "400px",
+      data: dialogData
+    });
+
+    dialogRef.afterClosed().subscribe(dialogResult => {
+      if(dialogResult){
+        this.bmoClientDataService.approveBMOClientData(bmoIds)
+        .pipe(takeUntil(this.unsubscribe$))
+          .subscribe({
+            next: (response) => {
+              this.gs.openSnackBar(response.message, "Dismiss");
+              this.getAvailableBMOClientData();
+            },
+            error: (error) => { }
+        });
+      }
+    });
+  }
+
+
+  approveTAData22222(bmoIds: number[]){
     this.bmoClientDataService.approveBMOClientData(bmoIds)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({

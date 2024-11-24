@@ -35,6 +35,7 @@ export class LoginComponent implements OnDestroy {
   public settings: Settings;
   userloginForm: FormGroup = this.fb.group({});
   msg: string = "";
+  hide = true;
   authResponse: any
   authResponse2?: { success: boolean, message: string, authToken: string }
   private unsubscribe$ = new Subject<void>();
@@ -69,6 +70,9 @@ export class LoginComponent implements OnDestroy {
     this.authService.userRedirection();
   }
 
+  togglePasswordVisibility() {
+    this.hide = !this.hide;
+  }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();

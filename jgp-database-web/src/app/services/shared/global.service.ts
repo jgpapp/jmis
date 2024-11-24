@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ChartDialogComponent } from '../../pages/chart-dialog/chart-dialog.component';
+import { ConfirmDialogModel } from '../../dto/confirm-dialog-model';
+import { ConfirmDialogComponent } from '../../pages/confirm-dialog/confirm-dialog.component';
 
 @Injectable({ providedIn: 'root' })
 export class GlobalService {
@@ -39,6 +41,20 @@ export class GlobalService {
     dialogRef.afterClosed().subscribe(result => {
       console.log('Dialog was closed');
     });
+  }
+
+  confirmDialog(dialog: MatDialog, message: string): string {
+    const dialogData = new ConfirmDialogModel("Confirm Action", message);
+    const dialogRef = dialog.open(ConfirmDialogComponent, {
+      maxWidth: "400px",
+      data: dialogData
+    });
+    let res = '';
+    dialogRef.afterClosed().subscribe(dialogResult => {
+      res = dialogResult;
+    });
+
+    return res;
   }
 
 }

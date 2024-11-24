@@ -50,7 +50,7 @@
 
                     <mat-form-field appearance="outline" fxFlex="48%">
                       <mat-label>Partner</mat-label>
-                      <mat-select formControlName="partnerId" required>
+                      <mat-select formControlName="partnerId">
                           @for (partner of partners; track partner) {
                               <mat-option [value]="partner.id">{{partner.partnerName}}</mat-option>
                             }

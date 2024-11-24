@@ -19,7 +19,7 @@
                             <button mat-raised-button color="primary" *jgpHasPermission="'LOAN_APPROVE'" routerLink="new" [disabled]="selection.selected.length == 0" (click)="approveSelectedRows()">
                               <mat-icon>verified</mat-icon>&nbsp;&nbsp;Approve Selected
                             </button>
-                            <button mat-raised-button color="primary" *jgpHasPermission="'LOAN_APPROVE'" routerLink="new" [disabled]="newLoansData.length == 0" (click)="approveAllPartnerLoansData()">
+                            <button mat-raised-button color="primary" *jgpHasPermission="'LOAN_APPROVE'" routerLink="new" [disabled]="newLoansData && newLoansData.length == 0" (click)="approveAllPartnerLoansData()">
                                 <mat-icon>verified</mat-icon>&nbsp;&nbsp;Approve All
                             </button>
                           </div>

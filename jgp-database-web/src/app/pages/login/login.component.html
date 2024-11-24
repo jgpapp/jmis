@@ -24,7 +24,10 @@
                 <mat-form-field class="w-100">
                     <mat-label>Password</mat-label>
                     <mat-icon matPrefix class="secondary-text-color">lock</mat-icon>
-                    <input matInput formControlName="password" type="password">
+                    <input matInput formControlName="password" [type]="hide ? 'password' : 'text'">
+                    <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()">
+                        <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
+                      </button>
                     <mat-error>
                         @if (userloginForm.controls.password.errors?.required) {
                             Password is required

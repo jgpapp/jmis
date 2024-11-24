@@ -31,9 +31,16 @@ import { DashboardFiltersComponent } from './dashboard-filters/dashboard-filters
 export class DashboardComponent {
 
   dashBoardFilters: any;
+  resetDashBoardFilters: boolean = false;
   constructor(private dashBoardService: DashboardService, public authService: AuthService){}
 
   setDashBoardFilters(currentDashBoardFilters: any){
     this.dashBoardFilters = currentDashBoardFilters;
+    this.resetDashBoardFilters = false;
+  }
+
+  doResetDashBoardFilters(){
+    this.dashBoardFilters = undefined;
+    this.resetDashBoardFilters = true;
   }
 }

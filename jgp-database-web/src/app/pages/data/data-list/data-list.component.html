@@ -19,7 +19,7 @@
                             <button mat-raised-button color="primary" *jgpHasPermission="'BMO_PARTICIPANTS_DATA_APPROVE'" routerLink="new" [disabled]="selection.selected.length == 0" (click)="approveSelectedRows()">
                               <mat-icon>verified</mat-icon>&nbsp;&nbsp;Approve Selected
                             </button>
-                            <button mat-raised-button color="primary" *jgpHasPermission="'BMO_PARTICIPANTS_DATA_APPROVE'" routerLink="new" [disabled]="bmoClientsData.length == 0" (click)="approveAllPartnerTAData()">
+                            <button mat-raised-button color="primary" *jgpHasPermission="'BMO_PARTICIPANTS_DATA_APPROVE'" routerLink="new" [disabled]="bmoClientsData && bmoClientsData.length == 0" (click)="approveAllPartnerTAData()">
                                 <mat-icon>verified</mat-icon>&nbsp;&nbsp;Approve All
                             </button>
                           </div>

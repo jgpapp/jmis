@@ -57,3 +57,13 @@
   width: 100%;
   background-color: lightblue;
 }
+
+.dash-board-reset-link {
+  color: rgb(34, 119, 73);
+}
+
+.dash-board-reset-link:hover {
+  color: rgb(34, 119, 73);
+  text-decoration: underline;
+  cursor: pointer;
+}
