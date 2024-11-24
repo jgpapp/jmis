@@ -8,7 +8,6 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { ContentHeaderComponent } from '../../theme/components/content-header/content-header.component';
-import { DataUploadComponent } from './data-upload/data-upload.component';
 import { LoanService } from '@services/data-management/loan.service';
 import { NoPermissionComponent } from '../errors/no-permission/no-permission.component';
 import { AuthService } from '@services/users/auth.service';
@@ -17,6 +16,9 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { HasPermissionDirective } from '../../directives/has-permission.directive';
 import { Subject, takeUntil } from 'rxjs';
+import { ConfirmDialogModel } from '../../dto/confirm-dialog-model';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-lending-data',
@@ -28,7 +30,6 @@ import { Subject, takeUntil } from 'rxjs';
     MatButtonModule,
     MatButtonToggleModule,
     MatIconModule,
-    DataUploadComponent,
     MatTableModule,
     MatPaginatorModule,
     NoPermissionComponent,
@@ -53,7 +54,7 @@ export class LendingDataComponent implements OnDestroy, OnInit {
   public selection = new SelectionModel<any>(true, []);
 
   private unsubscribe$ = new Subject<void>();
-  constructor(private loanService: LoanService, public authService: AuthService, private gs: GlobalService) { }
+  constructor(private loanService: LoanService, public authService: AuthService, private gs: GlobalService, private dialog: MatDialog) { }
 
   getAvailableNewLendingData() {
     this.loanService.getAvailableLendingData(false, this.authService.currentUser()?.partnerId)
@@ -91,7 +92,31 @@ export class LendingDataComponent implements OnDestroy, OnInit {
       this.dataSource.data.forEach((row: any) => this.selection.select(row));
   }
 
-  approveLoansData(loanIds: number[]){
+
+  approveLoansData(loanIds: number[]): void {
+    const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to approve loans data?`);
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      maxWidth: "400px",
+      data: dialogData
+    });
+
+    dialogRef.afterClosed().subscribe(dialogResult => {
+      if(dialogResult){
+        this.loanService.approveLoansData(loanIds)
+        .pipe(takeUntil(this.unsubscribe$))
+          .subscribe({
+            next: (response) => {
+              this.gs.openSnackBar(response.message, "Dismiss");
+              this.getAvailableNewLendingData();
+            },
+            error: (error) => { }
+          });
+      }
+    });
+  }
+
+
+  approveLoansData222222(loanIds: number[]){
     this.loanService.approveLoansData(loanIds)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({

@@ -63,7 +63,7 @@ public class BMOClientDataServiceImpl implements BMOClientDataService {
     @Override
     public void uploadBMOData(MultipartFile file) {
         try {
-            this.publisher.publishEvent(new BulkImportEvent(new XSSFWorkbook(file.getInputStream()), TemplatePopulateImportConstants.BMO_ENTITY));
+            this.publisher.publishEvent(new BulkImportEvent(new XSSFWorkbook(file.getInputStream()),  TemplatePopulateImportConstants.BMO_ENTITY));
         }  catch (Exception e){
             throw new RuntimeException("Error while importing BMO Data: "+ e.getMessage());
         }

@@ -3,9 +3,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
-import { TilesComponent } from '../tiles/tiles.component';
-import { InfoCardsComponent } from '../info-cards/info-cards.component';
-import { AnalyticsComponent } from '../analytics/analytics.component';
 import { AuthService } from '@services/users/auth.service';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { MatIconModule } from '@angular/material/icon';
@@ -22,9 +19,6 @@ import { HighLevelSummaryDto } from '../dto/highLevelSummaryDto';
     FlexLayoutModule,
     MatCardModule,
     MatProgressBarModule,
-    TilesComponent,
-    InfoCardsComponent,
-    AnalyticsComponent,
     FlexLayoutModule,
     MatCardModule,
     MatIconModule,
@@ -44,6 +38,8 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   public autoScale = true;
   @ViewChild('resizedDiv') resizedDiv: ElementRef;
   public previousWidthOfResizedDiv: number = 0;
+
+  resetDashBoardFilters: boolean = false;
 
   public loansDisbursedByGender: any[];
   public loansDisbursedByGenderShowLegend: boolean = false;
@@ -109,7 +105,13 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
 
   setDashBoardFilters(currentDashBoardFilters: any){
     this.dashBoardFilters = currentDashBoardFilters;
+    this.resetDashBoardFilters = false;
     this.reloadData();
+  }
+
+  doResetDashBoardFilters(){
+    this.dashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId}
+    this.resetDashBoardFilters = true;
   }
 
   ngOnInit() {

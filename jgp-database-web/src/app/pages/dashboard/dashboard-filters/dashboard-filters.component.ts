@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -28,12 +28,13 @@ import { DashboardService } from '@services/dashboard/dashboard.service';
   templateUrl: './dashboard-filters.component.html',
   styleUrl: './dashboard-filters.component.scss'
 })
-export class DashboardFiltersComponent implements OnDestroy, OnInit {
+export class DashboardFiltersComponent implements OnDestroy, OnInit, OnChanges{
 
   @Output() dashBoardFilters: EventEmitter<any> = new EventEmitter();
   @Input({required: true, alias: 'isPartnerDashBoard'}) isPartnerDashBoard: boolean;
   @Input('partnerId') partnerId: number;
   @Input({required: true, alias: 'fieldFlex'}) fieldFlex: number;
+  @Input({required: true, alias: 'resetDashBoardFilters'}) resetDashBoardFilters: boolean;
   public disableToDate: boolean = true;
   maxDate: Date = new Date();
   toDateMinValue = new Date();
@@ -54,6 +55,18 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit {
       selectedDateTo: [null]
       });
   }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if(changes['resetDashBoardFilters'] && true === changes['resetDashBoardFilters']['currentValue']){
+      this.dashFilterForm = this.fb.group({
+        selectedPartnerId: [null],
+        selectedCountyCode: [null],
+        selectedDateFrom: [null],
+        selectedDateTo: [null]
+        });
+    }
+  }
+
   ngOnInit(): void {
     this.getAvailablePartners();
     this.getAvailableCounties();

@@ -36,6 +36,7 @@ export class ChangePasswordComponent implements OnDestroy {
   public settings: Settings;
   passwordChangeForm: FormGroup = this.fb.group({});
   msg: string = "";
+  hide = true;
   authResponse: any
   private unsubscribe$ = new Subject<void>();
   constructor(public settingsService: SettingsService, public fb: FormBuilder, public router: Router, private userService: UserService, private gs: GlobalService, private authService: AuthService) {
@@ -69,6 +70,9 @@ export class ChangePasswordComponent implements OnDestroy {
 
   }
 
+  togglePasswordVisibility() {
+    this.hide = !this.hide;
+  }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();

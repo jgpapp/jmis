@@ -3,9 +3,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
-import { TilesComponent } from '../tiles/tiles.component';
-import { InfoCardsComponent } from '../info-cards/info-cards.component';
-import { AnalyticsComponent } from '../analytics/analytics.component';
 import { AuthService } from '@services/users/auth.service';
 import { MatIconModule } from '@angular/material/icon';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
@@ -23,9 +20,6 @@ import { HighLevelSummaryDto } from '../dto/highLevelSummaryDto';
     FlexLayoutModule,
     MatCardModule,
     MatProgressBarModule,
-    TilesComponent,
-    InfoCardsComponent,
-    AnalyticsComponent,
     MatIconModule,
     NgxChartsModule,
     PieChartComponent,
@@ -40,6 +34,7 @@ export class BmoDashboardComponent implements OnInit {
   partnerName: string = '';
   partnerId: any;
   public autoScale = true;
+  resetDashBoardFilters: boolean = false;
   @ViewChild('resizedDiv') resizedDiv: ElementRef;
   public previousWidthOfResizedDiv: number = 0;
   public chartSColorScheme: any = {
@@ -95,7 +90,13 @@ export class BmoDashboardComponent implements OnInit {
 
   setDashBoardFilters(currentDashBoardFilters: any){
     this.dashBoardFilters = currentDashBoardFilters;
+    this.resetDashBoardFilters = false;
     this.reloadData();
+  }
+
+  doResetDashBoardFilters(){
+    this.dashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId}
+    this.resetDashBoardFilters = true;
   }
 
   ngOnInit(): void {

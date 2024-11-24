@@ -29,12 +29,18 @@ export class BmoFiDashboardComponent implements OnInit{
  
   dashBoardFilters: any;
   partnerName: string = '';
+  resetDashBoardFilters: boolean = false;
   constructor(private authService: AuthService){}
 
   setDashBoardFilters(currentDashBoardFilters: any){
     this.dashBoardFilters = currentDashBoardFilters;
+    this.resetDashBoardFilters = false;
   }
 
+  doResetDashBoardFilters(){
+    this.dashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId}
+    this.resetDashBoardFilters = true;
+  }
 
   ngOnInit(): void {
     this.dashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId}

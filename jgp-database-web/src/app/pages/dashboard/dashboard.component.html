@@ -1,13 +1,16 @@
 @if(authService.hasPermission('DASHBOARD_VIEW')){
 <app-content-header
     icon="dashboard" 
-    desc="Main Dashboard !"
+    desc="Welcome to Jiinue Management Information System – Manage your data, monitor progress, and visualize your impact"
     [hideBreadcrumb]="true"
     [hasBgImage]="true" 
     [class]="'py-3'"/>
 
 <div class="p-2">
-    <app-dashboard-filters (dashBoardFilters)="setDashBoardFilters($event)" [isPartnerDashBoard]="false" [fieldFlex]="25"/>
+    <div fxLayout="row" fxLayoutAlign="center center">
+        <a class="dash-board-reset-link" mat-menu-item (click)="doResetDashBoardFilters()">Reset Filters</a>
+    </div>
+    <app-dashboard-filters (dashBoardFilters)="setDashBoardFilters($event)" [isPartnerDashBoard]="false" [resetDashBoardFilters]="resetDashBoardFilters" [fieldFlex]="25"/>
     <app-tiles [dashBoardFilters]="dashBoardFilters"/>
     <app-info-cards [dashBoardFilters]="dashBoardFilters"/>
     <div fxLayout="row wrap">

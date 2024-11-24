@@ -109,7 +109,7 @@ public class AppUser extends BaseEntity implements PlatformUser {
             this.firstName = userDto.firstName();
         }
         if(!StringUtils.equals(userDto.lastName(), this.lastName)){
-            this.lastName = userDto.firstName();
+            this.lastName = userDto.lastName();
         }
         if(!StringUtils.equals(userDto.gender(), this.gender)){
             this.gender = userDto.gender();
