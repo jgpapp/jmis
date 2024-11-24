@@ -9,12 +9,12 @@
                   [class]="'py-4'"></app-content-header>            
             <div class="p-3">
                 <mat-form-field class="w-100">
-                    <mat-label>User Name</mat-label>
+                    <mat-label>Email Address</mat-label>
                     <mat-icon matPrefix class="secondary-text-color">mail</mat-icon>
-                    <input matInput formControlName="username">
+                    <input matInput formControlName="username" type="email">
                     <mat-error>
                         @if (userloginForm.controls.username.errors?.required) {
-                            User Name is required
+                            Email address is required
                         }
                         @if (userloginForm.controls.username.hasError('invalidEmail')) {
                             Invalid email address
