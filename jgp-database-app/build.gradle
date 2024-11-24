@@ -35,6 +35,7 @@ dependencies {
 	implementation 'org.apache.poi:poi:5.2.5'
 	implementation 'org.apache.poi:poi-ooxml:5.2.5'
 	implementation 'com.google.guava:guava:r05'
+	implementation 'com.google.guava:guava:33.3.1-jre'
 	implementation 'com.google.code.gson:gson'
 	implementation 'org.apache.commons:commons-lang3:3.12.0'
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
