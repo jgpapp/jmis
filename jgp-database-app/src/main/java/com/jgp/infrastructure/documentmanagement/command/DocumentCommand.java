@@ -1,11 +1,13 @@
 
 package com.jgp.infrastructure.documentmanagement.command;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Set;
 
-/**
- * Immutable command for creating or updating details of a client identifier.
- */
+@Setter
+@Getter
 public class DocumentCommand {
 
     private final Long id;
@@ -18,7 +20,6 @@ public class DocumentCommand {
     private Long size;
     private String type;
     private String location;
-    private Integer storageType;
 
     private final Set<String> modifiedParameters;
 
@@ -34,70 +35,6 @@ public class DocumentCommand {
         this.type = type;
         this.description = description;
         this.location = location;
-    }
-
-    public Long getId() {
-        return this.id;
-    }
-
-    public String getParentEntityType() {
-        return this.parentEntityType;
-    }
-
-    public Long getParentEntityId() {
-        return this.parentEntityId;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public String getFileName() {
-        return this.fileName;
-    }
-
-    public Long getSize() {
-        return this.size;
-    }
-
-    public String getType() {
-        return this.type;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-    public String getLocation() {
-        return this.location;
-    }
-
-    public Set<String> getModifiedParameters() {
-        return this.modifiedParameters;
-    }
-
-    public void setFileName(final String fileName) {
-        this.fileName = fileName;
-    }
-
-    public void setSize(final Long size) {
-        this.size = size;
-    }
-
-    public void setType(final String type) {
-        this.type = type;
-    }
-
-    public void setLocation(final String location) {
-        this.location = location;
-    }
-
-    public Integer getStorageType() {
-        return this.storageType;
-    }
-
-    public void setStorageType(final Integer storageType) {
-        this.storageType = storageType;
     }
 
     public boolean isNameChanged() {

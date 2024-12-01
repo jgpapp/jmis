@@ -1,7 +1,6 @@
 
 package com.jgp.infrastructure.documentmanagement.data;
 
-import com.jgp.infrastructure.documentmanagement.domain.StorageType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,12 +21,11 @@ public class DocumentData implements Serializable {
     private final String type;
     private final String location;
     private final String description;
-    private final Integer storageType;
     @Setter
     private String url;
 
     public DocumentData(final Long id, final String parentEntityType, final Long parentEntityId, final String name, final String fileName,
-            final Long size, final String type, final String description, final String location, final Integer storageType) {
+            final Long size, final String type, final String description, final String location) {
         this.id = id;
         this.parentEntityType = parentEntityType;
         this.parentEntityId = parentEntityId;
@@ -37,7 +35,6 @@ public class DocumentData implements Serializable {
         this.type = type;
         this.description = description;
         this.location = location;
-        this.storageType = storageType;
     }
 
     public String contentType() {
@@ -52,8 +49,5 @@ public class DocumentData implements Serializable {
         return this.location;
     }
 
-    public StorageType storageType() {
-        return StorageType.fromInt(this.storageType);
-    }
 
 }

@@ -1,236 +1,150 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+
 package com.jgp.infrastructure.bulkimport.service;
 
+import com.jgp.authentication.service.PlatformSecurityContext;
+import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
+import com.jgp.infrastructure.bulkimport.data.ImportData;
+import com.jgp.infrastructure.bulkimport.domain.ImportDocument;
+import com.jgp.infrastructure.bulkimport.domain.ImportDocumentRepository;
+import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
+import com.jgp.infrastructure.bulkimport.importhandler.ImportHandlerUtils;
+import com.jgp.infrastructure.core.domain.JdbcSupport;
+import com.jgp.infrastructure.documentmanagement.data.DocumentData;
+import com.jgp.infrastructure.documentmanagement.domain.Document;
+import com.jgp.infrastructure.documentmanagement.domain.DocumentRepository;
+import com.jgp.infrastructure.documentmanagement.exception.InvalidEntityTypeForDocumentManagementException;
+import com.jgp.infrastructure.documentmanagement.mapper.ImportDocumentMapper;
+import com.jgp.infrastructure.documentmanagement.service.DocumentWritePlatformService;
+import com.jgp.infrastructure.documentmanagement.service.DocumentWritePlatformServiceJpaRepositoryImpl;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.apache.fineract.infrastructure.bulkimport.data.BulkImportEvent;
-import org.apache.fineract.infrastructure.bulkimport.data.GlobalEntityType;
-import org.apache.fineract.infrastructure.bulkimport.data.ImportData;
-import org.apache.fineract.infrastructure.bulkimport.domain.ImportDocument;
-import org.apache.fineract.infrastructure.bulkimport.domain.ImportDocumentRepository;
-import org.apache.fineract.infrastructure.bulkimport.importhandler.ImportHandlerUtils;
-import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
-import org.apache.fineract.infrastructure.core.exception.GeneralPlatformDomainRuleException;
-import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
-import org.apache.fineract.infrastructure.documentmanagement.data.DocumentData;
-import org.apache.fineract.infrastructure.documentmanagement.domain.Document;
-import org.apache.fineract.infrastructure.documentmanagement.domain.DocumentRepository;
-import org.apache.fineract.infrastructure.documentmanagement.service.DocumentWritePlatformService;
-import org.apache.fineract.infrastructure.documentmanagement.service.DocumentWritePlatformServiceJpaRepositoryImpl;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.tika.Tika;
-import org.apache.tika.io.TikaInputStream;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.ws.rs.core.Response;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
+@Validated
 public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BulkImportWorkbookServiceImpl.class);
     private final ApplicationContext applicationContext;
     private final PlatformSecurityContext securityContext;
     private final DocumentWritePlatformService documentWritePlatformService;
     private final DocumentRepository documentRepository;
     private final ImportDocumentRepository importDocumentRepository;
     private final JdbcTemplate jdbcTemplate;
+    private final ImportDocumentMapper importDocumentMapper;
+    private static final String SELECT_LITERAL = "select ";
 
-    @Autowired
-    public BulkImportWorkbookServiceImpl(final ApplicationContext applicationContext, final PlatformSecurityContext securityContext,
-            final DocumentWritePlatformService documentWritePlatformService, final DocumentRepository documentRepository,
-            final ImportDocumentRepository importDocumentRepository, final JdbcTemplate jdbcTemplate) {
-        this.applicationContext = applicationContext;
-        this.securityContext = securityContext;
-        this.documentWritePlatformService = documentWritePlatformService;
-        this.documentRepository = documentRepository;
-        this.importDocumentRepository = importDocumentRepository;
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     @Override
-    public Long importWorkbook(String entity, InputStream inputStream, FormDataContentDisposition fileDetail, final String locale,
-            final String dateFormat) {
-        return importWorkbook(entity, inputStream, fileDetail, locale, dateFormat, null);
-    }
-
-    @Override
-    public Long importWorkbook(String entity, InputStream inputStream, FormDataContentDisposition fileDetail, final String locale,
-            final String dateFormat, Long countryId) {
+    public Long importWorkbook(String entity, MultipartFile fileDetail) {
         try {
-            if (entity != null && inputStream != null && fileDetail != null && locale != null && dateFormat != null) {
+            if (entity != null && fileDetail != null) {
 
                 final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                IOUtils.copy(inputStream, baos);
+                IOUtils.copy(fileDetail.getInputStream(), baos);
                 final byte[] bytes = baos.toByteArray();
-                InputStream clonedInputStream = new ByteArrayInputStream(bytes);
                 final BufferedInputStream bis = new BufferedInputStream(new ByteArrayInputStream(bytes));
-                final Tika tika = new Tika();
-                final TikaInputStream tikaInputStream = TikaInputStream.get(clonedInputStream);
-                final String fileType = tika.detect(tikaInputStream);
-                if (!fileType.contains("msoffice") && !fileType.contains("application/vnd.ms-excel")) {
-                    // We had a problem where we tried to upload the downloaded
-                    // file from the import options, it was somehow changed the
-                    // extension we use this fix.
-                    throw new GeneralPlatformDomainRuleException("error.msg.invalid.file.extension",
-                            "Uploaded file extension is not recognized.");
-
-                }
-                Workbook workbook = new HSSFWorkbook(clonedInputStream);
+                Workbook workbook = new XSSFWorkbook(fileDetail.getInputStream());
                 GlobalEntityType entityType = null;
                 int primaryColumn = 0;
-                if (entity.trim().equalsIgnoreCase(GlobalEntityType.CLIENTS_PERSON.toString())) {
-                    entityType = GlobalEntityType.CLIENTS_PERSON;
-                    primaryColumn = 0;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.CLIENTS_ENTTTY.toString())) {
-                    entityType = GlobalEntityType.CLIENTS_ENTTTY;
-                    primaryColumn = 0;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.CENTERS.toString())) {
-                    entityType = GlobalEntityType.CENTERS;
-                    primaryColumn = 0;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.GROUPS.toString())) {
-                    entityType = GlobalEntityType.GROUPS;
-                    primaryColumn = 0;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.LOANS.toString())) {
-                    entityType = GlobalEntityType.LOANS;
-                    primaryColumn = 0;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.LOAN_TRANSACTIONS.toString())) {
-                    entityType = GlobalEntityType.LOAN_TRANSACTIONS;
-                    primaryColumn = 0;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.GUARANTORS.toString())) {
-                    entityType = GlobalEntityType.GUARANTORS;
-                    primaryColumn = 0;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.OFFICES.toString())) {
-                    entityType = GlobalEntityType.OFFICES;
-                    primaryColumn = 0;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.CHART_OF_ACCOUNTS.toString())) {
-                    entityType = GlobalEntityType.CHART_OF_ACCOUNTS;
-                    primaryColumn = 0;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.GL_JOURNAL_ENTRIES.toString())) {
-                    entityType = GlobalEntityType.GL_JOURNAL_ENTRIES;
-                    primaryColumn = 0;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.STAFF.toString())) {
-                    entityType = GlobalEntityType.STAFF;
-                    primaryColumn = 0;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.SHARE_ACCOUNTS.toString())) {
-                    entityType = GlobalEntityType.SHARE_ACCOUNTS;
-                    primaryColumn = 0;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.SAVINGS_ACCOUNT.toString())) {
-                    entityType = GlobalEntityType.SAVINGS_ACCOUNT;
-                    primaryColumn = 0;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.SAVINGS_TRANSACTIONS.toString())) {
-                    entityType = GlobalEntityType.SAVINGS_TRANSACTIONS;
-                    primaryColumn = 0;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.RECURRING_DEPOSIT_ACCOUNTS.toString())) {
-                    entityType = GlobalEntityType.RECURRING_DEPOSIT_ACCOUNTS;
-                    primaryColumn = 0;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.RECURRING_DEPOSIT_ACCOUNTS_TRANSACTIONS.toString())) {
-                    entityType = GlobalEntityType.RECURRING_DEPOSIT_ACCOUNTS_TRANSACTIONS;
-                    primaryColumn = 0;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.FIXED_DEPOSIT_ACCOUNTS.toString())) {
-                    entityType = GlobalEntityType.FIXED_DEPOSIT_ACCOUNTS;
-                    primaryColumn = 0;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.FIXED_DEPOSIT_TRANSACTIONS.toString())) {
-                    entityType = GlobalEntityType.FIXED_DEPOSIT_TRANSACTIONS;
-                    primaryColumn = 0;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.USERS.toString())) {
-                    entityType = GlobalEntityType.USERS;
-                    primaryColumn = 0;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.LOAN_PRODUCTS_HEALTHY_PATH.toString())) {
-                    entityType = GlobalEntityType.LOAN_PRODUCTS_HEALTHY_PATH;
-                    primaryColumn = 0;
-                } else {
+                if (entity.trim().equalsIgnoreCase(GlobalEntityType.TA_IMPORT_TEMPLATE.toString())) {
+                    entityType = GlobalEntityType.TA_IMPORT_TEMPLATE;
+                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.LOAN_IMPORT_TEMPLATE.toString())) {
+                    entityType = GlobalEntityType.LOAN_IMPORT_TEMPLATE;
+                }  else {
                     workbook.close();
-                    throw new GeneralPlatformDomainRuleException("error.msg.unable.to.find.resource", "Unable to find requested resource");
+                    throw new InvalidEntityTypeForDocumentManagementException("Unable to find requested resource");
 
                 }
-                return publishEvent(primaryColumn, fileDetail, bis, entityType, workbook, locale, dateFormat, countryId);
+                return publishEvent(primaryColumn, fileDetail, bis, entityType, workbook);
             }
-            throw new GeneralPlatformDomainRuleException("error.msg.null", "One or more of the given parameters not found");
+            throw new InvalidEntityTypeForDocumentManagementException("One or more of the given parameters not found");
         } catch (IOException e) {
-            LOG.error("Problem occurred in importWorkbook function", e);
-            throw new GeneralPlatformDomainRuleException("error.msg.io.exception",
-                    "IO exception occured with " + fileDetail.getFileName() + " " + e.getMessage(), e);
+            log.error("Problem occurred in importWorkbook function", e);
+            throw new InvalidEntityTypeForDocumentManagementException("IO exception occured with " + fileDetail.getOriginalFilename() + " " + e.getMessage());
 
         }
     }
 
-    private Long publishEvent(final Integer primaryColumn, final FormDataContentDisposition fileDetail,
-            final InputStream clonedInputStreamWorkbook, final GlobalEntityType entityType, final Workbook workbook, final String locale,
-            final String dateFormat, final Long countryId) {
+    private Long publishEvent(final Integer primaryColumn, final MultipartFile fileDetail,
+            final InputStream clonedInputStreamWorkbook, final GlobalEntityType entityType, final Workbook workbook) {
 
-        final String fileName = fileDetail.getFileName();
+        final String fileName = fileDetail.getOriginalFilename();
 
         final Long documentId = this.documentWritePlatformService.createInternalDocument(
                 DocumentWritePlatformServiceJpaRepositoryImpl.DocumentManagementEntity.IMPORT.name(),
-                this.securityContext.authenticatedUser().getId(), null, clonedInputStreamWorkbook,
+                this.securityContext.getAuthenticatedUserIfPresent().getId(), null, clonedInputStreamWorkbook,
                 URLConnection.guessContentTypeFromName(fileName), fileName, null, fileName);
         final Document document = this.documentRepository.findById(documentId).orElse(null);
 
-        final ImportDocument importDocument = ImportDocument.instance(document, DateUtils.getLocalDateTimeOfTenant(), entityType.getValue(),
-                this.securityContext.authenticatedUser(), ImportHandlerUtils.getNumberOfRows(workbook.getSheetAt(0), primaryColumn));
+        final ImportDocument importDocument = ImportDocument.instance(document, LocalDateTime.now(ZoneId.systemDefault()), entityType.getValue(),
+                ImportHandlerUtils.getNumberOfRows(workbook.getSheetAt(0), primaryColumn), this.securityContext.getAuthenticatedUserIfPresent().getPartner());
         this.importDocumentRepository.saveAndFlush(importDocument);
-        BulkImportEvent event = BulkImportEvent.instance(this, workbook, importDocument.getId(), locale, dateFormat,
-                ThreadLocalContextUtil.getContext(), countryId);
+        BulkImportEvent event = new BulkImportEvent(workbook, entityType.name(), importDocument.getId());
         applicationContext.publishEvent(event);
         return importDocument.getId();
     }
 
     @Override
     public Collection<ImportData> getImports(GlobalEntityType type) {
-        this.securityContext.authenticatedUser();
 
         final ImportMapper rm = new ImportMapper();
-        final String sql = "select " + rm.schema() + " order by i.id desc";
+        final String sql = SELECT_LITERAL + rm.schema() + " order by i.id desc";
 
-        return this.jdbcTemplate.query(sql, rm, new Object[] { type.getValue() }); // NOSONAR
+        return this.jdbcTemplate.query(sql, rm, type.getValue()); // NOSONAR
+    }
+
+    @Override
+    public Page<ImportData> getImports(GlobalEntityType type, Long partnerId, Pageable pageable) {
+        final var imports = this.importDocumentRepository.findByPartnerIdAndEntityType(partnerId, type.getValue(), pageable);
+        return new PageImpl<>(this.importDocumentMapper.toDto(imports.getContent()), pageable, imports.getTotalElements());
+    }
+
+    @Override
+    public Page<ImportData> getImportById(Long importDocumentId) {
+        final var importDoc = this.importDocumentRepository.findById(importDocumentId).orElse(null);
+        return Objects.nonNull(importDoc) ? new PageImpl<>(List.of(this.importDocumentMapper.toDto(importDoc))) : null;
     }
 
     private static final class ImportMapper implements RowMapper<ImportData> {
 
         public String schema() {
-            final StringBuilder sql = new StringBuilder();
-            sql.append("i.id as id, i.document_id as documentId, d.name as name, i.import_time as importTime, i.end_time as endTime, ")
-                    .append("i.completed as completed, i.total_records as totalRecords, i.success_count as successCount, ")
-                    .append("i.failure_count as failureCount, i.createdby_id as createdBy ")
-                    .append("from m_import_document i inner join m_document d on i.document_id=d.id ").append("where i.entity_type= ? ");
-            return sql.toString();
+            return "i.id as id, i.document_id as documentId, d.doc_name as name, i.import_time as importTime, i.end_time as endTime, " +
+                    "i.completed as completed, i.total_records as totalRecords, i.success_count as successCount, " +
+                    "i.failure_count as failureCount, i.created_by_id as createdBy " +
+                    "from import_document i inner join jgp_document d on i.document_id=d.id " + "where i.entity_type= ? ";
         }
 
         @Override
@@ -239,62 +153,71 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
             final Long id = rs.getLong("id");
             final Long documentId = rs.getLong("documentId");
             final String name = rs.getString("name");
-            final LocalDate importTime = JdbcSupport.getLocalDate(rs, "importTime");
-            final LocalDate endTime = JdbcSupport.getLocalDate(rs, "endTime");
+            final LocalDateTime importTime = JdbcSupport.getLocalDateTime(rs, "importTime");
+            final LocalDateTime endTime = JdbcSupport.getLocalDateTime(rs, "endTime");
             final Boolean completed = rs.getBoolean("completed");
             final Integer totalRecords = JdbcSupport.getInteger(rs, "totalRecords");
             final Integer successCount = JdbcSupport.getInteger(rs, "successCount");
             final Integer failureCount = JdbcSupport.getInteger(rs, "failureCount");
             final Long createdBy = rs.getLong("createdBy");
 
-            return ImportData.instance(id, documentId, importTime, endTime, completed, name, createdBy, totalRecords, successCount,
+            return new ImportData(id, documentId, name, importTime, endTime, completed, createdBy, totalRecords, successCount,
                     failureCount);
         }
     }
 
     @Override
     public DocumentData getOutputTemplateLocation(String importDocumentId) {
-        this.securityContext.authenticatedUser();
         final ImportTemplateLocationMapper importTemplateLocationMapper = new ImportTemplateLocationMapper();
-        final String sql = "select " + importTemplateLocationMapper.schema();
+        final String sql = SELECT_LITERAL + importTemplateLocationMapper.schema();
 
-        return this.jdbcTemplate.queryForObject(sql, importTemplateLocationMapper, new Object[] { Integer.parseInt(importDocumentId) }); // NOSONAR
+        return this.jdbcTemplate.queryForObject(sql, importTemplateLocationMapper, Integer.parseInt(importDocumentId)); // NOSONAR
     }
 
     @Override
-    public Response getOutputTemplate(String importDocumentId) {
-        this.securityContext.authenticatedUser();
+    public ResponseEntity<?> getOutputTemplate(String importDocumentId) {
         final ImportTemplateLocationMapper importTemplateLocationMapper = new ImportTemplateLocationMapper();
-        final String sql = "select " + importTemplateLocationMapper.schema();
+        final String sql = SELECT_LITERAL + importTemplateLocationMapper.schema();
         DocumentData documentData = this.jdbcTemplate.queryForObject(sql, importTemplateLocationMapper,
-                new Object[] { Integer.parseInt(importDocumentId) }); // NOSONAR
+                Integer.parseInt(importDocumentId)); // NOSONAR
         return (documentData != null) ? buildResponse(documentData) : null;
     }
 
-    private Response buildResponse(DocumentData documentData) {
+    private ResponseEntity<?> buildResponse(DocumentData documentData) {
         String fileName = "Output" + documentData.fileName();
         String fileLocation = documentData.fileLocation();
         File file = new File(fileLocation);
-        final Response.ResponseBuilder response = Response.ok(file);
-        response.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-        response.header("Content-Type", "application/vnd.ms-excel");
-        return response.build();
+        HttpHeaders headers = new HttpHeaders();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            InputStream initialStream = new FileInputStream(file);
+            byte[] targetArray = IOUtils.toByteArray(initialStream);
+            baos.write(targetArray);
+            // Set response headers
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.add("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+            headers.add("Content-Type", "application/vnd.ms-excel");
+
+        } catch (IOException e) {
+            log.error("Problem occurred in buildResponse function", e);
+        }
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(baos.toByteArray());
     }
 
     private static final class ImportTemplateLocationMapper implements RowMapper<DocumentData> {
 
         public String schema() {
-            final StringBuilder sql = new StringBuilder();
-            sql.append("d.location,d.file_name ").append("from m_import_document i inner join m_document d on i.document_id=d.id ")
-                    .append("where i.id= ? ");
-            return sql.toString();
+            return "d.location,d.file_name " + "from import_document i inner join jgp_document d on i.document_id=d.id " +
+                    "where i.id= ? ";
         }
 
         @Override
         public DocumentData mapRow(ResultSet rs, @SuppressWarnings("unused") int rowNum) throws SQLException {
             final String location = rs.getString("location");
             final String fileName = rs.getString("file_name");
-            return new DocumentData(null, null, null, null, fileName, null, null, null, location, null);
+            return new DocumentData(null, null, null, null, fileName, null, null, null, location);
         }
     }
 }

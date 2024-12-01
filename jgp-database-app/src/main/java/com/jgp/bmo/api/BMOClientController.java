@@ -5,6 +5,7 @@ import com.jgp.bmo.dto.BMOParticipantSearchCriteria;
 import com.jgp.bmo.service.BMOClientDataService;
 import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
+import com.jgp.infrastructure.bulkimport.service.BulkImportWorkbookService;
 import com.jgp.shared.dto.ApiResponseDto;
 import com.jgp.util.CommonUtil;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,6 +34,7 @@ public class BMOClientController {
 
     private final BMOClientDataService bmoDataService;
     private final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService;
+    private final BulkImportWorkbookService bulkImportWorkbookService;
 
     @GetMapping
     public ResponseEntity<List<BMOClientDto>> getAvailableBMODataRecords(@RequestParam(name = "partnerId", required = false) Long partnerId,
@@ -45,13 +47,21 @@ public class BMOClientController {
         return new ResponseEntity<>(this.bmoDataService.getBMODataRecords(new BMOParticipantSearchCriteria(partnerId, participantId, approvedByPartner), sortedByDateCreated), HttpStatus.OK);
     }
 
-    @PostMapping("upload-template")
-    public ResponseEntity<ApiResponseDto> createBMOParticipantData(@RequestParam("excelFile") MultipartFile excelFile) {
+    @PostMapping("upload-template-original")
+    public ResponseEntity<ApiResponseDto> createBMOParticipantData2(@RequestParam("excelFile") MultipartFile excelFile) {
         if (excelFile.isEmpty()) {
             return new ResponseEntity<>(new ApiResponseDto(false, CommonUtil.NO_FILE_TO_UPLOAD), HttpStatus.BAD_REQUEST);
         }
         this.bmoDataService.uploadBMOData(excelFile);
         return new ResponseEntity<>(new ApiResponseDto(true, CommonUtil.RESOURCE_CREATED), HttpStatus.CREATED);
+    }
+
+    @PostMapping("upload-template")
+    public ResponseEntity<ApiResponseDto> createBMOParticipantData(@RequestParam("excelFile") MultipartFile excelFile) {
+        if (excelFile.isEmpty()) {
+            return new ResponseEntity<>(new ApiResponseDto(false, CommonUtil.NO_FILE_TO_UPLOAD), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(new ApiResponseDto(true, this.bulkImportWorkbookService.importWorkbook(GlobalEntityType.TA_IMPORT_TEMPLATE.name(), excelFile)+""), HttpStatus.CREATED);
     }
 
     @GetMapping("template/download")

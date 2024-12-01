@@ -1,62 +1,49 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+
 package com.jgp.infrastructure.documentmanagement.api;
 
 import com.google.common.io.ByteSource;
-import org.apache.fineract.infrastructure.documentmanagement.data.FileData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.jgp.infrastructure.documentmanagement.data.FileData;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * Utilities common to file upload/download resources.
- *
- * @author Michael Vorburger.ch
- */
+@Slf4j
 final class ContentResources {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ContentResources.class);
 
     private ContentResources() {}
 
-    static Response fileDataToResponse(FileData fileData, String fileName, String dispositionType) {
-        ResponseBuilder response;
+    static ResponseEntity<?> fileDataToResponse(FileData fileData, String fileName, String dispositionType) {
+
+        HttpHeaders headers = new HttpHeaders();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             ByteSource byteSource = fileData.getByteSource();
             // TODO Where is this InputStream closed?! It needs to be AFTER it's read by JAX-RS.. how to do that?
-            InputStream is = byteSource.openBufferedStream();
-            response = Response.ok(is);
-            response.header("Content-Disposition", dispositionType + "; filename=\"" + fileName + "\"");
-            response.header("Content-Length", byteSource.sizeIfKnown().or(-1L));
-            response.header("Content-Type", fileData.contentType());
+            InputStream initialStream = byteSource.openBufferedStream();
+            byte[] targetArray = IOUtils.toByteArray(initialStream);
+            baos.write(targetArray);
+            // Set response headers
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.add("Content-Disposition", dispositionType + "; filename=\"" + fileName + "\"");
+            headers.add("Content-Length", byteSource.sizeIfKnown().or(-1L)+"");
+            headers.add("Content-Type", fileData.contentType());
+
         } catch (IOException e) {
-            LOG.error("resizedImage.getByteSource().openBufferedStream() failed", e);
-            response = Response.serverError();
+            log.error("Problem occurred in buildResponse function", e);
         }
-        return response.build();
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(baos.toByteArray());
+
     }
 
-    static Response fileDataToResponse(FileData fileData, String dispositionType) {
+    static ResponseEntity<?> fileDataToResponse(FileData fileData, String dispositionType) {
         return fileDataToResponse(fileData, fileData.name(), dispositionType);
     }
 }

@@ -1,13 +1,16 @@
 package com.jgp.infrastructure.bulkimport.data;
 
+import lombok.Getter;
+
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public enum GlobalEntityType {
 
     INVALID(0, "invalid"),
     LOAN_IMPORT_TEMPLATE(1, "Loans Template"),
-    TA_IMPORT_TEMPLATE(2, "BMO Template");
+    TA_IMPORT_TEMPLATE(2, "TA Template");
 
     private final Integer value;
     private final String code;
@@ -38,14 +41,6 @@ public enum GlobalEntityType {
     GlobalEntityType(final Integer value, final String code) {
         this.value = value;
         this.code = code;
-    }
-
-    public Integer getValue() {
-        return this.value;
-    }
-
-    public String getCode() {
-        return this.code;
     }
 
     public static GlobalEntityType fromInt(final int i) {

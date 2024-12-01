@@ -1,39 +1,16 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+
 package com.jgp.infrastructure.documentmanagement.service;
 
-import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
-import org.apache.fineract.infrastructure.core.domain.Base64EncodedFile;
-import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityException;
-import org.apache.fineract.infrastructure.documentmanagement.command.DocumentCommand;
-import org.apache.fineract.infrastructure.documentmanagement.command.DocumentCommandValidator;
-import org.apache.fineract.infrastructure.documentmanagement.contentrepository.ContentRepository;
-import org.apache.fineract.infrastructure.documentmanagement.contentrepository.ContentRepositoryFactory;
-import org.apache.fineract.infrastructure.documentmanagement.domain.Document;
-import org.apache.fineract.infrastructure.documentmanagement.domain.DocumentRepository;
-import org.apache.fineract.infrastructure.documentmanagement.domain.StorageType;
-import org.apache.fineract.infrastructure.documentmanagement.exception.ContentManagementException;
-import org.apache.fineract.infrastructure.documentmanagement.exception.DocumentNotFoundException;
-import org.apache.fineract.infrastructure.documentmanagement.exception.InvalidEntityTypeForDocumentManagementException;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.jgp.authentication.service.PlatformSecurityContext;
+import com.jgp.infrastructure.core.domain.Base64EncodedFile;
+import com.jgp.infrastructure.documentmanagement.command.DocumentCommand;
+import com.jgp.infrastructure.documentmanagement.contentrepository.ContentRepository;
+import com.jgp.infrastructure.documentmanagement.contentrepository.ContentRepositoryFactory;
+import com.jgp.infrastructure.documentmanagement.domain.Document;
+import com.jgp.infrastructure.documentmanagement.domain.DocumentRepository;
+import com.jgp.infrastructure.documentmanagement.exception.ContentManagementException;
+import com.jgp.infrastructure.documentmanagement.exception.DocumentNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -42,10 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 
+@Slf4j
 @Service
 public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWritePlatformService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(DocumentWritePlatformServiceJpaRepositoryImpl.class);
 
     private final PlatformSecurityContext context;
     private final DocumentRepository documentRepository;
@@ -66,28 +42,20 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
     @Override
     public Long createDocument(final DocumentCommand documentCommand, final InputStream inputStream) {
         try {
-            this.context.authenticatedUser();
-
-            final DocumentCommandValidator validator = new DocumentCommandValidator(documentCommand);
-
-            validateParentEntityType(documentCommand);
-
-            validator.validateForCreate();
-
             final ContentRepository contentRepository = this.contentRepositoryFactory.getRepository();
 
             final String fileLocation = contentRepository.saveFile(inputStream, documentCommand);
 
             final Document document = Document.createNew(documentCommand.getParentEntityType(), documentCommand.getParentEntityId(),
                     documentCommand.getName(), documentCommand.getFileName(), documentCommand.getSize(), documentCommand.getType(),
-                    documentCommand.getDescription(), fileLocation, contentRepository.getStorageType());
+                    documentCommand.getDescription(), fileLocation);
 
             this.documentRepository.saveAndFlush(document);
 
             return document.getId();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-            LOG.error("Error occured.", dve);
-            throw new PlatformDataIntegrityException(DOCUMENT_ERROR_MESSAGE_CODE, DOCUMENT_ERROR_MESSAGE, dve);
+            log.error("Error occured.", dve);
+            throw new ContentManagementException(DOCUMENT_ERROR_MESSAGE_CODE, DOCUMENT_ERROR_MESSAGE, dve);
         }
     }
 
@@ -107,93 +75,85 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
 
     @Override
     public Long createDocument(Base64EncodedFile base64EncodedFile, String entityType, Long entityId, String name, String fileName,
-            String docType) {
+                               String docType) {
         checkValidityOfEntityType(entityType);
         try {
-            this.context.authenticatedUser();
 
             final ContentRepository contentRepository = this.contentRepositoryFactory.getRepository();
 
             final String fileLocation = contentRepository.saveFile(base64EncodedFile, entityId, fileName, entityType);
 
-            final Document document = Document.createNew(entityType, entityId, name, fileName, base64EncodedFile.getSize(), docType,
-                    fileName, fileLocation, contentRepository.getStorageType());
+            final Document document = Document.createNew(entityType, entityId, name, fileName, base64EncodedFile.size(), docType,
+                    fileName, fileLocation);
 
             this.documentRepository.save(document);
 
             return document.getId();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-            LOG.error("Error occured.", dve);
-            throw new PlatformDataIntegrityException(DOCUMENT_ERROR_MESSAGE_CODE, DOCUMENT_ERROR_MESSAGE, dve);
+            log.error("Error occured.", dve);
+            throw new ContentManagementException(DOCUMENT_ERROR_MESSAGE_CODE, DOCUMENT_ERROR_MESSAGE, dve);
         }
     }
 
     @Override
     @Transactional
     public Long updateDocument(Base64EncodedFile base64EncodedFile, DocumentCommand documentCommand) {
-        CommandProcessingResult updatedDocument = updateDocument(documentCommand, null, base64EncodedFile);
-        if (updatedDocument.resourceId() != null) {
-            return updatedDocument.resourceId();
+        final var updatedDocument = updateDocument(documentCommand, null, base64EncodedFile);
+        if (updatedDocument.getId() != null) {
+            return updatedDocument.getId();
         }
         return null;
     }
 
     @Override
     @Transactional
-    public CommandProcessingResult updateDocument(final DocumentCommand documentCommand, final InputStream inputStream) {
-        return updateDocument(documentCommand, inputStream, null);
+    public void updateDocument(final DocumentCommand documentCommand, final InputStream inputStream) {
+        this.updateDocument(documentCommand, inputStream, null);
     }
 
-    public CommandProcessingResult updateDocument(final DocumentCommand documentCommand, final InputStream inputStream,
+    public Document updateDocument(final DocumentCommand documentCommand, final InputStream inputStream,
             final Base64EncodedFile base64EncodedFile) {
         try {
-            this.context.authenticatedUser();
 
             String oldLocation = null;
-            final DocumentCommandValidator validator = new DocumentCommandValidator(documentCommand);
-            validator.validateForUpdate();
             // TODO check if entity id is valid and within data scope for the
             // user
             final Document documentForUpdate = this.documentRepository.findById(documentCommand.getId())
                     .orElseThrow(() -> new DocumentNotFoundException(documentCommand.getParentEntityType(),
                             documentCommand.getParentEntityId(), documentCommand.getId()));
 
-            final StorageType documentStoreType = documentForUpdate.storageType();
             oldLocation = documentForUpdate.getLocation();
             if (inputStream != null && documentCommand.isFileNameChanged()) {
                 final ContentRepository contentRepository = this.contentRepositoryFactory.getRepository();
                 documentCommand.setLocation(contentRepository.saveFile(inputStream, documentCommand));
-                documentCommand.setStorageType(contentRepository.getStorageType().getValue());
             } else if (base64EncodedFile != null && documentCommand.isFileNameChanged()) {
                 final ContentRepository contentRepository = this.contentRepositoryFactory.getRepository();
                 documentCommand.setLocation(contentRepository.saveFile(base64EncodedFile, documentCommand.getParentEntityId(),
                         documentCommand.getFileName(), documentCommand.getParentEntityType()));
-                documentCommand.setStorageType(contentRepository.getStorageType().getValue());
             }
 
             documentForUpdate.update(documentCommand);
 
             if ((inputStream != null || base64EncodedFile != null) && documentCommand.isFileNameChanged()) {
-                final ContentRepository contentRepository = this.contentRepositoryFactory.getRepository(documentStoreType);
+                final ContentRepository contentRepository = this.contentRepositoryFactory.getRepository();
                 contentRepository.deleteFile(oldLocation);
             }
 
             this.documentRepository.saveAndFlush(documentForUpdate);
 
-            return new CommandProcessingResult(documentForUpdate.getId());
+            return documentForUpdate;
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-            LOG.error("Error occured.", dve);
-            throw new PlatformDataIntegrityException(DOCUMENT_ERROR_MESSAGE_CODE, DOCUMENT_ERROR_MESSAGE, dve);
+            log.error("Error occured.", dve);
+            throw new ContentManagementException(DOCUMENT_ERROR_MESSAGE_CODE, DOCUMENT_ERROR_MESSAGE, dve);
         } catch (final ContentManagementException cme) {
-            LOG.error("Error occured.", cme);
+            log.error("Error occured.", cme);
             throw new ContentManagementException(documentCommand.getName(), cme.getMessage(), cme);
         }
     }
 
     @Transactional
     @Override
-    public CommandProcessingResult deleteDocument(final DocumentCommand documentCommand) {
-        this.context.authenticatedUser();
+    public void deleteDocument(final DocumentCommand documentCommand) {
 
         validateParentEntityType(documentCommand);
         // TODO: Check document is present under this entity Id
@@ -202,9 +162,8 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
                         documentCommand.getId()));
         this.documentRepository.delete(document);
 
-        final ContentRepository contentRepository = this.contentRepositoryFactory.getRepository(document.storageType());
+        final ContentRepository contentRepository = this.contentRepositoryFactory.getRepository();
         contentRepository.deleteFile(document.getLocation());
-        return new CommandProcessingResult(document.getId());
     }
 
     private void validateParentEntityType(final DocumentCommand documentCommand) {
@@ -213,7 +172,7 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
 
     private void checkValidityOfEntityType(String entityType) {
         if (!checkValidEntityType(entityType)) {
-            throw new InvalidEntityTypeForDocumentManagementException(entityType);
+            throw new ContentManagementException(entityType);
         }
     }
 
@@ -233,7 +192,7 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
 
         @Override
         public String toString() {
-            return name().toString().toLowerCase();
+            return name().toLowerCase();
         }
     }
 }

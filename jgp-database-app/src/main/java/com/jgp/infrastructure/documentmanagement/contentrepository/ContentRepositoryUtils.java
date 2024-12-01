@@ -1,44 +1,24 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+
 package com.jgp.infrastructure.documentmanagement.contentrepository;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.jgp.infrastructure.core.domain.Base64EncodedFile;
+import com.jgp.infrastructure.core.domain.Base64EncodedImage;
+import com.jgp.infrastructure.documentmanagement.exception.ContentManagementException;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.fineract.infrastructure.core.data.ApiParameterError;
-import org.apache.fineract.infrastructure.core.domain.Base64EncodedFile;
-import org.apache.fineract.infrastructure.core.domain.Base64EncodedImage;
-import org.apache.fineract.infrastructure.core.exception.FileUploadException;
-import org.apache.fineract.infrastructure.core.exception.ImageDataURLNotValidException;
-import org.apache.fineract.infrastructure.core.exception.ImageUploadException;
-import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
-import org.apache.fineract.infrastructure.documentmanagement.exception.ContentManagementException;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
 
 public final class ContentRepositoryUtils {
 
     private static final SecureRandom random = new SecureRandom();
+    private static final String DATA_AND_BASE_64_PARAM = "data:%s;base64,";
 
     private ContentRepositoryUtils() {}
 
+    @Getter
     public enum ImageMIMEtype {
 
         GIF("image/gif"), JPEG("image/jpeg"), PNG("image/png");
@@ -49,26 +29,18 @@ public final class ContentRepositoryUtils {
             this.value = value;
         }
 
-        public String getValue() {
-            return this.value;
-        }
-
         @SuppressWarnings("UnnecessaryDefaultInEnumSwitch")
         public static ImageMIMEtype fromFileExtension(ImageFileExtension fileExtension) {
-            switch (fileExtension) {
-                case GIF:
-                    return ImageMIMEtype.GIF;
-                case JPG:
-                case JPEG:
-                    return ImageMIMEtype.JPEG;
-                case PNG:
-                    return ImageMIMEtype.PNG;
-                default:
-                    throw new IllegalArgumentException();
-            }
+            return switch (fileExtension) {
+                case GIF -> ImageMIMEtype.GIF;
+                case JPG, JPEG -> ImageMIMEtype.JPEG;
+                case PNG -> ImageMIMEtype.PNG;
+                default -> throw new IllegalArgumentException();
+            };
         }
     }
 
+    @Getter
     public enum ImageFileExtension {
 
         GIF(".gif"), JPEG(".jpeg"), JPG(".jpg"), PNG(".png");
@@ -79,41 +51,30 @@ public final class ContentRepositoryUtils {
             this.value = value;
         }
 
-        public String getValue() {
-            return this.value;
-        }
-
         public String getValueWithoutDot() {
             return this.value.substring(1);
         }
 
         public ImageFileExtension getFileExtension() {
-            switch (this) {
-                case GIF:
-                    return ImageFileExtension.GIF;
-                case JPEG:
-                    return ImageFileExtension.JPEG;
-                case PNG:
-                    return ImageFileExtension.PNG;
-                default:
-                    throw new IllegalArgumentException();
-            }
+            return switch (this) {
+                case GIF -> ImageFileExtension.GIF;
+                case JPEG -> ImageFileExtension.JPEG;
+                case PNG -> ImageFileExtension.PNG;
+                default -> throw new IllegalArgumentException();
+            };
         }
     }
 
+    @Getter
     public enum ImageDataURIsuffix {
-
-        GIF("data:" + ImageMIMEtype.GIF.getValue() + ";base64,"), JPEG("data:" + ImageMIMEtype.JPEG.getValue() + ";base64,"), PNG(
-                "data:" + ImageMIMEtype.PNG.getValue() + ";base64,");
+        GIF(String.format(DATA_AND_BASE_64_PARAM, ImageMIMEtype.GIF.getValue())),
+        JPEG(String.format(DATA_AND_BASE_64_PARAM, ImageMIMEtype.JPEG.getValue())),
+        PNG(String.format(DATA_AND_BASE_64_PARAM, ImageMIMEtype.PNG.getValue()));
 
         private final String value;
 
         ImageDataURIsuffix(final String value) {
             this.value = value;
-        }
-
-        public String getValue() {
-            return this.value;
         }
     }
 
@@ -130,12 +91,11 @@ public final class ContentRepositoryUtils {
     /**
      * Validates that passed in Mime type maps to known image mime types
      *
-     * @param mimeType
      */
     public static void validateImageMimeType(final String mimeType) {
         if ((!mimeType.equalsIgnoreCase(ImageMIMEtype.GIF.getValue()) && !mimeType.equalsIgnoreCase(ImageMIMEtype.JPEG.getValue())
                 && !mimeType.equalsIgnoreCase(ImageMIMEtype.PNG.getValue()))) {
-            throw new ImageUploadException(mimeType);
+            throw new ContentManagementException(mimeType);
         }
     }
 
@@ -158,33 +118,21 @@ public final class ContentRepositoryUtils {
             base64EncodedString = dataURL.replaceAll(ImageDataURIsuffix.JPEG.getValue(), "");
             fileExtension = ImageFileExtension.JPEG.getValue();
         } else {
-            throw new ImageDataURLNotValidException();
+            throw new ContentManagementException("Invalid file !!!");
         }
 
         return new Base64EncodedImage(base64EncodedString, fileExtension);
     }
 
+    /**
+     * Using Content-Length gives me size of the entire request, which is good enough for now for a fast fail as the
+     * length of the rest of the content i.e name and description while compared to the uploaded file size is
+     * negligible
+     **/
     public static void validateFileSizeWithinPermissibleRange(final Long fileSize, final String name) {
-        /**
-         * Using Content-Length gives me size of the entire request, which is good enough for now for a fast fail as the
-         * length of the rest of the content i.e name and description while compared to the uploaded file size is
-         * negligible
-         **/
+
         if (fileSize != null && ((fileSize / (1024 * 1024)) > ContentRepository.MAX_FILE_UPLOAD_SIZE_IN_MB)) {
             throw new ContentManagementException(name, fileSize, ContentRepository.MAX_FILE_UPLOAD_SIZE_IN_MB);
-        }
-    }
-
-    public static void validateClientImageNotEmpty(final String imageFileName) {
-        final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-        if (imageFileName == null) {
-            final StringBuilder validationErrorCode = new StringBuilder("validation.msg.clientImage.cannot.be.blank");
-            final StringBuilder defaultEnglishMessage = new StringBuilder("The parameter image cannot be blank.");
-            final ApiParameterError error = ApiParameterError.parameterError(validationErrorCode.toString(),
-                    defaultEnglishMessage.toString(), "image");
-            dataValidationErrors.add(error);
-            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.",
-                    dataValidationErrors);
         }
     }
 
@@ -211,7 +159,7 @@ public final class ContentRepositoryUtils {
      * @param dataURL
      *            mimeType
      */
-    public static Base64EncodedFile extractFileFromDataURL(final String dataURL) {
+    public static Base64EncodedFile extractFileFromDataURL(final String dataURL) throws FileUploadException {
         String fileExtension = "";
         String fileType = "";
         String base64EncodedString = null;

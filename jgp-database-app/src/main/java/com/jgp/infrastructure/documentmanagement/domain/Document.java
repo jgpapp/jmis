@@ -40,18 +40,15 @@ public class Document extends BaseEntity {
     @Column(name = "location", length = 500)
     private String location;
 
-    @Column(name = "storage_type_enum")
-    private Integer storageType;
-
     public Document() {}
 
     public static Document createNew(final String parentEntityType, final Long parentEntityId, final String name, final String fileName,
-            final Long size, final String type, final String description, final String location, final StorageType storageType) {
-        return new Document(parentEntityType, parentEntityId, name, fileName, size, type, description, location, storageType);
+            final Long size, final String type, final String description, final String location) {
+        return new Document(parentEntityType, parentEntityId, name, fileName, size, type, description, location);
     }
 
     private Document(final String parentEntityType, final Long parentEntityId, final String name, final String fileName, final Long size,
-            final String type, final String description, final String location, final StorageType storageType) {
+            final String type, final String description, final String location) {
         this.parentEntityType = StringUtils.defaultIfEmpty(parentEntityType, null);
         this.parentEntityId = parentEntityId;
         this.name = StringUtils.defaultIfEmpty(name, null);
@@ -60,7 +57,6 @@ public class Document extends BaseEntity {
         this.type = StringUtils.defaultIfEmpty(type, null);
         this.description = StringUtils.defaultIfEmpty(description, null);
         this.location = StringUtils.defaultIfEmpty(location, null);
-        this.storageType = storageType.getValue();
     }
 
     public void update(final DocumentCommand command) {
@@ -82,10 +78,6 @@ public class Document extends BaseEntity {
         if (command.isSizeChanged()) {
             this.size = command.getSize();
         }
-    }
-
-    public StorageType storageType() {
-        return StorageType.fromInt(this.storageType);
     }
 
     @Override

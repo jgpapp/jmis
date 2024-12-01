@@ -1,29 +1,12 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+
 package com.jgp.infrastructure.documentmanagement.contentrepository;
 
+import com.jgp.infrastructure.documentmanagement.exception.ContentManagementException;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
-import org.apache.fineract.infrastructure.documentmanagement.exception.ContentManagementException;
 import org.apache.tika.Tika;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
@@ -32,7 +15,6 @@ import org.apache.tika.sax.BodyContentHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.BufferedInputStream;
 import java.nio.file.Path;
 import java.util.List;
@@ -45,13 +27,13 @@ public class FileSystemContentPathSanitizer implements ContentPathSanitizer {
 
     private static Pattern OVERWRITE_SIBLING_IMAGE = Pattern.compile(".*\\.\\./+[0-9]+/+.*");
 
-    @Value("${fineract.content.regex-whitelist-enabled}")
+    @Value("${jgp.content.regex-whitelist-enabled}")
     private boolean isRegexWhitelistEnabled;
-    @Value("${fineract.content.regex-whitelist}")
+    @Value("${jgp.content.regex-whitelist}")
     private List<String> regexWhitelist;
-    @Value("${fineract.content.mime-whitelist-enabled}")
+    @Value("${jgp.content.mime-whitelist-enabled}")
     private boolean isMimeWhitelistEnabled;
-    @Value("${fineract.content.mime-whitelist}")
+    @Value("${jgp.content.mime-whitelist}")
     private List<String> mimeWhitelist;
     private List<Pattern> regexWhitelistPatterns;
 
@@ -107,7 +89,7 @@ public class FileSystemContentPathSanitizer implements ContentPathSanitizer {
                     throw new RuntimeException(String.format("Could not detect content mime type for %s!", fileName));
                 }
 
-                if (!mimeWhitelist.contains(contentMimeType)) {
+                /*if (!mimeWhitelist.contains(contentMimeType)) {
                     throw new RuntimeException(
                             String.format("Detected content mime type %s for %s not allowed!", contentMimeType, fileName));
                 }
@@ -115,12 +97,11 @@ public class FileSystemContentPathSanitizer implements ContentPathSanitizer {
                 if (!contentMimeType.equalsIgnoreCase(extensionMimeType)) {
                     throw new RuntimeException(String.format("Detected filename (%s) and content (%s) mime type do not match!",
                             extensionMimeType, contentMimeType));
-                }
+                }*/
             }
 
             Path target = Path.of(sanitizedPath);
-            Path rootFolder = Path.of(FileSystemContentRepository.FINERACT_BASE_DIR,
-                    ThreadLocalContextUtil.getTenant().getName().replaceAll(" ", "").trim());
+            Path rootFolder = Path.of(FileSystemContentRepository.JGP_BASE_DIR);
 
             if (!target.startsWith(rootFolder)) {
                 throw new RuntimeException(String.format("Path traversal attempt: %s (%s)", target, rootFolder));

@@ -4,6 +4,10 @@ package com.jgp.infrastructure.documentmanagement.exception;
 
 public class ContentManagementException extends RuntimeException {
 
+    public ContentManagementException(final String message) {
+        super(message);
+    }
+
     public ContentManagementException(final String filename, final String message) {
         super("Error while manipulating file " + filename + " due to a ContentRepository issue " + message);
     }

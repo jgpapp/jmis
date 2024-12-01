@@ -29,10 +29,6 @@ public class DocumentReadPlatformServiceImpl implements DocumentReadPlatformServ
 
     @Override
     public Collection<DocumentData> retrieveAllDocuments(final String entityType, final Long entityId) {
-
-        // TODO verify if the entities are valid and a user
-        // has data
-        // scope for the particular entities
         final DocumentMapper mapper = new DocumentMapper(true, true);
         final String sql = SELECT_LITERAL + mapper.schema() + " order by d.id";
         return this.jdbcTemplate.query(sql, mapper, new Object[] { entityType, entityId }); // NOSONAR
@@ -43,7 +39,7 @@ public class DocumentReadPlatformServiceImpl implements DocumentReadPlatformServ
         try {
             final DocumentMapper mapper = new DocumentMapper(false, false);
             final DocumentData documentData = fetchDocumentDetails(entityType, entityId, documentId, mapper);
-            final ContentRepository contentRepository = this.contentRepositoryFactory.getRepository(documentData.storageType());
+            final ContentRepository contentRepository = this.contentRepositoryFactory.getRepository();
             return contentRepository.fetchFile(documentData);
         } catch (final EmptyResultDataAccessException e) {
             throw new DocumentNotFoundException(entityType, entityId, documentId, e);
@@ -101,8 +97,7 @@ public class DocumentReadPlatformServiceImpl implements DocumentReadPlatformServ
             if (!this.hideStorageType) {
                 storageType = rs.getInt("storageType");
             }
-            return new DocumentData(id, parentEntityType, parentEntityId, name, fileName, fileSize, fileType, description, location,
-                    storageType);
+            return new DocumentData(id, parentEntityType, parentEntityId, name, fileName, fileSize, fileType, description, location);
         }
     }
 
