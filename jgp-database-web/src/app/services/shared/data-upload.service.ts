@@ -1,4 +1,4 @@
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { GlobalService } from '../shared/global.service';
 import { Observable, of } from 'rxjs';
@@ -39,12 +39,20 @@ export class DataUploadService {
       }
 
 
+      downloadDataImportedFile(row: any): Observable<any> {
+            return this.httpClient.get(`${this.gs.BASE_API_URL}/imports/downloadOutputTemplate?importDocumentId=${row.documentId}`, {
+              responseType: 'arraybuffer',
+              observe: 'response',
+            });
+      }
+
+
       /**
    * Download file from API response
    *
    * @param res
    */
-  downloadFileFromAPIResponse(res: any, downloadFileName: string) {
+  downloadFileFromAPIResponse(res: any) {
     const headers = res.headers;
     const contentType = headers.get('Content-Type');
     const blob = new Blob([res.body], { type: contentType });
@@ -73,4 +81,20 @@ export class DataUploadService {
     return result.replace(/"/g, '');
   }
 
+
+  getAvailableDocuments(partnerId: number, entityType: string, page: number, size: number): Observable<any> {
+    let params = new HttpParams()
+    .set('pageNumber', page.toString())
+    .set('pageSize', size.toString())
+    .set('entityType', entityType)
+    .set('partnerId', partnerId);
+    return this.httpClient.get(`${this.gs.BASE_API_URL}/imports`, { params });
+  }
+
+  getDocumentsById(importDocumentId: number, entityType: string): Observable<any> {
+    let params = new HttpParams()
+    .set('entityType', entityType)
+    .set('importDocumentId', importDocumentId);
+    return this.httpClient.get(`${this.gs.BASE_API_URL}/imports`, { params });
+  }
 }

@@ -6,6 +6,7 @@ import com.jgp.finance.dto.LoanSearchCriteria;
 import com.jgp.finance.service.LoanService;
 import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
+import com.jgp.infrastructure.bulkimport.service.BulkImportWorkbookService;
 import com.jgp.shared.dto.ApiResponseDto;
 import com.jgp.util.CommonUtil;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -35,6 +35,7 @@ public class LoanController {
 
     private final LoanService loanService;
     private final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService;
+    private final BulkImportWorkbookService bulkImportWorkbookService;
 
     @GetMapping
     public ResponseEntity<List<LoanDto>> getAvailableLoanRecords(@RequestParam(name = "partnerId", required = false) Long partnerId,
@@ -49,13 +50,21 @@ public class LoanController {
         return new ResponseEntity<>(this.loanService.getLoans(new LoanSearchCriteria(partnerId, participantId, status, quality, approvedByPartner, null, null), sortedByDateCreated), HttpStatus.OK);
     }
 
-    @PostMapping("upload-template")
-    public ResponseEntity<ApiResponseDto> uploadLoansData(@RequestParam("excelFile") MultipartFile excelFile) {
+    @PostMapping("upload-template-original")
+    public ResponseEntity<ApiResponseDto> uploadLoansData2(@RequestParam("excelFile") MultipartFile excelFile) {
         if (excelFile.isEmpty()) {
             return new ResponseEntity<>(new ApiResponseDto(false, CommonUtil.NO_FILE_TO_UPLOAD), HttpStatus.BAD_REQUEST);
         }
         this.loanService.uploadBulkLoanData(excelFile);
         return new ResponseEntity<>(new ApiResponseDto(true, CommonUtil.RESOURCE_CREATED), HttpStatus.CREATED);
+    }
+
+    @PostMapping("upload-template")
+    public ResponseEntity<ApiResponseDto> uploadLoansData(@RequestParam("excelFile") MultipartFile excelFile) {
+        if (excelFile.isEmpty()) {
+            return new ResponseEntity<>(new ApiResponseDto(false, CommonUtil.NO_FILE_TO_UPLOAD), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(new ApiResponseDto(true, this.bulkImportWorkbookService.importWorkbook(GlobalEntityType.LOAN_IMPORT_TEMPLATE.name(), excelFile)+""), HttpStatus.CREATED);
     }
 
     @GetMapping("template/download")

@@ -35,12 +35,16 @@ dependencies {
 	implementation 'org.apache.poi:poi:5.2.5'
 	implementation 'org.apache.poi:poi-ooxml:5.2.5'
 	implementation 'com.google.guava:guava:r05'
+	implementation 'com.google.guava:guava:33.3.1-jre'
 	implementation 'com.google.code.gson:gson'
 	implementation 'org.apache.commons:commons-lang3:3.12.0'
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 	implementation 'org.mapstruct:mapstruct:1.5.0.Final'
+	implementation 'org.apache.tika:tika-core:3.0.0'
+	implementation 'org.apache.tika:tika-parsers:3.0.0'
+	implementation 'com.google.code.findbugs:annotations:3.0.0'
 
 	// QueryDSL
 	implementation "com.querydsl:querydsl-jpa:${querydslVersion}:jakarta"

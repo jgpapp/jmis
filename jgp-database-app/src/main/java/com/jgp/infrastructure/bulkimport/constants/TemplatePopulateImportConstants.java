@@ -22,7 +22,6 @@ public class TemplatePopulateImportConstants {
     public static final String STATUS_CELL_IMPORTED = "Imported";
     public static final String STATUS_CREATION_FAILED = "Creation failed";
     public static final String STATUS_APPROVAL_FAILED = "Approval failed";
-    public static final String STATUS_ACTIVATION_FAILED = "Activation failed";
     public static final String STATUS_MEETING_FAILED = "Meeting failed";
     public static final String STATUS_DISBURSAL_FAILED = "Disbursal failed";
     public static final String STATUS_DISBURSAL_REPAYMENT_FAILED = "Repayment failed";
