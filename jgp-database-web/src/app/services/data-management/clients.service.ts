@@ -13,7 +13,6 @@ export class ClientService {
 
 
     getAvailableClients(searchText: string | null, page: number, size: number): Observable<any> {
-      console.log(searchText)
       let params = new HttpParams()
       .set('pageNumber', page.toString())
       .set('pageSize', size.toString());

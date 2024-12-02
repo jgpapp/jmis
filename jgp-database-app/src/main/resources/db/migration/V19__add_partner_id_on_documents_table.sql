@@ -1,0 +1,2 @@
+ALTER TABLE import_document ADD COLUMN partner_id BIGINT NULL,
+ADD CONSTRAINT M_DOCUMENT_ON_PARTNER FOREIGN KEY (partner_id) REFERENCES partners(id);

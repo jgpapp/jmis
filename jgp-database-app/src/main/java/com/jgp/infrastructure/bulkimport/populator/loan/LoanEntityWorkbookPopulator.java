@@ -24,40 +24,70 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         worksheet.setColumnWidth(LoanConstants.BUSINESS_PHONE_NUMBER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.GENDER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.AGE_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.PASS_PORT_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.BUSINESS_LOCATION_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.INDUSTRY_SECTOR_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(LoanConstants.BUSINESS_SEGMENT_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.PIPELINE_SOURCE, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.LOAN_STATUS, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.DATE_APPLIED, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.DATE_DISBURSED, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(LoanConstants.VALUE_ACCESSED, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.LOAN_AMOUNT_KES, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.LOAN_AMOUNT_USD, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.LOAN_DURATION, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.OUT_STANDING_AMOUNT, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.REPAID_LOAN_AMOUNT, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.LOAN_QUALITY, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(LoanConstants.DATE_RECORD_ENTERED_BY_PARTNER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(LoanConstants.UNIQUE_VALUES, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.TOTAL_REGULAR_EMPLOYEES_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.YOUTH_REGULAR_EMPLOYEES_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.TOTAL_CASUAL_EMPLOYEES_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.YOUTH_CASUAL_EMPLOYEES_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.BUSINESS_SEGMENT_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.LOANER_TYPE_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.TRAINED_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.ID_CHECK_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.AGE_CATEGORY_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.GENDER_STATUS_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.LOAN_TYPE_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.LOAN_PRODUCT_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.TRANCH_AMOUNT_ALLOCATED_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.TRANCH_AMOUNT_DISBURSED_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+
 
         writeString(LoanConstants.BUSINESS_NAME_COL, rowHeader, "Name of business*");
         writeString(LoanConstants.JGP_ID_COL, rowHeader, "Unique JGP ID (National ID)*");
         writeString(LoanConstants.BUSINESS_PHONE_NUMBER_COL, rowHeader, "Business phone number");
         writeString(LoanConstants.GENDER_COL, rowHeader, "Gender of owner");
         writeString(LoanConstants.AGE_COL, rowHeader, "Age of owner (full years)");
+        writeString(LoanConstants.PASS_PORT_COL, rowHeader, "Passport");
         writeString(LoanConstants.BUSINESS_LOCATION_COL, rowHeader, "Business Location(County)*");
         writeString(LoanConstants.INDUSTRY_SECTOR_COL, rowHeader, "Industry sector");
-        writeString(LoanConstants.BUSINESS_SEGMENT_COL, rowHeader, "Business segment");
         writeString(LoanConstants.PIPELINE_SOURCE, rowHeader, "Pipeline source");
         writeString(LoanConstants.LOAN_STATUS, rowHeader, "Decision on loan");
         writeString(LoanConstants.DATE_APPLIED, rowHeader, "Date loan application(yyyy-MM-dd)");
         writeString(LoanConstants.DATE_DISBURSED, rowHeader, "Date loan disbursed(yyyy-MM-dd)");
-        writeString(LoanConstants.VALUE_ACCESSED, rowHeader, "Amount Accessed (KES)");
+        writeString(LoanConstants.LOAN_AMOUNT_KES, rowHeader, "Loan Amount (KES)");
+        writeString(LoanConstants.LOAN_AMOUNT_USD, rowHeader, "Loan Amount (USD)");
         writeString(LoanConstants.LOAN_DURATION, rowHeader, "Loan duration (months)");
         writeString(LoanConstants.OUT_STANDING_AMOUNT, rowHeader, "Outstanding amount");
+        writeString(LoanConstants.REPAID_LOAN_AMOUNT, rowHeader, "Repaid Loan Amount (KES)");
         writeString(LoanConstants.LOAN_QUALITY, rowHeader, "Loan quality");
-        writeString(LoanConstants.DATE_RECORD_ENTERED_BY_PARTNER_COL, rowHeader, "Date recorded by partner(yyyy-MM-dd)");
-        writeString(LoanConstants.UNIQUE_VALUES, rowHeader, "Unique values");
+        writeString(LoanConstants.TOTAL_REGULAR_EMPLOYEES_COL, rowHeader, "Total number of regular employees including owner ");
+        writeString(LoanConstants.YOUTH_REGULAR_EMPLOYEES_COL, rowHeader, "Regular, of which are youth (18-35)");
+        writeString(LoanConstants.TOTAL_CASUAL_EMPLOYEES_COL, rowHeader, "Total number of casual employees excluding owner");
+        writeString(LoanConstants.YOUTH_CASUAL_EMPLOYEES_COL, rowHeader, "Casual, of which are youth (18-35)");
+        writeString(LoanConstants.BUSINESS_SEGMENT_COL, rowHeader, "Business segment");
+        writeString(LoanConstants.LOANER_TYPE_COL, rowHeader, "Loaner Type");
+        writeString(LoanConstants.TRAINED_COL, rowHeader, "Trained");
+        writeString(LoanConstants.ID_CHECK_COL, rowHeader, "ID Check");
+        writeString(LoanConstants.AGE_CATEGORY_COL, rowHeader, "Age Categories");
         writeString(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, rowHeader, "Date added to JGP database(yyyy-MM-dd)");
+        writeString(LoanConstants.GENDER_STATUS_COL, rowHeader, "Gender status");
+        writeString(LoanConstants.LOAN_TYPE_COL, rowHeader, "Loan Type");
+        writeString(LoanConstants.LOAN_PRODUCT_COL, rowHeader, "Loan product (Working Capital, Asset Finance, Stahimili, Purchase Order, Consignment Finance, Shariah Compliant)");
+        writeString(LoanConstants.TRANCH_AMOUNT_ALLOCATED_COL, rowHeader, "Tranch amount allocated");
+        writeString(LoanConstants.TRANCH_AMOUNT_DISBURSED_COL, rowHeader, "Tranch Amount Disbursed");
+
 
     }
 }

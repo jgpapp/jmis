@@ -42,7 +42,7 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public void uploadBulkLoanData(MultipartFile file) {
         try {
-            this.publisher.publishEvent(new BulkImportEvent(new XSSFWorkbook(file.getInputStream()), TemplatePopulateImportConstants.LOAN_ENTITY));
+            this.publisher.publishEvent(new BulkImportEvent(new XSSFWorkbook(file.getInputStream()), TemplatePopulateImportConstants.LOAN_ENTITY, 0L));
         }  catch (Exception e){
             throw new RuntimeException("Error while importing Loan Data: "+ e.getMessage());
         }

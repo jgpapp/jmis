@@ -6,7 +6,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { MatCardModule } from '@angular/material/card';
 import { DataUploadService } from '@services/shared/data-upload.service';
-import { ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -15,6 +15,9 @@ import { GlobalService } from '@services/shared/global.service';
 import { NoPermissionComponent } from '../../errors/no-permission/no-permission.component';
 import { AuthService } from '@services/users/auth.service';
 import { Subject, takeUntil } from 'rxjs';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-data-uploader',
@@ -32,7 +35,10 @@ import { Subject, takeUntil } from 'rxjs';
     MatIconModule,
     MatButtonModule,
     MatOptionModule,
-    NoPermissionComponent
+    NoPermissionComponent,
+    MatTableModule,
+    MatPaginatorModule,
+    MatTooltipModule
 ],
   templateUrl: './data-uploader.component.html',
   styleUrl: './data-uploader.component.scss'
@@ -43,14 +49,28 @@ export class DataUploaderComponent implements OnDestroy {
   template: File;
   bulkImportForm: UntypedFormGroup;
   partnerType: string | undefined = 'NONE';
+  public docsFilterForm: FormGroup;
+
+  public displayedColumns = ['name', 'importTime', 'endTime', 'completed', 'totalRecords', 'successCount', 'failureCount', 'actions'];
+  public dataSource: any;
+  pageSize = 10;
+  pageIndex = 0;
+  totalItems = 0;
+  entityType: any;
+  documents: any[]
+  importDocumentId: any;
 
   private unsubscribe$ = new Subject<void>();
   constructor(
+    public fb: FormBuilder,
     private dataUploadService: DataUploadService, 
     private gs: GlobalService,
     private formBuilder: UntypedFormBuilder,
     public authService: AuthService){
 
+      this.docsFilterForm = this.fb.group({
+        selectedEntityType: [null]
+        });
   }
 
 
@@ -66,6 +86,46 @@ export class DataUploaderComponent implements OnDestroy {
   ngOnInit() {
     this.partnerType = this.authService.currentUser()?.partnerType === '-' ? 'NONE' : this.authService.currentUser()?.partnerType;
     this.createBulkImportForm();
+  }
+
+
+  getAvailableDocuments() {
+    let partnerId = this.authService.currentUser()?.partnerId;
+    if(this.importDocumentId){
+      this.dataUploadService.getDocumentsById(this.importDocumentId, this.entityType)
+      .pipe(takeUntil(this.unsubscribe$))
+        .subscribe({
+          next: (response) => {
+            this.documents = response.content;
+            this.dataSource = new MatTableDataSource(this.documents);
+            this.totalItems = response.page.totalElements;
+          },
+          error: (error) => { }
+        });
+    } else if(partnerId){
+      this.dataUploadService.getAvailableDocuments(partnerId, this.entityType, this.pageIndex, this.pageSize)
+      .pipe(takeUntil(this.unsubscribe$))
+        .subscribe({
+          next: (response) => {
+            this.documents = response.content;
+            this.dataSource = new MatTableDataSource(this.documents);
+            this.totalItems = response.page.totalElements;
+          },
+          error: (error) => { }
+        });
+    }
+    this.importDocumentId = undefined;
+  }
+
+  filterEntityTypeChanged() {
+      this.entityType = this.docsFilterForm.controls['selectedEntityType'].value;
+      this.getAvailableDocuments();
+  }
+
+  onPageChange(event: PageEvent) {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.getAvailableDocuments();
   }
 
   /**
@@ -99,8 +159,10 @@ export class DataUploaderComponent implements OnDestroy {
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
-          this.gs.openSnackBar(response.message, "Dismiss");
-          //this.refreshDocuments();
+          //this.gs.openSnackBar(response.message, "Dismiss");
+          this.importDocumentId = response.message;
+          this.entityType = legalFormType;
+          this.getAvailableDocuments();
         }
       });
     }
@@ -113,10 +175,20 @@ export class DataUploaderComponent implements OnDestroy {
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
-            this.dataUploadService.downloadFileFromAPIResponse(response, this.bulkImportForm.value.legalForm);
+            this.dataUploadService.downloadFileFromAPIResponse(response);
         }
       });
     }
+  }
+
+  downLoadDocument(row: any){
+      this.dataUploadService.downloadDataImportedFile(row)
+        .pipe(takeUntil(this.unsubscribe$))
+        .subscribe({
+          next: (response) => {
+              this.dataUploadService.downloadFileFromAPIResponse(response);
+          }
+        });
   }
 
   ngOnDestroy(): void {
