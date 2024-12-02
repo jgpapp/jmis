@@ -21,8 +21,8 @@ public record ParticipantDto(
         @Max(value = 10, message = "JGP Id must be at most 10 characters !!")
         String jgpId,
 
-        @Min(value = 9, message = "JGP Id must be at least 9 characters !!")
-        @Max(value = 12, message = "JGP Id must be at most 12 characters !!")
+        @Min(value = 9, message = "Phone number must be at least 9 characters !!")
+        @Max(value = 12, message = "Phone number must be at most 12 characters !!")
         String phoneNumber,
 
         @NotNull(message = "Gender is required !!")
