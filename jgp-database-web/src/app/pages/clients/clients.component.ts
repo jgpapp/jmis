@@ -37,7 +37,8 @@ export class ClientsComponent implements OnInit, OnDestroy{
   public dataSource: any;
 
   participants: any
-  public searchText: string | null;
+  public searchTextInput: string | null;
+  searchText: string | null;
   pageSize = 10;
   pageIndex = 0;
   totalItems = 0;
@@ -58,9 +59,9 @@ export class ClientsComponent implements OnInit, OnDestroy{
   }
 
   onChange(event: Event) {
-    const newValue = (event.target as HTMLInputElement).value;
-    if(newValue.length > 2){
-      this.searchText = newValue;
+    console.log('fffffff====>'+this.searchTextInput)
+    if(this.searchTextInput && this.searchTextInput.length > 2){
+      this.searchText = this.searchTextInput;
       this.getAvailableClients();
     }else {
       this.searchText = null;

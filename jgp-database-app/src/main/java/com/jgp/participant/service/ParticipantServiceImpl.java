@@ -7,6 +7,7 @@ import com.jgp.finance.dto.LoanSearchCriteria;
 import com.jgp.finance.service.LoanService;
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.domain.ParticipantRepository;
+import com.jgp.participant.domain.QParticipant;
 import com.jgp.participant.domain.predicate.ParticipantsPredicateBuilder;
 import com.jgp.participant.dto.ParticipantDto;
 import com.jgp.participant.dto.ParticipantResponseDto;
@@ -58,6 +59,13 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     @Override
     public Page<Participant> availableClients(String searchText, Pageable pageable) {
-        return this.participantRepository.findAll(this.participantsPredicateBuilder.buildPredicateForSearchParticipants(searchText), pageable);
+        if (null != searchText) {
+            QParticipant qParticipant = QParticipant.participant;
+            var businessNamePredicate = qParticipant.businessName.likeIgnoreCase("%"+searchText+"%s");
+            var jgpPredicate = qParticipant.jgpId.likeIgnoreCase("%"+searchText+"%s");
+            var phoneNumberPredicate = qParticipant.phoneNumber.likeIgnoreCase("%"+searchText+"%s");
+            return this.participantRepository.findAll(businessNamePredicate.or(jgpPredicate).or(phoneNumberPredicate), pageable);
+        }
+        return this.participantRepository.findAll(pageable);
     }
 }

@@ -39,6 +39,7 @@ public record ParticipantDto(
         @NotBlank(message = "business segment is required !!")
         String businessSegment,
 
+        //@NotNull(message = "Business registration is required !!")
         Boolean isBusinessRegistered,
 
         String registrationNumber,
@@ -63,13 +64,13 @@ public record ParticipantDto(
         @NotNull(message = "Youth casual employees is required !!")
         Integer youthCasualEmployees,
 
-        @NotBlank(message = "Sample records is required !!")
+        //@NotBlank(message = "Sample records is required !!")
         String sampleRecords,
 
-        @NotBlank(message = "Disability status is required !!")
+        //@NotBlank(message = "Disability status is required !!")
         String personWithDisability,
 
-        @NotBlank(message = "Refugee status is required !!")
+        //@NotBlank(message = "Refugee status is required !!")
         String refugeeStatus,
 
         List<BMOClientDto> bmoClientDtos,

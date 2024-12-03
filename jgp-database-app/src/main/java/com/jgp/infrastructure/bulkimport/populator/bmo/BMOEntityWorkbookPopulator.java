@@ -52,37 +52,37 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         worksheet.setColumnWidth(BMOConstants.DATE_RECORD_ENTERED_BY_PARTNER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
 
         writeString(BMOConstants.BUSINESS_NAME_COL, rowHeader, "Name of business*");
-        writeString(BMOConstants.TRAINING_PARTNER, rowHeader, "Training Partner");
+        writeString(BMOConstants.TRAINING_PARTNER, rowHeader, "Training Partner*");
         writeString(BMOConstants.JGP_ID_COL, rowHeader, "Unique JGP ID (National ID)*");
         writeString(BMOConstants.BUSINESS_PHONE_NUMBER_COL, rowHeader, "Business phone number");
-        writeString(BMOConstants.GENDER_COL, rowHeader, "Gender of owner");
-        writeString(BMOConstants.AGE_COL, rowHeader, "Age of owner (full years)");
+        writeString(BMOConstants.GENDER_COL, rowHeader, "Gender of owner*");
+        writeString(BMOConstants.AGE_COL, rowHeader, "Age of owner (full years)*");
         writeString(BMOConstants.BUSINESS_LOCATION_COL, rowHeader, "Business Location (County)*");
         writeString(BMOConstants.INDUSTRY_SECTOR_COL, rowHeader, "Industry sector");
-        writeString(BMOConstants.BUSINESS_SEGMENT_COL, rowHeader, "Business segment");
-        writeString(BMOConstants.TA_DELIVERY_MODE, rowHeader, "TA delivery mode");
-        writeString(BMOConstants.BUSINESS_REG_NUMBER, rowHeader, "Business registration number");
+        writeString(BMOConstants.BUSINESS_SEGMENT_COL, rowHeader, "Business segment*");
+        writeString(BMOConstants.TA_DELIVERY_MODE, rowHeader, "TA delivery mode*");
+        writeString(BMOConstants.BUSINESS_REG_NUMBER, rowHeader, "Is your business registered?*");
         writeString(BMOConstants.BEST_MONTH_MONTHLY_REVENUE_COL, rowHeader, "Monthly revenues in best month (KES)");
         writeString(BMOConstants.WORST_MONTH_MONTHLY_REVENUE_COL, rowHeader, "Monthly revenues in worst month (KES)");
-        writeString(BMOConstants.TOTAL_REGULAR_EMPLOYEES_COL, rowHeader, "Total number of regular employees including owner");
-        writeString(BMOConstants.YOUTH_REGULAR_EMPLOYEES_COL, rowHeader, "Regular, of which are youth (18-35)");
-        writeString(BMOConstants.TOTAL_CASUAL_EMPLOYEES_COL, rowHeader, "Total number of casual employees excluding owner");
-        writeString(BMOConstants.YOUTH_CASUAL_EMPLOYEES_COL, rowHeader, "Casual, of which are youth (18-35)");
-        writeString(BMOConstants.SAMPLE_RECORDS_KEPT_COL, rowHeader, "Sample records kept");
-        writeString(BMOConstants.TA_NEEDS_COL, rowHeader, "TA needs");
+        writeString(BMOConstants.TOTAL_REGULAR_EMPLOYEES_COL, rowHeader, "Total number of regular employees including owner*");
+        writeString(BMOConstants.YOUTH_REGULAR_EMPLOYEES_COL, rowHeader, "Regular, of which are youth (18-35)*");
+        writeString(BMOConstants.TOTAL_CASUAL_EMPLOYEES_COL, rowHeader, "Total number of casual employees excluding owner*");
+        writeString(BMOConstants.YOUTH_CASUAL_EMPLOYEES_COL, rowHeader, "Casual, of which are youth (18-35)*");
+        writeString(BMOConstants.SAMPLE_RECORDS_KEPT_COL, rowHeader, "Sample records kept*");
+        writeString(BMOConstants.TA_NEEDS_COL, rowHeader, "TA needs*");
         writeString(BMOConstants.OTHER_TA_NEEDS_COL, rowHeader, "Other TA Needs");
-        writeString(BMOConstants.TYPE_OF_TA_COL, rowHeader, "Type of TA");
-        writeString(BMOConstants.PERSON_WITH_DISABILITY_COL, rowHeader, "Person with Disability");
+        writeString(BMOConstants.TYPE_OF_TA_COL, rowHeader, "Type of TA*");
+        writeString(BMOConstants.PERSON_WITH_DISABILITY_COL, rowHeader, "Person with Disability*");
 
-        writeString(BMOConstants.REFUGEE_STATUS_COL, rowHeader, "Refugee status");
+        writeString(BMOConstants.REFUGEE_STATUS_COL, rowHeader, "Refugee status*");
         writeString(BMOConstants.APPLICATION_FORM_SUBMITTED_DATE_COL, rowHeader, "Date submitted (yyyy-MM-dd)");
-        writeString(BMOConstants.IS_APPLICANT_ELIGIBLE_COL, rowHeader, "Is applicant eligible?");
+        writeString(BMOConstants.IS_APPLICANT_ELIGIBLE_COL, rowHeader, "Is applicant eligible?*");
         writeString(BMOConstants.NUMBER_TAS_ATTENDED_COL, rowHeader, "Number TAs attended");
         writeString(BMOConstants.NUMBER_TA_SESSION_ATTENDED_COL, rowHeader, "Number TA sessions attended");
         writeString(BMOConstants.RECOMMENDED_FOR_FINANCE_COL, rowHeader, "Recommended for finance");
         writeString(BMOConstants.DATE_OF_PIPELINE_DECISION_COL, rowHeader, "Pipeline Decision Date (yyyy-MM-dd)");
-        writeString(BMOConstants.REFERRED_FI_BUSINESS_COL, rowHeader, "FI business is referred to");
-        writeString(BMOConstants.DATE_RECORD_ENTERED_BY_PARTNER_COL, rowHeader, "Date recorded by partner(yyyy-MM-dd)");
+        writeString(BMOConstants.REFERRED_FI_BUSINESS_COL, rowHeader, "FI business is referred to*");
+        writeString(BMOConstants.DATE_RECORD_ENTERED_BY_PARTNER_COL, rowHeader, "Date recorded by partner(yyyy-MM-dd)*");
 
     }
 }

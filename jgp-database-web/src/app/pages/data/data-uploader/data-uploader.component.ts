@@ -119,6 +119,7 @@ export class DataUploaderComponent implements OnDestroy {
 
   filterEntityTypeChanged() {
       this.entityType = this.docsFilterForm.controls['selectedEntityType'].value;
+      this.pageIndex = 0;
       this.getAvailableDocuments();
   }
 

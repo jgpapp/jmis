@@ -116,7 +116,7 @@
           </td>
         </ng-container>
           <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-          <mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'failed-row': row.failureCount > 0 }"></mat-row>
+          <mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'success-row': row.failureCount == 0, 'failed-row': row.failureCount > 0 }"></mat-row>
       </mat-table>
       <mat-paginator 
       #paginator 

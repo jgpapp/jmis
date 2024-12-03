@@ -11,6 +11,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -36,6 +38,7 @@ public class Loan extends BaseEntity {
     @Column(name = "loan_number")
     private String loanNumber;
 
+    @NotBlank(message = "Pipeline source is required !!")
     @Column(name = "pipeline_source")
     private String pipeLineSource;
 
@@ -45,15 +48,19 @@ public class Loan extends BaseEntity {
     @Column(name = "loan_amount_approved")
     private BigDecimal loanAmountApproved;
 
+    @NotNull(message = "Loan Amount is required !!")
     @Column(name = "loan_amount_accessed")
     private BigDecimal loanAmountAccessed;
 
+    @NotNull(message = "Outstanding Loan Amount is required !!")
     @Column(name = "loan_outstanding_amount")
     private BigDecimal loanOutStandingAmount;
 
+    @NotNull(message = "Loan duration is required !!")
     @Column(name = "loan_duration")
     private Integer loanDuration;
 
+    @NotNull(message = "Application Date is required !!")
     @Column(name = "date_applied")
     private LocalDate dateApplied;
 
@@ -63,9 +70,11 @@ public class Loan extends BaseEntity {
     @Column(name = "date_recorded_by_partner")
     private LocalDate dateRecordedByPartner;
 
+    @NotNull(message = "Date of record added to JGP database is required !!")
     @Column(name = "date_added_to_db")
     private LocalDate dateAddedToDB;
 
+    @NotNull(message = "Disbursement Date is required !!")
     @Column(name = "date_disbursed")
     private LocalDate dateDisbursed;
 
@@ -73,6 +82,7 @@ public class Loan extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private LoanStatus loanStatus;
 
+    @NotNull(message = "Loan Quality is required !!")
     @Column(name = "loan_quality")
     @Enumerated(EnumType.STRING)
     private LoanQuality loanQuality;
