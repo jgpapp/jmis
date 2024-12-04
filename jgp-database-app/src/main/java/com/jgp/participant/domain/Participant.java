@@ -29,6 +29,9 @@ public class Participant extends BaseEntity {
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @Column(name = "passport")
+    private String passport;
+
     @Column(name = "owner_gender")
     @Enumerated(EnumType.STRING)
     private Gender ownerGender;
@@ -106,7 +109,7 @@ public class Participant extends BaseEntity {
             Boolean hasBMOMembership, String bmoMembership, BigDecimal bestMonthlyRevenue, BigDecimal worstMonthlyRevenue,
             Integer totalRegularEmployees, Integer youthRegularEmployees, Integer totalCasualEmployees,
             Integer youthCasualEmployees, String sampleRecords, String personWithDisability,
-            String refugeeStatus, String locationCountyCode) {
+            String refugeeStatus, String locationCountyCode, String passport) {
         this.businessName = businessName;
         this.jgpId = jgpId;
         this.phoneNumber = phoneNumber;
@@ -131,6 +134,7 @@ public class Participant extends BaseEntity {
         this.isActive = Boolean.FALSE;
         this.genderCategory = GenderCategory.getGenderCategory(this.ownerGender, ownerAge).getName();
         this.locationCountyCode = locationCountyCode;
+        this.passport = passport;
     }
 
     public static Participant createClient(ParticipantDto dto){
@@ -153,7 +157,7 @@ public class Participant extends BaseEntity {
                 dto.bmoMembership(), dto.bestMonthlyRevenue(), dto.worstMonthlyRevenue(),
                 dto.totalRegularEmployees(), dto.youthRegularEmployees(), dto.totalCasualEmployees(),
                 dto.youthCasualEmployees(), dto.sampleRecords(),
-                dto.personWithDisability(), dto.refugeeStatus(), dto.locationCountyCode());
+                dto.personWithDisability(), dto.refugeeStatus(), dto.locationCountyCode(), dto.passport());
     }
 
     public void activateParticipant(){

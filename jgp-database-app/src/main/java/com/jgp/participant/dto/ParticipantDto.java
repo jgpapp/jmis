@@ -2,8 +2,6 @@ package com.jgp.participant.dto;
 
 import com.jgp.bmo.dto.BMOClientDto;
 import com.jgp.finance.dto.LoanDto;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -17,12 +15,8 @@ public record ParticipantDto(
         String businessName,
 
         @NotNull(message = "JGP Id is required !!")
-        @Min(value = 5, message = "JGP Id must be at least 5 characters !!")
-        @Max(value = 10, message = "JGP Id must be at most 10 characters !!")
         String jgpId,
 
-        @Min(value = 9, message = "Phone number must be at least 9 characters !!")
-        @Max(value = 12, message = "Phone number must be at most 12 characters !!")
         String phoneNumber,
 
         @NotNull(message = "Gender is required !!")
@@ -64,14 +58,13 @@ public record ParticipantDto(
         @NotNull(message = "Youth casual employees is required !!")
         Integer youthCasualEmployees,
 
-        //@NotBlank(message = "Sample records is required !!")
         String sampleRecords,
 
-        //@NotBlank(message = "Disability status is required !!")
         String personWithDisability,
 
-        //@NotBlank(message = "Refugee status is required !!")
         String refugeeStatus,
+
+        String passport,
 
         List<BMOClientDto> bmoClientDtos,
 

@@ -88,6 +88,17 @@ public class LoanImportHandler implements ImportHandler {
         final var loanQuality = ImportHandlerUtils.readAsString(LoanConstants.LOAN_QUALITY, row);
         final var loanQualityEnum = null != loanQuality ? Loan.LoanQuality.valueOf(loanQuality.toUpperCase()) : Loan.LoanQuality.NORMAL;
         final var recordedToJGPDBOnDate = ImportHandlerUtils.readAsDate(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, row);
+        final var loanAmountUSDDouble = ImportHandlerUtils.readAsDouble(LoanConstants.LOAN_AMOUNT_USD, row);
+        final var loanAmountUSD = BigDecimal.valueOf(loanAmountUSDDouble);
+        final var loanAmountRepaidDouble = ImportHandlerUtils.readAsDouble(LoanConstants.REPAID_LOAN_AMOUNT, row);
+        final var loanAmountRepaid = BigDecimal.valueOf(loanAmountRepaidDouble);
+        final var tranchAmountAllocatedDouble = ImportHandlerUtils.readAsDouble(LoanConstants.TRANCH_AMOUNT_ALLOCATED_COL, row);
+        final var tranchAmountAllocated = BigDecimal.valueOf(tranchAmountAllocatedDouble);
+        final var tranchAmountDisbursedDouble = ImportHandlerUtils.readAsDouble(LoanConstants.TRANCH_AMOUNT_DISBURSED_COL, row);
+        final var tranchAmountDisbursed = BigDecimal.valueOf(tranchAmountDisbursedDouble);
+        final var loanerType = ImportHandlerUtils.readAsString(LoanConstants.LOANER_TYPE_COL, row);
+        final var loanType = ImportHandlerUtils.readAsString(LoanConstants.LOAN_TYPE_COL, row);
+        final var loanProduct = ImportHandlerUtils.readAsString(LoanConstants.LOAN_PRODUCT_COL, row);
 
         statuses.add(status);
         final var clientDto = getParticipantDto(row);
@@ -101,7 +112,8 @@ public class LoanImportHandler implements ImportHandler {
 
         var loanData = new Loan(Objects.nonNull(userService.currentUser()) ? userService.currentUser().getPartner() : null,
                 null, "1001", pipeLineSource, loanQualityEnum, loanStatusEnum, applicationDate, dateDisbursed, valueAccessed,
-                loanDuration, outStandingAmount, LocalDate.now(ZoneId.systemDefault()), null, recordedToJGPDBOnDate, row.getRowNum());
+                loanDuration, outStandingAmount, LocalDate.now(ZoneId.systemDefault()), null, recordedToJGPDBOnDate,
+                loanAmountUSD, loanAmountRepaid, loanerType, loanType, tranchAmountAllocated, tranchAmountDisbursed, loanProduct, row.getRowNum());
 
         if (null == rowErrorMap.get(row)){
             validateLoan(loanData, row);

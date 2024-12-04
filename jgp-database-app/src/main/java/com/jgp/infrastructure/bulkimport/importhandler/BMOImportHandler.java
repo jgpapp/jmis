@@ -85,6 +85,10 @@ public class BMOImportHandler implements ImportHandler {
         String referredFIBusiness = ImportHandlerUtils.readAsString(BMOConstants.REFERRED_FI_BUSINESS_COL, row);
         LocalDate dateRecordedByPartner = ImportHandlerUtils.readAsDate(BMOConstants.DATE_RECORD_ENTERED_BY_PARTNER_COL, row);
         final var taNeeds = ImportHandlerUtils.readAsString(BMOConstants.TA_NEEDS_COL, row);
+        final var trainingPartner = ImportHandlerUtils.readAsString(BMOConstants.TRAINING_PARTNER, row);
+        final var taDeliveryMode = ImportHandlerUtils.readAsString(BMOConstants.TA_DELIVERY_MODE, row);
+        final var otherTaNeeds = ImportHandlerUtils.readAsString(BMOConstants.OTHER_TA_NEEDS_COL, row);
+        final var taType = ImportHandlerUtils.readAsString(BMOConstants.TYPE_OF_TA_COL, row);
 
         statuses.add(status);
         final var clientDto = getParticipantDto(row);
@@ -100,7 +104,8 @@ public class BMOImportHandler implements ImportHandler {
                 null,
                 appFormSubmittedDate, isApplicantEligible, numberOfTAsAttended,
                 taSessionsAttended, isRecommendedForFinance, pipelineDecisionDate,
-                referredFIBusiness, dateRecordedByPartner, LocalDate.now(ZoneId.systemDefault()), taNeeds, row.getRowNum(), rowErrorMap.get(row));
+                referredFIBusiness, dateRecordedByPartner, LocalDate.now(ZoneId.systemDefault()), taNeeds,
+                row.getRowNum(), trainingPartner, taDeliveryMode, otherTaNeeds, taType, rowErrorMap.get(row));
 
         if (null == rowErrorMap.get(row)){
             validateTAData(taData, row);
