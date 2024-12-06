@@ -116,6 +116,17 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit, OnChanges{
         'selectedPartnerId': this.partnerId
       });
     }
+    if(this.dashFilterForm.controls['selectedPartnerId'].value == '0'){
+      this.dashFilterForm.patchValue({
+        'selectedPartnerId': null
+      });
+    }
+    if(this.dashFilterForm.controls['selectedCountyCode'].value == '0'){
+      this.dashFilterForm.patchValue({
+        'selectedCountyCode': null
+      });
+    }
+
     this.dashBoardFilters.emit(this.dashFilterForm.value);
   }
 }

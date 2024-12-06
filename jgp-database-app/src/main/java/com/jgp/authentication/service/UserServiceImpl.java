@@ -7,8 +7,6 @@ import com.jgp.authentication.dto.AuthRequestDto;
 import com.jgp.authentication.dto.AuthResponseDto;
 import com.jgp.authentication.dto.UserDtoV2;
 import com.jgp.authentication.dto.UserPassChangeDto;
-import com.jgp.authentication.exception.PasswordChangeException;
-import com.jgp.authentication.exception.UserNotAuthenticatedException;
 import com.jgp.authentication.exception.UserNotFoundException;
 import com.jgp.authentication.filter.JwtTokenProvider;
 import com.jgp.patner.domain.Partner;
@@ -43,6 +41,7 @@ public class UserServiceImpl implements UserService{
     private final PasswordEncoder passwordEncoder;
     private final PartnerRepository partnerRepository;
     private final RoleService roleService;
+    private static final String NO_USER_FOUND_WITH_ID = "No user found with Id";
 
 
     @Transactional
@@ -50,7 +49,7 @@ public class UserServiceImpl implements UserService{
     public void createUser(UserDtoV2 userDto) {
         try {
             Partner partner = null;
-            if (Objects.nonNull(userDto.partnerId())) {
+            if (Objects.nonNull(userDto.partnerId()) && !Objects.equals(0L, userDto.partnerId())) {
                 partner = this.partnerRepository.findById(userDto.partnerId())
                         .orElseThrow(() -> new PartnerNotFoundException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
             }
@@ -68,9 +67,9 @@ public class UserServiceImpl implements UserService{
     @Override
     public void updateUser(Long userId, UserDtoV2 userDto) {
         var currentUser = this.userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("No user found with Id"));
+                .orElseThrow(() -> new UserNotFoundException(NO_USER_FOUND_WITH_ID));
         Partner partner = null;
-        if (Objects.nonNull(userDto.partnerId())) {
+        if (Objects.nonNull(userDto.partnerId()) && !Objects.equals(0L, userDto.partnerId())) {
             partner = this.partnerRepository.findById(userDto.partnerId())
                     .orElseThrow(() -> new PartnerNotFoundException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
         }
@@ -121,7 +120,7 @@ public class UserServiceImpl implements UserService{
     public UserDtoV2 findUserById(Long userId) {
         return this.userRepository.findById(userId)
                 .map(AppUser::toDto)
-                .orElseThrow(() -> new UserNotFoundException("No user found with Id"));
+                .orElseThrow(() -> new UserNotFoundException(NO_USER_FOUND_WITH_ID));
     }
 
     @Override
@@ -168,7 +167,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public void updateUserRoles(Long userId, List<String> roleNames) {
         final var user =  this.userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("No user found with Id"));
+                .orElseThrow(() -> new UserNotFoundException(NO_USER_FOUND_WITH_ID));
         user.updateRoles(new HashSet<>(this.roleService.retrieveRolesByNames(roleNames)));
         this.userRepository.save(user);
     }
@@ -177,7 +176,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public void changeUserStatus(Long userId, boolean status) {
         final var user =  this.userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("No user found with Id"));
+                .orElseThrow(() -> new UserNotFoundException(NO_USER_FOUND_WITH_ID));
         user.changeUserStatus(status);
         this.userRepository.save(user);
     }

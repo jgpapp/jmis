@@ -4,6 +4,7 @@
             <mat-form-field appearance="outline" fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
                 <mat-label>Select Partner</mat-label>
                 <mat-select formControlName="selectedPartnerId" (selectionChange)="filterFormChanged()">
+                    <mat-option value="0">All</mat-option>
                     @for (partner of partners; track partner) {
                         <mat-option [value]="partner.id">{{partner.partnerName}}</mat-option>
                       }
@@ -14,6 +15,7 @@
         <mat-form-field appearance="outline" fxFlex="100" [fxFlex.xl]="fieldFlex" [fxFlex.lg]="fieldFlex" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
             <mat-label>Select County</mat-label>
             <mat-select formControlName="selectedCountyCode" (selectionChange)="filterFormChanged()">
+                <mat-option value="0">All</mat-option>
                 @for (county of counties; track county) {
                     <mat-option [value]="county.countyCode">{{county.countyName}}</mat-option>
                   }
