@@ -52,6 +52,7 @@ public class BMOImportHandler implements ImportHandler {
     private Workbook workbook;
     private List<String> statuses;
     private Map<Row, String> rowErrorMap;
+    private Long documentImportId;
 
     @Override
     public Count process(BulkImportEvent bulkImportEvent) {
@@ -59,14 +60,19 @@ public class BMOImportHandler implements ImportHandler {
         this.bmoDataList = new ArrayList<>();
         this.statuses = new ArrayList<>();
         this.rowErrorMap = new HashMap<>();
+        this.documentImportId = bulkImportEvent.importId();
         readExcelFile();
-        return importEntity(bulkImportEvent.importId());
+        return importEntity();
     }
 
     @Override
-    public void updateImportProgress(Long importId) {
+    public void updateImportProgress(Long importId, boolean updateTotal, int total) {
         try {
-            importProgressService.updateImportDocumentIdProgress(importId, this.bmoDataList.size());
+            if (updateTotal){
+                importProgressService.updateTotal(importId, total);
+            }else {
+                importProgressService.updateImportDocumentIdProgress(importId);
+            }
         } catch (ExecutionException e) {
             log.error("Error : {}", e.getMessage(), e);
         }
@@ -76,6 +82,13 @@ public class BMOImportHandler implements ImportHandler {
     public void readExcelFile() {
         Sheet bmoSheet = workbook.getSheet(TemplatePopulateImportConstants.BMO_SHEET_NAME);
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(bmoSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
+        updateImportProgress(this.documentImportId, true, noOfEntries);
+        try {
+            log.info("Updated Total Records =============== {}", importProgressService.getImportProgress(this.documentImportId).getTotal());
+        } catch (ExecutionException e) {
+            log.error("Error", e);
+        }
+
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
             Row row;
             row = bmoSheet.getRow(rowIndex);
@@ -170,7 +183,7 @@ public class BMOImportHandler implements ImportHandler {
 
     }
 
-    public Count importEntity(Long importId) {
+    public Count importEntity() {
         Sheet groupSheet = workbook.getSheet(TemplatePopulateImportConstants.BMO_SHEET_NAME);
         int successCount = 0;
         int errorCount = 0;
@@ -201,7 +214,7 @@ public class BMOImportHandler implements ImportHandler {
                 errorMessage = ImportHandlerUtils.getErrorMessage(ex);
                 writeGroupErrorMessage(errorMessage, progressLevel, statusCell, errorReportCell);
             }
-            updateImportProgress(importId);
+            updateImportProgress(this.documentImportId, false, 0);
         }
         setReportHeaders(groupSheet);
         log.info("Finished Import Finished := {}", LocalDateTime.now(ZoneId.systemDefault()));
