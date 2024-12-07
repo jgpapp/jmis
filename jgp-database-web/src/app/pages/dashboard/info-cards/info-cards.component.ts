@@ -4,13 +4,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { PieChartComponent } from "../pie-chart/pie-chart.component"; 
-import { DiskSpaceComponent } from "../disk-space/disk-space.component";
 import { multi, single } from '@data/charts.data';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { Subject, takeUntil } from 'rxjs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ChartDialogComponent } from '../../chart-dialog/chart-dialog.component';
-import { KenyanMapComponent } from "../kenyan-map/kenyan-map.component";
 
 @Component({
   selector: 'app-info-cards',
@@ -21,9 +19,7 @@ import { KenyanMapComponent } from "../kenyan-map/kenyan-map.component";
     MatIconModule,
     NgxChartsModule,
     PieChartComponent,
-    DiskSpaceComponent,
-    MatDialogModule,
-    KenyanMapComponent
+    MatDialogModule
 ],
   templateUrl: './info-cards.component.html',
   styleUrl: './info-cards.component.scss'
@@ -171,6 +167,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   public countyData: Map<number, any>;
   public businessesTrained: string;
   public businessesLoaned: string;
+  public keMapImage = "ke_map/KE-MAP.png";
 
 
   private unsubscribe$ = new Subject<void>();
