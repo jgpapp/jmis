@@ -10,7 +10,7 @@
 <div fxLayout="column" class="p-2">
     <div class="p-2">
         <div fxLayoutGap="2%" class="m-b-20">
-            <mat-card fxLayout="column" fxLayoutGap="2%" fxFlex="50%">
+            <mat-card fxLayout="column" fxLayoutGap="2%" fxFlex="50%" class="upload-container-padding">
               <h3>
                 <strong>Download Data Uploading Template</strong>
               </h3>
@@ -42,7 +42,7 @@
               </div>
             </mat-card>
         
-            <mat-card fxLayout="column" fxLayoutGap="2%" fxFlex="50%">
+            <mat-card fxLayout="column" fxLayoutGap="2%" fxFlex="50%" class="upload-container-padding">
               <h3>
                 <strong>{{ bulkImport.name }}</strong>
               </h3>
@@ -58,6 +58,17 @@
                   <mat-icon>cloud_upload</mat-icon>&nbsp;&nbsp;Upload
                 </button>
               </div>
+
+              @if (progress) {
+              <mat-progress-bar 
+                mode="determinate"
+                [value]="(progress.processed / progress.total) * 100">
+              </mat-progress-bar>
+              <div>
+                Processed {{ progress.processed }} of {{ progress.total }} rows
+              </div>
+              }
+              
         
             </mat-card>
           </div>

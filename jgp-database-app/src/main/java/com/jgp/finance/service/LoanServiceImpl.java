@@ -14,6 +14,7 @@ import com.jgp.participant.domain.ParticipantRepository;
 import com.jgp.util.CommonUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,7 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LoanServiceImpl implements LoanService {
 
     private final LoanRepository loanRepository;
@@ -42,7 +44,8 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public void uploadBulkLoanData(MultipartFile file) {
         try {
-            this.publisher.publishEvent(new BulkImportEvent(new XSSFWorkbook(file.getInputStream()), TemplatePopulateImportConstants.LOAN_ENTITY, 0L));
+            log.info("Old");
+            //this.publisher.publishEvent(new BulkImportEvent(new XSSFWorkbook(file.getInputStream()), TemplatePopulateImportConstants.LOAN_ENTITY, 0L));
         }  catch (Exception e){
             throw new RuntimeException("Error while importing Loan Data: "+ e.getMessage());
         }
