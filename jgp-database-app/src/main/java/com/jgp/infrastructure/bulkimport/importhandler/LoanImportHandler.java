@@ -66,9 +66,13 @@ public class LoanImportHandler implements ImportHandler {
     }
 
     @Override
-    public void updateImportProgress(Long importId) {
+    public void updateImportProgress(Long importId, boolean updateTotal, int total) {
         try {
-            importProgressService.updateImportDocumentIdProgress(importId, this.loanDataList.size());
+            if (updateTotal){
+                importProgressService.updateTotal(importId, total);
+            }else {
+                importProgressService.updateImportDocumentIdProgress(importId);
+            }
         } catch (ExecutionException e) {
             log.error("Error : {}", e.getMessage(), e);
         }
@@ -175,6 +179,7 @@ public class LoanImportHandler implements ImportHandler {
         int progressLevel = 0;
         String errorMessage = "";
         var loanDataSize = loanDataList.size();
+        updateImportProgress(importId, true, loanDataSize);
         for (int i = 0; i < loanDataSize; i++) {
             Row row = groupSheet.getRow(loanDataList.get(i).getRowIndex());
             Cell errorReportCell = row.createCell(BMOConstants.FAILURE_COL);
@@ -200,7 +205,7 @@ public class LoanImportHandler implements ImportHandler {
                 errorMessage = ImportHandlerUtils.getErrorMessage(ex);
                 writeGroupErrorMessage(errorMessage, progressLevel, statusCell, errorReportCell);
             }
-            updateImportProgress(importId);
+            updateImportProgress(importId, false, 0);
         }
         setReportHeaders(groupSheet);
         return Count.instance(successCount, errorCount);

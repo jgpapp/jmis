@@ -2,9 +2,13 @@ package com.jgp.infrastructure.bulkimport.service;
 
 import com.jgp.infrastructure.bulkimport.data.ImportProgress;
 
+import java.util.concurrent.ExecutionException;
+
 public interface ImportProgressService {
 
-    void updateImportDocumentIdProgress(Long importId, int total) throws  java.util.concurrent.ExecutionException;
+    void updateTotal(Long importId, int total);
 
-    ImportProgress getImportProgress(Long importId) throws  java.util.concurrent.ExecutionException;
+    void updateImportDocumentIdProgress(Long importId) throws  ExecutionException;
+
+    ImportProgress getImportProgress(Long importId) throws  ExecutionException;
 }

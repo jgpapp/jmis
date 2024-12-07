@@ -179,7 +179,7 @@ export class DataUploaderComponent implements OnDestroy {
   trackProgress(entityType: string) {
     if (!this.importDocumentId) return;
 
-    interval(1000)
+    interval(100)
       .pipe(
         switchMap(() =>
           this.dataUploadService.trackTemplateUploadProgress(entityType, this.importDocumentId)

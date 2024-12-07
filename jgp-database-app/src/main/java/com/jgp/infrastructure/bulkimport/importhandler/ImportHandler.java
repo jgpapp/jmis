@@ -7,5 +7,5 @@ public interface ImportHandler {
 
     Count process(BulkImportEvent bulkImportEvent);
 
-    void updateImportProgress(Long importId);
+    void updateImportProgress(Long importId, boolean updateTotal, int total);
 }
