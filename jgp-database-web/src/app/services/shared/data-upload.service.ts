@@ -14,13 +14,16 @@ export class DataUploadService {
     uploadDataTemplate(file: File, templateName: string): Observable<any> {
         const formData = new FormData();
         formData.append('excelFile', file, file.name);
-        console.log(templateName)
         if(templateName.toUpperCase().includes('TA_IMPORT_TEMPLATE')){
             return this.httpClient.post(`${this.gs.BASE_API_URL}/bmos/upload-template`, formData);
         }else if(templateName.toUpperCase().includes('LOAN_IMPORT_TEMPLATE')){
             return this.httpClient.post(`${this.gs.BASE_API_URL}/loans/upload-template`, formData);
         }
         return of(null);
+      }
+
+      trackTemplateUploadProgress(entityType: string, importDocumentId: any): Observable<any> {
+        return this.httpClient.get<{ processed: number; total: number }>(`${this.gs.BASE_API_URL}/${entityType}/import-progress/${importDocumentId}`);
       }
 
       downloadDataTemplate(templateName: string): Observable<any> {

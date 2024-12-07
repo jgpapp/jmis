@@ -4,6 +4,7 @@ package com.jgp.infrastructure.bulkimport.service;
 import com.jgp.authentication.service.PlatformSecurityContext;
 import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.bulkimport.data.ImportData;
+import com.jgp.infrastructure.bulkimport.data.ImportProgress;
 import com.jgp.infrastructure.bulkimport.domain.ImportDocument;
 import com.jgp.infrastructure.bulkimport.domain.ImportDocumentRepository;
 import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
@@ -44,12 +45,13 @@ import java.io.InputStream;
 import java.net.URLConnection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 
 @Service
 @Slf4j
@@ -64,7 +66,10 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     private final ImportDocumentRepository importDocumentRepository;
     private final JdbcTemplate jdbcTemplate;
     private final ImportDocumentMapper importDocumentMapper;
+    private final ImportProgressService importProgressService;
     private static final String SELECT_LITERAL = "select ";
+    private final ConcurrentHashMap<Long, ImportProgress> progressMap = new ConcurrentHashMap<>();
+
 
 
     @Override
@@ -98,6 +103,19 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
         }
     }
 
+    @Override
+    public ImportProgress getImportProgress(Long importDocumentId) {
+        try {
+            var p = importProgressService.getImportProgress(importDocumentId);
+            log.info("Progress> {}", p.getProcessed());
+            return p;
+        } catch (ExecutionException e) {
+            log.error("Error : {}", e.getMessage(), e);
+        }
+        return new ImportProgress(0, 0);
+
+    }
+
     private Long publishEvent(final Integer primaryColumn, final MultipartFile fileDetail,
             final InputStream clonedInputStreamWorkbook, final GlobalEntityType entityType, final Workbook workbook) {
 
@@ -112,8 +130,12 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
         final ImportDocument importDocument = ImportDocument.instance(document, LocalDateTime.now(ZoneId.systemDefault()), entityType.getValue(),
                 ImportHandlerUtils.getNumberOfRows(workbook.getSheetAt(0), primaryColumn), this.securityContext.getAuthenticatedUserIfPresent().getPartner());
         this.importDocumentRepository.saveAndFlush(importDocument);
-        BulkImportEvent event = new BulkImportEvent(workbook, entityType.name(), importDocument.getId());
+
+        var importProgress = new ImportProgress(0, 0);
+        progressMap.put(importDocument.getId(), importProgress);
+        BulkImportEvent event = new BulkImportEvent(workbook, entityType.name(), importDocument.getId(), importProgress);
         applicationContext.publishEvent(event);
+        log.info("Return import ID := {}", LocalDateTime.now(ZoneId.systemDefault()));
         return importDocument.getId();
     }
 

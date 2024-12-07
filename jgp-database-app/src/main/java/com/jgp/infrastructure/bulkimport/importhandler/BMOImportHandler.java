@@ -4,6 +4,7 @@ import com.jgp.authentication.service.UserService;
 import com.jgp.bmo.domain.BMOParticipantData;
 import com.jgp.bmo.service.BMOClientDataService;
 import com.jgp.infrastructure.bulkimport.exception.InvalidDataException;
+import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.dto.ParticipantDto;
 import com.jgp.participant.service.ParticipantService;
@@ -18,7 +19,6 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 @Service
 @Slf4j
@@ -45,6 +47,7 @@ public class BMOImportHandler implements ImportHandler {
     private final BMOClientDataService bmoDataService;
     private final ParticipantService clientService;
     private final UserService userService;
+    private final ImportProgressService importProgressService;
     List<BMOParticipantData> bmoDataList;
     private Workbook workbook;
     private List<String> statuses;
@@ -57,7 +60,16 @@ public class BMOImportHandler implements ImportHandler {
         this.statuses = new ArrayList<>();
         this.rowErrorMap = new HashMap<>();
         readExcelFile();
-        return importEntity();
+        return importEntity(bulkImportEvent.importId());
+    }
+
+    @Override
+    public void updateImportProgress(Long importId) {
+        try {
+            importProgressService.updateImportDocumentIdProgress(importId, this.bmoDataList.size());
+        } catch (ExecutionException e) {
+            log.error("Error : {}", e.getMessage(), e);
+        }
     }
 
 
@@ -158,13 +170,14 @@ public class BMOImportHandler implements ImportHandler {
 
     }
 
-    public Count importEntity() {
+    public Count importEntity(Long importId) {
         Sheet groupSheet = workbook.getSheet(TemplatePopulateImportConstants.BMO_SHEET_NAME);
         int successCount = 0;
         int errorCount = 0;
         int progressLevel = 0;
         String errorMessage = "";
-        for (int i = 0; i < bmoDataList.size(); i++) {
+        var bmoDataSize = bmoDataList.size();
+        for (int i = 0; i < bmoDataSize; i++) {
             Row row = groupSheet.getRow(bmoDataList.get(i).getRowIndex());
             Cell errorReportCell = row.createCell(BMOConstants.FAILURE_COL);
             Cell statusCell = row.createCell(BMOConstants.STATUS_COL);
@@ -184,12 +197,14 @@ public class BMOImportHandler implements ImportHandler {
                 successCount++;
             } catch (RuntimeException ex) {
                 errorCount++;
-                log.error("Problem occurred in importEntity function", ex);
+                //log.error("Problem occurred in importEntity function", ex);
                 errorMessage = ImportHandlerUtils.getErrorMessage(ex);
                 writeGroupErrorMessage(errorMessage, progressLevel, statusCell, errorReportCell);
             }
+            updateImportProgress(importId);
         }
         setReportHeaders(groupSheet);
+        log.info("Finished Import Finished := {}", LocalDateTime.now(ZoneId.systemDefault()));
         return Count.instance(successCount, errorCount);
     }
 
