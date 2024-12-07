@@ -236,6 +236,15 @@ public class BMOImportHandler implements ImportHandler {
             ConstraintViolation<ParticipantDto> firstViolation = violations.iterator().next();
             rowErrorMap.put(row, firstViolation.getMessage());
         }
+
+        if (null == rowErrorMap.get(row)){
+            if (!CommonUtil.isStringValueLengthValid(participantDto.jgpId(), 5, 10)){
+                rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
+            }
+            if (!CommonUtil.isStringValueLengthValid(participantDto.phoneNumber(), 9, 12)){
+                rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
+            }
+        }
     }
 
     private void validateTAData(BMOParticipantData bmoParticipantData, Row row) {

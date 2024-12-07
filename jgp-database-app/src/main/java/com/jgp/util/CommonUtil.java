@@ -168,4 +168,12 @@ public abstract class CommonUtil {
 
 
     }
+
+    public static boolean isStringValueLengthValid(String stringValue, int min, int max){
+        if (null == stringValue){
+            return true;
+        }
+        final var strLength = stringValue.length();
+        return strLength >= min && strLength <= max;
+    }
 }

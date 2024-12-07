@@ -50,15 +50,6 @@ public class LoanController {
         return new ResponseEntity<>(this.loanService.getLoans(new LoanSearchCriteria(partnerId, participantId, status, quality, approvedByPartner, null, null), sortedByDateCreated), HttpStatus.OK);
     }
 
-    @PostMapping("upload-template-original")
-    public ResponseEntity<ApiResponseDto> uploadLoansData2(@RequestParam("excelFile") MultipartFile excelFile) {
-        if (excelFile.isEmpty()) {
-            return new ResponseEntity<>(new ApiResponseDto(false, CommonUtil.NO_FILE_TO_UPLOAD), HttpStatus.BAD_REQUEST);
-        }
-        this.loanService.uploadBulkLoanData(excelFile);
-        return new ResponseEntity<>(new ApiResponseDto(true, CommonUtil.RESOURCE_CREATED), HttpStatus.CREATED);
-    }
-
     @PostMapping("upload-template")
     public ResponseEntity<ApiResponseDto> uploadLoansData(@RequestParam("excelFile") MultipartFile excelFile) {
         if (excelFile.isEmpty()) {
