@@ -52,7 +52,7 @@ export class DataUploaderComponent implements OnDestroy {
   bulkImportForm: UntypedFormGroup;
   partnerType: string | undefined = 'NONE';
   public docsFilterForm: FormGroup;
-  progress: { processed: number; total: number } | null = null;
+  progress: { processed: number; total: number; finished: number } | null = null;
   private subscription: Subscription | null = null;
 
   public displayedColumns = ['name', 'importTime', 'endTime', 'completed', 'totalRecords', 'successCount', 'failureCount', 'actions'];
@@ -179,17 +179,22 @@ export class DataUploaderComponent implements OnDestroy {
   trackProgress(entityType: string) {
     if (!this.importDocumentId) return;
 
-    interval(100)
+    interval(1000)
       .pipe(
         switchMap(() =>
           this.dataUploadService.trackTemplateUploadProgress(entityType, this.importDocumentId)
-        ), takeWhile((progress) => progress.processed < progress.total, true)
+        ), takeWhile((progress) =>  {
+          console.log(progress)
+          return progress.finished < 2
+        })
       )
       .subscribe({
         next: (progress) => {
           this.progress = progress;
-          console.log(this.progress)
-          //this.getAvailableDocuments();
+          if(progress.finished === 2){
+              this.getAvailableDocuments();
+          }
+          
         },
         error: (err) => console.error(err),
       });

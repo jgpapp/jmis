@@ -71,8 +71,20 @@ public class BMOImportHandler implements ImportHandler {
             if (updateTotal){
                 importProgressService.updateTotal(importId, total);
             }else {
-                importProgressService.updateImportDocumentIdProgress(importId);
+                importProgressService.incrementProcessedProgress(importId);
             }
+            var p = importProgressService.getImportProgress(importId);
+
+            log.info("Progress On Update> {}", p.getProcessed());
+        } catch (ExecutionException e) {
+            log.error("Error : {}", e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void markImportAsFinished(Long importId) {
+        try {
+            importProgressService.markImportAsFinished(importId);
         } catch (ExecutionException e) {
             log.error("Error : {}", e.getMessage(), e);
         }
@@ -83,11 +95,6 @@ public class BMOImportHandler implements ImportHandler {
         Sheet bmoSheet = workbook.getSheet(TemplatePopulateImportConstants.BMO_SHEET_NAME);
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(bmoSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
         updateImportProgress(this.documentImportId, true, noOfEntries);
-        try {
-            log.info("Updated Total Records =============== {}", importProgressService.getImportProgress(this.documentImportId).getTotal());
-        } catch (ExecutionException e) {
-            log.error("Error", e);
-        }
 
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
             Row row;
@@ -218,6 +225,7 @@ public class BMOImportHandler implements ImportHandler {
         }
         setReportHeaders(groupSheet);
         log.info("Finished Import Finished := {}", LocalDateTime.now(ZoneId.systemDefault()));
+        markImportAsFinished(this.documentImportId);
         return Count.instance(successCount, errorCount);
     }
 

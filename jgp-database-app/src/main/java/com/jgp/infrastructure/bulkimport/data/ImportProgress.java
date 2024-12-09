@@ -4,10 +4,10 @@ public class ImportProgress {
 
     private int processed;
     private int total;
+    private int finished;
 
-    public ImportProgress(int processed, int total) {
-        this.processed = processed;
-        this.total = total;
+    public ImportProgress() {
+        this.total = 1;
     }
 
     public synchronized void incrementProcessed() {
@@ -24,5 +24,13 @@ public class ImportProgress {
 
     public synchronized void setTotal(int total) {
         this.total = total;
+    }
+
+    public synchronized int isFinished() {
+        return finished;
+    }
+
+    public synchronized void setProgressAsFinished(int end) {
+        this.finished = end;
     }
 }

@@ -105,14 +105,20 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
 
     @Override
     public ImportProgress getImportProgress(Long importDocumentId) {
+        ImportProgress progress = null;
         try {
-            var p = importProgressService.getImportProgress(importDocumentId);
-            log.info("Progress> {}", p.getProcessed());
-            return p;
+            progress = importProgressService.getImportProgress(importDocumentId);
+            log.info("Progress On Query> {}", progress.getProcessed());
+
+            return progress;
         } catch (ExecutionException e) {
             log.error("Error : {}", e.getMessage(), e);
+        }finally {
+            if (Objects.nonNull(progress) && progress.getTotal() == progress.getProcessed()){
+                progress.setProgressAsFinished(2);
+            }
         }
-        return new ImportProgress(0, 0);
+        return new ImportProgress();
 
     }
 
@@ -131,7 +137,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                 ImportHandlerUtils.getNumberOfRows(workbook.getSheetAt(0), primaryColumn), this.securityContext.getAuthenticatedUserIfPresent().getPartner());
         this.importDocumentRepository.saveAndFlush(importDocument);
 
-        var importProgress = new ImportProgress(0, 0);
+        var importProgress = new ImportProgress();
         progressMap.put(importDocument.getId(), importProgress);
         BulkImportEvent event = new BulkImportEvent(workbook, entityType.name(), importDocument.getId(), importProgress);
         applicationContext.publishEvent(event);

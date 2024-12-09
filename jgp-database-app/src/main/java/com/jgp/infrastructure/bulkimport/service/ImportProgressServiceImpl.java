@@ -20,20 +20,28 @@ public class ImportProgressServiceImpl implements ImportProgressService {
             .expireAfterAccess(7, TimeUnit.DAYS).build(new CacheLoader<>() {
                 @Override
                 public ImportProgress load(Long importId) {
-                    return new ImportProgress(0, 0);
+                    return new ImportProgress();
                 }
             });
 
 
     @Override
-    public void updateTotal(Long importId, int total) {
-        requestCountsPerIdIdempotencyCache.put(importId, new ImportProgress(0, total));
+    public void updateTotal(Long importId, int total) throws ExecutionException{
+        var newProgress = this.getImportProgress(importId);
+        newProgress.setTotal(total);
+        requestCountsPerIdIdempotencyCache.put(importId, newProgress);
     }
 
     @Override
-    public void updateImportDocumentIdProgress(Long importId) throws ExecutionException {
+    public void incrementProcessedProgress(Long importId) throws ExecutionException {
         var progress = this.getImportProgress(importId);
         progress.incrementProcessed();
+    }
+
+    @Override
+    public void markImportAsFinished(Long importId) throws ExecutionException {
+        var progress = this.getImportProgress(importId);
+        progress.setProgressAsFinished(1);
     }
 
     @Override

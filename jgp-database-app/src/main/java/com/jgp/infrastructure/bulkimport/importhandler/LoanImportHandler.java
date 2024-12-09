@@ -71,8 +71,17 @@ public class LoanImportHandler implements ImportHandler {
             if (updateTotal){
                 importProgressService.updateTotal(importId, total);
             }else {
-                importProgressService.updateImportDocumentIdProgress(importId);
+                importProgressService.incrementProcessedProgress(importId);
             }
+        } catch (ExecutionException e) {
+            log.error("Error : {}", e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void markImportAsFinished(Long importId) {
+        try {
+            importProgressService.markImportAsFinished(importId);
         } catch (ExecutionException e) {
             log.error("Error : {}", e.getMessage(), e);
         }
