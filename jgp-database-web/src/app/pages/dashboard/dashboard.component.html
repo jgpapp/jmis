@@ -13,6 +13,7 @@
     <app-dashboard-filters (dashBoardFilters)="setDashBoardFilters($event)" [isPartnerDashBoard]="false" [resetDashBoardFilters]="resetDashBoardFilters" [fieldFlex]="25"/>
     <app-tiles [dashBoardFilters]="dashBoardFilters"/>
     <app-info-cards [dashBoardFilters]="dashBoardFilters"/>
+
     <div fxLayout="row wrap">
         <div fxFlex="100" fxFlex.gt-sm="70" class="p-2"> 
             <app-analytics [dashBoardFilters]="dashBoardFilters"/>
@@ -50,6 +51,94 @@
             </div>
         </div>
     </div>
+
+    
+    <div fxLayout="row wrap">
+        <div fxFlex="100" fxFlex.gt-sm="50" fxFlex.gt-md="33" class="p-2"> 
+            <mat-card>
+                <mat-card-header fxLayoutAlign="center center">                
+                    <mat-card-title>Loans Disbursed (KES)</mat-card-title>
+                </mat-card-header>
+                <div class="p-2">
+                    <mat-table #table [dataSource]="accessedLoanDataDataSource" class="mat-elevation-z8">
+                        <ng-container matColumnDef="partnerName">
+                            <mat-header-cell *matHeaderCellDef> Partner Name </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{element.partnerName}} </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="year">
+                            <mat-header-cell *matHeaderCellDef> Year </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{element.year}} </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="value">
+                            <mat-header-cell *matHeaderCellDef> Amount </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{element.value}} </mat-cell>
+                        </ng-container>
+                        <mat-header-row *matHeaderRowDef="loansAccessedDisplayedColumns"></mat-header-row>
+                        <mat-row *matRowDef="let row; columns: loansAccessedDisplayedColumns;"></mat-row>
+                    </mat-table>
+                    <!-- mat-paginator #paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"></mat-paginator -->
+                </div>
+            </mat-card>
+        </div>
+
+        <div fxFlex="100" fxFlex.gt-sm="50" fxFlex.gt-md="33" class="p-2"> 
+            <mat-card>
+                <mat-card-header fxLayoutAlign="center center">                
+                    <mat-card-title>Businesses Trained By Partner</mat-card-title>
+                </mat-card-header>
+                <div class="p-2">
+                    <mat-table #table [dataSource]="trainedBusinessesCountDataDataSource" class="mat-elevation-z8">
+                        <ng-container matColumnDef="partnerName">
+                            <mat-header-cell *matHeaderCellDef> Partner Name </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{element.partnerName}} </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="year">
+                            <mat-header-cell *matHeaderCellDef> Year </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{element.year}} </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="value">
+                            <mat-header-cell *matHeaderCellDef> Trained Businesses </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{element.value}} </mat-cell>
+                        </ng-container>
+                        <mat-header-row *matHeaderRowDef="loansAccessedDisplayedColumns"></mat-header-row>
+                        <mat-row *matRowDef="let row; columns: loansAccessedDisplayedColumns;"></mat-row>
+                    </mat-table>
+                    <!-- mat-paginator #paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"></mat-paginator -->
+                </div>
+            </mat-card>
+        </div>
+
+        <div fxFlex="100" fxFlex.gt-sm="50" fxFlex.gt-md="33" class="p-2"> 
+            <mat-card>
+                <mat-card-header fxLayoutAlign="center center">                
+                    <mat-card-title>Number of Loans by Partner</mat-card-title>
+                </mat-card-header>
+                <div class="p-2">
+                    <mat-table #table [dataSource]="accessedLoanCountDataDataSource" class="mat-elevation-z8">
+                        <ng-container matColumnDef="partnerName">
+                            <mat-header-cell *matHeaderCellDef> Partner Name </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{element.partnerName}} </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="year">
+                            <mat-header-cell *matHeaderCellDef> Year </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{element.year}} </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="value">
+                            <mat-header-cell *matHeaderCellDef> Number of Loans </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{element.value}} </mat-cell>
+                        </ng-container>
+                        <mat-header-row *matHeaderRowDef="loansAccessedDisplayedColumns"></mat-header-row>
+                        <mat-row *matRowDef="let row; columns: loansAccessedDisplayedColumns;"></mat-row>
+                    </mat-table>
+                    <!-- mat-paginator #paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"></mat-paginator -->
+                </div>
+            </mat-card>
+        </div>
+        
+    </div>
+    
+
+   
 </div>
 
 }
