@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -35,6 +36,7 @@ public class BulkImportEventListener {
     private final DocumentWritePlatformService documentService;
 
     @EventListener
+    //@Async
    public void handleBulkImportEvent(BulkImportEvent bulkImportEvent){
         final ImportDocument importDocument = this.importRepository.findById(bulkImportEvent.importId()).orElseThrow();
         final GlobalEntityType entityType = GlobalEntityType.fromInt(importDocument.getEntityType());

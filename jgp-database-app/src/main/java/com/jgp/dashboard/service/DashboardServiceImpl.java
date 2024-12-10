@@ -4,6 +4,7 @@ import com.jgp.dashboard.dto.CountySummaryDto;
 import com.jgp.dashboard.dto.DashboardSearchCriteria;
 import com.jgp.dashboard.dto.DataPointDto;
 import com.jgp.dashboard.dto.HighLevelSummaryDto;
+import com.jgp.dashboard.dto.PartnerYearlyDataDto;
 import com.jgp.util.CommonUtil;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -396,11 +397,55 @@ public class DashboardServiceImpl implements DashboardService {
         }
         if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
             parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
-            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+            whereClause = String.format("%s%s  and l.data_is_approved = true", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
         }
+        whereClause = String.format("%s  and l.data_is_approved = true", whereClause);
         var sqlQuery = String.format(SeriesDataPointMapper.ACCESSED_AMOUNT_BY_PARTNER_BY_YEAR_SCHEMA, whereClause);
 
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
+    public List<PartnerYearlyDataDto> getLastThreeYearsAccessedLoanAmountPerPartnerYearly(DashboardSearchCriteria dashboardSearchCriteria) {
+        return convertSeriesDataPointDtoToPartnerYearlyDataDto(getLastThreeYearsAccessedLoanPerPartnerSummary(dashboardSearchCriteria));
+    }
+
+    @Override
+    public List<PartnerYearlyDataDto> getLastThreeYearsAccessedLoansCountPerPartnerYearly(DashboardSearchCriteria dashboardSearchCriteria) {
+        final SeriesDataPointMapper rm = new SeriesDataPointMapper();
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        var whereClause = "";
+        if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
+            parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
+            whereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
+            parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
+            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        whereClause = String.format("%s  and l.data_is_approved = true", whereClause);
+        var sqlQuery = String.format(SeriesDataPointMapper.ACCESSED_LOAN_COUNT_BY_PARTNER_BY_YEAR_SCHEMA, whereClause);
+
+        return convertSeriesDataPointDtoToPartnerYearlyDataDto(Objects.requireNonNull(this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm)));
+    }
+
+    @Override
+    public List<PartnerYearlyDataDto> getLastThreeYearsTrainedBusinessesPerPartnerYearly(DashboardSearchCriteria dashboardSearchCriteria) {
+        final SeriesDataPointMapper rm = new SeriesDataPointMapper();
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        var whereClause = "";
+        if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
+            parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
+            whereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
+            parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
+            whereClause = String.format("%s%s and bpd.data_is_approved = true", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        whereClause = String.format("%s and bpd.data_is_approved = true", whereClause);
+        var sqlQuery = String.format(SeriesDataPointMapper.BUSINESSES_TRAINED_COUNT_BY_PARTNER_BY_YEAR_SCHEMA, whereClause);
+
+        return convertSeriesDataPointDtoToPartnerYearlyDataDto(Objects.requireNonNull(this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm)));
     }
 
     @Override
@@ -627,6 +672,28 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
              ORDER BY 2 ASC;
            \s""";
 
+    public static final String ACCESSED_LOAN_COUNT_BY_PARTNER_BY_YEAR_SCHEMA = """
+             SELECT p.partner_name as name,\s
+             EXTRACT(YEAR FROM l.date_disbursed) AS seriesName,\s
+             COUNT(*) AS value\s
+             FROM loans l inner join partners p on p.id = l.partner_id\s
+             inner join participants cl on l.participant_id = cl.id\s
+             WHERE EXTRACT(YEAR FROM l.date_disbursed) >= EXTRACT(YEAR FROM current_date) - 2 %s\s
+             GROUP BY 1, 2\s
+             ORDER BY 2 ASC;
+           \s""";
+
+    public static final String BUSINESSES_TRAINED_COUNT_BY_PARTNER_BY_YEAR_SCHEMA = """
+             SELECT p.partner_name as name,\s
+             EXTRACT(YEAR FROM bpd.date_partner_recorded) AS seriesName,\s
+             COUNT(*) AS value\s
+             FROM bmo_participants_data bpd inner join partners p on p.id = bpd.partner_id\s
+             inner join participants cl on bpd.participant_id = cl.id\s
+             WHERE EXTRACT(YEAR FROM bpd.date_partner_recorded) >= EXTRACT(YEAR FROM current_date) - 2 %s\s
+             GROUP BY 1, 2\s
+             ORDER BY 2 ASC;
+           \s""";
+
     public static final String LOAN_AMOUNT_ACCESSED_VS_OUTSTANDING_PER_PARTNER_BY_YEAR_SCHEMA = """
              SELECT p.partner_name AS name,\s
              'ACCESSED' as seriesName, SUM(l.loan_amount_accessed) AS value
@@ -733,6 +800,17 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
 private Pair<LocalDate, LocalDate> getDefaultQueryDates(){
         final var dateToday = LocalDate.now();
         return new ImmutablePair<>(LocalDate.of(dateToday.getYear(), Month.JANUARY, 1), dateToday);
+}
+
+private List<PartnerYearlyDataDto> convertSeriesDataPointDtoToPartnerYearlyDataDto(List<SeriesDataPointDto> seriesDataPointDtoTos){
+        return seriesDataPointDtoTos.stream()
+                .flatMap(series -> series.series().stream()
+                        .map(dataPoint -> new PartnerYearlyDataDto(
+                                series.name(),               // Partner name
+                                Integer.parseInt(dataPoint.name()),            // Year
+                                dataPoint.value()            // value
+                        ))
+                ).toList();
 }
 
 }

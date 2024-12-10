@@ -91,6 +91,12 @@ export class EditUserComponent implements OnDestroy{
           .subscribe({
             next: (response) => {
               this.partners = response.content
+              this.partners = this.partners.concat([{
+                id: 0,
+                partnerName: 'GLOBAL PARTNER',
+                type: 'NONE',
+                typeEnum: 'NONE'
+            }])
             },
             error: (error) => {
               this.gs.openSnackBar(`An error occured ${error.error.detail}`, "Dismiss");

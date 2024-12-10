@@ -4,6 +4,7 @@ import com.jgp.authentication.service.UserService;
 import com.jgp.bmo.domain.BMOParticipantData;
 import com.jgp.bmo.service.BMOClientDataService;
 import com.jgp.infrastructure.bulkimport.exception.InvalidDataException;
+import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.dto.ParticipantDto;
 import com.jgp.participant.service.ParticipantService;
@@ -18,7 +19,6 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 @Service
 @Slf4j
@@ -45,10 +47,12 @@ public class BMOImportHandler implements ImportHandler {
     private final BMOClientDataService bmoDataService;
     private final ParticipantService clientService;
     private final UserService userService;
+    private final ImportProgressService importProgressService;
     List<BMOParticipantData> bmoDataList;
     private Workbook workbook;
     private List<String> statuses;
     private Map<Row, String> rowErrorMap;
+    private Long documentImportId;
 
     @Override
     public Count process(BulkImportEvent bulkImportEvent) {
@@ -56,14 +60,42 @@ public class BMOImportHandler implements ImportHandler {
         this.bmoDataList = new ArrayList<>();
         this.statuses = new ArrayList<>();
         this.rowErrorMap = new HashMap<>();
+        this.documentImportId = bulkImportEvent.importId();
         readExcelFile();
         return importEntity();
+    }
+
+    @Override
+    public void updateImportProgress(Long importId, boolean updateTotal, int total) {
+        try {
+            if (updateTotal){
+                importProgressService.updateTotal(importId, total);
+            }else {
+                importProgressService.incrementProcessedProgress(importId);
+            }
+            var p = importProgressService.getImportProgress(importId);
+
+            log.info("Progress On Update> {}", p.getProcessed());
+        } catch (ExecutionException e) {
+            log.error("Error : {}", e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void markImportAsFinished(Long importId) {
+        try {
+            importProgressService.markImportAsFinished(importId);
+        } catch (ExecutionException e) {
+            log.error("Error : {}", e.getMessage(), e);
+        }
     }
 
 
     public void readExcelFile() {
         Sheet bmoSheet = workbook.getSheet(TemplatePopulateImportConstants.BMO_SHEET_NAME);
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(bmoSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
+        updateImportProgress(this.documentImportId, true, noOfEntries);
+
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
             Row row;
             row = bmoSheet.getRow(rowIndex);
@@ -85,6 +117,10 @@ public class BMOImportHandler implements ImportHandler {
         String referredFIBusiness = ImportHandlerUtils.readAsString(BMOConstants.REFERRED_FI_BUSINESS_COL, row);
         LocalDate dateRecordedByPartner = ImportHandlerUtils.readAsDate(BMOConstants.DATE_RECORD_ENTERED_BY_PARTNER_COL, row);
         final var taNeeds = ImportHandlerUtils.readAsString(BMOConstants.TA_NEEDS_COL, row);
+        final var trainingPartner = ImportHandlerUtils.readAsString(BMOConstants.TRAINING_PARTNER, row);
+        final var taDeliveryMode = ImportHandlerUtils.readAsString(BMOConstants.TA_DELIVERY_MODE, row);
+        final var otherTaNeeds = ImportHandlerUtils.readAsString(BMOConstants.OTHER_TA_NEEDS_COL, row);
+        final var taType = ImportHandlerUtils.readAsString(BMOConstants.TYPE_OF_TA_COL, row);
 
         statuses.add(status);
         final var clientDto = getParticipantDto(row);
@@ -100,7 +136,8 @@ public class BMOImportHandler implements ImportHandler {
                 null,
                 appFormSubmittedDate, isApplicantEligible, numberOfTAsAttended,
                 taSessionsAttended, isRecommendedForFinance, pipelineDecisionDate,
-                referredFIBusiness, dateRecordedByPartner, LocalDate.now(ZoneId.systemDefault()), taNeeds, row.getRowNum(), rowErrorMap.get(row));
+                referredFIBusiness, dateRecordedByPartner, LocalDate.now(ZoneId.systemDefault()), taNeeds,
+                row.getRowNum(), trainingPartner, taDeliveryMode, otherTaNeeds, taType, rowErrorMap.get(row));
 
         if (null == rowErrorMap.get(row)){
             validateTAData(taData, row);
@@ -159,7 +196,8 @@ public class BMOImportHandler implements ImportHandler {
         int errorCount = 0;
         int progressLevel = 0;
         String errorMessage = "";
-        for (int i = 0; i < bmoDataList.size(); i++) {
+        var bmoDataSize = bmoDataList.size();
+        for (int i = 0; i < bmoDataSize; i++) {
             Row row = groupSheet.getRow(bmoDataList.get(i).getRowIndex());
             Cell errorReportCell = row.createCell(BMOConstants.FAILURE_COL);
             Cell statusCell = row.createCell(BMOConstants.STATUS_COL);
@@ -179,12 +217,15 @@ public class BMOImportHandler implements ImportHandler {
                 successCount++;
             } catch (RuntimeException ex) {
                 errorCount++;
-                log.error("Problem occurred in importEntity function", ex);
+                //log.error("Problem occurred in importEntity function", ex);
                 errorMessage = ImportHandlerUtils.getErrorMessage(ex);
                 writeGroupErrorMessage(errorMessage, progressLevel, statusCell, errorReportCell);
             }
+            updateImportProgress(this.documentImportId, false, 0);
         }
         setReportHeaders(groupSheet);
+        log.info("Finished Import Finished := {}", LocalDateTime.now(ZoneId.systemDefault()));
+        markImportAsFinished(this.documentImportId);
         return Count.instance(successCount, errorCount);
     }
 
@@ -230,6 +271,15 @@ public class BMOImportHandler implements ImportHandler {
         if (!violations.isEmpty()) {
             ConstraintViolation<ParticipantDto> firstViolation = violations.iterator().next();
             rowErrorMap.put(row, firstViolation.getMessage());
+        }
+
+        if (null == rowErrorMap.get(row)){
+            if (!CommonUtil.isStringValueLengthValid(participantDto.jgpId(), 5, 10)){
+                rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
+            }
+            if (!CommonUtil.isStringValueLengthValid(participantDto.phoneNumber(), 9, 12)){
+                rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
+            }
         }
     }
 

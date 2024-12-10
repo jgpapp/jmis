@@ -73,6 +73,19 @@ export class DashboardService {
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loan-accessed-per-partner-for-last-three-years?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
+    getLastThreeYearsAccessedLoanPerPartnerYearly(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loan-accessed-per-partner-yearly?${this.getDashBoardQueryParams(dashBoardFilters)}`);
+    }
+
+    getLastThreeYearsAccessedLoansCountPerPartnerYearly(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/accessed-loans-count-per-partner-yearly?${this.getDashBoardQueryParams(dashBoardFilters)}`);
+    }
+
+    getLastThreeYearsTrainedBusinessesPerPartnerYearly(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/trained_businesses-per-partner-yearly?${this.getDashBoardQueryParams(dashBoardFilters)}`);
+    }
+
+
     getLoansAccessedVsOutStandingByPartnerSummary(dashBoardFilters: any = undefined): Observable<any> {
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-accessed-vs-out-standing-per-partner?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }

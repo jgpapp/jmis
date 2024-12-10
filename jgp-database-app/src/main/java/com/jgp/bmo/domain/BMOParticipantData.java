@@ -70,6 +70,21 @@ public class BMOParticipantData extends BaseEntity {
     @Column(name = "ta_needs")
     private String taNeeds;
 
+    @NotNull(message = "Training Partner is required !!")
+    @Column(name = "training_partner")
+    private String trainingPartner;
+
+    @NotNull(message = "Delivery mode is required !!")
+    @Column(name = "ta_delivery_mode")
+    private String taDeliveryMode;
+
+    @Column(name = "other_ta_needs")
+    private String otherTaNeeds;
+
+    @NotNull(message = "TA Type is required !!")
+    @Column(name = "ta_type")
+    private String taType;
+
     private transient Integer rowIndex;
 
     private transient String rowErrorMessage;
@@ -77,7 +92,12 @@ public class BMOParticipantData extends BaseEntity {
     public BMOParticipantData() {
     }
 
-    public BMOParticipantData(Partner partner, Participant participant, LocalDate dateFormSubmitted, Boolean isApplicantEligible, Integer tasAttended, Integer taSessionsAttended, Boolean isRecommendedForFinance, LocalDate decisionDate, String fiBusinessReferred, LocalDate dateRecordedByPartner, LocalDate dateRecordedToJGPDB, String taNeeds, Integer rowIndex, String rowErrorMessage) {
+    public BMOParticipantData(Partner partner, Participant participant, LocalDate dateFormSubmitted,
+                              Boolean isApplicantEligible, Integer tasAttended, Integer taSessionsAttended,
+                              Boolean isRecommendedForFinance, LocalDate decisionDate, String fiBusinessReferred,
+                              LocalDate dateRecordedByPartner, LocalDate dateRecordedToJGPDB,
+                              String taNeeds, Integer rowIndex, String trainingPartner, String taDeliveryMode,
+                              String otherTaNeeds, String taType, String rowErrorMessage) {
         this.partner = partner;
         this.participant = participant;
         this.dateFormSubmitted = dateFormSubmitted;
@@ -92,6 +112,10 @@ public class BMOParticipantData extends BaseEntity {
         this.rowIndex = rowIndex;
         this.isDataApprovedByPartner = false;
         this.taNeeds = taNeeds;
+        this.trainingPartner = trainingPartner;
+        this.taDeliveryMode = taDeliveryMode;
+        this.otherTaNeeds = otherTaNeeds;
+        this.taType = taType;
         this.rowErrorMessage = rowErrorMessage;
     }
 

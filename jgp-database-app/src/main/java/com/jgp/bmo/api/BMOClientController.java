@@ -4,6 +4,7 @@ import com.jgp.bmo.dto.BMOClientDto;
 import com.jgp.bmo.dto.BMOParticipantSearchCriteria;
 import com.jgp.bmo.service.BMOClientDataService;
 import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
+import com.jgp.infrastructure.bulkimport.data.ImportProgress;
 import com.jgp.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
 import com.jgp.infrastructure.bulkimport.service.BulkImportWorkbookService;
 import com.jgp.shared.dto.ApiResponseDto;
@@ -47,21 +48,21 @@ public class BMOClientController {
         return new ResponseEntity<>(this.bmoDataService.getBMODataRecords(new BMOParticipantSearchCriteria(partnerId, participantId, approvedByPartner), sortedByDateCreated), HttpStatus.OK);
     }
 
-    @PostMapping("upload-template-original")
-    public ResponseEntity<ApiResponseDto> createBMOParticipantData2(@RequestParam("excelFile") MultipartFile excelFile) {
-        if (excelFile.isEmpty()) {
-            return new ResponseEntity<>(new ApiResponseDto(false, CommonUtil.NO_FILE_TO_UPLOAD), HttpStatus.BAD_REQUEST);
-        }
-        this.bmoDataService.uploadBMOData(excelFile);
-        return new ResponseEntity<>(new ApiResponseDto(true, CommonUtil.RESOURCE_CREATED), HttpStatus.CREATED);
-    }
-
     @PostMapping("upload-template")
     public ResponseEntity<ApiResponseDto> createBMOParticipantData(@RequestParam("excelFile") MultipartFile excelFile) {
         if (excelFile.isEmpty()) {
             return new ResponseEntity<>(new ApiResponseDto(false, CommonUtil.NO_FILE_TO_UPLOAD), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(new ApiResponseDto(true, this.bulkImportWorkbookService.importWorkbook(GlobalEntityType.TA_IMPORT_TEMPLATE.name(), excelFile)+""), HttpStatus.CREATED);
+    }
+
+    @GetMapping("import-progress/{documentId}")
+    public ResponseEntity<ImportProgress> getProgress(@PathVariable("documentId") Long documentId) {
+        ImportProgress progress = this.bulkImportWorkbookService.getImportProgress(documentId);
+        if (progress == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(progress);
     }
 
     @GetMapping("template/download")

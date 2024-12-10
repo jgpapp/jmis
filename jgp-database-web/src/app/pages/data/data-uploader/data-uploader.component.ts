@@ -14,10 +14,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { GlobalService } from '@services/shared/global.service';
 import { NoPermissionComponent } from '../../errors/no-permission/no-permission.component';
 import { AuthService } from '@services/users/auth.service';
-import { Subject, takeUntil } from 'rxjs';
+import { interval, Subject, Subscription, switchMap, takeUntil, takeWhile } from 'rxjs';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @Component({
   selector: 'app-data-uploader',
@@ -38,7 +39,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     NoPermissionComponent,
     MatTableModule,
     MatPaginatorModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatProgressBarModule
 ],
   templateUrl: './data-uploader.component.html',
   styleUrl: './data-uploader.component.scss'
@@ -50,6 +52,8 @@ export class DataUploaderComponent implements OnDestroy {
   bulkImportForm: UntypedFormGroup;
   partnerType: string | undefined = 'NONE';
   public docsFilterForm: FormGroup;
+  progress: { processed: number; total: number; finished: number } | null = null;
+  private subscription: Subscription | null = null;
 
   public displayedColumns = ['name', 'importTime', 'endTime', 'completed', 'totalRecords', 'successCount', 'failureCount', 'actions'];
   public dataSource: any;
@@ -141,12 +145,15 @@ export class DataUploaderComponent implements OnDestroy {
 
   uploadTemplate() {
     let legalFormType = '';
+    let entityType = '';
     /** Only for Client Bulk Imports */
     if(this.authService.currentUser()?.partnerId){
       if (this.template.name.toUpperCase().includes('LOAN_IMPORT_TEMPLATE')) {
         legalFormType = 'LOAN_IMPORT_TEMPLATE';
+        entityType = 'loans';
       } else if (this.template.name.toUpperCase().includes('TA_IMPORT_TEMPLATE')) {
         legalFormType = 'TA_IMPORT_TEMPLATE';
+        entityType = 'bmos';
       }else {
         this.gs.openSnackBar('Invalid Template', "Dismiss");
       }
@@ -160,13 +167,39 @@ export class DataUploaderComponent implements OnDestroy {
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
-          //this.gs.openSnackBar(response.message, "Dismiss");
+          this.gs.openSnackBar('Template successfully uploaded with Id: '+response.message, "Dismiss");
           this.importDocumentId = response.message;
           this.entityType = legalFormType;
+          //this.trackProgress(entityType);
           this.getAvailableDocuments();
         }
       });
     }
+  }
+
+  trackProgress(entityType: string) {
+    if (!this.importDocumentId) return;
+
+    interval(1000)
+      .pipe(
+        switchMap(() =>
+          this.dataUploadService.trackTemplateUploadProgress(entityType, this.importDocumentId)
+        ), takeWhile((progress) =>  {
+          console.log(progress)
+          return progress.finished < 2
+        })
+      )
+      .subscribe({
+        next: (progress) => {
+          this.progress = progress;
+          if(progress.finished === 2){
+              this.getAvailableDocuments();
+          }
+          
+        },
+        error: (err) => console.error(err),
+      });
+
   }
 
   
@@ -193,6 +226,9 @@ export class DataUploaderComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }

@@ -11,6 +11,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -52,9 +53,30 @@ public class Loan extends BaseEntity {
     @Column(name = "loan_amount_accessed")
     private BigDecimal loanAmountAccessed;
 
-    @NotNull(message = "Outstanding Loan Amount is required !!")
+    @Min(value = 1, message = "Outstanding Loan Amount is required !!")
     @Column(name = "loan_outstanding_amount")
     private BigDecimal loanOutStandingAmount;
+
+    @Column(name = "loan_amount_usd")
+    private BigDecimal loanAmountUSD;
+
+    @Column(name = "loan_amount_repaid")
+    private BigDecimal loanAmountRepaid;
+
+    @Column(name = "loaner_type")
+    private String loanerType;
+
+    @Column(name = "loan_type")
+    private String loanType;
+
+    @Column(name = "tranch_amount_allocated")
+    private BigDecimal tranchAmountAllocated;
+
+    @Column(name = "tranch_amount_disbursed")
+    private BigDecimal tranchAmountDisbursed;
+
+    @Column(name = "loan_product")
+    private String loanProduct;
 
     @NotNull(message = "Loan duration is required !!")
     @Column(name = "loan_duration")
@@ -104,7 +126,9 @@ public class Loan extends BaseEntity {
                 LocalDate dateDisbursed, BigDecimal loanAmountAccessed,
                 Integer loanDuration, BigDecimal loanOutStandingAmount,
                 LocalDate dateRecordedByPartner, String uniqueValues,
-                LocalDate dateAddedToDB, Integer rowIndex) {
+                LocalDate dateAddedToDB, BigDecimal loanAmountUSD, BigDecimal loanAmountRepaid,
+                String loanerType, String loanType, BigDecimal tranchAmountAllocated,
+                BigDecimal tranchAmountDisbursed, String loanProduct, Integer rowIndex) {
         this.partner = partner;
         this.participant = participant;
         this.loanNumber = loanNumber;
@@ -120,6 +144,13 @@ public class Loan extends BaseEntity {
         this.uniqueValues = uniqueValues;
         this.dateAddedToDB = dateAddedToDB;
         this.rowIndex = rowIndex;
+        this.loanAmountUSD = loanAmountUSD;
+        this.loanAmountRepaid = loanAmountRepaid;
+        this.loanerType = loanerType;
+        this.loanType = loanType;
+        this.tranchAmountAllocated = tranchAmountAllocated;
+        this.tranchAmountDisbursed = tranchAmountDisbursed;
+        this.loanProduct = loanProduct;
         this.isDataApprovedByPartner = false;
     }
 

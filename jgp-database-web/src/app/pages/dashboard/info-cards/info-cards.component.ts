@@ -4,13 +4,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { PieChartComponent } from "../pie-chart/pie-chart.component"; 
-import { DiskSpaceComponent } from "../disk-space/disk-space.component";
 import { multi, single } from '@data/charts.data';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { Subject, takeUntil } from 'rxjs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ChartDialogComponent } from '../../chart-dialog/chart-dialog.component';
-import { KenyanMapComponent } from "../kenyan-map/kenyan-map.component";
 
 @Component({
   selector: 'app-info-cards',
@@ -21,9 +19,7 @@ import { KenyanMapComponent } from "../kenyan-map/kenyan-map.component";
     MatIconModule,
     NgxChartsModule,
     PieChartComponent,
-    DiskSpaceComponent,
-    MatDialogModule,
-    KenyanMapComponent
+    MatDialogModule
 ],
   templateUrl: './info-cards.component.html',
   styleUrl: './info-cards.component.scss'
@@ -37,7 +33,29 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   @ViewChild('resizedDiv') resizedDiv: ElementRef;
   public previousWidthOfResizedDiv: number = 0;
   public chartSColorScheme: any = {
-    domain: ['#2F3E9E', '#D22E2E', '#378D3B', '#7f7f7f', '#c4a678', '#6a7b6a', '#191919', '#3d144c', '#f0e1dc', '#a04324', '#00ffff', '#0e5600', '#0e9697']
+    domain: [
+      '#FF671B',
+      '#8DB92E',
+      '#4FCDB0',
+      '#DE3C95',
+      '#F38B00',
+      '#2F7B6B',
+      '#D22A2F',
+      '#FFC81F',
+      '#2F3E9E', 
+      '#D22E2E', 
+      '#378D3B', 
+      '#7f7f7f', 
+      '#c4a678', 
+      '#6a7b6a', 
+      '#191919', 
+      '#3d144c', 
+      '#f0e1dc', 
+      '#a04324', 
+      '#00ffff', 
+      '#0e5600', 
+      '#0e9697'
+    ]
   };
 
   public loansDisbursedByGender: any[];
@@ -171,6 +189,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   public countyData: Map<number, any>;
   public businessesTrained: string;
   public businessesLoaned: string;
+  public keMapImage = "ke_map/KE-MAP.png";
 
 
   private unsubscribe$ = new Subject<void>();

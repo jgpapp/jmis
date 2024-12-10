@@ -135,7 +135,7 @@ public class AppUser extends BaseEntity implements PlatformUser {
     public UserDtoV2 toDto(){
         return new UserDtoV2(getId(),
                 this.firstName, this.lastName, this.gender, this.image, this.roles.stream().map(Role::getRoleName).collect(Collectors.toSet()),
-                Objects.nonNull(this.partner) ? this.partner.getPartnerName() : "", Objects.nonNull(this.partner) ? this.partner.getId() : null, this.getDesignation(),
+                Objects.nonNull(this.partner) ? this.partner.getPartnerName() : "GLOBAL PARTNER", Objects.nonNull(this.partner) ? this.partner.getId() : 0L, this.getDesignation(),
                 this.username, this.cellPhone, this.town);
     }
 

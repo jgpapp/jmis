@@ -5,6 +5,7 @@ import com.jgp.dashboard.dto.CountySummaryDto;
 import com.jgp.dashboard.dto.DashboardSearchCriteria;
 import com.jgp.dashboard.dto.DataPointDto;
 import com.jgp.dashboard.dto.HighLevelSummaryDto;
+import com.jgp.dashboard.dto.PartnerYearlyDataDto;
 import com.jgp.dashboard.dto.SeriesDataPointDto;
 import com.jgp.dashboard.service.DashboardService;
 import com.jgp.util.CommonUtil;
@@ -145,6 +146,24 @@ public class DashboardController {
     public ResponseEntity<List<SeriesDataPointDto>> getLastThreeYearsAccessedLoanPerPartnerSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
                                                                                                    @RequestParam(value = "county-code", required = false) String countyCode){
         return new ResponseEntity<>(this.dashboardService.getLastThreeYearsAccessedLoanPerPartnerSummary(new DashboardSearchCriteria(null, null, partnerId, countyCode)), HttpStatus.OK);
+    }
+
+    @GetMapping("loan-accessed-per-partner-yearly")
+    public ResponseEntity<List<PartnerYearlyDataDto>> getLastThreeYearsAccessedLoanPerPartnerYearly(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                                                    @RequestParam(value = "county-code", required = false) String countyCode){
+        return new ResponseEntity<>(this.dashboardService.getLastThreeYearsAccessedLoanAmountPerPartnerYearly(new DashboardSearchCriteria(null, null, partnerId, countyCode)), HttpStatus.OK);
+    }
+
+    @GetMapping("accessed-loans-count-per-partner-yearly")
+    public ResponseEntity<List<PartnerYearlyDataDto>> getLastThreeYearsAccessedLoansCountPerPartnerYearly(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                                                    @RequestParam(value = "county-code", required = false) String countyCode){
+        return new ResponseEntity<>(this.dashboardService.getLastThreeYearsAccessedLoansCountPerPartnerYearly(new DashboardSearchCriteria(null, null, partnerId, countyCode)), HttpStatus.OK);
+    }
+
+    @GetMapping("trained_businesses-per-partner-yearly")
+    public ResponseEntity<List<PartnerYearlyDataDto>> getLastThreeYearsTrainedBusinessesPerPartnerYearly(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                                                    @RequestParam(value = "county-code", required = false) String countyCode){
+        return new ResponseEntity<>(this.dashboardService.getLastThreeYearsTrainedBusinessesPerPartnerYearly(new DashboardSearchCriteria(null, null, partnerId, countyCode)), HttpStatus.OK);
     }
 
     @GetMapping("loans-accessed-vs-out-standing-per-partner")

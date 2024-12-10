@@ -18,12 +18,11 @@
       /> 
   }
   @if (data.chartType === 'kenyan-county-map') {
-    <app-kenyan-map 
+    <app-ke-map
     [mapWidth]="450" 
     [mapHeight]="350" 
     [countyData]="data.chartData" 
-    [countyDataToBePicked]="data.countyDataToBePicked" 
-    [kenyanMapChartContainer]="data.mapContainerElement" />
+    [countyDataToBePicked]="data.countyDataToBePicked"  />
   }
   @if (data.chartType === 'ngx-charts-bar-vertical') {
     <ngx-charts-bar-vertical
