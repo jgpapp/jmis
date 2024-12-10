@@ -36,7 +36,7 @@ public class BulkImportEventListener {
     private final DocumentWritePlatformService documentService;
 
     @EventListener
-    @Async
+    //@Async
    public void handleBulkImportEvent(BulkImportEvent bulkImportEvent){
         final ImportDocument importDocument = this.importRepository.findById(bulkImportEvent.importId()).orElseThrow();
         final GlobalEntityType entityType = GlobalEntityType.fromInt(importDocument.getEntityType());

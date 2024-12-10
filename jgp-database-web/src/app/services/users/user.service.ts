@@ -27,6 +27,10 @@ export class UserService {
     return this.httpClient.put(`${this.globalService.BASE_API_URL}/users/change-password`, JSON.stringify(userPassDto));
   }
 
+  resetUserPassword(userId: number): Observable<any> {
+    return this.httpClient.put(`${this.globalService.BASE_API_URL}/users/reset-user-password/${userId}`, JSON.stringify({}));
+  }
+
   getUserById(userId: number | string | null): Observable<any> {
     return this.httpClient.get(`${this.globalService.BASE_API_URL}/users/${userId}`);
   }

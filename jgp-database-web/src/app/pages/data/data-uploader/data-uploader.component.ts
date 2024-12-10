@@ -167,10 +167,11 @@ export class DataUploaderComponent implements OnDestroy {
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
-          //this.gs.openSnackBar(response.message, "Dismiss");
+          this.gs.openSnackBar('Template successfully uploaded with Id: '+response.message, "Dismiss");
           this.importDocumentId = response.message;
           this.entityType = legalFormType;
-          this.trackProgress(entityType);
+          //this.trackProgress(entityType);
+          this.getAvailableDocuments();
         }
       });
     }

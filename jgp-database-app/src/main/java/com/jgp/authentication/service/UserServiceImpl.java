@@ -117,6 +117,15 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    public void resetUserPassword(Long userId) {
+        var user = this.userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(NO_USER_FOUND_WITH_ID));
+        user.setPassword(this.passwordEncoder.encode(user.getUsername()));
+        user.setForceChangePass(true);
+        this.userRepository.save(user);
+    }
+
+    @Override
     public UserDtoV2 findUserById(Long userId) {
         return this.userRepository.findById(userId)
                 .map(AppUser::toDto)
