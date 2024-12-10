@@ -16,6 +16,8 @@ public interface UserService {
 
     void updateUserPassword(UserPassChangeDto userPassChangeDto);
 
+    void resetUserPassword(Long userId);
+
     UserDtoV2 findUserById(Long userId);
 
     AppUser findUserByUsername(String userName);

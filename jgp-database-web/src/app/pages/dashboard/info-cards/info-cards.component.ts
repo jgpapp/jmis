@@ -33,7 +33,29 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   @ViewChild('resizedDiv') resizedDiv: ElementRef;
   public previousWidthOfResizedDiv: number = 0;
   public chartSColorScheme: any = {
-    domain: ['#2F3E9E', '#D22E2E', '#378D3B', '#7f7f7f', '#c4a678', '#6a7b6a', '#191919', '#3d144c', '#f0e1dc', '#a04324', '#00ffff', '#0e5600', '#0e9697']
+    domain: [
+      '#FF671B',
+      '#8DB92E',
+      '#4FCDB0',
+      '#DE3C95',
+      '#F38B00',
+      '#2F7B6B',
+      '#D22A2F',
+      '#FFC81F',
+      '#2F3E9E', 
+      '#D22E2E', 
+      '#378D3B', 
+      '#7f7f7f', 
+      '#c4a678', 
+      '#6a7b6a', 
+      '#191919', 
+      '#3d144c', 
+      '#f0e1dc', 
+      '#a04324', 
+      '#00ffff', 
+      '#0e5600', 
+      '#0e9697'
+    ]
   };
 
   public loansDisbursedByGender: any[];

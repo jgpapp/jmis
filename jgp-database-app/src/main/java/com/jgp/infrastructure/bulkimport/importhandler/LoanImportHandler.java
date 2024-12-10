@@ -7,8 +7,10 @@ import com.jgp.infrastructure.bulkimport.constants.BMOConstants;
 import com.jgp.infrastructure.bulkimport.constants.LoanConstants;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import com.jgp.infrastructure.bulkimport.data.Count;
+import com.jgp.infrastructure.bulkimport.data.ImportProgress;
 import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
 import com.jgp.infrastructure.bulkimport.exception.InvalidDataException;
+import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.dto.ParticipantDto;
 import com.jgp.participant.service.ParticipantService;
@@ -36,6 +38,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 
 @Service
@@ -46,6 +49,7 @@ public class LoanImportHandler implements ImportHandler {
     private final LoanService loanService;
     private final ParticipantService clientService;
     private final UserService userService;
+    private final ImportProgressService importProgressService;
     List<Loan> loanDataList;
     private Workbook workbook;
     private List<String> statuses;
@@ -58,7 +62,29 @@ public class LoanImportHandler implements ImportHandler {
         statuses = new ArrayList<>();
         this.rowErrorMap = new HashMap<>();
         readExcelFile();
-        return importEntity();
+        return importEntity(bulkImportEvent.importId());
+    }
+
+    @Override
+    public void updateImportProgress(Long importId, boolean updateTotal, int total) {
+        try {
+            if (updateTotal){
+                importProgressService.updateTotal(importId, total);
+            }else {
+                importProgressService.incrementProcessedProgress(importId);
+            }
+        } catch (ExecutionException e) {
+            log.error("Error : {}", e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void markImportAsFinished(Long importId) {
+        try {
+            importProgressService.markImportAsFinished(importId);
+        } catch (ExecutionException e) {
+            log.error("Error : {}", e.getMessage(), e);
+        }
     }
 
     public void readExcelFile() {
@@ -155,13 +181,15 @@ public class LoanImportHandler implements ImportHandler {
                 .locationCountyCode(locationCountyCode.isPresent() ? locationCountyCode.get().getCountyCode() : "999").build();
     }
 
-    public Count importEntity() {
+    public Count importEntity(Long importId) {
         Sheet groupSheet = workbook.getSheet(TemplatePopulateImportConstants.LOAN_SHEET_NAME);
         int successCount = 0;
         int errorCount = 0;
         int progressLevel = 0;
         String errorMessage = "";
-        for (int i = 0; i < loanDataList.size(); i++) {
+        var loanDataSize = loanDataList.size();
+        updateImportProgress(importId, true, loanDataSize);
+        for (int i = 0; i < loanDataSize; i++) {
             Row row = groupSheet.getRow(loanDataList.get(i).getRowIndex());
             Cell errorReportCell = row.createCell(BMOConstants.FAILURE_COL);
             Cell statusCell = row.createCell(BMOConstants.STATUS_COL);
@@ -186,6 +214,7 @@ public class LoanImportHandler implements ImportHandler {
                 errorMessage = ImportHandlerUtils.getErrorMessage(ex);
                 writeGroupErrorMessage(errorMessage, progressLevel, statusCell, errorReportCell);
             }
+            updateImportProgress(importId, false, 0);
         }
         setReportHeaders(groupSheet);
         return Count.instance(successCount, errorCount);

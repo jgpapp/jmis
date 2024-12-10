@@ -35,6 +35,12 @@ public class UserController {
         return new ResponseEntity<>(new ApiResponseDto(true, "Password successfully updated !!"), HttpStatus.OK);
     }
 
+    @PutMapping("reset-user-password/{userId}")
+    public ResponseEntity<ApiResponseDto> resetUserPassword(@PathVariable("userId") Long userId){
+        this.userService.resetUserPassword(userId);
+        return new ResponseEntity<>(new ApiResponseDto(true, "Password successfully Reset !!"), HttpStatus.OK);
+    }
+
     @GetMapping
     public ResponseEntity<List<UserDtoV2>> getAvailableUsers(){
         return new ResponseEntity<>(this.userService.getAllUsers(), HttpStatus.OK);
