@@ -14,7 +14,9 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Subject, takeUntil } from 'rxjs';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import * as XLSX from 'xlsx';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { GlobalService } from '@services/shared/global.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -30,7 +32,9 @@ import * as XLSX from 'xlsx';
     InfoCardsComponent,
     AnalyticsComponent,
     NoPermissionComponent,
-    DashboardFiltersComponent
+    DashboardFiltersComponent,
+    MatButtonModule,
+    MatIconModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
@@ -39,7 +43,7 @@ export class DashboardComponent {
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-  public loansAccessedDisplayedColumns = ['year', 'partnerName', 'genderName', 'value' ];
+  public displayedColumns = ['year', 'partnerName', 'genderName', 'value' ];
   accessedLoanData: any
   accessedLoanCountData: any
   trainedBusinessesCountData: any
@@ -51,7 +55,7 @@ export class DashboardComponent {
 
   dashBoardFilters: any;
   resetDashBoardFilters: boolean = false;
-  constructor(private dashBoardService: DashboardService, public authService: AuthService){}
+  constructor(private dashBoardService: DashboardService, public authService: AuthService, public gs: GlobalService){}
 
   setDashBoardFilters(currentDashBoardFilters: any){
     this.dashBoardFilters = currentDashBoardFilters;
@@ -151,23 +155,6 @@ export class DashboardComponent {
       return true;
     }
     return data[index].year !== data[index - 1].year;
-  }
-
-
-  exportToExcel(dataSource: any, fileName: string): void {
-    const data = dataSource.data; // Get the table data
-
-    // Convert data to a worksheet
-    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data, {
-      header: this.loansAccessedDisplayedColumns,
-    });
-
-    // Create a workbook
-    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Table Data');
-
-    // Export the workbook
-    XLSX.writeFile(workbook, fileName+'.xlsx');
   }
 
   ngOnInit(): void {

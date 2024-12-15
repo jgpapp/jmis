@@ -804,7 +804,7 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
                 final var genderName = rs.getString("genderName");
                 final var year = rs.getInt("year");
                 final var value = INTEGER_DATA_POINT_TYPE.equals(valueDataType) ? rs.getInt("value") : rs.getBigDecimal("value");
-                dataPoints.add(new PartnerYearlyDataDto(StringUtils.capitalize(partnerName), StringUtils.capitalize(genderName), year, value+""));
+                dataPoints.add(new PartnerYearlyDataDto(StringUtils.capitalize(partnerName), StringUtils.capitalize(genderName), year, CommonUtil.NUMBER_FORMAT.format(value)));
 
             }
             return dataPoints;

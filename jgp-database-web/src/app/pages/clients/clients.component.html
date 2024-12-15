@@ -9,11 +9,15 @@
 
 <div fxLayout="column" class="p-2">
     <div class="p-2">
-        <form class="user-search">
-            <mat-form-field class="user-search-input">
-                <input matInput placeholder="Search by name or email..." [(ngModel)]="searchTextInput" (keyup)="onChange($event)" name="search" autocomplete="off">
-            </mat-form-field>
-        </form>
+        <div>
+            <form class="user-search">
+                <mat-form-field class="user-search-input">
+                    <input matInput placeholder="Search by name or email..." [(ngModel)]="searchTextInput" (keyup)="onChange($event)" name="search" autocomplete="off">
+                </mat-form-field>
+            </form>
+            <button mat-raised-button color="primary" (click)="gs.exportToExcel(dataSource, displayedColumns, 'PARTICIPANTS')"><mat-icon>download</mat-icon> Excel</button>
+        </div>
+        
         <mat-table #table [dataSource]="dataSource" class="mat-elevation-z8">
             <ng-container matColumnDef="businessName">
                 <mat-header-cell *matHeaderCellDef> Business Name </mat-header-cell>
