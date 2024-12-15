@@ -14,6 +14,7 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Subject, takeUntil } from 'rxjs';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-dashboard',
@@ -38,7 +39,7 @@ export class DashboardComponent {
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-  public loansAccessedDisplayedColumns = ['partnerName', 'year', 'value' ];
+  public loansAccessedDisplayedColumns = ['year', 'partnerName', 'genderName', 'value' ];
   accessedLoanData: any
   accessedLoanCountData: any
   trainedBusinessesCountData: any
@@ -102,6 +103,71 @@ export class DashboardComponent {
         },
         error: (error) => { }
       });
+  }
+
+  shouldDisplayAccessedLoanDataPartnerName(index: number): boolean {
+    const data = this.accessedLoanDataDataSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].partnerName !== data[index - 1].partnerName;
+  }
+
+  shouldDisplayAccessedLoanDataYear(index: number): boolean {
+    const data = this.accessedLoanDataDataSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].year !== data[index - 1].year;
+  }
+
+  shouldDisplayAccessedLoanCountDataPartnerName(index: number): boolean {
+    const data = this.accessedLoanCountDataDataSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].partnerName !== data[index - 1].partnerName;
+  }
+
+  shouldDisplayAccessedLoanCountDataYear(index: number): boolean {
+    const data = this.accessedLoanCountDataDataSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].year !== data[index - 1].year;
+  }
+
+  shouldDisplayTrainedBusinessesCountDataPartnerName(index: number): boolean {
+    const data = this.trainedBusinessesCountDataDataSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].partnerName !== data[index - 1].partnerName;
+  }
+
+  shouldDisplayTrainedBusinessesCountDataYear(index: number): boolean {
+    const data = this.trainedBusinessesCountDataDataSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].year !== data[index - 1].year;
+  }
+
+
+  exportToExcel(dataSource: any, fileName: string): void {
+    const data = dataSource.data; // Get the table data
+
+    // Convert data to a worksheet
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data, {
+      header: this.loansAccessedDisplayedColumns,
+    });
+
+    // Create a workbook
+    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Table Data');
+
+    // Export the workbook
+    XLSX.writeFile(workbook, fileName+'.xlsx');
   }
 
   ngOnInit(): void {

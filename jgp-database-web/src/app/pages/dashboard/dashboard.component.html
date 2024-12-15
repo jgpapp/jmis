@@ -60,14 +60,25 @@
                     <mat-card-title>Loans Disbursed (KES)</mat-card-title>
                 </mat-card-header>
                 <div class="p-2">
+                    <button mat-raised-button color="primary" (click)="exportToExcel(accessedLoanDataDataSource, 'ACCESSED_LOANS')">Export to Excel</button>
                     <mat-table #table [dataSource]="accessedLoanDataDataSource" class="mat-elevation-z8">
-                        <ng-container matColumnDef="partnerName">
-                            <mat-header-cell *matHeaderCellDef> Partner Name </mat-header-cell>
-                            <mat-cell *matCellDef="let element"> {{element.partnerName}} </mat-cell>
-                        </ng-container>
                         <ng-container matColumnDef="year">
                             <mat-header-cell *matHeaderCellDef> Year </mat-header-cell>
-                            <mat-cell *matCellDef="let element"> {{element.year}} </mat-cell>
+                            <mat-cell *matCellDef="let element; let i = index">
+                              {{ shouldDisplayAccessedLoanDataYear(i) ? element.year : '' }}
+                            </mat-cell>
+                          </ng-container>
+                        <ng-container matColumnDef="partnerName">
+                            <mat-header-cell *matHeaderCellDef> Partner Name </mat-header-cell>
+                            <mat-cell *matCellDef="let element; let i = index">
+                              {{ shouldDisplayAccessedLoanDataPartnerName(i) ? element.partnerName : '' }}
+                            </mat-cell>
+                          </ng-container>
+
+                          
+                        <ng-container matColumnDef="genderName">
+                            <mat-header-cell *matHeaderCellDef> Category </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{element.genderName}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="value">
                             <mat-header-cell *matHeaderCellDef> Amount </mat-header-cell>
@@ -88,13 +99,23 @@
                 </mat-card-header>
                 <div class="p-2">
                     <mat-table #table [dataSource]="trainedBusinessesCountDataDataSource" class="mat-elevation-z8">
-                        <ng-container matColumnDef="partnerName">
-                            <mat-header-cell *matHeaderCellDef> Partner Name </mat-header-cell>
-                            <mat-cell *matCellDef="let element"> {{element.partnerName}} </mat-cell>
-                        </ng-container>
                         <ng-container matColumnDef="year">
                             <mat-header-cell *matHeaderCellDef> Year </mat-header-cell>
-                            <mat-cell *matCellDef="let element"> {{element.year}} </mat-cell>
+                            <mat-cell *matCellDef="let element; let i = index">
+                              {{ shouldDisplayTrainedBusinessesCountDataYear(i) ? element.year : '' }}
+                            </mat-cell>
+                          </ng-container>
+                        <ng-container matColumnDef="partnerName">
+                            <mat-header-cell *matHeaderCellDef> Partner Name </mat-header-cell>
+                            <mat-cell *matCellDef="let element; let i = index">
+                              {{ shouldDisplayTrainedBusinessesCountDataPartnerName(i) ? element.partnerName : '' }}
+                            </mat-cell>
+                          </ng-container>
+
+                          
+                        <ng-container matColumnDef="genderName">
+                            <mat-header-cell *matHeaderCellDef> Category </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{element.genderName}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="value">
                             <mat-header-cell *matHeaderCellDef> Trained Businesses </mat-header-cell>
@@ -115,13 +136,22 @@
                 </mat-card-header>
                 <div class="p-2">
                     <mat-table #table [dataSource]="accessedLoanCountDataDataSource" class="mat-elevation-z8">
-                        <ng-container matColumnDef="partnerName">
-                            <mat-header-cell *matHeaderCellDef> Partner Name </mat-header-cell>
-                            <mat-cell *matCellDef="let element"> {{element.partnerName}} </mat-cell>
-                        </ng-container>
                         <ng-container matColumnDef="year">
                             <mat-header-cell *matHeaderCellDef> Year </mat-header-cell>
-                            <mat-cell *matCellDef="let element"> {{element.year}} </mat-cell>
+                            <mat-cell *matCellDef="let element; let i = index">
+                              {{ shouldDisplayAccessedLoanCountDataYear(i) ? element.year : '' }}
+                            </mat-cell>
+                          </ng-container>
+                        <ng-container matColumnDef="partnerName">
+                            <mat-header-cell *matHeaderCellDef> Partner Name </mat-header-cell>
+                            <mat-cell *matCellDef="let element; let i = index">
+                              {{ shouldDisplayAccessedLoanCountDataPartnerName(i) ? element.partnerName : '' }}
+                            </mat-cell>
+                          </ng-container>
+
+                        <ng-container matColumnDef="genderName">
+                            <mat-header-cell *matHeaderCellDef> Category </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{element.genderName}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="value">
                             <mat-header-cell *matHeaderCellDef> Number of Loans </mat-header-cell>
