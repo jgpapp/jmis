@@ -67,6 +67,11 @@ export const routes: Routes = [
         data: { breadcrumb: 'Change Password' }
       },
       {
+        path: 'system-resources',
+        loadComponent: () => import('./system-resources/system-resources.component').then(c => c.SystemResourcesComponent),
+        data: { breadcrumb: 'System Resources' }
+      },
+      {
         path: 'ui',
         loadChildren: () => import('./ui/ui.routes').then(p => p.routes),
         data: { breadcrumb: 'UI' }

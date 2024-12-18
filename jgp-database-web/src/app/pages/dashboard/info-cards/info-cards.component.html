@@ -37,21 +37,6 @@
         </mat-card>
     </div> 
 
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
-        <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
-                <mat-card-title>{{topFourCountiesBusinessesTrainedChartTitle}}</mat-card-title>
-            </mat-card-header>
-            <div class="w-100 h-300p">
-                <ngx-charts-tree-map 
-                [results]="topFourCountiesBusinessesTrained" 
-                [scheme]="chartSColorScheme"
-                [animations]="true"
-                />       
-            </div>
-        </mat-card>
-    </div> 
-
     <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #loansDisbursedByStatusContentDiv (click)="expandLoansDisbursedByStatusBarChart()"> 
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
@@ -116,21 +101,6 @@
             </div>
         </mat-card>
     </div>
-    
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
-        <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
-                <mat-card-title>{{topFourCountiesloansDisbursedChartTitle}}</mat-card-title>
-            </mat-card-header>
-            <div class="w-100 h-300p">
-                <ngx-charts-tree-map 
-                [results]="topFourCountiesloansDisbursed" 
-                [scheme]="chartSColorScheme"
-                [animations]="true"
-                />       
-            </div>
-        </mat-card>
-    </div> 
 
     <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #trainingByPartnerByGenderContentDiv (click)="expandTrainingByPartnerByGenderBarChart()"> 
         <mat-card>
@@ -303,5 +273,34 @@
         </mat-card>
     </div>
 
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{topFourCountiesBusinessesTrainedChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                <ngx-charts-tree-map 
+                [results]="topFourCountiesBusinessesTrained" 
+                [scheme]="chartSColorScheme"
+                [animations]="true"
+                />       
+            </div>
+        </mat-card>
+    </div> 
+
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{topFourCountiesloansDisbursedChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                <ngx-charts-tree-map 
+                [results]="topFourCountiesloansDisbursed" 
+                [scheme]="chartSColorScheme"
+                [animations]="true"
+                />       
+            </div>
+        </mat-card>
+    </div> 
    
 </div>
