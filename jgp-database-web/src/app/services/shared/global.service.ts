@@ -5,6 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ChartDialogComponent } from '../../pages/chart-dialog/chart-dialog.component';
 import { ConfirmDialogModel } from '../../dto/confirm-dialog-model';
 import { ConfirmDialogComponent } from '../../pages/confirm-dialog/confirm-dialog.component';
+import * as XLSX from 'xlsx';
 
 @Injectable({ providedIn: 'root' })
 export class GlobalService {
@@ -55,6 +56,23 @@ export class GlobalService {
     });
 
     return res;
+  }
+
+
+  exportToExcel(dataSource: any, columns: any, fileName: string): void {
+    const data = dataSource.data; // Get the table data
+
+    // Convert data to a worksheet
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data, {
+      header: columns,
+    });
+
+    // Create a workbook
+    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Table Data');
+
+    // Export the workbook
+    XLSX.writeFile(workbook, fileName+'.xlsx');
   }
 
 }

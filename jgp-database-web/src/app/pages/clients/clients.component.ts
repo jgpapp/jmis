@@ -11,6 +11,9 @@ import { Subject, takeUntil } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { GlobalService } from '@services/shared/global.service';
 
 @Component({
   selector: 'app-clients',
@@ -23,7 +26,9 @@ import { FormsModule } from '@angular/forms';
     NoPermissionComponent,
     MatFormFieldModule,
     MatInputModule,
-    FormsModule
+    FormsModule,
+    MatButtonModule,
+    MatIconModule
   ],
   templateUrl: './clients.component.html',
   styleUrl: './clients.component.scss'
@@ -43,7 +48,7 @@ export class ClientsComponent implements OnInit, OnDestroy{
   pageIndex = 0;
   totalItems = 0;
   private unsubscribe$ = new Subject<void>();
-  constructor(private clientService: ClientService, public authService: AuthService) { }
+  constructor(private clientService: ClientService, public authService: AuthService, public gs: GlobalService) { }
 
   getAvailableClients() {
     this.clientService.getAvailableClients(this.searchText, this.pageIndex, this.pageSize)

@@ -1,15 +1,12 @@
 package com.jgp.util;
 
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContextAware;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +24,8 @@ public abstract class CommonUtil {
     public static final String NO_FILE_TO_UPLOAD = "No File To Upload Was Found!";
 
     public static final String STATUS_CELL_IMPORTED = "Imported";
+
+    public static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance();
 
     private CommonUtil() {
     }

@@ -17,6 +17,7 @@ import { NoPermissionComponent } from '../errors/no-permission/no-permission.com
 import { AuthService } from '@services/users/auth.service';
 import { HasPermissionDirective } from '../../directives/has-permission.directive';
 import { Subject, takeUntil } from 'rxjs';
+import { GlobalService } from '@services/shared/global.service';
 
 @Component({
   selector: 'app-partners',
@@ -53,7 +54,7 @@ export class PartnersComponent implements OnInit, OnDestroy{
 
   partners: any
   private unsubscribe$ = new Subject<void>();
-  constructor(public dialog: MatDialog, private partnerService: PartnerService, public authService: AuthService) { }
+  constructor(public dialog: MatDialog, private partnerService: PartnerService, public authService: AuthService, public gs: GlobalService) { }
 
   getAvailablePartners() {
     this.partnerService.getAvailablePartners(this.pageIndex, this.pageSize)

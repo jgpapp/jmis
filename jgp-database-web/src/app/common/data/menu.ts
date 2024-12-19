@@ -11,7 +11,8 @@ export const verticalMenuItems = [
     new Menu(8, 'Lending Data', '/lending-data', null, 'real_estate_agent', null, false, 5),
     new Menu(9, 'User Management', null, null, 'manage_accounts', null, true, 0),
     new Menu(10, 'Users', '/users', null, 'supervisor_account', null, false, 9),
-    new Menu(11, 'User Roles', '/user-roles', null, 'accessibility', null, false, 9)
+    new Menu(11, 'User Roles', '/user-roles', null, 'accessibility', null, false, 9),
+    new Menu(12, 'System Resources', '/system-resources', null, 'engineering', null, false, 0)
     /*new Menu(5, 'Cards', '/ui/cards', null, 'card_membership', null, false, 3),
     new Menu(6, 'Lists', '/ui/lists', null, 'list', null, false, 3),
     new Menu(7, 'Grids', '/ui/grids', null, 'grid_on', null, false, 3),
@@ -83,7 +84,8 @@ export const horizontalMenuItems = [
     new Menu(8, 'Lending Data', '/lending-data', null, 'real_estate_agent', null, false, 5),
     new Menu(9, 'User Management', null, null, 'manage_accounts', null, true, 0),
     new Menu(10, 'Users', '/users', null, 'supervisor_account', null, false, 9),
-    new Menu(11, 'User Roles', '/user-roles', null, 'accessibility', null, false, 9)
+    new Menu(11, 'User Roles', '/user-roles', null, 'accessibility', null, false, 9),
+    new Menu(12, 'System Resources', '/system-resources', null, 'engineering', null, false, 0)
     
     /*new Menu(5, 'Cards', '/ui/cards', null, 'card_membership', null, false, 3),
     new Menu(6, 'Lists', '/ui/lists', null, 'list', null, false, 3),

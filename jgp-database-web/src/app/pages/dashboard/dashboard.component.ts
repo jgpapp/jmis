@@ -14,6 +14,9 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Subject, takeUntil } from 'rxjs';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { GlobalService } from '@services/shared/global.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -29,7 +32,9 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
     InfoCardsComponent,
     AnalyticsComponent,
     NoPermissionComponent,
-    DashboardFiltersComponent
+    DashboardFiltersComponent,
+    MatButtonModule,
+    MatIconModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
@@ -38,7 +43,7 @@ export class DashboardComponent {
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-  public loansAccessedDisplayedColumns = ['partnerName', 'year', 'value' ];
+  public displayedColumns = ['year', 'partnerName', 'genderName', 'value' ];
   accessedLoanData: any
   accessedLoanCountData: any
   trainedBusinessesCountData: any
@@ -50,7 +55,7 @@ export class DashboardComponent {
 
   dashBoardFilters: any;
   resetDashBoardFilters: boolean = false;
-  constructor(private dashBoardService: DashboardService, public authService: AuthService){}
+  constructor(private dashBoardService: DashboardService, public authService: AuthService, public gs: GlobalService){}
 
   setDashBoardFilters(currentDashBoardFilters: any){
     this.dashBoardFilters = currentDashBoardFilters;
@@ -102,6 +107,54 @@ export class DashboardComponent {
         },
         error: (error) => { }
       });
+  }
+
+  shouldDisplayAccessedLoanDataPartnerName(index: number): boolean {
+    const data = this.accessedLoanDataDataSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].partnerName !== data[index - 1].partnerName;
+  }
+
+  shouldDisplayAccessedLoanDataYear(index: number): boolean {
+    const data = this.accessedLoanDataDataSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].year !== data[index - 1].year;
+  }
+
+  shouldDisplayAccessedLoanCountDataPartnerName(index: number): boolean {
+    const data = this.accessedLoanCountDataDataSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].partnerName !== data[index - 1].partnerName;
+  }
+
+  shouldDisplayAccessedLoanCountDataYear(index: number): boolean {
+    const data = this.accessedLoanCountDataDataSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].year !== data[index - 1].year;
+  }
+
+  shouldDisplayTrainedBusinessesCountDataPartnerName(index: number): boolean {
+    const data = this.trainedBusinessesCountDataDataSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].partnerName !== data[index - 1].partnerName;
+  }
+
+  shouldDisplayTrainedBusinessesCountDataYear(index: number): boolean {
+    const data = this.trainedBusinessesCountDataDataSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].year !== data[index - 1].year;
   }
 
   ngOnInit(): void {
