@@ -6,15 +6,19 @@ import { ChartDialogComponent } from '../../pages/chart-dialog/chart-dialog.comp
 import { ConfirmDialogModel } from '../../dto/confirm-dialog-model';
 import { ConfirmDialogComponent } from '../../pages/confirm-dialog/confirm-dialog.component';
 import * as XLSX from 'xlsx';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class GlobalService {
   //API_HOST = '68.183.21.53';
   //API_HOST = '20.242.125.65';
-  API_HOST = 'jmis.dt-global.com';
+  //API_HOST = 'jmis.dt-global.com';
   //API_HOST = 'localhost';
-  API_PORT = '8082';
-  BASE_API_URL: string = `https://${this.API_HOST}:${this.API_PORT}/jgp-app/api/v1`;  
+  //API_PORT = '8082';
+  //BASE_API_URL: string = `https://${this.API_HOST}:${this.API_PORT}/jgp-app/api/v1`;  
+  API_HOST = environment.baseApiUrl;
+  API_PORT = environment.baseApiUrlPort;
+  BASE_API_URL: string = `${this.API_HOST}:${this.API_PORT}/jgp-app/api/v1`;  
  
   HTTP_OPTIONS = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
