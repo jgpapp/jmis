@@ -6,7 +6,8 @@ WORKDIR /app
 
 # Install dependencies
 COPY package*.json ./
-RUN npm cache clean --force && install --force --fetch-timeout=60000 --max-old-space-size=4096
+RUN npm cache clean --force
+RUN npm install --force --fetch-timeout=60000 --max-old-space-size=4096
 
 # Copy the rest of the application files
 COPY . .
