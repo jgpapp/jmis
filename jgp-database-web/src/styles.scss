@@ -67,3 +67,16 @@
   text-decoration: underline;
   cursor: pointer;
 }
+
+.no-data-placeholder {
+  text-align: center;
+  padding: 20px;
+  font-size: 18px;
+  color: #888;
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  margin-top: 40px;
+  margin-left: 20px;
+  margin-right: 20px;
+}

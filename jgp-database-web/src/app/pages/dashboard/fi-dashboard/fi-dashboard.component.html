@@ -48,6 +48,7 @@
                     <mat-card-title>{{loansDisbursedByGenderChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
+                    @if (loansDisbursedByGender && loansDisbursedByGender.length > 0) {
                     <app-pie-chart 
                     [data]="loansDisbursedByGender" 
                     [showLegend]="loansDisbursedByGenderShowLegend" 
@@ -55,7 +56,10 @@
                     [showLabels]="loansDisbursedByGenderShowLabels" 
                     [explodeSlices]="loansDisbursedByGenderExplodeSlices" 
                     [doughnut]="loansDisbursedByGenderDoughnut"
-                    />       
+                    />
+                } @else {
+                    <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+                }        
                 </div>
             </mat-card>
         </div>
@@ -65,6 +69,7 @@
                     <mat-card-title>{{loansDisbursedByPipelineChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
+                    @if (loansDisbursedByPipeline && loansDisbursedByPipeline.length > 0) {
                     <app-pie-chart 
                 [data]="loansDisbursedByPipeline" 
                 [showLegend]="loansDisbursedByPipelineShowLegend" 
@@ -72,7 +77,10 @@
                 [showLabels]="loansDisbursedByPipelineShowLabels" 
                 [explodeSlices]="loansDisbursedByPipelineExplodeSlices" 
                 [doughnut]="loansDisbursedByPipelineDoughnut" 
-                />        
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }         
                 </div>
             </mat-card>
         </div>
@@ -82,6 +90,7 @@
                     <mat-card-title>Loans Disbursed By Status</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
+                    @if (loansDisbursedByStatus && loansDisbursedByStatus.length > 0) {
                     <ngx-charts-bar-vertical
                         [scheme]="chartSColorScheme"
                         [results]="loansDisbursedByStatus"
@@ -94,7 +103,10 @@
                         [xAxisLabel]="loansDisbursedByStatusYAxisLabel"
                         [yAxisLabel]="loansDisbursedByStatusXAxisLabel"
                         (select)="onSelect($event)"
-                    />         
+                    />
+                } @else {
+                    <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+                }          
                 </div>
             </mat-card>
         </div>  
@@ -105,6 +117,7 @@
                     <mat-card-title>{{loansDisbursedBySectorChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
+                    @if (loansDisbursedBySector && loansDisbursedBySector.length > 0) {
                     <app-pie-chart 
                     [data]="loansDisbursedBySector" 
                     [showLegend]="loansDisbursedBySectorShowLegend" 
@@ -112,7 +125,10 @@
                     [showLabels]="loansDisbursedBySectorShowLabels" 
                     [explodeSlices]="loansDisbursedBySectorExplodeSlices" 
                     [doughnut]="loansDisbursedBySectorDoughnut"
-                    />       
+                    />
+                } @else {
+                    <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+                }        
                 </div>
             </mat-card>
         </div> 
@@ -123,6 +139,7 @@
                     <mat-card-title>{{accessedVSOutStandingAmountByGenderChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
+                    @if (accessedVSOutStandingAmountByGender && accessedVSOutStandingAmountByGender.length > 0) {
                     <ngx-charts-bar-vertical-2d
                         [scheme]="chartSColorScheme"
                         [results]="accessedVSOutStandingAmountByGender"
@@ -135,7 +152,10 @@
                         [xAxisLabel]="accessedVSOutStandingAmountByGenderXAxisLabel"
                         [yAxisLabel]="accessedVSOutStandingAmountByGenderYAxisLabel"
                         (select)="onSelect($event)" 
-                    />        
+                    />
+                } @else {
+                    <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+                }         
                 </div>
             </mat-card>
         </div>
@@ -146,6 +166,7 @@
                     <mat-card-title>{{loansDisbursedBySegmentChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
+                    @if (loansDisbursedBySegment && loansDisbursedBySegment.length > 0) {
                     <app-pie-chart 
                 [data]="loansDisbursedBySegment" 
                 [showLegend]="loansDisbursedBySegmentShowLegend" 
@@ -153,7 +174,10 @@
                 [showLabels]="loansDisbursedBySegmentShowLabels" 
                 [explodeSlices]="loansDisbursedBySegmentExplodeSlices" 
                 [doughnut]="loansDisbursedBySegmentDoughnut" 
-                />        
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }         
                 </div>
             </mat-card>
         </div>
@@ -170,7 +194,9 @@
                     [scheme]="chartSColorScheme"
                     [animations]="true"
                     />
-                    }       
+                } @else {
+                    <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+                }        
                 </div>
             </mat-card>
         </div> 
@@ -179,3 +205,10 @@
     </div>
    
 </div>
+
+<!-- Template for no data placeholder -->
+<ng-template #noDataPlaceholder>
+    <div class="no-data-placeholder">
+      <p>No data available to display</p>
+    </div>
+  </ng-template>

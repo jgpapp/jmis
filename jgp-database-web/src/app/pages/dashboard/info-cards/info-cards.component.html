@@ -6,6 +6,7 @@
                 <mat-card-title>{{loansDisbursedByGenderChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
+                @if (loansDisbursedByGender && loansDisbursedByGender.length > 0) {
                 <app-pie-chart 
                 [data]="loansDisbursedByGender" 
                 [showLegend]="loansDisbursedByGenderShowLegend" 
@@ -13,7 +14,10 @@
                 [showLabels]="loansDisbursedByGenderShowLabels" 
                 [explodeSlices]="loansDisbursedByGenderExplodeSlices" 
                 [doughnut]="loansDisbursedByGenderDoughnut"
-                />       
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }        
             </div>
         </mat-card>
     </div> 
@@ -25,6 +29,7 @@
                 <mat-card-title>{{loansDisbursedByPipelineChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
+                @if (loansDisbursedByPipeline && loansDisbursedByPipeline.length > 0) {
                 <app-pie-chart 
             [data]="loansDisbursedByPipeline" 
             [showLegend]="loansDisbursedByPipelineShowLegend" 
@@ -32,7 +37,10 @@
             [showLabels]="loansDisbursedByPipelineShowLabels" 
             [explodeSlices]="loansDisbursedByPipelineExplodeSlices" 
             [doughnut]="loansDisbursedByPipelineDoughnut" 
-            />        
+            />
+        } @else {
+            <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+        }         
             </div>
         </mat-card>
     </div> 
@@ -43,6 +51,7 @@
                 <mat-card-title>{{loansDisbursedByStatusChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
+                @if (loansDisbursedByStatus && loansDisbursedByStatus.length > 0) {
                 <ngx-charts-bar-vertical
                     [scheme]="chartSColorScheme"
                     [results]="loansDisbursedByStatus"
@@ -56,7 +65,10 @@
                     [yAxisLabel]="loansDisbursedByStatusYAxisLabel"
                     [dataLabelFormatting]="valueFormatting"
                     (select)="onSelect($event)"
-                />         
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }          
             </div>
         </mat-card>
     </div> 
@@ -67,6 +79,7 @@
                 <mat-card-title>{{loansDisbursedBySegmentChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
+                @if (loansDisbursedBySegment && loansDisbursedBySegment.length > 0) {
                 <app-pie-chart 
             [data]="loansDisbursedBySegment" 
             [showLegend]="loansDisbursedBySegmentShowLegend" 
@@ -74,7 +87,10 @@
             [showLabels]="loansDisbursedBySegmentShowLabels" 
             [explodeSlices]="loansDisbursedBySegmentExplodeSlices" 
             [doughnut]="loansDisbursedBySegmentDoughnut" 
-            />        
+            />
+        } @else {
+            <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+        }         
             </div>
         </mat-card>
     </div>
@@ -85,6 +101,7 @@
                 <mat-card-title>{{TANeedsByGenderChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
+                @if (TANeedsByGender && TANeedsByGender.length > 0) {
                 <ngx-charts-bar-vertical-2d
                     [scheme]="chartSColorScheme"
                     [results]="TANeedsByGender"
@@ -97,7 +114,10 @@
                     [xAxisLabel]="TANeedsByGenderXAxisLabel"
                     [yAxisLabel]="TANeedsByGenderYAxisLabel"
                     (select)="onSelect($event)"
-                />        
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }         
             </div>
         </mat-card>
     </div>
@@ -108,6 +128,7 @@
                 <mat-card-title>{{trainingByPartnerByGenderChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
+                @if (trainingByPartnerByGender && trainingByPartnerByGender.length > 0) {
                 <ngx-charts-bar-vertical-2d
                     [scheme]="chartSColorScheme"
                     [results]="trainingByPartnerByGender"
@@ -120,7 +141,10 @@
                     [xAxisLabel]="trainingByPartnerByGenderXAxisLabel"
                     [yAxisLabel]="trainingByPartnerByGenderYAxisLabel"
                     (select)="onSelect($event)" 
-                />        
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }         
             </div>
         </mat-card>
     </div> 
@@ -131,6 +155,7 @@
                 <mat-card-title>{{businessesTainedByGenderChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
+                @if (businessesTainedByGender && businessesTainedByGender.length > 0) {
                 <app-pie-chart 
                 [data]="businessesTainedByGender" 
                 [showLegend]="businessesTainedByGenderShowLegend" 
@@ -138,7 +163,10 @@
                 [showLabels]="businessesTainedByGenderShowLabels" 
                 [explodeSlices]="businessesTainedByGenderExplodeSlices" 
                 [doughnut]="businessesTainedByGenderDoughnut"
-                />       
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }        
             </div>
         </mat-card>
     </div> 
@@ -149,6 +177,7 @@
                 <mat-card-title>{{taTrainedBySectorChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
+                @if (taTrainedBySector && taTrainedBySector.length > 0) {
                 <ngx-charts-bar-horizontal
                     [scheme]="chartSColorScheme"
                     [results]="taTrainedBySector"
@@ -161,7 +190,10 @@
                     [xAxisLabel]="taTrainedBySectorYAxisLabel"
                     [yAxisLabel]="taTrainedBySectorXAxisLabel"
                     (select)="onSelect($event)"
-                />         
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }          
             </div>
         </mat-card>
     </div>  
@@ -171,6 +203,7 @@
                 <mat-card-title>{{accessedVSOutStandingAmountChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
+                @if (accessedVSOutStandingAmount && accessedVSOutStandingAmount.length > 0) {
                 <ngx-charts-bar-vertical-2d
                     [scheme]="chartSColorScheme"
                     [results]="accessedVSOutStandingAmount"
@@ -183,7 +216,10 @@
                     [xAxisLabel]="accessedVSOutStandingAmountXAxisLabel"
                     [yAxisLabel]="accessedVSOutStandingAmountYAxisLabel"
                     (select)="onSelect($event)" 
-                />        
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }         
             </div>
         </mat-card>
     </div> 
@@ -193,6 +229,7 @@
                 <mat-card-title>{{taTrainedBySegmentChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
+                @if (taTrainedBySegment && taTrainedBySegment.length > 0) {
                 <app-pie-chart 
             [data]="taTrainedBySegment" 
             [showLegend]="taTrainedBySegmentShowLegend" 
@@ -200,7 +237,10 @@
             [showLabels]="taTrainedBySegmentShowLabels" 
             [explodeSlices]="taTrainedBySegmentExplodeSlices" 
             [doughnut]="taTrainedBySegmentDoughnut" 
-            />        
+            />
+        } @else {
+            <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+        }         
             </div>
         </mat-card>
     </div>  
@@ -211,6 +251,7 @@
                 <mat-card-title>{{accessedVSOutStandingAmountByGenderChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
+                @if (accessedVSOutStandingAmountByGender && accessedVSOutStandingAmountByGender.length > 0) {
                 <ngx-charts-bar-vertical-2d
                     [scheme]="chartSColorScheme"
                     [results]="accessedVSOutStandingAmountByGender"
@@ -223,7 +264,10 @@
                     [xAxisLabel]="accessedVSOutStandingAmountByGenderXAxisLabel"
                     [yAxisLabel]="accessedVSOutStandingAmountByGenderYAxisLabel"
                     (select)="onSelect($event)" 
-                />        
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }         
             </div>
         </mat-card>
     </div> 
@@ -235,6 +279,7 @@
                 <mat-card-title>{{loansDisbursedBySectorChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
+                @if (loansDisbursedBySector && loansDisbursedBySector.length > 0) {
                 <app-pie-chart 
                 [data]="loansDisbursedBySector" 
                 [showLegend]="loansDisbursedBySectorShowLegend" 
@@ -242,7 +287,10 @@
                 [showLabels]="loansDisbursedBySectorShowLabels" 
                 [explodeSlices]="loansDisbursedBySectorExplodeSlices" 
                 [doughnut]="loansDisbursedBySectorDoughnut"
-                />       
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }        
             </div>
         </mat-card>
     </div> 
@@ -259,7 +307,9 @@
                 [scheme]="chartSColorScheme"
                 [animations]="true"
                 />
-                }       
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }        
             </div>
         </mat-card>
     </div> 
@@ -270,7 +320,11 @@
                 <mat-card-title>Training By County</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
-                <img matListItemAvatar [src]="keMapImage" class="author-img">       
+                @if (countyData) {
+                <img matListItemAvatar [src]="keMapImage" class="author-img">
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }        
             </div>
         </mat-card>
     </div>
@@ -287,7 +341,9 @@
                 [scheme]="chartSColorScheme"
                 [animations]="true"
                 />
-                }       
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }      
             </div>
         </mat-card>
     </div> 
@@ -304,9 +360,18 @@
                 [scheme]="chartSColorScheme"
                 [animations]="true"
                 />
-                }       
+                } @else {
+                    <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+                }      
             </div>
         </mat-card>
     </div> 
-   
 </div>
+
+<!-- Template for no data placeholder -->
+<ng-template #noDataPlaceholder>
+    <div class="no-data-placeholder">
+      <p>No data available to display</p>
+    </div>
+  </ng-template>
+
