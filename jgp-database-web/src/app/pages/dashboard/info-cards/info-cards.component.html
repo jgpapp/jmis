@@ -253,11 +253,13 @@
                 <mat-card-title>{{topFourPartnersloansDisbursedChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
+                @if (topFourPartnersloansDisbursed && topFourPartnersloansDisbursed.length > 0) {
                 <ngx-charts-tree-map 
                 [results]="topFourPartnersloansDisbursed" 
                 [scheme]="chartSColorScheme"
                 [animations]="true"
-                />       
+                />
+                }       
             </div>
         </mat-card>
     </div> 
@@ -279,11 +281,13 @@
                 <mat-card-title>{{topFourCountiesBusinessesTrainedChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
+                @if (topFourCountiesBusinessesTrained && topFourCountiesBusinessesTrained.length > 0) {
                 <ngx-charts-tree-map 
                 [results]="topFourCountiesBusinessesTrained" 
                 [scheme]="chartSColorScheme"
                 [animations]="true"
-                />       
+                />
+                }       
             </div>
         </mat-card>
     </div> 
@@ -294,11 +298,13 @@
                 <mat-card-title>{{topFourCountiesloansDisbursedChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
+                @if (topFourCountiesloansDisbursed && topFourCountiesloansDisbursed.length > 0) {
                 <ngx-charts-tree-map 
                 [results]="topFourCountiesloansDisbursed" 
                 [scheme]="chartSColorScheme"
                 [animations]="true"
-                />       
+                />
+                }       
             </div>
         </mat-card>
     </div> 

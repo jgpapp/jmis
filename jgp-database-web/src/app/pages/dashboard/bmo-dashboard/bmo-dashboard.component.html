@@ -118,11 +118,13 @@
                     <mat-card-title>{{topFourCountiesBusinessesTrainedChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
+                    @if (topFourCountiesBusinessesTrained && topFourCountiesBusinessesTrained.length > 0) {
                     <ngx-charts-tree-map
                     [results]="topFourCountiesBusinessesTrained" 
                     [scheme]="chartSColorScheme"
                     [animations]="true"
-                    />       
+                    />
+                    }       
                 </div>
             </mat-card>
         </div> 
