@@ -46,10 +46,12 @@
                 <mat-card-title>Pie Grid Chart</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
+                @if (single && single.length > 0) {
                 <ngx-charts-tree-map
                     [scheme]="colorScheme"
                     [results]="single"
-                    (select)="onSelect($event)" />       
+                    (select)="onSelect($event)" /> 
+                }      
             </div>
         </mat-card>
     </div>    

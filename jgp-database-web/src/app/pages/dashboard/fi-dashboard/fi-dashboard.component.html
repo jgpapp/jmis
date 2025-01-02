@@ -164,11 +164,13 @@
                     <mat-card-title>{{topFourCountiesloansDisbursedChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
+                    @if (topFourCountiesloansDisbursed && topFourCountiesloansDisbursed.length > 0) {
                     <ngx-charts-tree-map 
                     [results]="topFourCountiesloansDisbursed" 
                     [scheme]="chartSColorScheme"
                     [animations]="true"
-                    />       
+                    />
+                    }       
                 </div>
             </mat-card>
         </div> 
