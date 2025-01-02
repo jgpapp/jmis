@@ -36,6 +36,7 @@
                     <mat-card-title>{{TANeedsByGenderChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
+                    @if (TANeedsByGender && TANeedsByGender.length > 0) {
                     <ngx-charts-bar-vertical-2d
                         [scheme]="chartSColorScheme"
                         [results]="TANeedsByGender"
@@ -47,8 +48,11 @@
                         [showYAxisLabel]="TANeedsByGenderShowYAxisLabel"
                         [xAxisLabel]="TANeedsByGenderXAxisLabel"
                         [yAxisLabel]="TANeedsByGenderYAxisLabel"
-                        (select)="onSelect($event)">
-                    </ngx-charts-bar-vertical-2d>        
+                        (select)="onSelect($event)"
+                        />
+                    } @else {
+                        <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+                    }        
                 </div>
             </mat-card>
         </div>   
@@ -59,6 +63,7 @@
                     <mat-card-title>{{taTrainedBySectorChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
+                    @if (taTrainedBySector && taTrainedBySector.length > 0) {
                     <ngx-charts-bar-horizontal
                         [scheme]="chartSColorScheme"
                         [results]="taTrainedBySector"
@@ -71,7 +76,10 @@
                         [xAxisLabel]="taTrainedBySectorYAxisLabel"
                         [yAxisLabel]="taTrainedBySectorXAxisLabel"
                         (select)="onSelect($event)"
-                    />         
+                    />
+                } @else {
+                    <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+                }          
                 </div>
             </mat-card>
         </div>  
@@ -82,6 +90,7 @@
                     <mat-card-title>{{taTrainedBySegmentChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
+                    @if (taTrainedBySegment && taTrainedBySegment.length > 0) {
                     <app-pie-chart 
                 [data]="taTrainedBySegment" 
                 [showLegend]="taTrainedBySegmentShowLegend" 
@@ -89,7 +98,10 @@
                 [showLabels]="taTrainedBySegmentShowLabels" 
                 [explodeSlices]="taTrainedBySegmentExplodeSlices" 
                 [doughnut]="taTrainedBySegmentDoughnut" 
-                />        
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }         
                 </div>
             </mat-card>
         </div> 
@@ -100,6 +112,7 @@
                     <mat-card-title>{{businessesTainedByGenderChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
+                    @if (businessesTainedByGender && businessesTainedByGender.length > 0) {
                     <app-pie-chart 
                     [data]="businessesTainedByGender" 
                     [showLegend]="businessesTainedByGenderShowLegend" 
@@ -107,7 +120,10 @@
                     [showLabels]="businessesTainedByGenderShowLabels" 
                     [explodeSlices]="businessesTainedByGenderExplodeSlices" 
                     [doughnut]="businessesTainedByGenderDoughnut"
-                    />       
+                    />
+                } @else {
+                    <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+                }        
                 </div>
             </mat-card>
         </div> 
@@ -124,7 +140,9 @@
                     [scheme]="chartSColorScheme"
                     [animations]="true"
                     />
-                    }       
+                } @else {
+                    <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+                }        
                 </div>
             </mat-card>
         </div> 
@@ -133,3 +151,10 @@
     
 
 </div>
+
+<!-- Template for no data placeholder -->
+<ng-template #noDataPlaceholder>
+    <div class="no-data-placeholder">
+      <p>No data available to display</p>
+    </div>
+  </ng-template>
