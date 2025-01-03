@@ -50,17 +50,9 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - /usr/share/nginx/html
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./certbot/www:/var/www/certbot
-      - ./certbot/conf:/etc/letsencrypt
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    volumes:
-      - ./certbot/www:/var/www/certbot
-      - ./certbot/conf:/etc/letsencrypt
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do sleep 6h & wait $${!}; certbot renew; done;'"
+      - ./etc/letsencrypt:/etc/letsencrypt:ro  # Mount Let's Encrypt certificates from host
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro  # Mount Nginx global configuration
+      - ./nginx/nginx-log:/var/log/nginx  # Persist Nginx logs on the host
 networks:
   jgp-app-network:
     driver: bridge
