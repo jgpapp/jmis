@@ -29,7 +29,7 @@ RUN mkdir -p /var/cache/nginx/client_temp
 RUN chown -R nginx:nginx /var/cache/nginx
 
 # Expose port 80
-EXPOSE 80
+EXPOSE 80 443
 
 # Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
