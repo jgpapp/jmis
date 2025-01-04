@@ -12,13 +12,13 @@ public class HttpToHttpsRedirectConfig {
 
     @Value("${server.port:8082}")
     private Integer springHttpPort;
-    @Value("${spring.https.port:8443}")
+    @Value("${spring.https.port:8082}")
     private Integer springHttpsPort;
 
-    @Bean
+   /* @Bean
     public WebServerFactoryCustomizer<TomcatServletWebServerFactory> containerCustomizer() {
         return factory -> factory.addAdditionalTomcatConnectors(httpToHttpsRedirectConnector());
-    }
+    }*/
 
     private Connector httpToHttpsRedirectConnector() {
         Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
