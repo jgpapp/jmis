@@ -29,10 +29,18 @@ services:
       - POSTGRESQL_USER=jgp_user
       - POSTGRESQL_PASSWORD=S3cretJmIs@#321
       - POSTGRESQL_DATABASE=jgp_db
+      - SPRING_PROFILES_ACTIVE=production
+      - KEY_STORE_PATH=/etc/letsencrypt/live/jmis.dt-global.com/keystore.p12
+      - KEY_STORE_PASS_PHRASE=jGP@#dataBase
+      - KEY_STORE_ALIAS=tomcat
+      - SPRING_HTTPS_PORT=8443
     depends_on:
       - postgres_jgp_db
     ports:
       - "8082:8082"
+      - "8443:8443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro  # Mount Let's Encrypt certificates from host
   jgp_app_ui:
     container_name: jgp_app_ui
     build:
@@ -44,14 +52,12 @@ services:
     networks:
       - jgp-app-network
     depends_on:
-      - certbot
       - jgp_app
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./etc/letsencrypt:/etc/letsencrypt:ro  # Mount Let's Encrypt certificates from host
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro  # Mount Nginx global configuration
+      - /etc/letsencrypt:/etc/letsencrypt:ro  # Mount Let's Encrypt certificates from host
       - ./nginx/nginx-log:/var/log/nginx  # Persist Nginx logs on the host
 networks:
   jgp-app-network:
