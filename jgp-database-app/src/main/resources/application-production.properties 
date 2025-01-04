@@ -3,21 +3,15 @@ spring.application.name=jgp-app
 ################################
 ## SERVER PROPERTIES
 ################################
+#server.port=8082
 server.servlet.context-path=/jgp-app
-spring.profiles.active=production
-spring.https.port=${SPRING_HTTPS_PORT:8082}
-server.port=${SPRING_HTTPS_PORT:8082}
-server.ssl.key-store-type=PKCS12
-server.ssl.key-store=${KEY_STORE_PATH:/etc/letsencrypt/live/yourdomain.com/keystore.p12}
-server.ssl.key-store-password=${KEY_STORE_PASS_PHRASE:tomcat123}
-server.ssl.key-alias=${KEY_STORE_ALIAS:tomcat}
 
 ##################################
 ## DATA SOURCE
 ##################################
 spring.datasource.url= jdbc:postgresql://${POSTGRESQL_HOST:localhost}:${POSTGRESQL_PORT:5433}/${POSTGRESQL_DATABASE:jgp_app_db}
 spring.datasource.username=${POSTGRESQL_USER:root}
-spring.datasource.password=${POSTGRESQL_PASSWORD:postgres}
+spring.datasource.password=${POSTGRESQL_PASSWOHRD:postgres}
 
 
 ######################################
@@ -45,4 +39,14 @@ jgp.content.regex-whitelist=${JGP_CONTENT_REGEX_WHITELIST:.*\\.pdf$,.*\\.doc,.*\
 jgp.content.mime-whitelist-enabled=${JGP_CONTENT_MIME_WHITELIST_ENABLED:true}
 jgp.content.mime-whitelist=${JGP_CONTENT_MIME_WHITELIST:application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,image/jpeg,image/png}
 
+
+##########################################
+## SSL Configuration
+##########################################
+spring.https.port=${SPRING_HTTPS_PORT:8082}
+server.port=${SPRING_HTTPS_PORT:8082}
+server.ssl.key-store-type=PKCS12
+server.ssl.key-store=${KEY_STORE_PATH:/etc/letsencrypt/live/yourdomain.com/keystore.p12}
+server.ssl.key-store-password=${KEY_STORE_PASS_PHRASE:tomcat123}
+server.ssl.key-alias=${KEY_STORE_ALIAS:tomcat}
 

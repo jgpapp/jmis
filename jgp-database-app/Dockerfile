@@ -4,5 +4,5 @@ WORKDIR /home/jgp
 RUN ./gradlew clean -x test bootJar
 RUN mv /home/jgp/build/libs/*.jar /home/jgp-1.0.0.jar && rm -rf /home/jgp
 ENTRYPOINT ["java"]
-CMD ["-jar", "/home/jgp-1.0.0.jar"]
-EXPOSE 8082
+CMD ["-jar", "-Dspring.profiles.active=production", "/home/jgp-1.0.0.jar"]
+EXPOSE 8082 8443
