@@ -11,7 +11,7 @@ server.servlet.context-path=/jgp-app
 ##################################
 spring.datasource.url= jdbc:postgresql://${POSTGRESQL_HOST:localhost}:${POSTGRESQL_PORT:5433}/${POSTGRESQL_DATABASE:jgp_app_db}
 spring.datasource.username=${POSTGRESQL_USER:root}
-spring.datasource.password=${POSTGRESQL_PASSWORD:postgres}
+spring.datasource.password=${POSTGRESQL_PASSWOHRD:postgres}
 
 
 ######################################
