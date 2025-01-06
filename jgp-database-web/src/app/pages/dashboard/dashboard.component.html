@@ -60,7 +60,7 @@
                     <mat-card-title>Loans Disbursed (KES)</mat-card-title>
                     <button mat-raised-button color="primary" (click)="gs.exportToExcel(accessedLoanDataDataSource, displayedColumns, 'ACCESSED_LOANS')"><mat-icon>download</mat-icon> Excel</button>
                 </mat-card-header>
-                <div class="p-2">
+                <div class="p-2 table-container">
                     <mat-table #table [dataSource]="accessedLoanDataDataSource" class="mat-elevation-z8">
                         <ng-container matColumnDef="year">
                             <mat-header-cell *matHeaderCellDef> Year </mat-header-cell>
@@ -98,7 +98,7 @@
                     <mat-card-title>Businesses Trained By Partner</mat-card-title>
                     <button mat-raised-button color="primary" (click)="gs.exportToExcel(trainedBusinessesCountDataDataSource, displayedColumns, 'BUSINESSES_TRAINED')"><mat-icon>download</mat-icon> Excel</button>
                 </mat-card-header>
-                <div class="p-2">
+                <div class="p-2 table-container">
                     <mat-table #table [dataSource]="trainedBusinessesCountDataDataSource" class="mat-elevation-z8">
                         <ng-container matColumnDef="year">
                             <mat-header-cell *matHeaderCellDef> Year </mat-header-cell>
@@ -136,7 +136,7 @@
                     <mat-card-title>Number of Loans by Partner</mat-card-title>
                     <button mat-raised-button color="primary" (click)="gs.exportToExcel(accessedLoanCountDataDataSource, displayedColumns, 'ACCESSED_LOANS_COUNT')"><mat-icon>download</mat-icon> Excel</button>
                 </mat-card-header>
-                <div class="p-2">
+                <div class="p-2 table-container">
                     <mat-table #table [dataSource]="accessedLoanCountDataDataSource" class="mat-elevation-z8">
                         <ng-container matColumnDef="year">
                             <mat-header-cell *matHeaderCellDef> Year </mat-header-cell>
