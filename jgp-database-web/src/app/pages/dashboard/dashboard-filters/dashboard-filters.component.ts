@@ -11,6 +11,7 @@ import { PartnerService } from '@services/data-management/partners.service';
 import { Subject, takeUntil } from 'rxjs';
 import { GlobalService } from '@services/shared/global.service';
 import { DashboardService } from '@services/dashboard/dashboard.service';
+import { AuthService } from '@services/users/auth.service';
 
 @Component({
   selector: 'app-dashboard-filters',
@@ -46,7 +47,8 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit, OnChanges{
     public fb: FormBuilder, 
     private partnerService: PartnerService,
     private gs: GlobalService,
-    private dashBoardService: DashboardService){
+    private dashBoardService: DashboardService,
+  public authService: AuthService){
 
     this.dashFilterForm = this.fb.group({
       selectedPartnerId: [null],
