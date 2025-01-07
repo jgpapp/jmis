@@ -34,6 +34,7 @@ services:
       - KEY_STORE_PASS_PHRASE=jGP@#dataBase
       - KEY_STORE_ALIAS=tomcat
       - SPRING_HTTPS_PORT=8082
+      - JGP_DASHBOARD_DEFAULT_VIEW_PERIOD_IN_MONTHS=6
     depends_on:
       - postgres_jgp_db
     ports:
