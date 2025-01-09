@@ -9,7 +9,7 @@ import com.jgp.util.CommonUtil;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.Month;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -50,6 +51,9 @@ public class DashboardServiceImpl implements DashboardService {
     private static final String LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and l.partner_id = :partnerId ";
     private static final String BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and bpd.partner_id = :partnerId ";
     private static final String WHERE_CLAUSE_BY_COUNTY_CODE_PARAM = "and cl.location_county_code = :countyCode";
+
+    @Value("${jgp.dashboard.default.view.period.in.months}")
+    private Integer jgpDashboardDefaultViewPeriodInMonths;
 
     @Override
     public HighLevelSummaryDto getHighLevelSummary(DashboardSearchCriteria dashboardSearchCriteria) {
@@ -853,7 +857,7 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
 
 private Pair<LocalDate, LocalDate> getDefaultQueryDates(){
         final var dateToday = LocalDate.now();
-        return new ImmutablePair<>(LocalDate.of(dateToday.getYear(), Month.JANUARY, 1), dateToday);
+        return new ImmutablePair<>(LocalDate.now(ZoneId.systemDefault()).minusMonths(jgpDashboardDefaultViewPeriodInMonths), dateToday);
 }
 
 }

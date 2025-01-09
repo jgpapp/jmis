@@ -105,20 +105,22 @@ export class DashboardService {
 
 
     getDashBoardQueryParams(dashBoardFilters: any): string {
-      const currentDate = new Date();
-      let dateFrom = new Date(`${currentDate.getFullYear()}-01-01`);
-      let dateTo = new Date(`${currentDate.getFullYear()}-12-31`);
-      let queryParam = `from-date=${dateFrom.toISOString().split('T')[0]}&to-date=${dateTo.toISOString().split('T')[0]}`
+      //const currentDate = new Date();
+      //let dateFrom = new Date(`${currentDate.getFullYear()}-01-01`);
+      //let dateTo = new Date(`${currentDate.getFullYear()}-12-31`);
+      //let queryParam = `from-date=${dateFrom.toISOString().split('T')[0]}&to-date=${dateTo.toISOString().split('T')[0]}`
+      let queryParam = ``
       if(!dashBoardFilters){
         return queryParam;
       }
-      
+
       if(dashBoardFilters.selectedDateFrom && dashBoardFilters.selectedDateTo) {
         const currentDate = new Date();
-        dateFrom = dashBoardFilters.selectedDateFrom;
-        dateTo = dashBoardFilters.selectedDateTo;
+        let dateFrom = dashBoardFilters.selectedDateFrom;
+        let dateTo = dashBoardFilters.selectedDateTo;
+        queryParam = `from-date=${dateFrom.toISOString().split('T')[0]}&to-date=${dateTo.toISOString().split('T')[0]}`
       }
-      queryParam = `from-date=${dateFrom.toISOString().split('T')[0]}&to-date=${dateTo.toISOString().split('T')[0]}`
+      
       if(dashBoardFilters.selectedPartnerId){
         queryParam = `${queryParam}&partner-id=${dashBoardFilters.selectedPartnerId}`
       }
