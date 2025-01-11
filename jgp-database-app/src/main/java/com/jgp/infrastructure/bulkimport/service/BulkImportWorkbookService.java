@@ -16,9 +16,9 @@ import java.util.Collection;
 
 public interface BulkImportWorkbookService {
 
-    Long importWorkbook(String entityType, MultipartFile fileDetail);
+    Long importWorkbook(String entityType, MultipartFile fileDetail, String importProgressUUID);
 
-    ImportProgress getImportProgress(@NotNull Long importDocumentId);
+    ImportProgress getImportProgress(@NotNull String importDocumentId);
 
     Collection<ImportData> getImports(GlobalEntityType type);
 

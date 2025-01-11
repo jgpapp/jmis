@@ -51,16 +51,16 @@ public class LoanController {
         return new ResponseEntity<>(this.loanService.getLoans(new LoanSearchCriteria(partnerId, participantId, status, quality, approvedByPartner, null, null), sortedByDateCreated), HttpStatus.OK);
     }
 
-    @PostMapping("upload-template")
-    public ResponseEntity<ApiResponseDto> uploadLoansData(@RequestParam("excelFile") MultipartFile excelFile) {
+    @PostMapping("upload-template/{documentProgressId}")
+    public ResponseEntity<ApiResponseDto> uploadLoansData(@RequestParam("excelFile") MultipartFile excelFile, @PathVariable("documentProgressId") String documentProgressId) {
         if (excelFile.isEmpty()) {
             return new ResponseEntity<>(new ApiResponseDto(false, CommonUtil.NO_FILE_TO_UPLOAD), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(new ApiResponseDto(true, this.bulkImportWorkbookService.importWorkbook(GlobalEntityType.LOAN_IMPORT_TEMPLATE.name(), excelFile)+""), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponseDto(true, this.bulkImportWorkbookService.importWorkbook(GlobalEntityType.LOAN_IMPORT_TEMPLATE.name(), excelFile, documentProgressId)+""), HttpStatus.CREATED);
     }
 
     @GetMapping("import-progress/{documentId}")
-    public ResponseEntity<ImportProgress> getProgress(@PathVariable("documentId") Long documentId) {
+    public ResponseEntity<ImportProgress> getProgress(@PathVariable("documentId") String documentId) {
         ImportProgress progress = this.bulkImportWorkbookService.getImportProgress(documentId);
         if (progress == null) {
             return ResponseEntity.notFound().build();

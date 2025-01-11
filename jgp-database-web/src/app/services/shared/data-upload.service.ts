@@ -2,8 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { GlobalService } from '../shared/global.service';
 import { Observable, of } from 'rxjs';
-import * as SockJS from 'sockjs-client';
-import { Client, Message, Stomp } from '@stomp/stompjs'; // Correct import
+import { Client} from '@stomp/stompjs'; 
 
 
 @Injectable({
@@ -13,23 +12,19 @@ export class DataUploadService {
 
   private webSocketClient: Client;
     constructor(private httpClient: HttpClient, private gs: GlobalService) { 
-      this.initializeStompClient();
+      
     }
 
 
-    uploadDataTemplate(file: File, templateName: string): Observable<any> {
+    uploadDataTemplate(file: File, templateName: string, uploadProgressID: string): Observable<any> {
         const formData = new FormData();
         formData.append('excelFile', file, file.name);
         if(templateName.toUpperCase().includes('TA_IMPORT_TEMPLATE')){
-            return this.httpClient.post(`${this.gs.BASE_API_URL}/bmos/upload-template`, formData);
+            return this.httpClient.post(`${this.gs.BASE_API_URL}/bmos/upload-template/${uploadProgressID}`, formData);
         }else if(templateName.toUpperCase().includes('LOAN_IMPORT_TEMPLATE')){
-            return this.httpClient.post(`${this.gs.BASE_API_URL}/loans/upload-template`, formData);
+            return this.httpClient.post(`${this.gs.BASE_API_URL}/loans/upload-template/${uploadProgressID}`, formData);
         }
         return of(null);
-      }
-
-      trackTemplateUploadProgress(entityType: string, importDocumentId: any): Observable<any> {
-        return this.httpClient.get<{ processed: number; total: number }>(`${this.gs.BASE_API_URL}/${entityType}/import-progress/${importDocumentId}`);
       }
 
       downloadDataTemplate(templateName: string): Observable<any> {
@@ -113,7 +108,7 @@ export class DataUploadService {
       brokerURL: this.gs.BASE_WS_URL, // WebSocket URL for the backend
       connectHeaders: {},
       debug: (str) => {
-        console.log(str); // Debugging logs for STOMP
+        //console.log(str); // Debugging logs for STOMP. Enable in case of issues
       },
       onConnect: () => {
         console.log('Connected to WebSocket');
@@ -128,7 +123,7 @@ export class DataUploadService {
   
 
    // Method to subscribe to progress updates
-   subscribeToUploadProgress(documentId: number): Observable<string> {
+   subscribeToUploadProgress(documentId: string): Observable<string> {
     return new Observable(observer => {
       // Wait for the connection to be established
       if (this.webSocketClient.connected) {

@@ -11,9 +11,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,12 +58,5 @@ public class BulkImportController {
     @GetMapping("downloadOutputTemplate")
     public ResponseEntity<?> getOutputTemplate(@RequestParam("importDocumentId") final String importDocumentId) {
         return bulkImportWorkbookService.getOutputTemplate(importDocumentId);
-    }
-
-    @MessageMapping("/uploadProgress/{uploadId}")
-    @SendTo("/topic/progress/{uploadId}")
-    public String uploadProgress(String progress, @DestinationVariable String uploadId) {
-        // Sends progress update for a specific upload ID
-        return progress;
     }
 }

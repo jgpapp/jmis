@@ -11,10 +11,10 @@ import * as XLSX from 'xlsx';
 export class GlobalService {
   //API_HOST = '68.183.21.53';
   //API_HOST = '20.242.125.65';
-  //API_HOST = 'jmis.dt-global.com';
-  HTTP_SCHEMA = 'http';
-  WS_SCHEMA = 'ws';
-  API_HOST = 'localhost';
+  API_HOST = 'jmis.dt-global.com';
+  HTTP_SCHEMA = 'https';
+  WS_SCHEMA = 'wss';
+  //API_HOST = 'localhost';
   API_PORT = '8082';
   BASE_API_URL: string = `${this.HTTP_SCHEMA}://${this.API_HOST}:${this.API_PORT}/jgp-app/api/v1`;  
   BASE_WS_URL: string = `${this.WS_SCHEMA}://${this.API_HOST}:${this.API_PORT}/jgp-app/ws`;

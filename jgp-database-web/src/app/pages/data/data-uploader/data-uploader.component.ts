@@ -14,12 +14,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { GlobalService } from '@services/shared/global.service';
 import { NoPermissionComponent } from '../../errors/no-permission/no-permission.component';
 import { AuthService } from '@services/users/auth.service';
-import { interval, Subject, Subscription, switchMap, takeUntil, takeWhile } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { Client, Message, Stomp } from '@stomp/stompjs'; // Correct import
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-data-uploader',
@@ -54,7 +54,6 @@ export class DataUploaderComponent implements OnDestroy {
   partnerType: string | undefined = 'NONE';
   public docsFilterForm: FormGroup;
   progress: { processed: number; total: number; finished: number } | null = null;
-  private webSocket: WebSocket;
   private subscription: Subscription | null = null;
 
   public displayedColumns = ['name', 'importTime', 'endTime', 'completed', 'totalRecords', 'successCount', 'failureCount', 'actions'];
@@ -77,6 +76,7 @@ export class DataUploaderComponent implements OnDestroy {
       this.docsFilterForm = this.fb.group({
         selectedEntityType: [null]
         });
+        this.dataUploadService.initializeStompClient();
   }
 
 
@@ -99,7 +99,6 @@ export class DataUploaderComponent implements OnDestroy {
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
-          console.log(response)
           this.progress = JSON.parse(response);
         },
         error: (error) => { }
@@ -176,43 +175,18 @@ export class DataUploaderComponent implements OnDestroy {
     }
 
     if('' !== legalFormType){
-    this.dataUploadService.uploadDataTemplate(this.template, legalFormType)
+      let uploadProgressID = uuidv4();
+      this.subscribeToUploadProgress(uploadProgressID);
+    this.dataUploadService.uploadDataTemplate(this.template, legalFormType, uploadProgressID)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
-          this.gs.openSnackBar('Template successfully uploaded with Id: '+response.message, "Dismiss");
           this.importDocumentId = response.message;
           this.entityType = legalFormType;
-          this.subscribeToUploadProgress(this.importDocumentId);
           this.getAvailableDocuments();
         }
       });
     }
-  }
-
-  trackProgress(entityType: string) {
-    if (!this.importDocumentId) return;
-
-    interval(1000)
-      .pipe(
-        switchMap(() =>
-          this.dataUploadService.trackTemplateUploadProgress(entityType, this.importDocumentId)
-        ), takeWhile((progress) =>  {
-          console.log(progress)
-          return progress.finished < 2
-        })
-      )
-      .subscribe({
-        next: (progress) => {
-          this.progress = progress;
-          if(progress.finished === 2){
-              this.getAvailableDocuments();
-          }
-          
-        },
-        error: (err) => console.error(err),
-      });
-
   }
 
   

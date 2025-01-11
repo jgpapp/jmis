@@ -43,7 +43,7 @@ public class BulkImportEventListener {
     //@Async
    public void handleBulkImportEvent(BulkImportEvent bulkImportEvent){
         try {
-            this.importProgressService.sendProgressUpdate(bulkImportEvent.importId());
+            this.importProgressService.sendProgressUpdate(bulkImportEvent.importProgressUUID());
         } catch (JsonProcessingException | ExecutionException e) {
             log.error("Problem Updating Progress: {}", e.getMessage());
         }
