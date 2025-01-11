@@ -50,7 +50,6 @@ import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -68,7 +67,6 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     private final ImportDocumentMapper importDocumentMapper;
     private final ImportProgressService importProgressService;
     private static final String SELECT_LITERAL = "select ";
-    private final ConcurrentHashMap<Long, ImportProgress> progressMap = new ConcurrentHashMap<>();
 
 
 
@@ -137,9 +135,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                 ImportHandlerUtils.getNumberOfRows(workbook.getSheetAt(0), primaryColumn), this.securityContext.getAuthenticatedUserIfPresent().getPartner());
         this.importDocumentRepository.saveAndFlush(importDocument);
 
-        var importProgress = new ImportProgress();
-        progressMap.put(importDocument.getId(), importProgress);
-        BulkImportEvent event = new BulkImportEvent(workbook, entityType.name(), importDocument.getId(), importProgress);
+        BulkImportEvent event = new BulkImportEvent(workbook, entityType.name(), importDocument.getId());
         applicationContext.publishEvent(event);
         log.info("Return import ID := {}", LocalDateTime.now(ZoneId.systemDefault()));
         return importDocument.getId();

@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,6 +55,7 @@ public class LoanImportHandler implements ImportHandler {
     private Workbook workbook;
     private List<String> statuses;
     private Map<Row, String> rowErrorMap;
+    private Long documentImportId;
 
     @Override
     public Count process(BulkImportEvent bulkImportEvent) {
@@ -61,8 +63,9 @@ public class LoanImportHandler implements ImportHandler {
         loanDataList = new ArrayList<>();
         statuses = new ArrayList<>();
         this.rowErrorMap = new HashMap<>();
+        this.documentImportId = bulkImportEvent.importId();
         readExcelFile();
-        return importEntity(bulkImportEvent.importId());
+        return importEntity();
     }
 
     @Override
@@ -90,6 +93,7 @@ public class LoanImportHandler implements ImportHandler {
     public void readExcelFile() {
         Sheet loanSheet = workbook.getSheet(TemplatePopulateImportConstants.LOAN_SHEET_NAME);
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(loanSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
+        updateImportProgress(this.documentImportId, true, noOfEntries);
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
             Row row;
             row = loanSheet.getRow(rowIndex);
@@ -181,14 +185,13 @@ public class LoanImportHandler implements ImportHandler {
                 .locationCountyCode(locationCountyCode.isPresent() ? locationCountyCode.get().getCountyCode() : "999").build();
     }
 
-    public Count importEntity(Long importId) {
+    public Count importEntity() {
         Sheet groupSheet = workbook.getSheet(TemplatePopulateImportConstants.LOAN_SHEET_NAME);
         int successCount = 0;
         int errorCount = 0;
         int progressLevel = 0;
         String errorMessage = "";
         var loanDataSize = loanDataList.size();
-        updateImportProgress(importId, true, loanDataSize);
         for (int i = 0; i < loanDataSize; i++) {
             Row row = groupSheet.getRow(loanDataList.get(i).getRowIndex());
             Cell errorReportCell = row.createCell(BMOConstants.FAILURE_COL);
@@ -210,13 +213,16 @@ public class LoanImportHandler implements ImportHandler {
                 successCount++;
             } catch (RuntimeException ex) {
                 errorCount++;
-                log.error("Problem occurred in importEntity function", ex);
+                log.error("Problem occurred When Uploading Lending Data: {}", ex.getMessage());
                 errorMessage = ImportHandlerUtils.getErrorMessage(ex);
                 writeGroupErrorMessage(errorMessage, progressLevel, statusCell, errorReportCell);
+            }finally {
+                updateImportProgress(this.documentImportId, false, 0);
             }
-            updateImportProgress(importId, false, 0);
         }
         setReportHeaders(groupSheet);
+        log.info("Finished Import Finished := {}", LocalDateTime.now(ZoneId.systemDefault()));
+        markImportAsFinished(this.documentImportId);
         return Count.instance(successCount, errorCount);
     }
 

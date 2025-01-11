@@ -1,5 +1,6 @@
 package com.jgp.infrastructure.bulkimport.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jgp.infrastructure.bulkimport.data.ImportProgress;
 
 import java.util.concurrent.ExecutionException;
@@ -13,4 +14,6 @@ public interface ImportProgressService {
     void markImportAsFinished(Long importId) throws  ExecutionException;
 
     ImportProgress getImportProgress(Long importId) throws  ExecutionException;
+
+    void sendProgressUpdate(Long importId) throws ExecutionException, JsonProcessingException;
 }

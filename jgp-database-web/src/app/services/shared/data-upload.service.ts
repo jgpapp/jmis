@@ -2,13 +2,19 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { GlobalService } from '../shared/global.service';
 import { Observable, of } from 'rxjs';
+import * as SockJS from 'sockjs-client';
+import { Client, Message, Stomp } from '@stomp/stompjs'; // Correct import
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataUploadService {
 
-    constructor(private httpClient: HttpClient, private gs: GlobalService) { }
+  private webSocketClient: Client;
+    constructor(private httpClient: HttpClient, private gs: GlobalService) { 
+      this.initializeStompClient();
+    }
 
 
     uploadDataTemplate(file: File, templateName: string): Observable<any> {
@@ -99,5 +105,43 @@ export class DataUploadService {
     .set('entityType', entityType)
     .set('importDocumentId', importDocumentId);
     return this.httpClient.get(`${this.gs.BASE_API_URL}/imports`, { params });
+  }
+
+  initializeStompClient(): void {
+    // Initialize the STOMP client
+    this.webSocketClient = new Client({
+      brokerURL: this.gs.BASE_WS_URL, // WebSocket URL for the backend
+      connectHeaders: {},
+      debug: (str) => {
+        console.log(str); // Debugging logs for STOMP
+      },
+      onConnect: () => {
+        console.log('Connected to WebSocket');
+      },
+      onDisconnect: () => {
+        console.log('Disconnected from WebSocket');
+      }
+    });
+
+    this.webSocketClient.activate();
+  }
+  
+
+   // Method to subscribe to progress updates
+   subscribeToUploadProgress(documentId: number): Observable<string> {
+    return new Observable(observer => {
+      // Wait for the connection to be established
+      if (this.webSocketClient.connected) {
+        this.webSocketClient.subscribe(`/topic/progress/${documentId}`, (message) => {
+          observer.next(message.body); // Send progress updates to observers
+        });
+      }
+    });
+  }
+
+  disconnectWebSocket(): void {
+    if(this.webSocketClient.connected){
+      this.webSocketClient.deactivate();
+    }
   }
 }

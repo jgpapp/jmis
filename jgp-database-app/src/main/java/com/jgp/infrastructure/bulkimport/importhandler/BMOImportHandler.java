@@ -1,8 +1,10 @@
 package com.jgp.infrastructure.bulkimport.importhandler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jgp.authentication.service.UserService;
 import com.jgp.bmo.domain.BMOParticipantData;
 import com.jgp.bmo.service.BMOClientDataService;
+import com.jgp.infrastructure.bulkimport.data.ImportProgress;
 import com.jgp.infrastructure.bulkimport.exception.InvalidDataException;
 import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
 import com.jgp.participant.domain.Participant;
@@ -217,11 +219,18 @@ public class BMOImportHandler implements ImportHandler {
                 successCount++;
             } catch (RuntimeException ex) {
                 errorCount++;
-                //log.error("Problem occurred in importEntity function", ex);
+                log.error("Problem occurred When Uploading TA: {}", ex.getMessage());
                 errorMessage = ImportHandlerUtils.getErrorMessage(ex);
                 writeGroupErrorMessage(errorMessage, progressLevel, statusCell, errorReportCell);
+            }finally {
+                updateImportProgress(this.documentImportId, false, 0);
+                try {
+                    this.importProgressService.sendProgressUpdate(this.documentImportId);
+                } catch (JsonProcessingException | ExecutionException e) {
+                    log.error("Problem Updating Progress: {}", e.getMessage());
+                }
+
             }
-            updateImportProgress(this.documentImportId, false, 0);
         }
         setReportHeaders(groupSheet);
         log.info("Finished Import Finished := {}", LocalDateTime.now(ZoneId.systemDefault()));

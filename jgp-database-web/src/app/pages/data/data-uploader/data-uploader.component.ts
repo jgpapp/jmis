@@ -19,6 +19,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { Client, Message, Stomp } from '@stomp/stompjs'; // Correct import
 
 @Component({
   selector: 'app-data-uploader',
@@ -53,6 +54,7 @@ export class DataUploaderComponent implements OnDestroy {
   partnerType: string | undefined = 'NONE';
   public docsFilterForm: FormGroup;
   progress: { processed: number; total: number; finished: number } | null = null;
+  private webSocket: WebSocket;
   private subscription: Subscription | null = null;
 
   public displayedColumns = ['name', 'importTime', 'endTime', 'completed', 'totalRecords', 'successCount', 'failureCount', 'actions'];
@@ -62,7 +64,7 @@ export class DataUploaderComponent implements OnDestroy {
   totalItems = 0;
   entityType: any;
   documents: any[]
-  importDocumentId: any;
+  importDocumentId: any = 127;
 
   private unsubscribe$ = new Subject<void>();
   constructor(
@@ -90,6 +92,18 @@ export class DataUploaderComponent implements OnDestroy {
   ngOnInit() {
     this.partnerType = this.authService.currentUser()?.partnerType === '-' ? 'NONE' : this.authService.currentUser()?.partnerType;
     this.createBulkImportForm();
+  }
+
+  subscribeToUploadProgress(documentId: any): void {
+    this.dataUploadService.subscribeToUploadProgress(documentId)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          console.log(response)
+          this.progress = JSON.parse(response);
+        },
+        error: (error) => { }
+      });
   }
 
 
@@ -162,15 +176,14 @@ export class DataUploaderComponent implements OnDestroy {
     }
 
     if('' !== legalFormType){
-    this.dataUploadService
-      .uploadDataTemplate(this.template, legalFormType)
+    this.dataUploadService.uploadDataTemplate(this.template, legalFormType)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
           this.gs.openSnackBar('Template successfully uploaded with Id: '+response.message, "Dismiss");
           this.importDocumentId = response.message;
           this.entityType = legalFormType;
-          //this.trackProgress(entityType);
+          this.subscribeToUploadProgress(this.importDocumentId);
           this.getAvailableDocuments();
         }
       });
@@ -226,6 +239,7 @@ export class DataUploaderComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.dataUploadService.disconnectWebSocket()
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
