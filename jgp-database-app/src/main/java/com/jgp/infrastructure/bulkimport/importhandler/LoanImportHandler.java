@@ -80,14 +80,6 @@ public class LoanImportHandler implements ImportHandler {
         }
     }
 
-    @Override
-    public void markImportAsFinished(String importId) {
-        try {
-            importProgressService.markImportAsFinished(importId);
-        } catch (ExecutionException e) {
-            log.error("Error : {}", e.getMessage(), e);
-        }
-    }
 
     public void readExcelFile() {
         Sheet loanSheet = workbook.getSheet(TemplatePopulateImportConstants.LOAN_SHEET_NAME);
@@ -221,7 +213,6 @@ public class LoanImportHandler implements ImportHandler {
         }
         setReportHeaders(groupSheet);
         log.info("Finished Import Finished := {}", LocalDateTime.now(ZoneId.systemDefault()));
-        markImportAsFinished(this.documentImportProgressUUId);
         return Count.instance(successCount, errorCount);
     }
 

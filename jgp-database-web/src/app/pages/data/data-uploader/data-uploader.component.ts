@@ -63,7 +63,7 @@ export class DataUploaderComponent implements OnDestroy {
   totalItems = 0;
   entityType: any;
   documents: any[]
-  importDocumentId: any = 127;
+  importDocumentId: any;
 
   private unsubscribe$ = new Subject<void>();
   constructor(

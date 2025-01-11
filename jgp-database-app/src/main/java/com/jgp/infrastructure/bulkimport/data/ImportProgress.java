@@ -4,7 +4,6 @@ public class ImportProgress {
 
     private int processed;
     private int total;
-    private int finished;
 
     public ImportProgress() {
         this.total = 1;
@@ -24,13 +23,5 @@ public class ImportProgress {
 
     public synchronized void setTotal(int total) {
         this.total = total;
-    }
-
-    public synchronized int isFinished() {
-        return finished;
-    }
-
-    public synchronized void setProgressAsFinished(int end) {
-        this.finished = end;
     }
 }

@@ -11,8 +11,6 @@ public interface ImportProgressService {
 
     void incrementProcessedProgress(String importUUId) throws  ExecutionException;
 
-    void markImportAsFinished(String importUUId) throws  ExecutionException;
-
     ImportProgress getImportProgress(String importUUId) throws  ExecutionException;
 
     void sendProgressUpdate(String importUUId) throws ExecutionException, JsonProcessingException;

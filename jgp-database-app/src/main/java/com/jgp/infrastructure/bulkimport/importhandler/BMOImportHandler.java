@@ -82,15 +82,6 @@ public class BMOImportHandler implements ImportHandler {
         }
     }
 
-    @Override
-    public void markImportAsFinished(String importId) {
-        try {
-            importProgressService.markImportAsFinished(importId);
-        } catch (ExecutionException e) {
-            log.error("Error : {}", e.getMessage(), e);
-        }
-    }
-
 
     public void readExcelFile() {
         Sheet bmoSheet = workbook.getSheet(TemplatePopulateImportConstants.BMO_SHEET_NAME);
@@ -233,7 +224,6 @@ public class BMOImportHandler implements ImportHandler {
         }
         setReportHeaders(groupSheet);
         log.info("Finished Import Finished := {}", LocalDateTime.now(ZoneId.systemDefault()));
-        markImportAsFinished(this.documentImportProgressUUId);
         return Count.instance(successCount, errorCount);
     }
 

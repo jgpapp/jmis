@@ -8,6 +8,4 @@ public interface ImportHandler {
     Count process(BulkImportEvent bulkImportEvent);
 
     void updateImportProgress(String importId, boolean updateTotal, int total);
-
-    void markImportAsFinished(String importId);
 }

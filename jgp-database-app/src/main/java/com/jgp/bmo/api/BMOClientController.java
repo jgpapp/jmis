@@ -1,14 +1,11 @@
 package com.jgp.bmo.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jgp.bmo.dto.BMOClientDto;
 import com.jgp.bmo.dto.BMOParticipantSearchCriteria;
 import com.jgp.bmo.service.BMOClientDataService;
 import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
-import com.jgp.infrastructure.bulkimport.data.ImportProgress;
 import com.jgp.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
 import com.jgp.infrastructure.bulkimport.service.BulkImportWorkbookService;
-import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
 import com.jgp.shared.dto.ApiResponseDto;
 import com.jgp.util.CommonUtil;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,7 +35,6 @@ public class BMOClientController {
     private final BMOClientDataService bmoDataService;
     private final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService;
     private final BulkImportWorkbookService bulkImportWorkbookService;
-    private final ImportProgressService importProgressService;
 
     @GetMapping
     public ResponseEntity<List<BMOClientDto>> getAvailableBMODataRecords(@RequestParam(name = "partnerId", required = false) Long partnerId,
@@ -58,15 +53,6 @@ public class BMOClientController {
             return new ResponseEntity<>(new ApiResponseDto(false, CommonUtil.NO_FILE_TO_UPLOAD), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(new ApiResponseDto(true, this.bulkImportWorkbookService.importWorkbook(GlobalEntityType.TA_IMPORT_TEMPLATE.name(), excelFile, documentProgressId)+""), HttpStatus.CREATED);
-    }
-
-    @GetMapping("import-progress/{documentId}")
-    public ResponseEntity<ImportProgress> getProgress(@PathVariable("documentId") String documentId) {
-        ImportProgress progress = this.bulkImportWorkbookService.getImportProgress(documentId);
-        if (progress == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(progress);
     }
 
     @GetMapping("template/download")

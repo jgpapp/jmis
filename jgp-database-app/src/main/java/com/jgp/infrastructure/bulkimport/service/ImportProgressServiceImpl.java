@@ -45,12 +45,6 @@ public class ImportProgressServiceImpl implements ImportProgressService {
     }
 
     @Override
-    public void markImportAsFinished(String importUUId) throws ExecutionException {
-        var progress = this.getImportProgress(importUUId);
-        progress.setProgressAsFinished(1);
-    }
-
-    @Override
     public ImportProgress getImportProgress(String importUUId) throws ExecutionException {
         return requestCountsPerIdIdempotencyCache.get(importUUId);
     }
