@@ -30,7 +30,7 @@ public class ParticipantController {
                                                                  @RequestParam(name = "searchText", required = false) String searchText){
         final var sortedByDateCreated =
                 PageRequest.of(pageNumber, pageSize, Sort.by("dateCreated").descending());
-        return new ResponseEntity<>(this.participantService.availableClients(searchText, sortedByDateCreated), HttpStatus.OK);
+        return new ResponseEntity<>(this.participantService.availableParticipants(searchText, sortedByDateCreated), HttpStatus.OK);
     }
 
     @GetMapping("{participantId}")

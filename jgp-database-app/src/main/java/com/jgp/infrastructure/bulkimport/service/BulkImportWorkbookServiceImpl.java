@@ -4,7 +4,6 @@ package com.jgp.infrastructure.bulkimport.service;
 import com.jgp.authentication.service.PlatformSecurityContext;
 import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.bulkimport.data.ImportData;
-import com.jgp.infrastructure.bulkimport.data.ImportProgress;
 import com.jgp.infrastructure.bulkimport.domain.ImportDocument;
 import com.jgp.infrastructure.bulkimport.domain.ImportDocumentRepository;
 import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
@@ -50,8 +49,6 @@ import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 
 @Service
 @Slf4j
@@ -66,14 +63,12 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     private final ImportDocumentRepository importDocumentRepository;
     private final JdbcTemplate jdbcTemplate;
     private final ImportDocumentMapper importDocumentMapper;
-    private final ImportProgressService importProgressService;
     private static final String SELECT_LITERAL = "select ";
-    private final ConcurrentHashMap<Long, ImportProgress> progressMap = new ConcurrentHashMap<>();
 
 
 
     @Override
-    public Long importWorkbook(String entity, MultipartFile fileDetail) {
+    public Long importWorkbook(String entity, MultipartFile fileDetail, String importProgressUUID) {
         try {
             if (entity != null && fileDetail != null) {
 
@@ -93,7 +88,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                     throw new InvalidEntityTypeForDocumentManagementException("Unable to find requested resource");
 
                 }
-                return publishEvent(primaryColumn, fileDetail, bis, entityType, workbook);
+                return publishEvent(primaryColumn, fileDetail, bis, entityType, workbook, importProgressUUID);
             }
             throw new InvalidEntityTypeForDocumentManagementException("One or more of the given parameters not found");
         } catch (IOException e) {
@@ -103,27 +98,9 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
         }
     }
 
-    @Override
-    public ImportProgress getImportProgress(Long importDocumentId) {
-        ImportProgress progress = null;
-        try {
-            progress = importProgressService.getImportProgress(importDocumentId);
-            log.info("Progress On Query> {}", progress.getProcessed());
-
-            return progress;
-        } catch (ExecutionException e) {
-            log.error("Error : {}", e.getMessage(), e);
-        }finally {
-            if (Objects.nonNull(progress) && progress.getTotal() == progress.getProcessed()){
-                progress.setProgressAsFinished(2);
-            }
-        }
-        return new ImportProgress();
-
-    }
 
     private Long publishEvent(final Integer primaryColumn, final MultipartFile fileDetail,
-            final InputStream clonedInputStreamWorkbook, final GlobalEntityType entityType, final Workbook workbook) {
+            final InputStream clonedInputStreamWorkbook, final GlobalEntityType entityType, final Workbook workbook, String importProgressUUID) {
 
         final String fileName = fileDetail.getOriginalFilename();
 
@@ -137,9 +114,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                 ImportHandlerUtils.getNumberOfRows(workbook.getSheetAt(0), primaryColumn), this.securityContext.getAuthenticatedUserIfPresent().getPartner());
         this.importDocumentRepository.saveAndFlush(importDocument);
 
-        var importProgress = new ImportProgress();
-        progressMap.put(importDocument.getId(), importProgress);
-        BulkImportEvent event = new BulkImportEvent(workbook, entityType.name(), importDocument.getId(), importProgress);
+        BulkImportEvent event = new BulkImportEvent(workbook, entityType.name(), importDocument.getId(), importProgressUUID);
         applicationContext.publishEvent(event);
         log.info("Return import ID := {}", LocalDateTime.now(ZoneId.systemDefault()));
         return importDocument.getId();

@@ -2,28 +2,29 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { GlobalService } from '../shared/global.service';
 import { Observable, of } from 'rxjs';
+import { Client} from '@stomp/stompjs'; 
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataUploadService {
 
-    constructor(private httpClient: HttpClient, private gs: GlobalService) { }
+  private webSocketClient: Client;
+    constructor(private httpClient: HttpClient, private gs: GlobalService) { 
+      
+    }
 
 
-    uploadDataTemplate(file: File, templateName: string): Observable<any> {
+    uploadDataTemplate(file: File, templateName: string, uploadProgressID: string): Observable<any> {
         const formData = new FormData();
         formData.append('excelFile', file, file.name);
         if(templateName.toUpperCase().includes('TA_IMPORT_TEMPLATE')){
-            return this.httpClient.post(`${this.gs.BASE_API_URL}/bmos/upload-template`, formData);
+            return this.httpClient.post(`${this.gs.BASE_API_URL}/bmos/upload-template/${uploadProgressID}`, formData);
         }else if(templateName.toUpperCase().includes('LOAN_IMPORT_TEMPLATE')){
-            return this.httpClient.post(`${this.gs.BASE_API_URL}/loans/upload-template`, formData);
+            return this.httpClient.post(`${this.gs.BASE_API_URL}/loans/upload-template/${uploadProgressID}`, formData);
         }
         return of(null);
-      }
-
-      trackTemplateUploadProgress(entityType: string, importDocumentId: any): Observable<any> {
-        return this.httpClient.get<{ processed: number; total: number }>(`${this.gs.BASE_API_URL}/${entityType}/import-progress/${importDocumentId}`);
       }
 
       downloadDataTemplate(templateName: string): Observable<any> {
@@ -99,5 +100,43 @@ export class DataUploadService {
     .set('entityType', entityType)
     .set('importDocumentId', importDocumentId);
     return this.httpClient.get(`${this.gs.BASE_API_URL}/imports`, { params });
+  }
+
+  initializeStompClient(): void {
+    // Initialize the STOMP client
+    this.webSocketClient = new Client({
+      brokerURL: this.gs.BASE_WS_URL, // WebSocket URL for the backend
+      connectHeaders: {},
+      debug: (str) => {
+        //console.log(str); // Debugging logs for STOMP. Enable in case of issues
+      },
+      onConnect: () => {
+        console.log('Connected to WebSocket');
+      },
+      onDisconnect: () => {
+        console.log('Disconnected from WebSocket');
+      }
+    });
+
+    this.webSocketClient.activate();
+  }
+  
+
+   // Method to subscribe to progress updates
+   subscribeToUploadProgress(documentId: string): Observable<string> {
+    return new Observable(observer => {
+      // Wait for the connection to be established
+      if (this.webSocketClient.connected) {
+        this.webSocketClient.subscribe(`/topic/progress/${documentId}`, (message) => {
+          observer.next(message.body); // Send progress updates to observers
+        });
+      }
+    });
+  }
+
+  disconnectWebSocket(): void {
+    if(this.webSocketClient.connected){
+      this.webSocketClient.deactivate();
+    }
   }
 }

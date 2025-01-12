@@ -14,8 +14,6 @@ public interface BMOClientDataService {
 
     void approvedBMOParticipantsData(List<Long> dataIds, Boolean approval);
 
-    void uploadBMOData(MultipartFile file);
-
     List<BMOClientDto> getBMODataRecords(BMOParticipantSearchCriteria searchCriteria,Pageable pageable);
 
     BMOClientDto findBMODataById(Long bmoId);

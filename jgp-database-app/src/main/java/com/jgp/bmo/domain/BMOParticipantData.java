@@ -36,7 +36,6 @@ public class BMOParticipantData extends BaseEntity {
     @Column(name = "form_submitted_on")
     private LocalDate dateFormSubmitted;
 
-    @NotNull(message = "Applicant eligibility is required !!")
     @Column(name = "is_applicant_eligible")
     private Boolean isApplicantEligible;
 

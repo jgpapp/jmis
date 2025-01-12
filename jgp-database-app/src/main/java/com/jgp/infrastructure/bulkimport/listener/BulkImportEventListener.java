@@ -1,11 +1,13 @@
 package com.jgp.infrastructure.bulkimport.listener;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.bulkimport.domain.ImportDocument;
 import com.jgp.infrastructure.bulkimport.domain.ImportDocumentRepository;
 import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
 import com.jgp.infrastructure.bulkimport.importhandler.ImportHandler;
 import com.jgp.infrastructure.bulkimport.importhandler.LoanImportHandler;
+import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
 import com.jgp.infrastructure.documentmanagement.command.DocumentCommand;
 import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.infrastructure.documentmanagement.service.DocumentWritePlatformService;
@@ -25,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor
@@ -34,10 +37,16 @@ public class BulkImportEventListener {
     private final ApplicationContext applicationContext;
     private final ImportDocumentRepository importRepository;
     private final DocumentWritePlatformService documentService;
+    private final ImportProgressService importProgressService;
 
     @EventListener
     //@Async
    public void handleBulkImportEvent(BulkImportEvent bulkImportEvent){
+        try {
+            this.importProgressService.sendProgressUpdate(bulkImportEvent.importProgressUUID());
+        } catch (JsonProcessingException | ExecutionException e) {
+            log.error("Problem Updating Progress: {}", e.getMessage());
+        }
         final ImportDocument importDocument = this.importRepository.findById(bulkImportEvent.importId()).orElseThrow();
         final GlobalEntityType entityType = GlobalEntityType.fromInt(importDocument.getEntityType());
         ImportHandler importHandler = switch (entityType) {

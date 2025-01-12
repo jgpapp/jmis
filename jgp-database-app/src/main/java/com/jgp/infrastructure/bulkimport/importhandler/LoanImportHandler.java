@@ -1,5 +1,6 @@
 package com.jgp.infrastructure.bulkimport.importhandler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jgp.authentication.service.UserService;
 import com.jgp.finance.domain.Loan;
 import com.jgp.finance.service.LoanService;
@@ -7,7 +8,6 @@ import com.jgp.infrastructure.bulkimport.constants.BMOConstants;
 import com.jgp.infrastructure.bulkimport.constants.LoanConstants;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import com.jgp.infrastructure.bulkimport.data.Count;
-import com.jgp.infrastructure.bulkimport.data.ImportProgress;
 import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
 import com.jgp.infrastructure.bulkimport.exception.InvalidDataException;
 import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,13 +48,14 @@ import java.util.concurrent.ExecutionException;
 public class LoanImportHandler implements ImportHandler {
 
     private final LoanService loanService;
-    private final ParticipantService clientService;
+    private final ParticipantService participantService;
     private final UserService userService;
     private final ImportProgressService importProgressService;
     List<Loan> loanDataList;
     private Workbook workbook;
     private List<String> statuses;
     private Map<Row, String> rowErrorMap;
+    private String documentImportProgressUUId;
 
     @Override
     public Count process(BulkImportEvent bulkImportEvent) {
@@ -61,12 +63,13 @@ public class LoanImportHandler implements ImportHandler {
         loanDataList = new ArrayList<>();
         statuses = new ArrayList<>();
         this.rowErrorMap = new HashMap<>();
+        this.documentImportProgressUUId = bulkImportEvent.importProgressUUID();
         readExcelFile();
-        return importEntity(bulkImportEvent.importId());
+        return importEntity();
     }
 
     @Override
-    public void updateImportProgress(Long importId, boolean updateTotal, int total) {
+    public void updateImportProgress(String importId, boolean updateTotal, int total) {
         try {
             if (updateTotal){
                 importProgressService.updateTotal(importId, total);
@@ -78,18 +81,11 @@ public class LoanImportHandler implements ImportHandler {
         }
     }
 
-    @Override
-    public void markImportAsFinished(Long importId) {
-        try {
-            importProgressService.markImportAsFinished(importId);
-        } catch (ExecutionException e) {
-            log.error("Error : {}", e.getMessage(), e);
-        }
-    }
 
     public void readExcelFile() {
         Sheet loanSheet = workbook.getSheet(TemplatePopulateImportConstants.LOAN_SHEET_NAME);
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(loanSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
+        updateImportProgress(this.documentImportProgressUUId, true, noOfEntries);
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
             Row row;
             row = loanSheet.getRow(rowIndex);
@@ -103,7 +99,11 @@ public class LoanImportHandler implements ImportHandler {
         final var status = ImportHandlerUtils.readAsString(LoanConstants.STATUS_COL, row);
         final var pipeLineSource = ImportHandlerUtils.readAsString(LoanConstants.PIPELINE_SOURCE, row);
         final var loanStatus = ImportHandlerUtils.readAsString(LoanConstants.LOAN_STATUS, row);
-        final var loanStatusEnum = null != loanStatus ? Loan.LoanStatus.valueOf(loanStatus.toUpperCase()) : Loan.LoanStatus.NEW;
+        var loanStatusEnum = Loan.LoanStatus.NEW;
+        validateLoanStatus(loanStatus, row);
+        if (null == rowErrorMap.get(row) && null != loanStatus){
+            loanStatusEnum = Loan.LoanStatus.valueOf(loanStatus.toUpperCase());
+        }
         final var applicationDate = ImportHandlerUtils.readAsDate(LoanConstants.DATE_APPLIED, row);
         final var dateDisbursed = ImportHandlerUtils.readAsDate(LoanConstants.DATE_DISBURSED, row);
         final var amountAccessed = ImportHandlerUtils.readAsDouble(LoanConstants.LOAN_AMOUNT_KES, row);
@@ -114,43 +114,43 @@ public class LoanImportHandler implements ImportHandler {
         final var loanQuality = ImportHandlerUtils.readAsString(LoanConstants.LOAN_QUALITY, row);
         final var loanQualityEnum = null != loanQuality ? Loan.LoanQuality.valueOf(loanQuality.toUpperCase()) : Loan.LoanQuality.NORMAL;
         final var recordedToJGPDBOnDate = ImportHandlerUtils.readAsDate(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, row);
-        final var loanAmountUSDDouble = ImportHandlerUtils.readAsDouble(LoanConstants.LOAN_AMOUNT_USD, row);
-        final var loanAmountUSD = BigDecimal.valueOf(loanAmountUSDDouble);
         final var loanAmountRepaidDouble = ImportHandlerUtils.readAsDouble(LoanConstants.REPAID_LOAN_AMOUNT, row);
         final var loanAmountRepaid = BigDecimal.valueOf(loanAmountRepaidDouble);
-        final var tranchAmountAllocatedDouble = ImportHandlerUtils.readAsDouble(LoanConstants.TRANCH_AMOUNT_ALLOCATED_COL, row);
-        final var tranchAmountAllocated = BigDecimal.valueOf(tranchAmountAllocatedDouble);
+        final var tranchAllocatedAmount = ImportHandlerUtils.readAsString(LoanConstants.TRANCH_AMOUNT_ALLOCATED_COL, row);
+        validateTranchAllocated(tranchAllocatedAmount, row);
+        final var tranchAmountAllocated = BigDecimal.ONE;
         final var tranchAmountDisbursedDouble = ImportHandlerUtils.readAsDouble(LoanConstants.TRANCH_AMOUNT_DISBURSED_COL, row);
         final var tranchAmountDisbursed = BigDecimal.valueOf(tranchAmountDisbursedDouble);
         final var loanerType = ImportHandlerUtils.readAsString(LoanConstants.LOANER_TYPE_COL, row);
-        final var loanType = ImportHandlerUtils.readAsString(LoanConstants.LOAN_TYPE_COL, row);
         final var loanProduct = ImportHandlerUtils.readAsString(LoanConstants.LOAN_PRODUCT_COL, row);
 
         statuses.add(status);
-        final var clientDto = getParticipantDto(row);
         String jgpId = ImportHandlerUtils.readAsString(BMOConstants.JGP_ID_COL, row);
-        var existingClient = Optional.<Participant>empty();
+        var existingParticipant = Optional.<Participant>empty();
         if (null == jgpId){
             rowErrorMap.put(row, "JGP Id is required !!");
         }else {
-            existingClient = this.clientService.findOneByJGPID(jgpId);
+            existingParticipant = this.participantService.findOneParticipantByJGPID(jgpId);
         }
 
         var loanData = new Loan(Objects.nonNull(userService.currentUser()) ? userService.currentUser().getPartner() : null,
                 null, "1001", pipeLineSource, loanQualityEnum, loanStatusEnum, applicationDate, dateDisbursed, valueAccessed,
                 loanDuration, outStandingAmount, LocalDate.now(ZoneId.systemDefault()), null, recordedToJGPDBOnDate,
-                loanAmountUSD, loanAmountRepaid, loanerType, loanType, tranchAmountAllocated, tranchAmountDisbursed, loanProduct, row.getRowNum());
+                loanAmountRepaid, loanerType, tranchAmountAllocated, tranchAmountDisbursed, loanProduct, row.getRowNum());
 
         if (null == rowErrorMap.get(row)){
             validateLoan(loanData, row);
         }
 
-        validateParticipant(clientDto, row);
-        if (existingClient.isEmpty() && null == rowErrorMap.get(row)){
-            existingClient = Optional.of(this.clientService.createClient(clientDto));
+        if (existingParticipant.isEmpty() && null == rowErrorMap.get(row)){
+            final var participantDto = getParticipantDto(row);
+            validateParticipant(participantDto, row);
+            if (null == rowErrorMap.get(row)){
+                existingParticipant = Optional.of(this.participantService.createParticipant(participantDto));
+            }
         }
 
-        existingClient.ifPresent(loanData::setParticipant);
+        existingParticipant.ifPresent(loanData::setParticipant);
 
         return loanData;
     }
@@ -167,6 +167,9 @@ public class LoanImportHandler implements ImportHandler {
         final var businessSegment = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_SEGMENT_COL, row);
 
         final var totalRegularEmployees = ImportHandlerUtils.readAsInt(LoanConstants.TOTAL_REGULAR_EMPLOYEES_COL, row);
+        if ((null == totalRegularEmployees || totalRegularEmployees < 1) && null == rowErrorMap.get(row)){
+            rowErrorMap.put(row, "Regular Employees Must Be Greater Than 0 !!");
+        }
         final var youthRegularEmployees = ImportHandlerUtils.readAsInt(LoanConstants.YOUTH_REGULAR_EMPLOYEES_COL, row);
         final var totalCasualEmployees = ImportHandlerUtils.readAsInt(LoanConstants.TOTAL_CASUAL_EMPLOYEES_COL, row);
         final var youthCasualEmployees = ImportHandlerUtils.readAsInt(LoanConstants.YOUTH_CASUAL_EMPLOYEES_COL, row);
@@ -181,14 +184,13 @@ public class LoanImportHandler implements ImportHandler {
                 .locationCountyCode(locationCountyCode.isPresent() ? locationCountyCode.get().getCountyCode() : "999").build();
     }
 
-    public Count importEntity(Long importId) {
+    public Count importEntity() {
         Sheet groupSheet = workbook.getSheet(TemplatePopulateImportConstants.LOAN_SHEET_NAME);
         int successCount = 0;
         int errorCount = 0;
         int progressLevel = 0;
         String errorMessage = "";
         var loanDataSize = loanDataList.size();
-        updateImportProgress(importId, true, loanDataSize);
         for (int i = 0; i < loanDataSize; i++) {
             Row row = groupSheet.getRow(loanDataList.get(i).getRowIndex());
             Cell errorReportCell = row.createCell(BMOConstants.FAILURE_COL);
@@ -210,13 +212,20 @@ public class LoanImportHandler implements ImportHandler {
                 successCount++;
             } catch (RuntimeException ex) {
                 errorCount++;
-                log.error("Problem occurred in importEntity function", ex);
+                log.error("Problem occurred When Uploading Lending Data: {}", ex.getMessage());
                 errorMessage = ImportHandlerUtils.getErrorMessage(ex);
                 writeGroupErrorMessage(errorMessage, progressLevel, statusCell, errorReportCell);
+            }finally {
+                updateImportProgress(this.documentImportProgressUUId, false, 0);
+                try {
+                    this.importProgressService.sendProgressUpdate(this.documentImportProgressUUId);
+                } catch (JsonProcessingException | ExecutionException e) {
+                    log.error("Problem Updating Progress: {}", e.getMessage());
+                }
             }
-            updateImportProgress(importId, false, 0);
         }
         setReportHeaders(groupSheet);
+        log.info("Finished Import Finished := {}", LocalDateTime.now(ZoneId.systemDefault()));
         return Count.instance(successCount, errorCount);
     }
 
@@ -285,6 +294,20 @@ public class LoanImportHandler implements ImportHandler {
         if (!violations.isEmpty()) {
             ConstraintViolation<Loan> firstViolation = violations.iterator().next();
             rowErrorMap.put(row, firstViolation.getMessage());
+        }
+    }
+
+    private void validateLoanStatus(String value, Row row) {
+        final var deliveryModes = Set.of("APPROVED", "REJECTED");
+        if (null != value && !deliveryModes.contains(value.toUpperCase())){
+            rowErrorMap.put(row, "Invalid Value for Refugee Status (Must be Approved/Rejected) !!");
+        }
+    }
+
+    private void validateTranchAllocated(String value, Row row) {
+        final var deliveryModes = Set.of("TRANCH 1", "TRANCH 2", "TRANCH 3", "NOT APPLICABLE");
+        if (null != value && !deliveryModes.contains(value.toUpperCase())){
+            rowErrorMap.put(row, "Invalid Value for Refugee Status (Must be Tranch 1/Tranch 2/Tranch 3/Not Applicable) !!");
         }
     }
 }

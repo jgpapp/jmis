@@ -126,8 +126,8 @@ public class Loan extends BaseEntity {
                 LocalDate dateDisbursed, BigDecimal loanAmountAccessed,
                 Integer loanDuration, BigDecimal loanOutStandingAmount,
                 LocalDate dateRecordedByPartner, String uniqueValues,
-                LocalDate dateAddedToDB, BigDecimal loanAmountUSD, BigDecimal loanAmountRepaid,
-                String loanerType, String loanType, BigDecimal tranchAmountAllocated,
+                LocalDate dateAddedToDB, BigDecimal loanAmountRepaid,
+                String loanerType, BigDecimal tranchAmountAllocated,
                 BigDecimal tranchAmountDisbursed, String loanProduct, Integer rowIndex) {
         this.partner = partner;
         this.participant = participant;
@@ -144,10 +144,10 @@ public class Loan extends BaseEntity {
         this.uniqueValues = uniqueValues;
         this.dateAddedToDB = dateAddedToDB;
         this.rowIndex = rowIndex;
-        this.loanAmountUSD = loanAmountUSD;
+        this.loanAmountUSD = BigDecimal.ZERO;
         this.loanAmountRepaid = loanAmountRepaid;
         this.loanerType = loanerType;
-        this.loanType = loanType;
+        this.loanType = "loan Type";
         this.tranchAmountAllocated = tranchAmountAllocated;
         this.tranchAmountDisbursed = tranchAmountDisbursed;
         this.loanProduct = loanProduct;
