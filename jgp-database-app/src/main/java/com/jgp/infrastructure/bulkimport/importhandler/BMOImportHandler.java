@@ -1,5 +1,6 @@
 package com.jgp.infrastructure.bulkimport.importhandler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jgp.authentication.service.UserService;
 import com.jgp.bmo.domain.BMOParticipantData;
 import com.jgp.bmo.service.BMOClientDataService;
@@ -52,7 +53,7 @@ public class BMOImportHandler implements ImportHandler {
     private Workbook workbook;
     private List<String> statuses;
     private Map<Row, String> rowErrorMap;
-    private Long documentImportId;
+    private String documentImportProgressUUId;
 
     @Override
     public Count process(BulkImportEvent bulkImportEvent) {
@@ -60,31 +61,19 @@ public class BMOImportHandler implements ImportHandler {
         this.bmoDataList = new ArrayList<>();
         this.statuses = new ArrayList<>();
         this.rowErrorMap = new HashMap<>();
-        this.documentImportId = bulkImportEvent.importId();
+        this.documentImportProgressUUId = bulkImportEvent.importProgressUUID();
         readExcelFile();
         return importEntity();
     }
 
     @Override
-    public void updateImportProgress(Long importId, boolean updateTotal, int total) {
+    public void updateImportProgress(String importId, boolean updateTotal, int total) {
         try {
             if (updateTotal){
                 importProgressService.updateTotal(importId, total);
             }else {
                 importProgressService.incrementProcessedProgress(importId);
             }
-            var p = importProgressService.getImportProgress(importId);
-
-            log.info("Progress On Update> {}", p.getProcessed());
-        } catch (ExecutionException e) {
-            log.error("Error : {}", e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public void markImportAsFinished(Long importId) {
-        try {
-            importProgressService.markImportAsFinished(importId);
         } catch (ExecutionException e) {
             log.error("Error : {}", e.getMessage(), e);
         }
@@ -94,7 +83,7 @@ public class BMOImportHandler implements ImportHandler {
     public void readExcelFile() {
         Sheet bmoSheet = workbook.getSheet(TemplatePopulateImportConstants.BMO_SHEET_NAME);
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(bmoSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
-        updateImportProgress(this.documentImportId, true, noOfEntries);
+        updateImportProgress(this.documentImportProgressUUId, true, noOfEntries);
 
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
             Row row;
@@ -217,15 +206,21 @@ public class BMOImportHandler implements ImportHandler {
                 successCount++;
             } catch (RuntimeException ex) {
                 errorCount++;
-                //log.error("Problem occurred in importEntity function", ex);
+                log.error("Problem occurred When Uploading TA: {}", ex.getMessage());
                 errorMessage = ImportHandlerUtils.getErrorMessage(ex);
                 writeGroupErrorMessage(errorMessage, progressLevel, statusCell, errorReportCell);
+            }finally {
+                updateImportProgress(this.documentImportProgressUUId, false, 0);
+                try {
+                    this.importProgressService.sendProgressUpdate(this.documentImportProgressUUId);
+                } catch (JsonProcessingException | ExecutionException e) {
+                    log.error("Problem Updating Progress: {}", e.getMessage());
+                }
+
             }
-            updateImportProgress(this.documentImportId, false, 0);
         }
         setReportHeaders(groupSheet);
         log.info("Finished Import Finished := {}", LocalDateTime.now(ZoneId.systemDefault()));
-        markImportAsFinished(this.documentImportId);
         return Count.instance(successCount, errorCount);
     }
 

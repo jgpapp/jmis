@@ -7,7 +7,6 @@ import com.jgp.infrastructure.bulkimport.constants.BMOConstants;
 import com.jgp.infrastructure.bulkimport.constants.LoanConstants;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import com.jgp.infrastructure.bulkimport.data.Count;
-import com.jgp.infrastructure.bulkimport.data.ImportProgress;
 import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
 import com.jgp.infrastructure.bulkimport.exception.InvalidDataException;
 import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
@@ -30,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,6 +54,7 @@ public class LoanImportHandler implements ImportHandler {
     private Workbook workbook;
     private List<String> statuses;
     private Map<Row, String> rowErrorMap;
+    private String documentImportProgressUUId;
 
     @Override
     public Count process(BulkImportEvent bulkImportEvent) {
@@ -61,12 +62,13 @@ public class LoanImportHandler implements ImportHandler {
         loanDataList = new ArrayList<>();
         statuses = new ArrayList<>();
         this.rowErrorMap = new HashMap<>();
+        this.documentImportProgressUUId = bulkImportEvent.importProgressUUID();
         readExcelFile();
-        return importEntity(bulkImportEvent.importId());
+        return importEntity();
     }
 
     @Override
-    public void updateImportProgress(Long importId, boolean updateTotal, int total) {
+    public void updateImportProgress(String importId, boolean updateTotal, int total) {
         try {
             if (updateTotal){
                 importProgressService.updateTotal(importId, total);
@@ -78,18 +80,11 @@ public class LoanImportHandler implements ImportHandler {
         }
     }
 
-    @Override
-    public void markImportAsFinished(Long importId) {
-        try {
-            importProgressService.markImportAsFinished(importId);
-        } catch (ExecutionException e) {
-            log.error("Error : {}", e.getMessage(), e);
-        }
-    }
 
     public void readExcelFile() {
         Sheet loanSheet = workbook.getSheet(TemplatePopulateImportConstants.LOAN_SHEET_NAME);
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(loanSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
+        updateImportProgress(this.documentImportProgressUUId, true, noOfEntries);
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
             Row row;
             row = loanSheet.getRow(rowIndex);
@@ -181,14 +176,13 @@ public class LoanImportHandler implements ImportHandler {
                 .locationCountyCode(locationCountyCode.isPresent() ? locationCountyCode.get().getCountyCode() : "999").build();
     }
 
-    public Count importEntity(Long importId) {
+    public Count importEntity() {
         Sheet groupSheet = workbook.getSheet(TemplatePopulateImportConstants.LOAN_SHEET_NAME);
         int successCount = 0;
         int errorCount = 0;
         int progressLevel = 0;
         String errorMessage = "";
         var loanDataSize = loanDataList.size();
-        updateImportProgress(importId, true, loanDataSize);
         for (int i = 0; i < loanDataSize; i++) {
             Row row = groupSheet.getRow(loanDataList.get(i).getRowIndex());
             Cell errorReportCell = row.createCell(BMOConstants.FAILURE_COL);
@@ -210,13 +204,15 @@ public class LoanImportHandler implements ImportHandler {
                 successCount++;
             } catch (RuntimeException ex) {
                 errorCount++;
-                log.error("Problem occurred in importEntity function", ex);
+                log.error("Problem occurred When Uploading Lending Data: {}", ex.getMessage());
                 errorMessage = ImportHandlerUtils.getErrorMessage(ex);
                 writeGroupErrorMessage(errorMessage, progressLevel, statusCell, errorReportCell);
+            }finally {
+                updateImportProgress(this.documentImportProgressUUId, false, 0);
             }
-            updateImportProgress(importId, false, 0);
         }
         setReportHeaders(groupSheet);
+        log.info("Finished Import Finished := {}", LocalDateTime.now(ZoneId.systemDefault()));
         return Count.instance(successCount, errorCount);
     }
 
