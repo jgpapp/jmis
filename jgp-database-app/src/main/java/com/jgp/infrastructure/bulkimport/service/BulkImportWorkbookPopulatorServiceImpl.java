@@ -7,9 +7,6 @@ import com.jgp.infrastructure.bulkimport.populator.loan.LoanEntityWorkbookPopula
 import com.jgp.shared.exception.ResourceNotFound;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ooxml.POIXMLProperties;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -38,14 +35,14 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
             }  else {
                 throw new ResourceNotFound(HttpStatus.NOT_FOUND);
             }
-            populator.populate(workbook, "yyyy-MM-dd");
-            return buildResponse(workbook, entityType, response);
+            populator.populate(workbook);
+            return buildResponse(workbook, entityType);
         } else {
             throw new ResourceNotFound(HttpStatus.NOT_FOUND);
         }
     }
 
-    private ResponseEntity<?> buildResponse(final XSSFWorkbook workbook, final String entity, HttpServletResponse response) {
+    private ResponseEntity<?> buildResponse(final XSSFWorkbook workbook, final String entity) {
         String filename = String.format("%s_%s.xlsx", entity, LocalDate.now());
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {

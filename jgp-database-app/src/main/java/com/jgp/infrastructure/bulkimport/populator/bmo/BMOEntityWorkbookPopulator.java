@@ -10,13 +10,12 @@ import org.apache.poi.ss.usermodel.Workbook;
 public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
 
     @Override
-    public void populate(Workbook workbook, String dateFormat) {
+    public void populate(Workbook workbook) {
         Sheet bmoSheet = workbook.createSheet(TemplatePopulateImportConstants.BMO_SHEET_NAME);
-        setLayout(bmoSheet, dateFormat);
-        //setRules(bmoSheet);
+        setLayout(bmoSheet);
     }
 
-    private void setLayout(Sheet worksheet, String dateFormat) {
+    private void setLayout(Sheet worksheet) {
         Row rowHeader = worksheet.createRow(TemplatePopulateImportConstants.ROWHEADER_INDEX);
         rowHeader.setHeight(TemplatePopulateImportConstants.ROW_HEADER_HEIGHT);
         worksheet.setColumnWidth(BMOConstants.BUSINESS_NAME_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
@@ -42,7 +41,6 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         worksheet.setColumnWidth(BMOConstants.TYPE_OF_TA_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.PERSON_WITH_DISABILITY_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.REFUGEE_STATUS_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(BMOConstants.APPLICATION_FORM_SUBMITTED_DATE_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.IS_APPLICANT_ELIGIBLE_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.NUMBER_TAS_ATTENDED_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.NUMBER_TA_SESSION_ATTENDED_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
@@ -75,8 +73,7 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(BMOConstants.PERSON_WITH_DISABILITY_COL, rowHeader, "Person with Disability*");
 
         writeString(BMOConstants.REFUGEE_STATUS_COL, rowHeader, "Refugee status*");
-        writeString(BMOConstants.APPLICATION_FORM_SUBMITTED_DATE_COL, rowHeader, "Date submitted (yyyy-MM-dd)");
-        writeString(BMOConstants.IS_APPLICANT_ELIGIBLE_COL, rowHeader, "Is applicant eligible?*");
+        writeString(BMOConstants.IS_APPLICANT_ELIGIBLE_COL, rowHeader, "Is applicant eligible?");
         writeString(BMOConstants.NUMBER_TAS_ATTENDED_COL, rowHeader, "Number TAs attended");
         writeString(BMOConstants.NUMBER_TA_SESSION_ATTENDED_COL, rowHeader, "Number TA sessions attended");
         writeString(BMOConstants.RECOMMENDED_FOR_FINANCE_COL, rowHeader, "Recommended for finance");

@@ -1,6 +1,5 @@
 package com.jgp.participant.service;
 
-import com.jgp.bmo.domain.predicate.BMOPredicateBuilder;
 import com.jgp.bmo.dto.BMOParticipantSearchCriteria;
 import com.jgp.bmo.service.BMOClientDataService;
 import com.jgp.finance.dto.LoanSearchCriteria;
@@ -17,9 +16,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -34,12 +34,13 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final ParticipantsPredicateBuilder participantsPredicateBuilder;
 
     @Override
-    public Participant createClient(ParticipantDto clientDto) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Participant createParticipant(ParticipantDto clientDto) {
         return this.participantRepository.save(Participant.createClient(clientDto));
     }
 
     @Override
-    public Optional<Participant> findOneByJGPID(String jgpId) {
+    public Optional<Participant> findOneParticipantByJGPID(String jgpId) {
         return this.participantRepository.findByJgpId(jgpId);
     }
 
@@ -58,7 +59,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public Page<Participant> availableClients(String searchText, Pageable pageable) {
+    public Page<Participant> availableParticipants(String searchText, Pageable pageable) {
         if (null != searchText) {
             QParticipant qParticipant = QParticipant.participant;
             var businessNamePredicate = qParticipant.businessName.likeIgnoreCase("%"+searchText+"%s");

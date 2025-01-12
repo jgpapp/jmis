@@ -29,14 +29,13 @@ public final class BMOConstants {
     public static final int TYPE_OF_TA_COL = 20;// U
     public static final int PERSON_WITH_DISABILITY_COL = 21;// V
     public static final int REFUGEE_STATUS_COL = 22;// W
-    public static final int APPLICATION_FORM_SUBMITTED_DATE_COL = 23;// X
-    public static final int IS_APPLICANT_ELIGIBLE_COL = 24;// Y
-    public static final int NUMBER_TAS_ATTENDED_COL = 25;// Z
-    public static final int NUMBER_TA_SESSION_ATTENDED_COL = 26;// AA
-    public static final int RECOMMENDED_FOR_FINANCE_COL = 27;// AB
-    public static final int DATE_OF_PIPELINE_DECISION_COL = 28;// AC
-    public static final int REFERRED_FI_BUSINESS_COL = 29;// AD
-    public static final int DATE_RECORD_ENTERED_BY_PARTNER_COL = 30;// AE
-    public static final int FAILURE_COL = 31;// AF
-    public static final int STATUS_COL = 32;// AG
+    public static final int IS_APPLICANT_ELIGIBLE_COL = 23;// X
+    public static final int NUMBER_TAS_ATTENDED_COL = 24;// Y
+    public static final int NUMBER_TA_SESSION_ATTENDED_COL = 25;// Z
+    public static final int RECOMMENDED_FOR_FINANCE_COL = 26;// AA
+    public static final int DATE_OF_PIPELINE_DECISION_COL = 27;// AB
+    public static final int REFERRED_FI_BUSINESS_COL = 28;// AC
+    public static final int DATE_RECORD_ENTERED_BY_PARTNER_COL = 29;// AD
+    public static final int FAILURE_COL = 30;// AE
+    public static final int STATUS_COL = 31;// AF
 }

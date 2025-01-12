@@ -10,13 +10,12 @@ import org.apache.poi.ss.usermodel.Workbook;
 public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
 
     @Override
-    public void populate(Workbook workbook, String dateFormat) {
+    public void populate(Workbook workbook) {
         Sheet loanSheet = workbook.createSheet(TemplatePopulateImportConstants.LOAN_SHEET_NAME);
-        setLayout(loanSheet, dateFormat);
-        //setRules(loanSheet);
+        setLayout(loanSheet);
     }
 
-    private void setLayout(Sheet worksheet, String dateFormat) {
+    private void setLayout(Sheet worksheet) {
         Row rowHeader = worksheet.createRow(TemplatePopulateImportConstants.ROWHEADER_INDEX);
         rowHeader.setHeight(TemplatePopulateImportConstants.ROW_HEADER_HEIGHT);
         worksheet.setColumnWidth(LoanConstants.BUSINESS_NAME_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
@@ -32,7 +31,6 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         worksheet.setColumnWidth(LoanConstants.DATE_APPLIED, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.DATE_DISBURSED, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.LOAN_AMOUNT_KES, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(LoanConstants.LOAN_AMOUNT_USD, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.LOAN_DURATION, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.OUT_STANDING_AMOUNT, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.REPAID_LOAN_AMOUNT, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
@@ -43,12 +41,7 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         worksheet.setColumnWidth(LoanConstants.YOUTH_CASUAL_EMPLOYEES_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.BUSINESS_SEGMENT_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.LOANER_TYPE_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(LoanConstants.TRAINED_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(LoanConstants.ID_CHECK_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(LoanConstants.AGE_CATEGORY_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(LoanConstants.GENDER_STATUS_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(LoanConstants.LOAN_TYPE_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.LOAN_PRODUCT_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.TRANCH_AMOUNT_ALLOCATED_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.TRANCH_AMOUNT_DISBURSED_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
@@ -67,7 +60,6 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(LoanConstants.DATE_APPLIED, rowHeader, "Date loan application(yyyy-MM-dd)*");
         writeString(LoanConstants.DATE_DISBURSED, rowHeader, "Date loan disbursed(yyyy-MM-dd)*");
         writeString(LoanConstants.LOAN_AMOUNT_KES, rowHeader, "Loan Amount (KES)*");
-        writeString(LoanConstants.LOAN_AMOUNT_USD, rowHeader, "Loan Amount (USD)");
         writeString(LoanConstants.LOAN_DURATION, rowHeader, "Loan duration (months)*");
         writeString(LoanConstants.OUT_STANDING_AMOUNT, rowHeader, "Outstanding amount*");
         writeString(LoanConstants.REPAID_LOAN_AMOUNT, rowHeader, "Repaid Loan Amount (KES)");
@@ -78,15 +70,10 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(LoanConstants.YOUTH_CASUAL_EMPLOYEES_COL, rowHeader, "Casual, of which are youth (18-35)*");
         writeString(LoanConstants.BUSINESS_SEGMENT_COL, rowHeader, "Business segment");
         writeString(LoanConstants.LOANER_TYPE_COL, rowHeader, "Loaner Type");
-        writeString(LoanConstants.TRAINED_COL, rowHeader, "Trained");
-        writeString(LoanConstants.ID_CHECK_COL, rowHeader, "ID Check");
-        writeString(LoanConstants.AGE_CATEGORY_COL, rowHeader, "Age Categories");
         writeString(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, rowHeader, "Date added to JGP database(yyyy-MM-dd)*");
-        writeString(LoanConstants.GENDER_STATUS_COL, rowHeader, "Gender status");
-        writeString(LoanConstants.LOAN_TYPE_COL, rowHeader, "Loan Type*");
         writeString(LoanConstants.LOAN_PRODUCT_COL, rowHeader, "Loan product (Working Capital, Asset Finance, Stahimili, Purchase Order, Consignment Finance, Shariah Compliant)*");
         writeString(LoanConstants.TRANCH_AMOUNT_ALLOCATED_COL, rowHeader, "Tranch amount allocated");
-        writeString(LoanConstants.TRANCH_AMOUNT_DISBURSED_COL, rowHeader, "Tranch Amount Disbursed");
+        writeString(LoanConstants.TRANCH_AMOUNT_DISBURSED_COL, rowHeader, "Tranch Amount Disbursed (KES)");
 
 
     }

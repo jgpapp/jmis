@@ -63,16 +63,6 @@ public class BMOClientDataServiceImpl implements BMOClientDataService {
     }
 
     @Override
-    public void uploadBMOData(MultipartFile file) {
-        try {
-            log.info("Old");
-            //this.publisher.publishEvent(new BulkImportEvent(new XSSFWorkbook(file.getInputStream()),  TemplatePopulateImportConstants.BMO_ENTITY, 0L));
-        }  catch (Exception e){
-            throw new RuntimeException("Error while importing BMO Data: "+ e.getMessage());
-        }
-    }
-
-    @Override
     public List<BMOClientDto> getBMODataRecords(BMOParticipantSearchCriteria searchCriteria, Pageable pageable) {
         return this.bmoClientMapper.toDto(this.bmoDataRepository.findAll(this.bmoPredicateBuilder.buildPredicateForSearchTAData(searchCriteria), pageable).stream().toList());
     }

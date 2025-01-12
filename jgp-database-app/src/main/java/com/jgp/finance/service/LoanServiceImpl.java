@@ -1,25 +1,20 @@
 package com.jgp.finance.service;
 
 import com.jgp.authentication.service.PlatformSecurityContext;
-import com.jgp.bmo.dto.BMOParticipantSearchCriteria;
 import com.jgp.finance.domain.predicate.LoanPredicateBuilder;
 import com.jgp.finance.dto.LoanSearchCriteria;
 import com.jgp.finance.mapper.LoanMapper;
 import com.jgp.finance.domain.Loan;
 import com.jgp.finance.domain.LoanRepository;
 import com.jgp.finance.dto.LoanDto;
-import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
-import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
 import com.jgp.participant.domain.ParticipantRepository;
 import com.jgp.util.CommonUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Objects;
@@ -39,16 +34,6 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public void createLoans(List<Loan> loans) {
         this.loanRepository.saveAll(loans);
-    }
-
-    @Override
-    public void uploadBulkLoanData(MultipartFile file) {
-        try {
-            log.info("Old");
-            //this.publisher.publishEvent(new BulkImportEvent(new XSSFWorkbook(file.getInputStream()), TemplatePopulateImportConstants.LOAN_ENTITY, 0L));
-        }  catch (Exception e){
-            throw new RuntimeException("Error while importing Loan Data: "+ e.getMessage());
-        }
     }
 
     @Transactional

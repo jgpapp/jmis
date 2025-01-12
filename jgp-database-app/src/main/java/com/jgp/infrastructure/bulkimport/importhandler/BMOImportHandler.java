@@ -34,6 +34,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -46,7 +47,7 @@ import java.util.concurrent.ExecutionException;
 public class BMOImportHandler implements ImportHandler {
 
     private final BMOClientDataService bmoDataService;
-    private final ParticipantService clientService;
+    private final ParticipantService participantService;
     private final UserService userService;
     private final ImportProgressService importProgressService;
     List<BMOParticipantData> bmoDataList;
@@ -97,7 +98,6 @@ public class BMOImportHandler implements ImportHandler {
 
     private BMOParticipantData readBMOData(Row row) {
         String status = ImportHandlerUtils.readAsString(BMOConstants.STATUS_COL, row);
-        LocalDate appFormSubmittedDate = ImportHandlerUtils.readAsDate(BMOConstants.APPLICATION_FORM_SUBMITTED_DATE_COL, row);
         Boolean isApplicantEligible = "YES".equalsIgnoreCase(ImportHandlerUtils.readAsString(BMOConstants.IS_APPLICANT_ELIGIBLE_COL, row));
         Integer numberOfTAsAttended = ImportHandlerUtils.readAsInt(BMOConstants.NUMBER_TAS_ATTENDED_COL, row);
         Integer taSessionsAttended = ImportHandlerUtils.readAsInt(BMOConstants.NUMBER_TA_SESSION_ATTENDED_COL, row);
@@ -108,22 +108,23 @@ public class BMOImportHandler implements ImportHandler {
         final var taNeeds = ImportHandlerUtils.readAsString(BMOConstants.TA_NEEDS_COL, row);
         final var trainingPartner = ImportHandlerUtils.readAsString(BMOConstants.TRAINING_PARTNER, row);
         final var taDeliveryMode = ImportHandlerUtils.readAsString(BMOConstants.TA_DELIVERY_MODE, row);
+        validateTADeliveryMode(taDeliveryMode, row);
         final var otherTaNeeds = ImportHandlerUtils.readAsString(BMOConstants.OTHER_TA_NEEDS_COL, row);
         final var taType = ImportHandlerUtils.readAsString(BMOConstants.TYPE_OF_TA_COL, row);
+        validateTATypes(taType, row);
 
         statuses.add(status);
-        final var clientDto = getParticipantDto(row);
         String jgpId = ImportHandlerUtils.readAsString(BMOConstants.JGP_ID_COL, row);
-        var existingClient = Optional.<Participant>empty();
+        var existingParticipant = Optional.<Participant>empty();
         if (null == jgpId){
             rowErrorMap.put(row, "JGP Id is required !!");
         }else {
-            existingClient = this.clientService.findOneByJGPID(jgpId);
+            existingParticipant = this.participantService.findOneParticipantByJGPID(jgpId);
         }
 
         final var taData = new BMOParticipantData(Objects.nonNull(userService.currentUser()) ? userService.currentUser().getPartner() : null,
                 null,
-                appFormSubmittedDate, isApplicantEligible, numberOfTAsAttended,
+                LocalDate.now(ZoneId.systemDefault()), isApplicantEligible, numberOfTAsAttended,
                 taSessionsAttended, isRecommendedForFinance, pipelineDecisionDate,
                 referredFIBusiness, dateRecordedByPartner, LocalDate.now(ZoneId.systemDefault()), taNeeds,
                 row.getRowNum(), trainingPartner, taDeliveryMode, otherTaNeeds, taType, rowErrorMap.get(row));
@@ -132,12 +133,15 @@ public class BMOImportHandler implements ImportHandler {
             validateTAData(taData, row);
         }
 
-        validateParticipant(clientDto, row);
-        if (existingClient.isEmpty() && null == rowErrorMap.get(row)){
-            existingClient = Optional.of(this.clientService.createClient(clientDto));
+        if (existingParticipant.isEmpty() && null == rowErrorMap.get(row)){
+            final var participantDto = getParticipantDto(row);
+            validateParticipant(participantDto, row);
+            if (null == rowErrorMap.get(row)){
+                existingParticipant = Optional.of(this.participantService.createParticipant(participantDto));
+            }
         }
 
-        existingClient.ifPresent(taData::setParticipant);
+        existingParticipant.ifPresent(taData::setParticipant);
 
         return taData;
 
@@ -159,12 +163,17 @@ public class BMOImportHandler implements ImportHandler {
         final var worstMonthlyRevenueD = ImportHandlerUtils.readAsDouble(BMOConstants.WORST_MONTH_MONTHLY_REVENUE_COL, row);
         final var worstMonthlyRevenue = Objects.nonNull(worstMonthlyRevenueD) ? BigDecimal.valueOf(worstMonthlyRevenueD) : null;
         final var totalRegularEmployees = ImportHandlerUtils.readAsInt(BMOConstants.TOTAL_REGULAR_EMPLOYEES_COL, row);
+        if ((null == totalRegularEmployees || totalRegularEmployees < 1) && null == rowErrorMap.get(row)){
+            rowErrorMap.put(row, "Regular Employees Must Be Greater Than 0 !!");
+        }
         final var youthRegularEmployees = ImportHandlerUtils.readAsInt(BMOConstants.YOUTH_REGULAR_EMPLOYEES_COL, row);
         final var totalCasualEmployees = ImportHandlerUtils.readAsInt(BMOConstants.TOTAL_CASUAL_EMPLOYEES_COL, row);
         final var youthCasualEmployees = ImportHandlerUtils.readAsInt(BMOConstants.YOUTH_CASUAL_EMPLOYEES_COL, row);
         final var sampleRecordsKept = ImportHandlerUtils.readAsString(BMOConstants.SAMPLE_RECORDS_KEPT_COL, row);
         final var personWithDisability = ImportHandlerUtils.readAsString(BMOConstants.PERSON_WITH_DISABILITY_COL, row);
+        validatePersonWithDisability(personWithDisability, row);
         final var refugeeStatus = ImportHandlerUtils.readAsString(BMOConstants.REFUGEE_STATUS_COL, row);
+        validateRefugeeStatus(refugeeStatus, row);
 
         return ParticipantDto.builder()
                 .phoneNumber(phoneNumber).bestMonthlyRevenue(bestMonthlyRevenue).bmoMembership(null)
@@ -290,6 +299,41 @@ public class BMOImportHandler implements ImportHandler {
         if (!violations.isEmpty()) {
             ConstraintViolation<BMOParticipantData> firstViolation = violations.iterator().next();
             rowErrorMap.put(row, firstViolation.getMessage());
+        }
+    }
+
+    private void validateTADeliveryMode(String value, Row row){
+        final var deliveryModes = Set.of("in person", "virtual", "mixed");
+        if (null == value || !deliveryModes.contains(value.toLowerCase())){
+            rowErrorMap.put(row, "Invalid Delivery Mode (Must be In person/Virtual/Mixed) !!");
+        }
+    }
+
+    private void validateTATypes(String value, Row row){
+        final var deliveryModes = Set.of("post-lending", "pre-lending", "non-lending", "mentorship", "voucher scheme");
+        if (null == value || !deliveryModes.contains(value.toLowerCase())){
+            rowErrorMap.put(row, "Invalid TA Type (Must be Post-lending/Pre-lending/Non-lending/Mentorship/Voucher scheme) !!");
+        }
+    }
+
+    private void validatePersonWithDisability(String value, Row row){
+        final var deliveryModes = Set.of("YES", "NO");
+        if (null == value || !deliveryModes.contains(value.toUpperCase())){
+            rowErrorMap.put(row, "Invalid Value for Person With Disability (Must be Yes/No) !!");
+        }
+    }
+
+    private void validateRefugeeStatus(String value, Row row){
+        final var deliveryModes = Set.of("YES", "NO");
+        if (null == value || !deliveryModes.contains(value.toUpperCase())){
+            rowErrorMap.put(row, "Invalid Value for Refugee Status (Must be Yes/No) !!");
+        }
+    }
+
+    private void validateFinanceRecommendation(String value, Row row){
+        final var deliveryModes = Set.of("YES", "NO");
+        if (null == value || !deliveryModes.contains(value.toUpperCase())){
+            rowErrorMap.put(row, "Invalid Value for Finance Recommendation (Must be Yes/No) !!");
         }
     }
 }
