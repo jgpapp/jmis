@@ -53,7 +53,6 @@ public class ImportProgressServiceImpl implements ImportProgressService {
     public void sendProgressUpdate(String importUUId) throws ExecutionException, JsonProcessingException {
         // Send progress to the WebSocket
         var progress = this.getImportProgress(importUUId);
-        log.info(this.objectMapper.writeValueAsString(progress));
         simpMessagingTemplate.convertAndSend(String.format("/topic/progress/%s", importUUId), this.objectMapper.writeValueAsString(progress));
     }
 }

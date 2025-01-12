@@ -5,10 +5,6 @@ public class ImportProgress {
     private int processed;
     private int total;
 
-    public ImportProgress() {
-        this.total = 1;
-    }
-
     public synchronized void incrementProcessed() {
         this.processed++;
     }

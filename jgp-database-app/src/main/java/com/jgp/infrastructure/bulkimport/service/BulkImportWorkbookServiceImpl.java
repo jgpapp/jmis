@@ -4,7 +4,6 @@ package com.jgp.infrastructure.bulkimport.service;
 import com.jgp.authentication.service.PlatformSecurityContext;
 import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.bulkimport.data.ImportData;
-import com.jgp.infrastructure.bulkimport.data.ImportProgress;
 import com.jgp.infrastructure.bulkimport.domain.ImportDocument;
 import com.jgp.infrastructure.bulkimport.domain.ImportDocumentRepository;
 import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
@@ -50,7 +49,6 @@ import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 
 @Service
 @Slf4j
@@ -65,7 +63,6 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     private final ImportDocumentRepository importDocumentRepository;
     private final JdbcTemplate jdbcTemplate;
     private final ImportDocumentMapper importDocumentMapper;
-    private final ImportProgressService importProgressService;
     private static final String SELECT_LITERAL = "select ";
 
 
@@ -101,24 +98,6 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
         }
     }
 
-    @Override
-    public ImportProgress getImportProgress(String importDocumentId) {
-        ImportProgress progress = null;
-        try {
-            progress = importProgressService.getImportProgress(importDocumentId);
-            log.info("Progress On Query> {}", progress.getProcessed());
-
-            return progress;
-        } catch (ExecutionException e) {
-            log.error("Error : {}", e.getMessage(), e);
-        }finally {
-            if (Objects.nonNull(progress) && progress.getTotal() == progress.getProcessed()){
-                progress.setProgressAsFinished(2);
-            }
-        }
-        return new ImportProgress();
-
-    }
 
     private Long publishEvent(final Integer primaryColumn, final MultipartFile fileDetail,
             final InputStream clonedInputStreamWorkbook, final GlobalEntityType entityType, final Workbook workbook, String importProgressUUID) {

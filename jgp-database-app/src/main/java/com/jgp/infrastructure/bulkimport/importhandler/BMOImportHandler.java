@@ -74,9 +74,6 @@ public class BMOImportHandler implements ImportHandler {
             }else {
                 importProgressService.incrementProcessedProgress(importId);
             }
-            var p = importProgressService.getImportProgress(importId);
-
-            log.info("Progress On Update> {}", p.getProcessed());
         } catch (ExecutionException e) {
             log.error("Error : {}", e.getMessage(), e);
         }
