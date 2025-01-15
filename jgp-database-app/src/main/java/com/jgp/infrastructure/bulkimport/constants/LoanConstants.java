@@ -38,5 +38,6 @@ public final class LoanConstants {
     public static final int TRANCH_AMOUNT_ALLOCATED_COL = 25;// Z
     public static final int TRANCH_AMOUNT_DISBURSED_COL = 26;// AA
 
-    public static final int STATUS_COL = 27;// AB
+    public static final int FAILURE_COL = 27;// AB
+    public static final int STATUS_COL = 28;// AC
 }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jgp.authentication.service.UserService;
 import com.jgp.finance.domain.Loan;
 import com.jgp.finance.service.LoanService;
-import com.jgp.infrastructure.bulkimport.constants.BMOConstants;
 import com.jgp.infrastructure.bulkimport.constants.LoanConstants;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import com.jgp.infrastructure.bulkimport.data.Count;
@@ -125,12 +124,15 @@ public class LoanImportHandler implements ImportHandler {
         final var loanProduct = ImportHandlerUtils.readAsString(LoanConstants.LOAN_PRODUCT_COL, row);
 
         statuses.add(status);
-        String jgpId = ImportHandlerUtils.readAsString(BMOConstants.JGP_ID_COL, row);
+        String jgpId = ImportHandlerUtils.readAsString(LoanConstants.JGP_ID_COL, row);
+        log.info("JGP Id: {}", jgpId);
         var existingParticipant = Optional.<Participant>empty();
         if (null == jgpId){
             rowErrorMap.put(row, "JGP Id is required !!");
         }else {
+            log.info("JGP Id: {}", jgpId);
             existingParticipant = this.participantService.findOneParticipantByJGPID(jgpId);
+            log.info("Client with JGP Id Found: {}", existingParticipant.isPresent());
         }
 
         var loanData = new Loan(Objects.nonNull(userService.currentUser()) ? userService.currentUser().getPartner() : null,
@@ -193,8 +195,8 @@ public class LoanImportHandler implements ImportHandler {
         var loanDataSize = loanDataList.size();
         for (int i = 0; i < loanDataSize; i++) {
             Row row = groupSheet.getRow(loanDataList.get(i).getRowIndex());
-            Cell errorReportCell = row.createCell(BMOConstants.FAILURE_COL);
-            Cell statusCell = row.createCell(BMOConstants.STATUS_COL);
+            Cell errorReportCell = row.createCell(LoanConstants.FAILURE_COL);
+            Cell statusCell = row.createCell(LoanConstants.STATUS_COL);
             try {
                 String status = statuses.get(i);
                 progressLevel = getProgressLevel(status);
@@ -242,9 +244,9 @@ public class LoanImportHandler implements ImportHandler {
     }
 
     private void setReportHeaders(Sheet bmpSheet) {
-        ImportHandlerUtils.writeString(BMOConstants.STATUS_COL, bmpSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX),
+        ImportHandlerUtils.writeString(LoanConstants.STATUS_COL, bmpSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX),
                 TemplatePopulateImportConstants.STATUS_COL_REPORT_HEADER);
-        ImportHandlerUtils.writeString(BMOConstants.FAILURE_COL, bmpSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX),
+        ImportHandlerUtils.writeString(LoanConstants.FAILURE_COL, bmpSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX),
                 TemplatePopulateImportConstants.FAILURE_COL_REPORT_HEADER);
     }
 
@@ -300,14 +302,14 @@ public class LoanImportHandler implements ImportHandler {
     private void validateLoanStatus(String value, Row row) {
         final var deliveryModes = Set.of("APPROVED", "REJECTED");
         if (null != value && !deliveryModes.contains(value.toUpperCase())){
-            rowErrorMap.put(row, "Invalid Value for Refugee Status (Must be Approved/Rejected) !!");
+            rowErrorMap.put(row, "Invalid Value for Loan Status (Must be Approved/Rejected) !!");
         }
     }
 
     private void validateTranchAllocated(String value, Row row) {
         final var deliveryModes = Set.of("TRANCH 1", "TRANCH 2", "TRANCH 3", "NOT APPLICABLE");
         if (null != value && !deliveryModes.contains(value.toUpperCase())){
-            rowErrorMap.put(row, "Invalid Value for Refugee Status (Must be Tranch 1/Tranch 2/Tranch 3/Not Applicable) !!");
+            rowErrorMap.put(row, "Invalid Value for Allocated Tranch (Must be Tranch 1/Tranch 2/Tranch 3/Not Applicable) !!");
         }
     }
 }
