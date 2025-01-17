@@ -432,6 +432,9 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
 
   valueFormatting = (value: number) => {
     // Custom value formatting: Convert to a string with thousands separator
+    if(!value){
+      return '0'
+    }
     return value.toLocaleString(); // Outputs as "8,940,000"
   };
 
