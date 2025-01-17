@@ -430,7 +430,10 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
     console.log(event);
   }
 
- 
+  valueFormatting = (value: any) => {
+    // Custom value formatting: Convert to a string with thousands separator
+    return this.dashBoardService.formatNumberToShortForm(value); // Outputs as "8,940,000"
+  };
 
 
   ngOnDestroy() {

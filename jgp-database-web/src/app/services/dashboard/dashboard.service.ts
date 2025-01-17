@@ -134,7 +134,7 @@ export class DashboardService {
 
     formatNumberToShortForm(number: any): string {
       // Use the toLocaleString method to add suffixes to the number
-      return number ? number.toLocaleString('en-US', {
+      return number && null !== number ? number.toLocaleString('en-US', {
         // add suffixes for thousands, millions, and billions
         // the maximum number of decimal places to use
         maximumFractionDigits: 2,
