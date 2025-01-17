@@ -145,6 +145,7 @@ export class DashboardService {
     }
 
     getFormattedTileData(highLevelSummary: any): HighLevelSummaryDto {
+      console.log(highLevelSummary)
       return {
         businessesTrained: this.formatNumberToShortForm(highLevelSummary.businessesTrained), 
         businessesLoaned: this.formatNumberToShortForm(highLevelSummary.businessesLoaned), 
