@@ -133,21 +133,18 @@ export class DashboardService {
 
 
     formatNumberToShortForm(number: any): string {
-      if(!number){
-        return '0'
-      }
       // Use the toLocaleString method to add suffixes to the number
-      return number.toLocaleString('en-US', {
+      return number ? number.toLocaleString('en-US', {
         // add suffixes for thousands, millions, and billions
         // the maximum number of decimal places to use
         maximumFractionDigits: 2,
         // specify the abbreviations to use for the suffixes
         notation: 'compact',
         compactDisplay: 'short'
-      });
+      }) : '0';
     }
 
-    getFormattedTileData(highLevelSummary: any): HighLevelSummaryDto{
+    getFormattedTileData(highLevelSummary: any): HighLevelSummaryDto {
       return {
         businessesTrained: this.formatNumberToShortForm(highLevelSummary.businessesTrained), 
         businessesLoaned: this.formatNumberToShortForm(highLevelSummary.businessesLoaned), 
