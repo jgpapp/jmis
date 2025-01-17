@@ -10,6 +10,7 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { ExportAsService, ExportAsConfig, ExportAsModule } from 'ngx-export-as';
 import { KeMapComponent } from "../dashboard/ke-map/ke-map.component";
+import { KenyanMapComponent } from "../dashboard/kenyan-map/kenyan-map.component";
 
 @Component({
   selector: 'app-chart-dialog',
@@ -22,13 +23,14 @@ import { KeMapComponent } from "../dashboard/ke-map/ke-map.component";
     NgxChartsModule,
     MatButtonModule,
     ExportAsModule,
-    KeMapComponent
+    KenyanMapComponent
 ],
   templateUrl: './chart-dialog.component.html',
   styleUrl: './chart-dialog.component.scss'
 })
 export class ChartDialogComponent implements AfterViewInit {
   @ViewChild('dialogContentContainer', { static: true }) dialogContentContainer!: ElementRef;
+  @ViewChild('chartContainer', { static: true }) chartContainerRef!: ElementRef;
 
   exportAsConfig: ExportAsConfig = {
     type: 'png', // the file format: PDF, PNG, etc.
@@ -41,6 +43,9 @@ export class ChartDialogComponent implements AfterViewInit {
       }
     }
   };
+
+  map: L.Map;
+  geoJsonLayer: L.GeoJSON;
 
   constructor(
     private exportAsService: ExportAsService,

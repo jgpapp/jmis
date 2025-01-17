@@ -1,6 +1,9 @@
 <div fxLayout="row wrap" #resizedDiv>
 
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #loansDisbursedByGenderContentDiv (click)="expandLoansDisbursedByGenderDoughnut()"> 
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByGenderContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByGenderDoughnut()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
                 <mat-card-title>{{loansDisbursedByGenderChartTitle}}</mat-card-title>
@@ -23,7 +26,10 @@
     </div> 
     
     
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #loansDisbursedByPipelineContentDiv (click)="expandLoansDisbursedByPipelinePieChart()"> 
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByPipelineContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByPipelinePieChart()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
                 <mat-card-title>{{loansDisbursedByPipelineChartTitle}}</mat-card-title>
@@ -45,7 +51,10 @@
         </mat-card>
     </div> 
 
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #loansDisbursedByStatusContentDiv (click)="expandLoansDisbursedByStatusBarChart()"> 
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByStatusContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByStatusBarChart()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
                 <mat-card-title>{{loansDisbursedByStatusChartTitle}}</mat-card-title>
@@ -95,7 +104,10 @@
         </mat-card>
     </div>
 
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #taNeedsByGenderContentDiv (click)="expandTANeedsByGenderBarChart()"> 
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #taNeedsByGenderContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandTANeedsByGenderBarChart()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
                 <mat-card-title>{{TANeedsByGenderChartTitle}}</mat-card-title>
@@ -122,7 +134,10 @@
         </mat-card>
     </div>
 
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #trainingByPartnerByGenderContentDiv (click)="expandTrainingByPartnerByGenderBarChart()"> 
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #trainingByPartnerByGenderContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandTrainingByPartnerByGenderBarChart()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
                 <mat-card-title>{{trainingByPartnerByGenderChartTitle}}</mat-card-title>
@@ -149,7 +164,10 @@
         </mat-card>
     </div> 
 
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #loansDisbursedByGenderContentDiv (click)="expandLoansDisbursedByGenderDoughnut()"> 
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByGenderContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByGenderDoughnut()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
                 <mat-card-title>{{businessesTainedByGenderChartTitle}}</mat-card-title>
@@ -171,7 +189,10 @@
         </mat-card>
     </div> 
     
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #taTrainedBySectorContentDiv (click)="expandTaTrainedBySectorBarChart()"> 
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #taTrainedBySectorContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandTaTrainedBySectorBarChart()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
                 <mat-card-title>{{taTrainedBySectorChartTitle}}</mat-card-title>
@@ -197,7 +218,10 @@
             </div>
         </mat-card>
     </div>  
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #accessedVSOutStandingAmountContentDiv (click)="expandAccessedVSOutStandingAmountBarChart()"> 
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #accessedVSOutStandingAmountContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandAccessedVSOutStandingAmountBarChart()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
                 <mat-card-title>{{accessedVSOutStandingAmountChartTitle}}</mat-card-title>
@@ -223,7 +247,10 @@
             </div>
         </mat-card>
     </div> 
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #taTrainedBySegmentContentDiv (click)="expandTaTrainedBySegmentPieChart()"> 
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #taTrainedBySegmentContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandTaTrainedBySegmentPieChart()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
                 <mat-card-title>{{taTrainedBySegmentChartTitle}}</mat-card-title>
@@ -273,7 +300,10 @@
     </div> 
 
 
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #loansDisbursedByGenderContentDiv (click)="expandLoansDisbursedByGenderDoughnut()"> 
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByGenderContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByGenderDoughnut()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
                 <mat-card-title>{{loansDisbursedBySectorChartTitle}}</mat-card-title>
@@ -314,7 +344,10 @@
         </mat-card>
     </div> 
 
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #countyTrainedBusinessesMapContentDiv (click)="expandCountyTrainedBusinessesMap()"> 
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #countyTrainedBusinessesMapContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandCountyTrainedBusinessesMap()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
                 <mat-card-title>Training By County</mat-card-title>

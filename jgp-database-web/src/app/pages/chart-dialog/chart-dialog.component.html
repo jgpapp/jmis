@@ -5,7 +5,7 @@
 <div fxLayout="column" fxLayoutAlign="center center" fxFlex="88%" id="chartDiv" class="chart-props">
 <h1 mat-dialog-title fxFlex="10%" fxFlexAlign="center center">{{data.chartTitle}}</h1>
 <div mat-dialog-content fxLayout="row" fxFlex="90%" class="chart-props">
-  <div class="chart-props" fxFlex="100%">
+  <div class="chart-props" fxFlex="100%" #chartContainer>
   @if (data.chartType === 'app-pie-chart') {
       <app-pie-chart 
       [data]="data.chartData" 
@@ -18,11 +18,12 @@
       /> 
   }
   @if (data.chartType === 'kenyan-county-map') {
-    <app-ke-map
-    [mapWidth]="450" 
-    [mapHeight]="350" 
+    <app-kenyan-map
+    [mapWidth]="950" 
+    [mapHeight]="950" 
     [countyData]="data.chartData" 
-    [countyDataToBePicked]="data.countyDataToBePicked"  />
+    [countyDataToBePicked]="data.countyDataToBePicked"
+    [kenyanMapChartContainer]="chartContainerRef"  />
   }
   @if (data.chartType === 'ngx-charts-bar-vertical') {
     <ngx-charts-bar-vertical
