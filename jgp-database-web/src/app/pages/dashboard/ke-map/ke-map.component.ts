@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { tileLayer, geoJSON, map, Map as Mapp, Layer, DivIcon, Marker } from 'leaflet';
+import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import L, { tileLayer, geoJSON, map, Map as Mapp, Layer, DivIcon, Marker } from 'leaflet';
 
 @Component({
   selector: 'app-ke-map',
@@ -11,19 +13,20 @@ import { tileLayer, geoJSON, map, Map as Mapp, Layer, DivIcon, Marker } from 'le
   styleUrl: './ke-map.component.scss'
 })
 export class KeMapComponent implements OnInit, OnChanges {
-  private map!: Mapp;
-  private geoJsonLayer!: Layer;
+  private map!: L.Map;
+  private geoJsonLayer!: L.GeoJSON;
   private markers: Marker[] = [];
   private geoJsonData: any = null; // To store the GeoJSON data
   @Input('countyData') countyData: Map<number, any>;
   @Input('countyDataToBePicked') countyDataToBePicked: any;
   @Input('mapWidth') mapWidth: number;
   @Input('mapHeight') mapHeight: number;
+  @ViewChild('mapContainer', { static: true }) mapContainer!: ElementRef;
 
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.renderMap();
+    this.initMap();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -34,6 +37,43 @@ export class KeMapComponent implements OnInit, OnChanges {
   renderMap(): void {
     this.initializeMap();
     this.loadGeoJson(); // Load GeoJSON data from the file
+  }
+
+  private initMap(): void {
+    this.map = map('map').setView([1.2921, 36.8219], 7); // Initial view Centered on Kenya
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(this.map);
+
+    // Fetch GeoJSON data
+    this.http.get<any>('data/kenya-counties.json') // Replace with your GeoJSON data source
+      .subscribe(data => {
+        this.geoJsonLayer = L.geoJSON(data, {
+          onEachFeature: (feature, layer) => {
+            const properties = feature.properties;
+            const countyCode = properties.COUNTY_COD;
+            const dataMap = new Map(Object.entries(this.countyData))
+            const dataToDisplay = dataMap.get(`${countyCode}`) ? dataMap.get(`${countyCode}`)[this.countyDataToBePicked] : '';
+            const popupContent = `
+              ${properties.COUNTY_NAM}:${dataToDisplay | 0}
+            `;
+
+            if (feature.geometry.type === 'Polygon') {
+              const center = this.getPolygonCenter(feature.geometry.coordinates[0]);
+              const label = new DivIcon({
+                className: 'region-label',
+                html: `${popupContent}`,
+              });
+              const marker = new Marker(center, { icon: label });
+              marker.addTo(this.map);
+              this.markers.push(marker);
+            }
+
+            layer.bindPopup(popupContent);
+          }
+        }).addTo(this.map);
+      });
   }
 
   private initializeMap(): void {
@@ -113,4 +153,14 @@ console.log(this.map)
     return [latSum / len, lngSum / len];
   }
 
+  downloadMapAsPDF() {
+    html2canvas(this.mapContainer.nativeElement).then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF();
+      const imgWidth = 210; // Adjust width as needed
+      const imgHeight = canvas.height * imgWidth / canvas.width;
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      pdf.save('map.pdf');
+    });
+  }
 }
