@@ -133,6 +133,9 @@ export class DashboardService {
 
 
     formatNumberToShortForm(number: any): string {
+      if(!number){
+        return '0'
+      }
       // Use the toLocaleString method to add suffixes to the number
       return number.toLocaleString('en-US', {
         // add suffixes for thousands, millions, and billions
