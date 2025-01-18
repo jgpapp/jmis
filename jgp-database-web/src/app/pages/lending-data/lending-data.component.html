@@ -68,10 +68,6 @@
                                 <mat-header-cell *matHeaderCellDef> Date Applied </mat-header-cell>
                                 <mat-cell *matCellDef="let element"> {{element.dateApplied}} </mat-cell>
                             </ng-container>
-                            <ng-container matColumnDef="loanStatus">
-                                <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
-                                <mat-cell *matCellDef="let element"> {{element.loanStatus}} </mat-cell>
-                            </ng-container>
                             <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
                             <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)"></mat-row>
                         </mat-table>

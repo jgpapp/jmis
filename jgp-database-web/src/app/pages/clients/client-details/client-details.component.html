@@ -236,10 +236,6 @@
                             <mat-header-cell *matHeaderCellDef> Date Disbursed </mat-header-cell>
                             <mat-cell *matCellDef="let element"> {{element.dateDisbursed}} </mat-cell>
                         </ng-container>
-                        <ng-container matColumnDef="loanStatus">
-                          <mat-header-cell *matHeaderCellDef> Loan Status </mat-header-cell>
-                          <mat-cell *matCellDef="let element"> {{element.loanStatus}} </mat-cell>
-                      </ng-container>
                       <mat-header-row *matHeaderRowDef="loansDisplayedColumns"></mat-header-row>
                       <mat-row *matRowDef="let row; columns: loansDisplayedColumns;"></mat-row>
                         </mat-table>
