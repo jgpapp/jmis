@@ -64,7 +64,6 @@ export class ClientsComponent implements OnInit, OnDestroy{
   }
 
   onChange(event: Event) {
-    console.log('fffffff====>'+this.searchTextInput)
     if(this.searchTextInput && this.searchTextInput.length > 2){
       this.searchText = this.searchTextInput;
       this.getAvailableClients();
