@@ -97,12 +97,6 @@ public class LoanImportHandler implements ImportHandler {
     private Loan readLoanData(Row row) {
         final var status = ImportHandlerUtils.readAsString(LoanConstants.STATUS_COL, row);
         final var pipeLineSource = ImportHandlerUtils.readAsString(LoanConstants.PIPELINE_SOURCE, row);
-        final var loanStatus = ImportHandlerUtils.readAsString(LoanConstants.LOAN_STATUS, row);
-        var loanStatusEnum = Loan.LoanStatus.NEW;
-        validateLoanStatus(loanStatus, row);
-        if (null == rowErrorMap.get(row) && null != loanStatus){
-            loanStatusEnum = Loan.LoanStatus.valueOf(loanStatus.toUpperCase());
-        }
         final var applicationDate = ImportHandlerUtils.readAsDate(LoanConstants.DATE_APPLIED, row);
         final var dateDisbursed = ImportHandlerUtils.readAsDate(LoanConstants.DATE_DISBURSED, row);
         final var amountAccessed = ImportHandlerUtils.readAsDouble(LoanConstants.LOAN_AMOUNT_KES, row);
@@ -136,7 +130,7 @@ public class LoanImportHandler implements ImportHandler {
         }
 
         var loanData = new Loan(Objects.nonNull(userService.currentUser()) ? userService.currentUser().getPartner() : null,
-                null, "1001", pipeLineSource, loanQualityEnum, loanStatusEnum, applicationDate, dateDisbursed, valueAccessed,
+                null, "1001", pipeLineSource, loanQualityEnum, Loan.LoanStatus.APPROVED, applicationDate, dateDisbursed, valueAccessed,
                 loanDuration, outStandingAmount, LocalDate.now(ZoneId.systemDefault()), null, recordedToJGPDBOnDate,
                 loanAmountRepaid, loanerType, tranchAmountAllocated, tranchAmountDisbursed, loanProduct, row.getRowNum());
 
@@ -296,13 +290,6 @@ public class LoanImportHandler implements ImportHandler {
         if (!violations.isEmpty()) {
             ConstraintViolation<Loan> firstViolation = violations.iterator().next();
             rowErrorMap.put(row, firstViolation.getMessage());
-        }
-    }
-
-    private void validateLoanStatus(String value, Row row) {
-        final var deliveryModes = Set.of("APPROVED", "REJECTED");
-        if (null != value && !deliveryModes.contains(value.toUpperCase())){
-            rowErrorMap.put(row, "Invalid Value for Loan Status (Must be Approved/Rejected) !!");
         }
     }
 

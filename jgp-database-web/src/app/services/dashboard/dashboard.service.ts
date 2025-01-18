@@ -94,9 +94,8 @@ export class DashboardService {
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-accessed-vs-out-standing-per-gender?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
-    getCountySummaryMap(partnerId: number | undefined = undefined): Observable<any> {
-      const queryParam = (partnerId ? `?partner-id=${partnerId}` : '');
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/county-summary-map${queryParam}`);
+    getCountySummaryMap(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/county-summary-map?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
     getKenyanCounties(): Observable<any> {

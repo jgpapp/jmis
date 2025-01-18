@@ -370,7 +370,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getCountySummaryMap() {
-    this.dashBoardService.getCountySummaryMap()
+    this.dashBoardService.getCountySummaryMap(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
