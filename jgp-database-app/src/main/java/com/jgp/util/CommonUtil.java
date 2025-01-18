@@ -175,4 +175,8 @@ public abstract class CommonUtil {
         final var strLength = stringValue.length();
         return strLength >= min && strLength <= max;
     }
+
+    public static String defaultToOtherIfStringIsNull(String value){
+        return null != value ? value : "Other";
+    }
 }

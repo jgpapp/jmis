@@ -654,12 +654,13 @@ public class DashboardServiceImpl implements DashboardService {
             var dataPoints = new ArrayList<DataPointDto>();
             while (rs.next()){
                 final var dataKey = rs.getString("dataKey");
+                final var nullableDataKey = CommonUtil.defaultToOtherIfStringIsNull(dataKey);
                 if (DashboardServiceImpl.INTEGER_DATA_POINT_TYPE.equals(this.valueDataType)){
-                    dataPoints.add(new DataPointDto(StringUtils.capitalize(dataKey), String.valueOf(rs.getInt(DATA_VALUE_PARAM)), String.valueOf(rs.getBigDecimal(DATA_PERCENTAGE_VALUE_PARAM))));
+                    dataPoints.add(new DataPointDto(StringUtils.capitalize(nullableDataKey), String.valueOf(rs.getInt(DATA_VALUE_PARAM)), String.valueOf(rs.getBigDecimal(DATA_PERCENTAGE_VALUE_PARAM))));
                 } else if (DECIMAL_DATA_POINT_TYPE.equals(this.valueDataType)) {
-                    dataPoints.add(new DataPointDto(StringUtils.capitalize(dataKey), String.valueOf(rs.getBigDecimal(DATA_VALUE_PARAM)), String.valueOf(rs.getBigDecimal(DATA_PERCENTAGE_VALUE_PARAM))));
+                    dataPoints.add(new DataPointDto(StringUtils.capitalize(nullableDataKey), String.valueOf(rs.getBigDecimal(DATA_VALUE_PARAM)), String.valueOf(rs.getBigDecimal(DATA_PERCENTAGE_VALUE_PARAM))));
                 }else {
-                    dataPoints.add(new DataPointDto(StringUtils.capitalize(dataKey), rs.getString(DATA_VALUE_PARAM), String.valueOf(rs.getBigDecimal(DATA_PERCENTAGE_VALUE_PARAM))));
+                    dataPoints.add(new DataPointDto(StringUtils.capitalize(nullableDataKey), rs.getString(DATA_VALUE_PARAM), String.valueOf(rs.getBigDecimal(DATA_PERCENTAGE_VALUE_PARAM))));
                 }
             }
             return dataPoints;
@@ -728,27 +729,30 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
         while (rs.next()){
             final var taName = rs.getString("name");
             final var seriesName = rs.getString("seriesName");
+            final var nullableTaName = CommonUtil.defaultToOtherIfStringIsNull(taName);
+            final var nullableSeriesName = CommonUtil.defaultToOtherIfStringIsNull(seriesName);
+
             final var value = rs.getInt("value");
 
-            if (dataPointsMap.containsKey(taName)){
-                var genderMap = dataPointsMap.get(taName);
-                if (genderMap.containsKey(seriesName)){
-                    genderMap.put(seriesName, value + genderMap.get(seriesName));
+            if (dataPointsMap.containsKey(nullableTaName)){
+                var genderMap = dataPointsMap.get(nullableTaName);
+                if (genderMap.containsKey(nullableSeriesName)){
+                    genderMap.put(nullableSeriesName, value + genderMap.get(nullableSeriesName));
                 }else {
-                    genderMap.put(seriesName, value);
+                    genderMap.put(nullableSeriesName, value);
                 }
             }else {
                 var genderMap = new HashMap<String, Integer>();
-                genderMap.put(seriesName, value);
-                dataPointsMap.put(taName, genderMap);
+                genderMap.put(nullableSeriesName, value);
+                dataPointsMap.put(nullableTaName, genderMap);
             }
         }
         for (Map.Entry<String, Map<String, Integer>> entry: dataPointsMap.entrySet()){
             var series = new HashSet<DataPointDto>();
             for (Map.Entry<String, Integer> seriesEntry: entry.getValue().entrySet()){
-                series.add(new DataPointDto(StringUtils.capitalize(seriesEntry.getKey()), seriesEntry.getValue().toString(), ""));
+                series.add(new DataPointDto(StringUtils.capitalize(CommonUtil.defaultToOtherIfStringIsNull(seriesEntry.getKey())), seriesEntry.getValue().toString(), ""));
             }
-            dataPoints.add(new SeriesDataPointDto(StringUtils.capitalize(entry.getKey()), series));
+            dataPoints.add(new SeriesDataPointDto(StringUtils.capitalize(CommonUtil.defaultToOtherIfStringIsNull(entry.getKey())), series));
         }
         return dataPoints;
     }
@@ -808,7 +812,7 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
                 final var genderName = rs.getString("genderName");
                 final var year = rs.getInt("year");
                 final var value = INTEGER_DATA_POINT_TYPE.equals(valueDataType) ? rs.getInt("value") : rs.getBigDecimal("value");
-                dataPoints.add(new PartnerYearlyDataDto(StringUtils.capitalize(partnerName), StringUtils.capitalize(genderName), year, CommonUtil.NUMBER_FORMAT.format(value)));
+                dataPoints.add(new PartnerYearlyDataDto(StringUtils.capitalize(CommonUtil.defaultToOtherIfStringIsNull(partnerName)), StringUtils.capitalize(CommonUtil.defaultToOtherIfStringIsNull(genderName)), year, CommonUtil.NUMBER_FORMAT.format(value)));
 
             }
             return dataPoints;
@@ -848,7 +852,7 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
 
                 final var county = CommonUtil.KenyanCounty.getKenyanCountyFromCode(countyCode);
                 final var kenyaCounty = county.orElse(CommonUtil.KenyanCounty.UNKNOWN);
-                dataPoints.add(new CountySummaryDto(countyCode, kenyaCounty.getCountyName(), businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount));
+                dataPoints.add(new CountySummaryDto(CommonUtil.defaultToOtherIfStringIsNull(countyCode), kenyaCounty.getCountyName(), businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount));
             }
             return dataPoints;
         }
