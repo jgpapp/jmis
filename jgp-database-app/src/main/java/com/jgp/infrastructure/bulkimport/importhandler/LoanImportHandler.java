@@ -84,7 +84,7 @@ public class LoanImportHandler implements ImportHandler {
     public void readExcelFile() {
         Sheet loanSheet = workbook.getSheet(TemplatePopulateImportConstants.LOAN_SHEET_NAME);
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(loanSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
-        updateImportProgress(this.documentImportProgressUUId, true, noOfEntries);
+
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
             Row row;
             row = loanSheet.getRow(rowIndex);
@@ -92,6 +92,7 @@ public class LoanImportHandler implements ImportHandler {
                 loanDataList.add(readLoanData(row));
             }
         }
+        updateImportProgress(this.documentImportProgressUUId, true, loanDataList.size());
     }
 
     private Loan readLoanData(Row row) {
@@ -119,14 +120,11 @@ public class LoanImportHandler implements ImportHandler {
 
         statuses.add(status);
         String jgpId = ImportHandlerUtils.readAsString(LoanConstants.JGP_ID_COL, row);
-        log.info("JGP Id: {}", jgpId);
         var existingParticipant = Optional.<Participant>empty();
         if (null == jgpId){
             rowErrorMap.put(row, "JGP Id is required !!");
         }else {
-            log.info("JGP Id: {}", jgpId);
             existingParticipant = this.participantService.findOneParticipantByJGPID(jgpId);
-            log.info("Client with JGP Id Found: {}", existingParticipant.isPresent());
         }
 
         var loanData = new Loan(Objects.nonNull(userService.currentUser()) ? userService.currentUser().getPartner() : null,
@@ -222,7 +220,7 @@ public class LoanImportHandler implements ImportHandler {
         }
         setReportHeaders(groupSheet);
         log.info("Finished Import Finished := {}", LocalDateTime.now(ZoneId.systemDefault()));
-        return Count.instance(successCount, errorCount);
+        return Count.instance(loanDataSize, successCount, errorCount);
     }
 
     private void writeGroupErrorMessage(String errorMessage, int progressLevel, Cell statusCell, Cell errorReportCell) {
@@ -273,7 +271,7 @@ public class LoanImportHandler implements ImportHandler {
                 rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
             }
             if (!CommonUtil.isStringValueLengthValid(participantDto.phoneNumber(), 9, 12)){
-                rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
+                rowErrorMap.put(row, "Phone number must be 9-12 digits !!");
             }
         }
     }

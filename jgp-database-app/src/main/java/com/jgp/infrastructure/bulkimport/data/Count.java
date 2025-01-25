@@ -5,16 +5,18 @@ import lombok.Getter;
 @Getter
 public final class Count {
 
-    private Integer successCount;
-    private Integer errorCount;
+    private final Integer successCount;
+    private final Integer errorCount;
+    private final Integer totalCount;
 
-    public static Count instance(final Integer successCount, final Integer errorCount) {
-        return new Count(successCount, errorCount);
+    public static Count instance(final Integer totalCount, final Integer successCount, final Integer errorCount) {
+        return new Count(totalCount, successCount, errorCount);
     }
 
-    private Count(final Integer successCount, final Integer errorCount) {
+    private Count(final Integer totalCount, final Integer successCount, final Integer errorCount) {
         this.successCount = successCount;
         this.errorCount = errorCount;
+        this.totalCount = totalCount;
     }
 
 }

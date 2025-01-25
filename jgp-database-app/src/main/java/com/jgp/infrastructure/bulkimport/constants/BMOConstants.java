@@ -16,7 +16,7 @@ public final class BMOConstants {
     public static final int INDUSTRY_SECTOR_COL = 7;// H
     public static final int BUSINESS_SEGMENT_COL = 8;// I
     public static final int TA_DELIVERY_MODE = 9;// J
-    public static final int BUSINESS_REG_NUMBER = 10;// K
+    public static final int BUSINESS_IS_REGISTERED = 10;// K
     public static final int BEST_MONTH_MONTHLY_REVENUE_COL = 11;// L
     public static final int WORST_MONTH_MONTHLY_REVENUE_COL = 12;// M
     public static final int TOTAL_REGULAR_EMPLOYEES_COL = 13;// N

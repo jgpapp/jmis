@@ -182,7 +182,7 @@ public final class ImportHandlerUtils {
         } else if (c.getCellType() == CellType.NUMERIC) {
             return ((Double) c.getNumericCellValue()).intValue();
         } else {
-            return Integer.parseInt(row.getCell(colIndex).getStringCellValue());
+            return Integer.parseInt(row.getCell(colIndex).getStringCellValue().trim());
         }
     }
 

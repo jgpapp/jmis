@@ -430,9 +430,8 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
     console.log(event);
   }
 
-  valueFormatting = (value: any) => {
-    // Custom value formatting: Convert to a string with thousands separator
-    return this.dashBoardService.formatNumberToShortForm(value); // Outputs as "8,940,000"
+  valueFormatting = (value: number) => {
+    return this.dashBoardService.formatNumberToShortForm(Number(value)); // Outputs as "8.94M"
   };
 
 
@@ -471,11 +470,12 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartShowLabels: this.loansDisbursedByGenderShowLabels,
       chartExplodeSlices: this.loansDisbursedByGenderExplodeSlices,
       chartIsDoughnut: this.loansDisbursedByGenderDoughnut,
+      labelFormatting: this.valueFormatting,
       chartTitle: 'Loan Disbursed by Gender',
       chartFormatLabel: (label: string): string => {
         // Find the data object by name and return the value instead of name
         const item = this.loansDisbursedByGender.find(data => data.name === label);
-        return item ? `${item.value}` : label; // If found, return the value; otherwise return the name as fallback
+        return item ? `${this.valueFormatting(item.value)}` : label; // If found, return the value; otherwise return the name as fallback
       }
     };
     this.openExpandedChartDialog(data);
@@ -495,7 +495,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartFormatLabel: (label: string): string => {
         // Find the data object by name and return the value instead of name
         const item = this.loansDisbursedByPipeline.find(data => data.name === label);
-        return item ? `${item.value}` : label; // If found, return the value; otherwise return the name as fallback
+        return item ? `${this.valueFormatting(item.value)}` : label; // If found, return the value; otherwise return the name as fallback
       }
     };
     this.openExpandedChartDialog(data);
@@ -528,6 +528,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartShowYAxisLabel: this.loansDisbursedByStatusShowYAxisLabel,
       chartYAxisLabel: this.loansDisbursedByStatusYAxisLabel,
       chartXAxisLabel: this.loansDisbursedByStatusXAxisLabel,
+      chartFormatLabel: this.valueFormatting,
       chartTitle: this.loansDisbursedByStatusChartTitle,
     };
     this.openExpandedChartDialog(data);
@@ -548,6 +549,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartShowYAxisLabel: this.TANeedsByGenderShowYAxisLabel,
       chartYAxisLabel: this.TANeedsByGenderYAxisLabel,
       chartXAxisLabel: this.TANeedsByGenderXAxisLabel,
+      chartFormatLabel: this.valueFormatting,
       chartTitle: this.TANeedsByGenderChartTitle,
     };
     this.openExpandedChartDialog(data);
@@ -568,6 +570,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartShowYAxisLabel: this.trainingByPartnerByGenderShowYAxisLabel,
       chartYAxisLabel: this.trainingByPartnerByGenderYAxisLabel,
       chartXAxisLabel: this.trainingByPartnerByGenderXAxisLabel,
+      chartFormatLabel: this.valueFormatting,
       chartTitle: this.trainingByPartnerByGenderChartTitle,
     };
     this.openExpandedChartDialog(data);
@@ -588,6 +591,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartShowYAxisLabel: this.taTrainedBySectorShowYAxisLabel,
       chartYAxisLabel: this.taTrainedBySectorXAxisLabel,
       chartXAxisLabel: this.taTrainedBySectorYAxisLabel,
+      chartFormatLabel: this.valueFormatting,
       chartTitle: this.taTrainedBySectorChartTitle,
     };
     this.openExpandedChartDialog(data);
@@ -608,6 +612,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartShowYAxisLabel: this.accessedVSOutStandingAmountShowYAxisLabel,
       chartYAxisLabel: this.accessedVSOutStandingAmountYAxisLabel,
       chartXAxisLabel: this.accessedVSOutStandingAmountXAxisLabel,
+      chartFormatLabel: this.valueFormatting,
       chartTitle: this.accessedVSOutStandingAmountChartTitle,
     };
     this.openExpandedChartDialog(data);

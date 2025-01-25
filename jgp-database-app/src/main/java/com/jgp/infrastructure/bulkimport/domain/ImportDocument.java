@@ -80,11 +80,12 @@ public class ImportDocument extends BaseEntity {
         this.partner = partner;
     }
 
-    public void update(final LocalDateTime endTime, final Integer successCount, final Integer errorCount) {
+    public void update(final LocalDateTime endTime, final Integer totalCount, final Integer successCount, final Integer errorCount) {
         this.endTime = endTime;
         this.completed = Boolean.TRUE;
         this.successCount = successCount;
         this.failureCount = errorCount;
+        this.totalRecords = totalCount;
     }
 
     @Override
