@@ -2,6 +2,8 @@
 package com.jgp.infrastructure.bulkimport.service;
 
 import com.jgp.authentication.service.PlatformSecurityContext;
+import com.jgp.infrastructure.bulkimport.constants.BMOConstants;
+import com.jgp.infrastructure.bulkimport.constants.LoanConstants;
 import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.bulkimport.data.ImportData;
 import com.jgp.infrastructure.bulkimport.domain.ImportDocument;
@@ -116,7 +118,6 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
 
         BulkImportEvent event = new BulkImportEvent(workbook, entityType.name(), importDocument.getId(), importProgressUUID);
         applicationContext.publishEvent(event);
-        log.info("Return import ID := {}", LocalDateTime.now(ZoneId.systemDefault()));
         return importDocument.getId();
     }
 
@@ -212,8 +213,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     private static final class ImportTemplateLocationMapper implements RowMapper<DocumentData> {
 
         public String schema() {
-            return "d.location,d.file_name " + "from import_document i inner join jgp_document d on i.document_id=d.id " +
-                    "where i.id= ? ";
+            return "d.location,d.file_name from import_document i inner join jgp_document d on i.document_id=d.id where d.id= ? ";
         }
 
         @Override

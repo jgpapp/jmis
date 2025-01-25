@@ -58,7 +58,7 @@ public class BulkImportEventListener {
 
         final var count = importHandler.process(bulkImportEvent);
         final Workbook workbook = bulkImportEvent.workbook();
-        importDocument.update(LocalDateTime.now(ZoneId.systemDefault()), count.getSuccessCount(), count.getErrorCount());
+        importDocument.update(LocalDateTime.now(ZoneId.systemDefault()), count.getTotalCount(), count.getSuccessCount(), count.getErrorCount());
         this.importRepository.saveAndFlush(importDocument);
 
         final Set<String> modifiedParams = new HashSet<>();

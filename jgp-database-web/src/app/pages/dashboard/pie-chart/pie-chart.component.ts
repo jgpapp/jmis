@@ -29,6 +29,7 @@ export class PieChartComponent {
   @Input('chartTitle') chartTitle: string;
   @Input('chartView') chartView: [number, number];
   @Input('chartFormatLabel') chartFormatLabel: any;
+  @Input('labelFormatting') labelFormatting: any;
   //@ViewChild('resizedDiv') resizedDiv: ElementRef;
   //public previousWidthOfResizedDiv: number = 0;
 

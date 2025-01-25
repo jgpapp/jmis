@@ -58,6 +58,7 @@ export class KenyanMapComponent implements OnInit {
     const element = this.kenyanMapChartContainer.nativeElement;
     const containerWidth = element.offsetWidth - this.margin.left - this.margin.right;
     const containerHeight = element.offsetHeight - this.margin.top - this.margin.bottom;
+    console.log('Width: '+containerWidth+" Height: "+containerHeight)
 
     d3.json(this.kenyanMapJson).then(res => {
       this.kenyanGeoJson = res;
@@ -67,7 +68,6 @@ export class KenyanMapComponent implements OnInit {
     const dx = bounds[1][0] - bounds[0][0]; // Longitude range
     const dy = bounds[1][1] - bounds[0][1]; // Latitude range
     const scale = this.calculateScale(dx, dy, containerWidth, containerHeight);
-    
 
     this.svg = d3.select("figure#map")
       .append("svg")
@@ -75,7 +75,7 @@ export class KenyanMapComponent implements OnInit {
       .attr("height", containerHeight);
 
     this.projection = d3.geoMercator()
-      .scale(4500)
+      .scale(4200)
       .center([37.9062, 0.0236])  // Kenya's center
       .translate([containerWidth / 2, containerHeight / 2]);
 
@@ -163,7 +163,7 @@ export class KenyanMapComponent implements OnInit {
     const yScale = containerHeight / dy;
   
     // Return the smaller of the two scale factors to ensure the map fits both horizontally and vertically
-    return Math.min(xScale, yScale);
+    return Math.max(xScale, yScale);
   }
 
   categorizeAndColor(values: number[], colorArray: string[]): { value: number, category: number, color: string }[] {

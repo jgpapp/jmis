@@ -15,6 +15,7 @@
       [explodeSlices]="data.chartExplodeSlices" 
       [doughnut]="data.chartIsDoughnut" 
       [chartFormatLabel]="data.chartFormatLabel"
+      [labelFormatting]="data.labelFormatting"
       /> 
   }
   @if (data.chartType === 'kenyan-county-map') {
@@ -37,6 +38,7 @@
     [showYAxisLabel]="data.chartShowYAxisLabel"
     [xAxisLabel]="data.chartXAxisLabel"
     [yAxisLabel]="data.chartYAxisLabel"
+    [dataLabelFormatting]="data.chartFormatLabel"
     (select)="onSelect($event)"
 /> 
   }
@@ -52,6 +54,7 @@
       [showYAxisLabel]="data.chartShowYAxisLabel"
       [xAxisLabel]="data.chartXAxisLabel"
       [yAxisLabel]="data.chartYAxisLabel"
+      [dataLabelFormatting]="data.chartFormatLabel"
       (select)="onSelect($event)"
   />   
   }
@@ -67,6 +70,7 @@
     [showYAxisLabel]="data.chartShowYAxisLabel"
     [xAxisLabel]="data.chartXAxisLabel"
     [yAxisLabel]="data.chartYAxisLabel"
+    [dataLabelFormatting]="data.chartFormatLabel"
     (select)="onSelect($event)"
 />  
   }

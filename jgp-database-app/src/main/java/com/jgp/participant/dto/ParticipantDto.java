@@ -31,7 +31,7 @@ public record ParticipantDto(
 
         String industrySector,
 
-        @NotBlank(message = "business segment is required !!")
+        //@NotBlank(message = "business segment is required !!")
         String businessSegment,
 
         //@NotNull(message = "Business registration is required !!")

@@ -53,7 +53,7 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(LoanConstants.AGE_COL, rowHeader, "Age of owner (full years)*");
         writeString(LoanConstants.PASS_PORT_COL, rowHeader, "Passport");
         writeString(LoanConstants.BUSINESS_LOCATION_COL, rowHeader, "Business Location(County)*");
-        writeString(LoanConstants.INDUSTRY_SECTOR_COL, rowHeader, "Industry sector*");
+        writeString(LoanConstants.INDUSTRY_SECTOR_COL, rowHeader, "Industry sector*(Agriculture, Artists/artisans, Manufacturing, Trading & Retail, Other)");
         writeString(LoanConstants.PIPELINE_SOURCE, rowHeader, "Pipeline source*");
         writeString(LoanConstants.DATE_APPLIED, rowHeader, "Date loan application(yyyy-MM-dd)*");
         writeString(LoanConstants.DATE_DISBURSED, rowHeader, "Date loan disbursed(yyyy-MM-dd)*");

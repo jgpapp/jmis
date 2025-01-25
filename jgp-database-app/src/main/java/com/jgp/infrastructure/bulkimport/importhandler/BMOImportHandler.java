@@ -84,7 +84,6 @@ public class BMOImportHandler implements ImportHandler {
     public void readExcelFile() {
         Sheet bmoSheet = workbook.getSheet(TemplatePopulateImportConstants.BMO_SHEET_NAME);
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(bmoSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
-        updateImportProgress(this.documentImportProgressUUId, true, noOfEntries);
 
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
             Row row;
@@ -93,6 +92,7 @@ public class BMOImportHandler implements ImportHandler {
                 bmoDataList.add(readBMOData(row));
             }
         }
+        updateImportProgress(this.documentImportProgressUUId, true, bmoDataList.size());
     }
 
 
@@ -157,7 +157,10 @@ public class BMOImportHandler implements ImportHandler {
         final var locationCountyCode = CommonUtil.KenyanCounty.getKenyanCountyFromName(businessLocation);
         final var industrySector = ImportHandlerUtils.readAsString(BMOConstants.INDUSTRY_SECTOR_COL, row);
         final var businessSegment = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_SEGMENT_COL, row);
-        final var registrationNumber = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_REG_NUMBER, row);
+        if (null == businessSegment && null == rowErrorMap.get(row)){
+            rowErrorMap.put(row, "Business segment is required !!");
+        }
+        final var registrationNumber = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_IS_REGISTERED, row);
         final var bestMonthlyRevenueD = ImportHandlerUtils.readAsDouble(BMOConstants.BEST_MONTH_MONTHLY_REVENUE_COL, row);
         final var bestMonthlyRevenue = Objects.nonNull(bestMonthlyRevenueD) ? BigDecimal.valueOf(bestMonthlyRevenueD) : null;
         final var worstMonthlyRevenueD = ImportHandlerUtils.readAsDouble(BMOConstants.WORST_MONTH_MONTHLY_REVENUE_COL, row);
@@ -179,7 +182,7 @@ public class BMOImportHandler implements ImportHandler {
                 .phoneNumber(phoneNumber).bestMonthlyRevenue(bestMonthlyRevenue).bmoMembership(null)
                 .hasBMOMembership(Boolean.TRUE).businessLocation(businessLocation).businessName(businessName)
                 .ownerGender(gender).ownerAge(age).industrySector(industrySector).businessSegment(businessSegment)
-                .registrationNumber(registrationNumber).isBusinessRegistered(null != registrationNumber)
+                .registrationNumber("10001").isBusinessRegistered(registrationNumber != null && registrationNumber.trim().equalsIgnoreCase("YES"))
                 .worstMonthlyRevenue(worstMonthlyRevenue).totalRegularEmployees(totalRegularEmployees)
                 .youthRegularEmployees(youthRegularEmployees).totalCasualEmployees(totalCasualEmployees)
                 .youthCasualEmployees(youthCasualEmployees).sampleRecords(sampleRecordsKept)
@@ -230,7 +233,7 @@ public class BMOImportHandler implements ImportHandler {
         }
         setReportHeaders(groupSheet);
         log.info("Finished Import Finished := {}", LocalDateTime.now(ZoneId.systemDefault()));
-        return Count.instance(successCount, errorCount);
+        return Count.instance(bmoDataSize, successCount, errorCount);
     }
 
     private void writeGroupErrorMessage(String errorMessage, int progressLevel, Cell statusCell, Cell errorReportCell) {
@@ -282,7 +285,7 @@ public class BMOImportHandler implements ImportHandler {
                 rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
             }
             if (!CommonUtil.isStringValueLengthValid(participantDto.phoneNumber(), 9, 12)){
-                rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
+                rowErrorMap.put(row, "Phone number must be 9-12 digits !!");
             }
         }
     }
