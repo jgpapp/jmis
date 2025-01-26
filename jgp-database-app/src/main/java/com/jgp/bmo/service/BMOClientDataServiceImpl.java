@@ -7,19 +7,14 @@ import com.jgp.bmo.domain.predicate.BMOPredicateBuilder;
 import com.jgp.bmo.dto.BMOClientDto;
 import com.jgp.bmo.dto.BMOParticipantSearchCriteria;
 import com.jgp.bmo.mapper.BMOClientMapper;
-import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
-import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
-import com.jgp.participant.domain.ParticipantRepository;
 import com.jgp.util.CommonUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,10 +24,8 @@ import java.util.Objects;
 public class BMOClientDataServiceImpl implements BMOClientDataService {
 
     private final BMOClientDataRepository bmoDataRepository;
-    private final ApplicationEventPublisher publisher;
     private final BMOClientMapper bmoClientMapper;
     private final BMOPredicateBuilder bmoPredicateBuilder;
-    private final ParticipantRepository participantRepository;
     private final PlatformSecurityContext platformSecurityContext;
 
     @Override
@@ -51,15 +44,23 @@ public class BMOClientDataServiceImpl implements BMOClientDataService {
                 bmoData = this.bmoDataRepository.findAll(this.bmoPredicateBuilder.buildPredicateForSearchTAData(new BMOParticipantSearchCriteria(currentUserPartner.getId(), null, false)), Pageable.unpaged()).getContent();
             }
         }
-        bmoData.forEach(bmo -> {
+        int count = 0;
+        var bmoToSave = new ArrayList<BMOParticipantData>();
+        for(BMOParticipantData bmo : bmoData) {
             bmo.approveData(approval);
             var participant = bmo.getParticipant();
             if (Boolean.TRUE.equals(approval) && Boolean.FALSE.equals(participant.getIsActive())){
                 participant.activateParticipant();
-                this.participantRepository.save(participant);
             }
-        });
-        this.bmoDataRepository.saveAll(bmoData);
+            bmoToSave.add(bmo);
+            count++;
+            if (count % 20 == 0) { // Flush and clear the session every 20 entities
+                this.bmoDataRepository.saveAllAndFlush(bmoToSave);
+                count = 0;
+                bmoToSave = new ArrayList<>();
+            }
+        }
+        this.bmoDataRepository.saveAllAndFlush(bmoToSave);
     }
 
     @Override
