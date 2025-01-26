@@ -27,13 +27,12 @@ public final class LoanConstants {
     public static final int YOUTH_REGULAR_EMPLOYEES_COL = 17;// R
     public static final int TOTAL_CASUAL_EMPLOYEES_COL = 18;// S
     public static final int YOUTH_CASUAL_EMPLOYEES_COL = 19;// T
-    public static final int BUSINESS_SEGMENT_COL = 20;// U
-    public static final int LOANER_TYPE_COL = 21;// V
-    public static final int DATE_RECORDED_TO_JGP_DB_COL = 22;// W
-    public static final int LOAN_PRODUCT_COL = 23;// X
-    public static final int TRANCH_AMOUNT_ALLOCATED_COL = 24;// Y
-    public static final int TRANCH_AMOUNT_DISBURSED_COL = 25;// Z
+    public static final int LOANER_TYPE_COL = 20;// U
+    public static final int DATE_RECORDED_TO_JGP_DB_COL = 21;// V
+    public static final int LOAN_PRODUCT_COL = 22;// W
+    public static final int TRANCH_AMOUNT_ALLOCATED_COL = 23;// X
+    public static final int TRANCH_AMOUNT_DISBURSED_COL = 24;// Y
 
-    public static final int FAILURE_COL = 26;// AA
-    public static final int STATUS_COL = 27;// AB
+    public static final int FAILURE_COL = 25;// Z
+    public static final int STATUS_COL = 26;// AA
 }
