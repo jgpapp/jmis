@@ -50,10 +50,12 @@ public class Loan extends BaseEntity {
     private BigDecimal loanAmountApproved;
 
     @NotNull(message = "Loan Amount is required !!")
+    @Min(value = 0, message = "Loan Amount is required !!")
     @Column(name = "loan_amount_accessed")
     private BigDecimal loanAmountAccessed;
 
-    @Min(value = 1, message = "Outstanding Loan Amount is required !!")
+    @NotNull(message = "Outstanding Loan Amount is required !!")
+    @Min(value = 0, message = "Outstanding Loan Amount is required !!")
     @Column(name = "loan_outstanding_amount")
     private BigDecimal loanOutStandingAmount;
 

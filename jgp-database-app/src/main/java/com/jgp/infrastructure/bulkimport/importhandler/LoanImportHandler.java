@@ -105,6 +105,10 @@ public class LoanImportHandler implements ImportHandler {
         final var loanDuration = ImportHandlerUtils.readAsInt(LoanConstants.LOAN_DURATION, row);
         final var outStandingAmountDouble = ImportHandlerUtils.readAsDouble(LoanConstants.OUT_STANDING_AMOUNT, row);
         final var outStandingAmount = BigDecimal.valueOf(outStandingAmountDouble);
+        final var accessedPlusOutStanding = valueAccessed.add(outStandingAmount);
+        if (accessedPlusOutStanding.compareTo(BigDecimal.ZERO) < 1){
+            rowErrorMap.put(row, "Loan Accessed and Outstanding can not be both 0! !");
+        }
         final var loanQuality = ImportHandlerUtils.readAsString(LoanConstants.LOAN_QUALITY, row);
         final var loanQualityEnum = null != loanQuality ? Loan.LoanQuality.valueOf(loanQuality.toUpperCase()) : Loan.LoanQuality.NORMAL;
         final var recordedToJGPDBOnDate = ImportHandlerUtils.readAsDate(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, row);
@@ -185,9 +189,13 @@ public class LoanImportHandler implements ImportHandler {
         String errorMessage = "";
         var loanDataSize = loanDataList.size();
         for (int i = 0; i < loanDataSize; i++) {
-            Row row = groupSheet.getRow(loanDataList.get(i).getRowIndex());
+            final var loanData = loanDataList.get(i);
+            Row row = groupSheet.getRow(loanData.getRowIndex());
             Cell errorReportCell = row.createCell(LoanConstants.FAILURE_COL);
             Cell statusCell = row.createCell(LoanConstants.STATUS_COL);
+            if (Objects.isNull(loanData.getParticipant())){
+                rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
+            }
             try {
                 String status = statuses.get(i);
                 progressLevel = getProgressLevel(status);
@@ -197,7 +205,7 @@ public class LoanImportHandler implements ImportHandler {
                     throw new InvalidDataException(validationError);
                 }
                 if (progressLevel == 0) {
-                    this.loanService.createLoans(List.of(loanDataList.get(i)));
+                    this.loanService.createLoans(List.of(loanData));
                     progressLevel = 1;
                 }
                 statusCell.setCellValue(TemplatePopulateImportConstants.STATUS_CELL_IMPORTED);

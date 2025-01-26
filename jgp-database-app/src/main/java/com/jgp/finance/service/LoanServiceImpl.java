@@ -7,15 +7,14 @@ import com.jgp.finance.mapper.LoanMapper;
 import com.jgp.finance.domain.Loan;
 import com.jgp.finance.domain.LoanRepository;
 import com.jgp.finance.dto.LoanDto;
-import com.jgp.participant.domain.ParticipantRepository;
 import com.jgp.util.CommonUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,10 +24,8 @@ import java.util.Objects;
 public class LoanServiceImpl implements LoanService {
 
     private final LoanRepository loanRepository;
-    private final ApplicationEventPublisher publisher;
     private final LoanMapper loanMapper;
     private final LoanPredicateBuilder loanPredicateBuilder;
-    private final ParticipantRepository participantRepository;
     private final PlatformSecurityContext platformSecurityContext;
 
     @Override
@@ -47,15 +44,23 @@ public class LoanServiceImpl implements LoanService {
                 loans = this.loanRepository.findAll(this.loanPredicateBuilder.buildPredicateForSearchLoans(new LoanSearchCriteria(currentUserPartner.getId(), null, null, null,  false, null, null)), Pageable.unpaged()).getContent();
             }
         }
-        loans.forEach(loan -> {
+        int count = 0;
+        var loansToSave = new ArrayList<Loan>();
+        for(Loan loan : loans) {
             loan.approveData(approval);
             var participant = loan.getParticipant();
             if (Boolean.TRUE.equals(approval) && Boolean.FALSE.equals(participant.getIsActive())){
                 participant.activateParticipant();
-                this.participantRepository.save(participant);
             }
-        });
-        this.loanRepository.saveAll(loans);
+            loansToSave.add(loan);
+            count++;
+            if (count % 20 == 0) { // Flush and clear the session every 20 entities
+                this.loanRepository.saveAllAndFlush(loansToSave);
+                count = 0;
+                loansToSave = new ArrayList<>();
+            }
+        }
+        this.loanRepository.saveAllAndFlush(loansToSave);
     }
 
     @Override

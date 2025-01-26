@@ -197,9 +197,13 @@ public class BMOImportHandler implements ImportHandler {
         String errorMessage = "";
         var bmoDataSize = bmoDataList.size();
         for (int i = 0; i < bmoDataSize; i++) {
-            Row row = groupSheet.getRow(bmoDataList.get(i).getRowIndex());
+            final var bmoData = bmoDataList.get(i);
+            Row row = groupSheet.getRow(bmoData.getRowIndex());
             Cell errorReportCell = row.createCell(BMOConstants.FAILURE_COL);
             Cell statusCell = row.createCell(BMOConstants.STATUS_COL);
+            if (Objects.isNull(bmoData.getParticipant())){
+                rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
+            }
             try {
                 String status = statuses.get(i);
                 progressLevel = getProgressLevel(status);
@@ -208,7 +212,7 @@ public class BMOImportHandler implements ImportHandler {
                     throw new InvalidDataException(validationError);
                 }
                 if (progressLevel == 0) {
-                    this.bmoDataService.createBMOData(List.of(bmoDataList.get(i)));
+                    this.bmoDataService.createBMOData(List.of(bmoData));
                     progressLevel = 1;
                 }
                 statusCell.setCellValue(TemplatePopulateImportConstants.STATUS_CELL_IMPORTED);
