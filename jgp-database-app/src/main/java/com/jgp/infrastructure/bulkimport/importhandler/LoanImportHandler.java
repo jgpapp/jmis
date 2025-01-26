@@ -158,7 +158,6 @@ public class LoanImportHandler implements ImportHandler {
         final var businessLocation = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_LOCATION_COL, row);
         final var locationCountyCode = CommonUtil.KenyanCounty.getKenyanCountyFromName(businessLocation);
         final var industrySector = ImportHandlerUtils.readAsString(LoanConstants.INDUSTRY_SECTOR_COL, row);
-        final var businessSegment = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_SEGMENT_COL, row);
 
         final var totalRegularEmployees = ImportHandlerUtils.readAsInt(LoanConstants.TOTAL_REGULAR_EMPLOYEES_COL, row);
         if ((null == totalRegularEmployees || totalRegularEmployees < 1) && null == rowErrorMap.get(row)){
@@ -171,7 +170,7 @@ public class LoanImportHandler implements ImportHandler {
         return ParticipantDto.builder()
                 .phoneNumber(phoneNumber).bmoMembership(null)
                 .hasBMOMembership(Boolean.TRUE).businessLocation(businessLocation).businessName(businessName)
-                .ownerGender(gender).ownerAge(age).industrySector(industrySector).businessSegment(businessSegment)
+                .ownerGender(gender).ownerAge(age).industrySector(industrySector).businessSegment("Other")
                 .totalRegularEmployees(totalRegularEmployees)
                 .youthRegularEmployees(youthRegularEmployees).totalCasualEmployees(totalCasualEmployees)
                 .youthCasualEmployees(youthCasualEmployees).jgpId(jgpId)

@@ -42,8 +42,6 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         worksheet.setColumnWidth(BMOConstants.PERSON_WITH_DISABILITY_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.REFUGEE_STATUS_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.IS_APPLICANT_ELIGIBLE_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(BMOConstants.NUMBER_TAS_ATTENDED_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(BMOConstants.NUMBER_TA_SESSION_ATTENDED_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.RECOMMENDED_FOR_FINANCE_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.DATE_OF_PIPELINE_DECISION_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.REFERRED_FI_BUSINESS_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
@@ -58,7 +56,7 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(BMOConstants.BUSINESS_LOCATION_COL, rowHeader, "Business Location (County)*");
         writeString(BMOConstants.INDUSTRY_SECTOR_COL, rowHeader, "Industry sector(Agriculture, Artists/artisans, Manufacturing, Trading & Retail, Other)");
         writeString(BMOConstants.BUSINESS_SEGMENT_COL, rowHeader, "Business segment*");
-        writeString(BMOConstants.TA_DELIVERY_MODE, rowHeader, "TA delivery mode*");
+        writeString(BMOConstants.TA_DELIVERY_MODE, rowHeader, "TA delivery mode*(In person/Virtual/Mixed)");
         writeString(BMOConstants.BUSINESS_IS_REGISTERED, rowHeader, "Is your business registered?* (Yes/No)");
         writeString(BMOConstants.BEST_MONTH_MONTHLY_REVENUE_COL, rowHeader, "Monthly revenues in best month (KES)");
         writeString(BMOConstants.WORST_MONTH_MONTHLY_REVENUE_COL, rowHeader, "Monthly revenues in worst month (KES)");
@@ -69,13 +67,11 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(BMOConstants.SAMPLE_RECORDS_KEPT_COL, rowHeader, "Sample records kept*(Purchase record, Record of sales, Delivery records, Record of expenses, Receipts, Other)");
         writeString(BMOConstants.TA_NEEDS_COL, rowHeader, "TA needs*");
         writeString(BMOConstants.OTHER_TA_NEEDS_COL, rowHeader, "Other TA Needs");
-        writeString(BMOConstants.TYPE_OF_TA_COL, rowHeader, "Type of TA*");
-        writeString(BMOConstants.PERSON_WITH_DISABILITY_COL, rowHeader, "Person with Disability*");
+        writeString(BMOConstants.TYPE_OF_TA_COL, rowHeader, "Type of TA*(Post-lending/Pre-lending/Non-lending/Mentorship/Voucher scheme)");
+        writeString(BMOConstants.PERSON_WITH_DISABILITY_COL, rowHeader, "Person with Disability*(Yes/No)");
 
-        writeString(BMOConstants.REFUGEE_STATUS_COL, rowHeader, "Refugee status*");
+        writeString(BMOConstants.REFUGEE_STATUS_COL, rowHeader, "Refugee status*(Yes/No)");
         writeString(BMOConstants.IS_APPLICANT_ELIGIBLE_COL, rowHeader, "Is applicant eligible?");
-        writeString(BMOConstants.NUMBER_TAS_ATTENDED_COL, rowHeader, "Number TAs attended");
-        writeString(BMOConstants.NUMBER_TA_SESSION_ATTENDED_COL, rowHeader, "Number TA sessions attended");
         writeString(BMOConstants.RECOMMENDED_FOR_FINANCE_COL, rowHeader, "Recommended for finance");
         writeString(BMOConstants.DATE_OF_PIPELINE_DECISION_COL, rowHeader, "Pipeline Decision Date (yyyy-MM-dd)");
         writeString(BMOConstants.REFERRED_FI_BUSINESS_COL, rowHeader, "FI business is referred to*");
