@@ -17,6 +17,8 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { GlobalService } from '@services/shared/global.service';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-dashboard',
@@ -34,13 +36,16 @@ import { GlobalService } from '@services/shared/global.service';
     NoPermissionComponent,
     DashboardFiltersComponent,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatButtonToggleModule,
+    FormsModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
 
+  selectedDashboardView: string = 'TA';
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   public displayedColumns = ['year', 'partnerName', 'genderName', 'value' ];
@@ -167,5 +172,13 @@ export class DashboardComponent {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  isFinancialDashboard(): boolean {
+    return 'FI' === this.selectedDashboardView;
+  }
+
+  isTADashboard(): boolean {
+    return 'TA' === this.selectedDashboardView;
   }
 }
