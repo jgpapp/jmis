@@ -134,6 +134,7 @@
                     [showYAxisLabel]="TANeedsByGenderShowYAxisLabel"
                     [xAxisLabel]="TANeedsByGenderXAxisLabel"
                     [yAxisLabel]="TANeedsByGenderYAxisLabel"
+                    [dataLabelFormatting]="valueFormatting"
                     (select)="onSelect($event)"
                 />
             } @else {
@@ -166,6 +167,7 @@
                     [showYAxisLabel]="trainingByPartnerByGenderShowYAxisLabel"
                     [xAxisLabel]="trainingByPartnerByGenderXAxisLabel"
                     [yAxisLabel]="trainingByPartnerByGenderYAxisLabel"
+                    [dataLabelFormatting]="valueFormatting"
                     (select)="onSelect($event)" 
                 />
             } @else {
@@ -257,6 +259,7 @@
                     [showYAxisLabel]="accessedVSOutStandingAmountShowYAxisLabel"
                     [xAxisLabel]="accessedVSOutStandingAmountXAxisLabel"
                     [yAxisLabel]="accessedVSOutStandingAmountYAxisLabel"
+                    [dataLabelFormatting]="valueFormatting"
                     (select)="onSelect($event)" 
                 />
             } @else {
@@ -313,6 +316,7 @@
                     [showYAxisLabel]="accessedVSOutStandingAmountByGenderShowYAxisLabel"
                     [xAxisLabel]="accessedVSOutStandingAmountByGenderXAxisLabel"
                     [yAxisLabel]="accessedVSOutStandingAmountByGenderYAxisLabel"
+                    [dataLabelFormatting]="valueFormatting"
                     (select)="onSelect($event)" 
                 />
             } @else {

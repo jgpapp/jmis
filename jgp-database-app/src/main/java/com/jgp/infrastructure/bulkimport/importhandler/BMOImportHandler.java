@@ -114,7 +114,7 @@ public class BMOImportHandler implements ImportHandler {
         statuses.add(status);
         String jgpId = ImportHandlerUtils.readAsString(BMOConstants.JGP_ID_COL, row);
         var existingParticipant = Optional.<Participant>empty();
-        if (null == jgpId){
+        if (null == rowErrorMap.get(row) && null == jgpId){
             rowErrorMap.put(row, "JGP Id is required !!");
         }else {
             existingParticipant = this.participantService.findOneParticipantByJGPID(jgpId);
@@ -201,8 +201,8 @@ public class BMOImportHandler implements ImportHandler {
             Row row = groupSheet.getRow(bmoData.getRowIndex());
             Cell errorReportCell = row.createCell(BMOConstants.FAILURE_COL);
             Cell statusCell = row.createCell(BMOConstants.STATUS_COL);
-            if (Objects.isNull(bmoData.getParticipant())){
-                rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
+            if (null == rowErrorMap.get(row) && Objects.isNull(bmoData.getParticipant())){
+                rowErrorMap.put(row, "Can not associate data to a participant !!");
             }
             try {
                 String status = statuses.get(i);
@@ -286,7 +286,7 @@ public class BMOImportHandler implements ImportHandler {
             if (!CommonUtil.isStringValueLengthValid(participantDto.jgpId(), 5, 10)){
                 rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
             }
-            if (!CommonUtil.isStringValueLengthValid(participantDto.phoneNumber(), 9, 12)){
+            if (null == rowErrorMap.get(row) && !CommonUtil.isStringValueLengthValid(participantDto.phoneNumber(), 9, 12)){
                 rowErrorMap.put(row, "Phone number must be 9-12 digits !!");
             }
         }
@@ -309,35 +309,35 @@ public class BMOImportHandler implements ImportHandler {
 
     private void validateTADeliveryMode(String value, Row row){
         final var deliveryModes = Set.of("in person", "virtual", "mixed");
-        if (null == value || !deliveryModes.contains(value.toLowerCase())){
+        if (null == rowErrorMap.get(row) && (null == value || !deliveryModes.contains(value.toLowerCase()))){
             rowErrorMap.put(row, "Invalid Delivery Mode (Must be In person/Virtual/Mixed) !!");
         }
     }
 
     private void validateTATypes(String value, Row row){
         final var deliveryModes = Set.of("post-lending", "pre-lending", "non-lending", "mentorship", "voucher scheme");
-        if (null == value || !deliveryModes.contains(value.toLowerCase())){
+        if (null == rowErrorMap.get(row) && (null == value || !deliveryModes.contains(value.toLowerCase()))){
             rowErrorMap.put(row, "Invalid TA Type (Must be Post-lending/Pre-lending/Non-lending/Mentorship/Voucher scheme) !!");
         }
     }
 
     private void validatePersonWithDisability(String value, Row row){
         final var deliveryModes = Set.of("YES", "NO");
-        if (null == value || !deliveryModes.contains(value.toUpperCase())){
+        if (null == rowErrorMap.get(row) && (null == value || !deliveryModes.contains(value.toUpperCase()))){
             rowErrorMap.put(row, "Invalid Value for Person With Disability (Must be Yes/No) !!");
         }
     }
 
     private void validateRefugeeStatus(String value, Row row){
         final var deliveryModes = Set.of("YES", "NO");
-        if (null == value || !deliveryModes.contains(value.toUpperCase())){
+        if (null == rowErrorMap.get(row) && (null == value || !deliveryModes.contains(value.toUpperCase()))){
             rowErrorMap.put(row, "Invalid Value for Refugee Status (Must be Yes/No) !!");
         }
     }
 
     private void validateFinanceRecommendation(String value, Row row){
         final var deliveryModes = Set.of("YES", "NO");
-        if (null == value || !deliveryModes.contains(value.toUpperCase())){
+        if (null == rowErrorMap.get(row) && (null == value || !deliveryModes.contains(value.toUpperCase()))){
             rowErrorMap.put(row, "Invalid Value for Finance Recommendation (Must be Yes/No) !!");
         }
     }
