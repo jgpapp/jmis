@@ -1,6 +1,7 @@
 <div fxLayout="row wrap" #resizedDiv>
 
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByGenderContentDiv> 
+    @if(isFinancialDashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByGenderContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByGenderDoughnut()">
             <mat-icon>open_in_full</mat-icon>
           </button>
@@ -24,9 +25,11 @@
             </div>
         </mat-card>
     </div> 
+}
     
-    
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByPipelineContentDiv> 
+
+@if(isFinancialDashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByPipelineContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByPipelinePieChart()">
             <mat-icon>open_in_full</mat-icon>
           </button>
@@ -50,8 +53,10 @@
             </div>
         </mat-card>
     </div> 
+}
 
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByStatusContentDiv> 
+@if(isFinancialDashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByStatusContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByStatusBarChart()">
             <mat-icon>open_in_full</mat-icon>
           </button>
@@ -81,8 +86,10 @@
             </div>
         </mat-card>
     </div> 
+}
     
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
+@if(isFinancialDashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
                 <mat-card-title>{{loansDisbursedBySegmentChartTitle}}</mat-card-title>
@@ -103,8 +110,10 @@
             </div>
         </mat-card>
     </div>
+}
 
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #taNeedsByGenderContentDiv> 
+@if(isTADashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #taNeedsByGenderContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandTANeedsByGenderBarChart()">
             <mat-icon>open_in_full</mat-icon>
           </button>
@@ -125,6 +134,7 @@
                     [showYAxisLabel]="TANeedsByGenderShowYAxisLabel"
                     [xAxisLabel]="TANeedsByGenderXAxisLabel"
                     [yAxisLabel]="TANeedsByGenderYAxisLabel"
+                    [dataLabelFormatting]="valueFormatting"
                     (select)="onSelect($event)"
                 />
             } @else {
@@ -133,8 +143,10 @@
             </div>
         </mat-card>
     </div>
+}
 
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #trainingByPartnerByGenderContentDiv> 
+@if(isTADashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #trainingByPartnerByGenderContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandTrainingByPartnerByGenderBarChart()">
             <mat-icon>open_in_full</mat-icon>
           </button>
@@ -155,6 +167,7 @@
                     [showYAxisLabel]="trainingByPartnerByGenderShowYAxisLabel"
                     [xAxisLabel]="trainingByPartnerByGenderXAxisLabel"
                     [yAxisLabel]="trainingByPartnerByGenderYAxisLabel"
+                    [dataLabelFormatting]="valueFormatting"
                     (select)="onSelect($event)" 
                 />
             } @else {
@@ -163,8 +176,10 @@
             </div>
         </mat-card>
     </div> 
+}
 
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByGenderContentDiv> 
+@if(isTADashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByGenderContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByGenderDoughnut()">
             <mat-icon>open_in_full</mat-icon>
           </button>
@@ -188,8 +203,10 @@
             </div>
         </mat-card>
     </div> 
+}
     
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #taTrainedBySectorContentDiv> 
+@if(isTADashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #taTrainedBySectorContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandTaTrainedBySectorBarChart()">
             <mat-icon>open_in_full</mat-icon>
           </button>
@@ -218,7 +235,10 @@
             </div>
         </mat-card>
     </div>  
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #accessedVSOutStandingAmountContentDiv> 
+}
+
+@if(isFinancialDashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #accessedVSOutStandingAmountContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandAccessedVSOutStandingAmountBarChart()">
             <mat-icon>open_in_full</mat-icon>
           </button>
@@ -239,6 +259,7 @@
                     [showYAxisLabel]="accessedVSOutStandingAmountShowYAxisLabel"
                     [xAxisLabel]="accessedVSOutStandingAmountXAxisLabel"
                     [yAxisLabel]="accessedVSOutStandingAmountYAxisLabel"
+                    [dataLabelFormatting]="valueFormatting"
                     (select)="onSelect($event)" 
                 />
             } @else {
@@ -247,7 +268,10 @@
             </div>
         </mat-card>
     </div> 
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #taTrainedBySegmentContentDiv> 
+}
+
+@if(isTADashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #taTrainedBySegmentContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandTaTrainedBySegmentPieChart()">
             <mat-icon>open_in_full</mat-icon>
           </button>
@@ -271,8 +295,10 @@
             </div>
         </mat-card>
     </div>  
+}
 
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
+@if(isFinancialDashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
                 <mat-card-title>{{accessedVSOutStandingAmountByGenderChartTitle}}</mat-card-title>
@@ -290,6 +316,7 @@
                     [showYAxisLabel]="accessedVSOutStandingAmountByGenderShowYAxisLabel"
                     [xAxisLabel]="accessedVSOutStandingAmountByGenderXAxisLabel"
                     [yAxisLabel]="accessedVSOutStandingAmountByGenderYAxisLabel"
+                    [dataLabelFormatting]="valueFormatting"
                     (select)="onSelect($event)" 
                 />
             } @else {
@@ -298,9 +325,10 @@
             </div>
         </mat-card>
     </div> 
+}
 
-
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByGenderContentDiv> 
+@if(isFinancialDashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByGenderContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByGenderDoughnut()">
             <mat-icon>open_in_full</mat-icon>
           </button>
@@ -324,8 +352,10 @@
             </div>
         </mat-card>
     </div> 
+}
 
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
+@if(isFinancialDashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
                 <mat-card-title>{{topFourPartnersloansDisbursedChartTitle}}</mat-card-title>
@@ -343,8 +373,10 @@
             </div>
         </mat-card>
     </div> 
+}
 
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #countyTrainedBusinessesMapContentDiv> 
+@if(isTADashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #countyTrainedBusinessesMapContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandCountyTrainedBusinessesMap()">
             <mat-icon>open_in_full</mat-icon>
           </button>
@@ -361,8 +393,10 @@
             </div>
         </mat-card>
     </div>
+}
 
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
+@if(isTADashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
                 <mat-card-title>{{topFourCountiesBusinessesTrainedChartTitle}}</mat-card-title>
@@ -380,8 +414,10 @@
             </div>
         </mat-card>
     </div> 
+}
 
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
+@if(isFinancialDashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
                 <mat-card-title>{{topFourCountiesloansDisbursedChartTitle}}</mat-card-title>
@@ -399,6 +435,7 @@
             </div>
         </mat-card>
     </div> 
+}
 </div>
 
 <!-- Template for no data placeholder -->

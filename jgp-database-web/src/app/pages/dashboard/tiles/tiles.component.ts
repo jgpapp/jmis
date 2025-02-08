@@ -20,6 +20,7 @@ import { Subject, takeUntil } from 'rxjs';
 export class TilesComponent implements OnInit, OnDestroy, OnChanges {
 
   @Input('dashBoardFilters') dashBoardFilters: any;
+  @Input('selectedDashboardView') selectedDashboardView: any;
   highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', outStandingAmount: '0'}
   private unsubscribe$ = new Subject<void>();
   constructor(private dashBoardService: DashboardService){
@@ -27,8 +28,14 @@ export class TilesComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.dashBoardFilters = changes['dashBoardFilters']['currentValue']
+    
+    if (changes['selectedDashboardView']) {
+      this.selectedDashboardView = changes['selectedDashboardView']['currentValue']
+    }
+    if (changes['dashBoardFilters']) {
+      this.dashBoardFilters = changes['dashBoardFilters']['currentValue']
     this.getHighLevelSummary();
+    }
   }
 
   getHighLevelSummary() {
@@ -49,6 +56,14 @@ export class TilesComponent implements OnInit, OnDestroy, OnChanges {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  isFinancialDashboard(): boolean {
+    return 'FI' === this.selectedDashboardView;
+  }
+
+  isTADashboard(): boolean {
+    return 'TA' === this.selectedDashboardView;
   }
 
 }
