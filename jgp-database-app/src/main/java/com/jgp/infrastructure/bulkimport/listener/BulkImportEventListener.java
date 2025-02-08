@@ -40,7 +40,6 @@ public class BulkImportEventListener {
     private final ImportProgressService importProgressService;
 
     @EventListener
-    //@Async
    public void handleBulkImportEvent(BulkImportEvent bulkImportEvent){
         try {
             this.importProgressService.sendProgressUpdate(bulkImportEvent.importProgressUUID());

@@ -852,7 +852,7 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
 
                 final var county = CommonUtil.KenyanCounty.getKenyanCountyFromCode(countyCode);
                 final var kenyaCounty = county.orElse(CommonUtil.KenyanCounty.UNKNOWN);
-                dataPoints.add(new CountySummaryDto(CommonUtil.defaultToOtherIfStringIsNull(countyCode), kenyaCounty.getCountyName(), businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount, LocalDate.now(ZoneId.systemDefault())));
+                dataPoints.add(new CountySummaryDto(CommonUtil.defaultToOtherIfStringIsNull(countyCode), kenyaCounty.getCountyName(), businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount, 2025, 2));
             }
             return dataPoints;
         }

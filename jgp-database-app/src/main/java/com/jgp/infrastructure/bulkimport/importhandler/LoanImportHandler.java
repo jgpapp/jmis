@@ -261,8 +261,10 @@ public class LoanImportHandler implements ImportHandler {
 
     private void validateParticipant(ParticipantDto participantDto, Row row) {
         // Create a Validator instance
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
+        Validator validator;
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
 
         // Validate the object
         Set<ConstraintViolation<ParticipantDto>> violations = validator.validate(participantDto);
@@ -283,8 +285,10 @@ public class LoanImportHandler implements ImportHandler {
 
     private void validateLoan(Loan loan, Row row) {
         // Create a Validator instance
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
+        Validator validator;
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
 
         // Validate the object
         Set<ConstraintViolation<Loan>> violations = validator.validate(loan);

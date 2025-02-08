@@ -7,16 +7,21 @@ import com.jgp.bmo.domain.predicate.BMOPredicateBuilder;
 import com.jgp.bmo.dto.BMOClientDto;
 import com.jgp.bmo.dto.BMOParticipantSearchCriteria;
 import com.jgp.bmo.mapper.BMOClientMapper;
+import com.jgp.infrastructure.bulkimport.event.DataApprovedEvent;
 import com.jgp.util.CommonUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +32,7 @@ public class BMOClientDataServiceImpl implements BMOClientDataService {
     private final BMOClientMapper bmoClientMapper;
     private final BMOPredicateBuilder bmoPredicateBuilder;
     private final PlatformSecurityContext platformSecurityContext;
+    private final ApplicationContext applicationContext;
 
     @Override
     public void createBMOData(List<BMOParticipantData> bmoDataListRequest) {
@@ -37,15 +43,15 @@ public class BMOClientDataServiceImpl implements BMOClientDataService {
     @Override
     public void approvedBMOParticipantsData(List<Long> dataIds, Boolean approval) {
         var bmoData = this.bmoDataRepository.findAllById(dataIds);
-        if (dataIds.isEmpty()) {
-            var currentUser = this.platformSecurityContext.getAuthenticatedUserIfPresent();
-            var currentUserPartner = Objects.nonNull(currentUser) ? currentUser.getPartner() : null;
-            if(Objects.nonNull(currentUserPartner)) {
+        var currentUser = this.platformSecurityContext.getAuthenticatedUserIfPresent();
+        var currentUserPartner = Objects.nonNull(currentUser) ? currentUser.getPartner() : null;
+        if (dataIds.isEmpty() && Objects.nonNull(currentUserPartner)) {
                 bmoData = this.bmoDataRepository.findAll(this.bmoPredicateBuilder.buildPredicateForSearchTAData(new BMOParticipantSearchCriteria(currentUserPartner.getId(), null, false)), Pageable.unpaged()).getContent();
             }
-        }
+
         int count = 0;
         var bmoToSave = new ArrayList<BMOParticipantData>();
+        Set<LocalDate> dataDates = new HashSet<>();
         for(BMOParticipantData bmo : bmoData) {
             bmo.approveData(approval);
             var participant = bmo.getParticipant();
@@ -59,8 +65,10 @@ public class BMOClientDataServiceImpl implements BMOClientDataService {
                 count = 0;
                 bmoToSave = new ArrayList<>();
             }
+            dataDates.add(bmo.getDateRecordedByPartner());
         }
         this.bmoDataRepository.saveAllAndFlush(bmoToSave);
+        this.applicationContext.publishEvent(new DataApprovedEvent(currentUserPartner.getId(), dataDates));
     }
 
     @Override
