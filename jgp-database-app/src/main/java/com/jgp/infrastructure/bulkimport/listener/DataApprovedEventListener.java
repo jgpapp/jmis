@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Objects;
 
 @Service
@@ -24,7 +25,8 @@ public class DataApprovedEventListener {
         if (Objects.isNull(dataApprovedEvent.dates()) || dataApprovedEvent.dates().isEmpty()){
             return;
         }
-        var fromDate = dataApprovedEvent.dates().stream().findFirst().get();
+        var fromDateOptional = dataApprovedEvent.dates().stream().findFirst();
+        var fromDate = fromDateOptional.orElse(LocalDate.now(ZoneId.systemDefault()).plusYears(10));
         var toDate = fromDate;
 
         for (LocalDate localDate: dataApprovedEvent.dates()){

@@ -98,8 +98,29 @@ export class DashboardService {
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/county-summary-map?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
+    getPerformanceSummary(year: string | undefined, partnerId: string | undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/performance-summary?${this.getPerformanceSummaryQueryParams(year, partnerId)}`);
+    }
+
     getKenyanCounties(): Observable<any> {
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/kenyan-counties`);
+    }
+
+    getPerformanceSummaryQueryParams(year: string | undefined, partnerId: string | undefined): string {
+      let queryParam = ``
+      if(!year && !partnerId){
+        return queryParam;
+      }
+
+      queryParam = '?'
+      if(!year && partnerId) {
+        return `${queryParam}partner-id=${partnerId}`
+      }
+      
+      if(!year && !partnerId){
+        return `${queryParam}year=${year}`
+      }
+        return `${queryParam}partner-id=${partnerId}&year=${year}`;
     }
 
 

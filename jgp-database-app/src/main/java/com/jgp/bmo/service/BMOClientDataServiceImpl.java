@@ -68,7 +68,9 @@ public class BMOClientDataServiceImpl implements BMOClientDataService {
             dataDates.add(bmo.getDateRecordedByPartner());
         }
         this.bmoDataRepository.saveAllAndFlush(bmoToSave);
-        this.applicationContext.publishEvent(new DataApprovedEvent(currentUserPartner.getId(), dataDates));
+        if (Objects.nonNull(currentUserPartner)) {
+            this.applicationContext.publishEvent(new DataApprovedEvent(currentUserPartner.getId(), dataDates));
+        }
     }
 
     @Override

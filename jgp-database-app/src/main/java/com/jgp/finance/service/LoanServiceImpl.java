@@ -68,7 +68,9 @@ public class LoanServiceImpl implements LoanService {
             dataDates.add(loan.getDateDisbursed());
         }
         this.loanRepository.saveAllAndFlush(loansToSave);
-        this.applicationContext.publishEvent(new DataApprovedEvent(currentUserPartner.getId(), dataDates));
+        if (Objects.nonNull(currentUserPartner)) {
+            this.applicationContext.publishEvent(new DataApprovedEvent(currentUserPartner.getId(), dataDates));
+        }
     }
 
     @Override

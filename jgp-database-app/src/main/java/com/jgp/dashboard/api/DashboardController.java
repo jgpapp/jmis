@@ -6,6 +6,7 @@ import com.jgp.dashboard.dto.DashboardSearchCriteria;
 import com.jgp.dashboard.dto.DataPointDto;
 import com.jgp.dashboard.dto.HighLevelSummaryDto;
 import com.jgp.dashboard.dto.PartnerYearlyDataDto;
+import com.jgp.dashboard.dto.PerformanceSummaryDto;
 import com.jgp.dashboard.dto.SeriesDataPointDto;
 import com.jgp.dashboard.service.DashboardService;
 import com.jgp.util.CommonUtil;
@@ -202,5 +203,11 @@ public class DashboardController {
                 .stream().map(county -> new CountyDto(county.getCountyCode(), county.getCountyName()))
                 .sorted(Comparator.comparing(CountyDto::countyName))
                 .toList(), HttpStatus.OK);
+    }
+
+    @GetMapping("performance-summary")
+    public ResponseEntity<List<PerformanceSummaryDto>> getPerformanceSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                             @RequestParam(value = "year", required = false) String year){
+        return new ResponseEntity<>(this.dashboardService.getPerformanceSummary(year, partnerId), HttpStatus.OK);
     }
 }
