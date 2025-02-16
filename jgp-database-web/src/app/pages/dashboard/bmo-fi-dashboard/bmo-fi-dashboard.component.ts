@@ -8,6 +8,9 @@ import { TilesComponent } from '../tiles/tiles.component';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { FormsModule } from '@angular/forms';
+import { PerformanceSummaryComponent } from "../performance-summary/performance-summary.component";
 
 @Component({
   selector: 'app-bmo-fi-dashboard',
@@ -20,13 +23,17 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     MatCardModule,
     TilesComponent,
     InfoCardsComponent,
-    AnalyticsComponent
-  ],
+    AnalyticsComponent,
+    MatButtonToggleModule,
+    FormsModule,
+    PerformanceSummaryComponent
+],
   templateUrl: './bmo-fi-dashboard.component.html',
   styleUrl: './bmo-fi-dashboard.component.scss'
 })
 export class BmoFiDashboardComponent implements OnInit{
  
+  selectedDashboardView: string = 'TA';
   dashBoardFilters: any;
   partnerName: string = '';
   resetDashBoardFilters: boolean = false;
@@ -45,5 +52,13 @@ export class BmoFiDashboardComponent implements OnInit{
   ngOnInit(): void {
     this.dashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId}
     this.partnerName = `${this.authService.currentUser()?.partnerName} Dashboard !`;
+  }
+
+  isFinancialDashboard(): boolean {
+    return 'FI' === this.selectedDashboardView;
+  }
+
+  isTADashboard(): boolean {
+    return 'TA' === this.selectedDashboardView;
   }
 }

@@ -45,6 +45,12 @@ export const routes: Routes = [
         data: { breadcrumb: 'Lending Data Management' }
       },
       {
+        path: 'analytics-update',
+        loadComponent: () => import('./data/analytics/analytics.component').then(c => c.AnalyticsComponent),
+        canActivate: [AuthGuard],
+        data: { breadcrumb: 'Analytics Update' }
+      },
+      {
         path: 'users',
         loadChildren: () => import('./users/user.routes').then(p => p.routes),
         canActivate: [AuthGuard],

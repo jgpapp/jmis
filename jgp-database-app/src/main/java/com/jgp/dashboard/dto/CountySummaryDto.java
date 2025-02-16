@@ -8,6 +8,8 @@ public record CountySummaryDto(
         Integer businessesTrained,
         Integer businessesLoaned,
         BigDecimal amountDisbursed,
-        BigDecimal outStandingAmount
+        BigDecimal outStandingAmount,
+        Integer dataYear,
+        Integer dataMonth
 ) {
 }

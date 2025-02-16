@@ -7,16 +7,21 @@ import com.jgp.finance.mapper.LoanMapper;
 import com.jgp.finance.domain.Loan;
 import com.jgp.finance.domain.LoanRepository;
 import com.jgp.finance.dto.LoanDto;
+import com.jgp.infrastructure.bulkimport.event.DataApprovedEvent;
 import com.jgp.util.CommonUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +32,7 @@ public class LoanServiceImpl implements LoanService {
     private final LoanMapper loanMapper;
     private final LoanPredicateBuilder loanPredicateBuilder;
     private final PlatformSecurityContext platformSecurityContext;
+    private final ApplicationContext applicationContext;
 
     @Override
     public void createLoans(List<Loan> loans) {
@@ -37,15 +43,15 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public void approvedParticipantsLoansData(List<Long> dataIds, Boolean approval) {
         var loans = this.loanRepository.findAllById(dataIds);
-        if (dataIds.isEmpty()) {
-            var currentUser = this.platformSecurityContext.getAuthenticatedUserIfPresent();
-            var currentUserPartner = Objects.nonNull(currentUser) ? currentUser.getPartner() : null;
-            if(Objects.nonNull(currentUserPartner)) {
+        var currentUser = this.platformSecurityContext.getAuthenticatedUserIfPresent();
+        var currentUserPartner = Objects.nonNull(currentUser) ? currentUser.getPartner() : null;
+        if (dataIds.isEmpty() && Objects.nonNull(currentUserPartner)) {
                 loans = this.loanRepository.findAll(this.loanPredicateBuilder.buildPredicateForSearchLoans(new LoanSearchCriteria(currentUserPartner.getId(), null, null, null,  false, null, null)), Pageable.unpaged()).getContent();
             }
-        }
+
         int count = 0;
         var loansToSave = new ArrayList<Loan>();
+        Set<LocalDate> dataDates = new HashSet<>();
         for(Loan loan : loans) {
             loan.approveData(approval);
             var participant = loan.getParticipant();
@@ -59,8 +65,12 @@ public class LoanServiceImpl implements LoanService {
                 count = 0;
                 loansToSave = new ArrayList<>();
             }
+            dataDates.add(loan.getDateDisbursed());
         }
         this.loanRepository.saveAllAndFlush(loansToSave);
+        if (Objects.nonNull(currentUserPartner)) {
+            this.applicationContext.publishEvent(new DataApprovedEvent(currentUserPartner.getId(), dataDates));
+        }
     }
 
     @Override

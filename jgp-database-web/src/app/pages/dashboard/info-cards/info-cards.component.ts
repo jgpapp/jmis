@@ -1,4 +1,4 @@
-import { AfterViewChecked, AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
@@ -26,6 +26,7 @@ import { ChartDialogComponent } from '../../chart-dialog/chart-dialog.component'
 })
 export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, OnDestroy {
   @Input('dashBoardFilters') dashBoardFilters: any;
+  @Input('selectedDashboardView') selectedDashboardView: any;
   public colorScheme: any = {
     domain: ['rgba(255,255,255,0.8)']
   };
@@ -194,23 +195,29 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
 
   private unsubscribe$ = new Subject<void>();
 
-  @ViewChild('loansDisbursedByGenderContentDiv', { static: true }) loansDisbursedByGenderContentDiv!: ElementRef;
-  @ViewChild('loansDisbursedByPipelineContentDiv', { static: true }) loansDisbursedByPipelineContentDiv!: ElementRef;
-  @ViewChild('countyTrainedBusinessesMapContentDiv', { static: true }) countyTrainedBusinessesMapContentDiv!: ElementRef;
-  @ViewChild('loansDisbursedByStatusContentDiv', { static: true }) loansDisbursedByStatusContentDiv!: ElementRef;
-  @ViewChild('taNeedsByGenderContentDiv', { static: true }) taNeedsByGenderContentDiv!: ElementRef;
-  @ViewChild('trainingByPartnerByGenderContentDiv', { static: true }) trainingByPartnerByGenderContentDiv!: ElementRef;
-  @ViewChild('taTrainedBySectorContentDiv', { static: true }) taTrainedBySectorContentDiv!: ElementRef;
-  @ViewChild('accessedVSOutStandingAmountContentDiv', { static: true }) accessedVSOutStandingAmountContentDiv!: ElementRef;
-  @ViewChild('taTrainedBySegmentContentDiv', { static: true }) taTrainedBySegmentContentDiv!: ElementRef;
+  @ViewChild('loansDisbursedByGenderContentDiv', { static: false }) loansDisbursedByGenderContentDiv!: ElementRef;
+  @ViewChild('loansDisbursedByPipelineContentDiv', { static: false }) loansDisbursedByPipelineContentDiv!: ElementRef;
+  @ViewChild('countyTrainedBusinessesMapContentDiv', { static: false }) countyTrainedBusinessesMapContentDiv!: ElementRef;
+  @ViewChild('loansDisbursedByStatusContentDiv', { static: false }) loansDisbursedByStatusContentDiv!: ElementRef;
+  @ViewChild('taNeedsByGenderContentDiv', { static: false }) taNeedsByGenderContentDiv!: ElementRef;
+  @ViewChild('trainingByPartnerByGenderContentDiv', { static: false }) trainingByPartnerByGenderContentDiv!: ElementRef;
+  @ViewChild('taTrainedBySectorContentDiv', { static: false }) taTrainedBySectorContentDiv!: ElementRef;
+  @ViewChild('accessedVSOutStandingAmountContentDiv', { static: false }) accessedVSOutStandingAmountContentDiv!: ElementRef;
+  @ViewChild('taTrainedBySegmentContentDiv', { static: false }) taTrainedBySegmentContentDiv!: ElementRef;
 
   constructor(private dashBoardService: DashboardService, public dialog: MatDialog){
     Object.assign(this, { single, multi });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.dashBoardFilters = changes['dashBoardFilters']['currentValue']
-    this.reloadData();
+    if (changes['selectedDashboardView']) {
+      this.selectedDashboardView = changes['selectedDashboardView']['currentValue']
+    }
+    if (changes['dashBoardFilters']) {
+      this.dashBoardFilters = changes['dashBoardFilters']['currentValue']
+      this.reloadData();
+    }
+    
   }
 
   ngOnInit() {
@@ -452,7 +459,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       width: `${dialogWidth}px`,
       height: `${dialogHeight}px`,
       data: chartData,
-      panelClass: 'custom-dialog-container', // Custom styles can be added
+      panelClass: 'custom-dialog-container',
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -638,4 +645,12 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
     this.openExpandedChartDialog(data);
   }
   
+
+  isFinancialDashboard(): boolean {
+    return 'FI' === this.selectedDashboardView;
+  }
+
+  isTADashboard(): boolean {
+    return 'TA' === this.selectedDashboardView;
+  }
 }

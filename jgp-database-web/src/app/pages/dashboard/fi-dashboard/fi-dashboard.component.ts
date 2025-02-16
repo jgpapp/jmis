@@ -11,6 +11,7 @@ import { PieChartComponent } from '../pie-chart/pie-chart.component';
 import { Subject, takeUntil } from 'rxjs';
 import { DashboardFiltersComponent } from "../dashboard-filters/dashboard-filters.component";
 import { HighLevelSummaryDto } from '../dto/highLevelSummaryDto';
+import { PerformanceSummaryComponent } from "../performance-summary/performance-summary.component";
 @Component({
   selector: 'app-fi-dashboard',
   standalone: true,
@@ -24,7 +25,8 @@ import { HighLevelSummaryDto } from '../dto/highLevelSummaryDto';
     MatIconModule,
     NgxChartsModule,
     PieChartComponent,
-    DashboardFiltersComponent
+    DashboardFiltersComponent,
+    PerformanceSummaryComponent
 ],
   templateUrl: './fi-dashboard.component.html',
   styleUrl: './fi-dashboard.component.scss'

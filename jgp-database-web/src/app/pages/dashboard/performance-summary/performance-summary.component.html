@@ -1,0 +1,51 @@
+
+    <mat-card>
+        <mat-card-header fxLayoutAlign="space-between center">                
+            <mat-card-title>Analytics Summary</mat-card-title>
+            <!-- button mat-raised-button color="primary" (click)="gs.exportToExcel(dataSource, displayedColumns, 'ANALYTICS_SUMMARY')"><mat-icon>download</mat-icon> Excel</button -->
+        </mat-card-header>
+        <div class="p-2 table-container">
+          <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+            <ng-container matColumnDef="category">
+              <th mat-header-cell *matHeaderCellDef> 
+                <span [style.paddingLeft.px]="40"> Category </span>
+              </th>
+              <td mat-cell *matCellDef="let data"> 
+                <button mat-icon-button 
+                        [style.visibility]="!data.expandable ? 'hidden' : ''"
+                        [style.marginLeft.px]="data.level * 32"
+                        (click)="treeControl.toggle(data)">
+                  <mat-icon class="mat-icon-rtl-mirror">
+                    {{treeControl.isExpanded(data) ? 'expand_more' : 'chevron_right'}}
+                  </mat-icon>
+                </button>
+          
+                {{data.category}}
+              </td>
+            </ng-container> 
+          
+            <ng-container matColumnDef="businessesTrained">
+              <th mat-header-cell *matHeaderCellDef> Businesses Trained </th>
+              <td mat-cell *matCellDef="let data"> {{data.businessesTrained | number:'1.0-2'}} </td>
+            </ng-container> 
+        
+            <ng-container matColumnDef="businessesLoaned">
+                <th mat-header-cell *matHeaderCellDef> Businesses Loaned </th>
+                <td mat-cell *matCellDef="let data"> {{data.businessesLoaned | number:'1.0-2'}} </td>
+              </ng-container> 
+        
+              <ng-container matColumnDef="amountDisbursed">
+                <th mat-header-cell *matHeaderCellDef> Amount Disbursed </th>
+                <td mat-cell *matCellDef="let data"> {{data.amountDisbursed | number:'1.0-2'}} </td>
+              </ng-container> 
+        
+              <ng-container matColumnDef="outStandingAmount">
+                <th mat-header-cell *matHeaderCellDef> Out-Standing Amount </th>
+                <td mat-cell *matCellDef="let data"> {{data.outStandingAmount | number:'1.0-2'}} </td>
+              </ng-container> 
+          
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+    </mat-card>

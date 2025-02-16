@@ -9,7 +9,6 @@ import { MatButtonModule } from '@angular/material/button';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { ExportAsService, ExportAsConfig, ExportAsModule } from 'ngx-export-as';
-import { KeMapComponent } from "../dashboard/ke-map/ke-map.component";
 import { KenyanMapComponent } from "../dashboard/kenyan-map/kenyan-map.component";
 
 @Component({
@@ -44,8 +43,6 @@ export class ChartDialogComponent implements AfterViewInit {
     }
   };
 
-  map: L.Map;
-  geoJsonLayer: L.GeoJSON;
 
   constructor(
     private exportAsService: ExportAsService,

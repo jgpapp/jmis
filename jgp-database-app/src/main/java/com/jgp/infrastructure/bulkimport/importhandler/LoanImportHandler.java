@@ -106,7 +106,7 @@ public class LoanImportHandler implements ImportHandler {
         final var outStandingAmountDouble = ImportHandlerUtils.readAsDouble(LoanConstants.OUT_STANDING_AMOUNT, row);
         final var outStandingAmount = BigDecimal.valueOf(outStandingAmountDouble);
         final var accessedPlusOutStanding = valueAccessed.add(outStandingAmount);
-        if (accessedPlusOutStanding.compareTo(BigDecimal.ZERO) < 1){
+        if (null == rowErrorMap.get(row) && accessedPlusOutStanding.compareTo(BigDecimal.ZERO) < 1){
             rowErrorMap.put(row, "Loan Accessed and Outstanding can not be both 0! !");
         }
         final var loanQuality = ImportHandlerUtils.readAsString(LoanConstants.LOAN_QUALITY, row);
@@ -193,8 +193,8 @@ public class LoanImportHandler implements ImportHandler {
             Row row = groupSheet.getRow(loanData.getRowIndex());
             Cell errorReportCell = row.createCell(LoanConstants.FAILURE_COL);
             Cell statusCell = row.createCell(LoanConstants.STATUS_COL);
-            if (Objects.isNull(loanData.getParticipant())){
-                rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
+            if (null == rowErrorMap.get(row) && Objects.isNull(loanData.getParticipant())){
+                rowErrorMap.put(row, "Can not associate loan data to a participant !!");
             }
             try {
                 String status = statuses.get(i);
@@ -261,38 +261,40 @@ public class LoanImportHandler implements ImportHandler {
 
     private void validateParticipant(ParticipantDto participantDto, Row row) {
         // Create a Validator instance
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
+        Validator validator;
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
 
         // Validate the object
         Set<ConstraintViolation<ParticipantDto>> violations = validator.validate(participantDto);
 
         // Get the first error, if any
-        if (!violations.isEmpty()) {
+        if (null == rowErrorMap.get(row) && !violations.isEmpty()) {
             ConstraintViolation<ParticipantDto> firstViolation = violations.iterator().next();
             rowErrorMap.put(row, firstViolation.getMessage());
         }
 
-        if (null == rowErrorMap.get(row)){
-            if (!CommonUtil.isStringValueLengthValid(participantDto.jgpId(), 5, 10)){
-                rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
-            }
-            if (!CommonUtil.isStringValueLengthValid(participantDto.phoneNumber(), 9, 12)){
-                rowErrorMap.put(row, "Phone number must be 9-12 digits !!");
-            }
+        if (null == rowErrorMap.get(row) && CommonUtil.isStringValueLengthNotValid(participantDto.jgpId(), 5, 10)){
+            rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
+        }
+        if (null == rowErrorMap.get(row) && CommonUtil.isStringValueLengthNotValid(participantDto.phoneNumber(), 9, 12)){
+            rowErrorMap.put(row, "Phone number must be 9-12 digits !!");
         }
     }
 
     private void validateLoan(Loan loan, Row row) {
         // Create a Validator instance
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
+        Validator validator;
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
 
         // Validate the object
         Set<ConstraintViolation<Loan>> violations = validator.validate(loan);
 
         // Get the first error, if any
-        if (!violations.isEmpty()) {
+        if (null == rowErrorMap.get(row) && !violations.isEmpty()) {
             ConstraintViolation<Loan> firstViolation = violations.iterator().next();
             rowErrorMap.put(row, firstViolation.getMessage());
         }
@@ -300,7 +302,7 @@ public class LoanImportHandler implements ImportHandler {
 
     private void validateTranchAllocated(String value, Row row) {
         final var deliveryModes = Set.of("TRANCH 1", "TRANCH 2", "TRANCH 3", "NOT APPLICABLE");
-        if (null != value && !deliveryModes.contains(value.toUpperCase())){
+        if (null == rowErrorMap.get(row) && null != value && !deliveryModes.contains(value.toUpperCase())){
             rowErrorMap.put(row, "Invalid Value for Allocated Tranch (Must be Tranch 1/Tranch 2/Tranch 3/Not Applicable) !!");
         }
     }
