@@ -105,15 +105,15 @@ export class DashboardService {
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/county-summary-map?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
-    getPerformanceSummary(year: string | undefined, partnerId: string | undefined): Observable<any> {
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/performance-summary?${this.getPerformanceSummaryQueryParams(year, partnerId)}`);
+    getPerformanceSummary(year: string | undefined, partnerId: number | undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/performance-summary${this.getPerformanceSummaryQueryParams(year, partnerId)}`);
     }
 
     getKenyanCounties(): Observable<any> {
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/kenyan-counties`);
     }
 
-    getPerformanceSummaryQueryParams(year: string | undefined, partnerId: string | undefined): string {
+    getPerformanceSummaryQueryParams(year: string | undefined, partnerId: number | undefined): string {
       let queryParam = ``
       if(!year && !partnerId){
         return queryParam;
@@ -124,7 +124,7 @@ export class DashboardService {
         return `${queryParam}partner-id=${partnerId}`
       }
       
-      if(!year && !partnerId){
+      if(year && !partnerId){
         return `${queryParam}year=${year}`
       }
         return `${queryParam}partner-id=${partnerId}&year=${year}`;

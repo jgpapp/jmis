@@ -19,12 +19,17 @@
         <app-dashboard-filters (dashBoardFilters)="setDashBoardFilters($event)" [isPartnerDashBoard]="true" [resetDashBoardFilters]="resetDashBoardFilters" [fieldFlex]="33.3"/>
         <app-tiles [dashBoardFilters]="dashBoardFilters" [selectedDashboardView]="selectedDashboardView"/>
         <app-info-cards [dashBoardFilters]="dashBoardFilters" [selectedDashboardView]="selectedDashboardView"/>
-        @if(isFinancialDashboard()){
+        
         <div fxLayout="row wrap">
+            @if(isFinancialDashboard()){
             <div fxFlex="100" fxFlex.gt-sm="100" class="p-2"> 
                 <app-analytics [dashBoardFilters]="dashBoardFilters"/>
             </div>
+            }
+            <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
+                <app-performance-summary />
+            </div>
         </div>
-    }
+    
     </div>
     

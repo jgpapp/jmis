@@ -8,6 +8,8 @@ import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { GlobalService } from '@services/shared/global.service';
 import { Subject, takeUntil } from 'rxjs';
+import { CommonModule, DecimalPipe } from '@angular/common';
+import { AuthService } from '@services/users/auth.service';
 
 interface PerformanceSummaryDto {
   year: number | undefined;
@@ -44,7 +46,8 @@ interface PerformanceSummaryFlatNode {
     MatTableModule,
     MatIconModule,
     FlexLayoutModule,
-    MatCardModule
+    MatCardModule,
+    CommonModule
   ],
   templateUrl: './performance-summary.component.html',
   styleUrl: './performance-summary.component.scss'
@@ -79,18 +82,17 @@ export class PerformanceSummaryComponent implements OnInit {
   dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
 
   private unsubscribe$ = new Subject<void>();
-  constructor(private dashBoardService: DashboardService, public gs: GlobalService){}
+  constructor(private dashBoardService: DashboardService, public gs: GlobalService, private authService: AuthService){}
 
   ngOnInit(): void {
     this.getPerformanceSummary();
   }
 
   getPerformanceSummary() {
-    this.dashBoardService.getPerformanceSummary(undefined, undefined)
+    this.dashBoardService.getPerformanceSummary(undefined, this.authService.currentUser()?.partnerId)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
-          console.log(response);
           this.dataSource.data = response; // Set the hierarchical data
         },
         error: (error) => { }

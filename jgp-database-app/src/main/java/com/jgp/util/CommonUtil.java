@@ -180,10 +180,4 @@ public abstract class CommonUtil {
     public static String defaultToOtherIfStringIsNull(String value){
         return null != value ? value : "Other";
     }
-
-    public static String formatNumber(Double value){
-        NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
-        numberFormat.setMaximumFractionDigits(2);
-        return numberFormat.format(value);
-    }
 }
