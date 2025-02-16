@@ -34,7 +34,6 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -270,8 +269,10 @@ public class BMOImportHandler implements ImportHandler {
 
     private void validateParticipant(ParticipantDto participantDto, Row row) {
         // Create a Validator instance
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
+        Validator validator;
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
 
         // Validate the object
         Set<ConstraintViolation<ParticipantDto>> violations = validator.validate(participantDto);
@@ -283,10 +284,10 @@ public class BMOImportHandler implements ImportHandler {
         }
 
         if (null == rowErrorMap.get(row)){
-            if (!CommonUtil.isStringValueLengthValid(participantDto.jgpId(), 5, 10)){
+            if (CommonUtil.isStringValueLengthNotValid(participantDto.jgpId(), 5, 10)){
                 rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
             }
-            if (null == rowErrorMap.get(row) && !CommonUtil.isStringValueLengthValid(participantDto.phoneNumber(), 9, 12)){
+            if (null == rowErrorMap.get(row) && CommonUtil.isStringValueLengthNotValid(participantDto.phoneNumber(), 9, 12)){
                 rowErrorMap.put(row, "Phone number must be 9-12 digits !!");
             }
         }
@@ -294,8 +295,10 @@ public class BMOImportHandler implements ImportHandler {
 
     private void validateTAData(BMOParticipantData bmoParticipantData, Row row) {
         // Create a Validator instance
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
+        Validator validator;
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
 
         // Validate the object
         Set<ConstraintViolation<BMOParticipantData>> violations = validator.validate(bmoParticipantData);
@@ -335,10 +338,4 @@ public class BMOImportHandler implements ImportHandler {
         }
     }
 
-    private void validateFinanceRecommendation(String value, Row row){
-        final var deliveryModes = Set.of("YES", "NO");
-        if (null == rowErrorMap.get(row) && (null == value || !deliveryModes.contains(value.toUpperCase()))){
-            rowErrorMap.put(row, "Invalid Value for Finance Recommendation (Must be Yes/No) !!");
-        }
-    }
 }

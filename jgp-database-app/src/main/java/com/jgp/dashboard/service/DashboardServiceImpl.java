@@ -1,21 +1,31 @@
 package com.jgp.dashboard.service;
 
+import com.jgp.dashboard.dto.AnalyticsUpdateRequestDto;
 import com.jgp.dashboard.dto.CountySummaryDto;
 import com.jgp.dashboard.dto.DashboardSearchCriteria;
 import com.jgp.dashboard.dto.DataPointDto;
 import com.jgp.dashboard.dto.HighLevelSummaryDto;
 import com.jgp.dashboard.dto.PartnerYearlyDataDto;
+import com.jgp.dashboard.dto.PerformanceSummaryDto;
+import com.jgp.infrastructure.bulkimport.event.DataApprovedEvent;
+import com.jgp.patner.domain.Partner;
+import com.jgp.patner.domain.PartnerRepository;
 import com.jgp.util.CommonUtil;
+
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.jgp.dashboard.dto.SeriesDataPointDto;
@@ -25,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -38,6 +49,8 @@ import org.springframework.stereotype.Service;
 public class DashboardServiceImpl implements DashboardService {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private final ApplicationContext applicationContext;
+    private final PartnerRepository partnerRepository;
     private static final String INTEGER_DATA_POINT_TYPE = "INTEGER";
     private static final String DECIMAL_DATA_POINT_TYPE = "DECIMAL";
     private static final String PARTNER_ID_PARAM = "partnerId";
@@ -51,6 +64,10 @@ public class DashboardServiceImpl implements DashboardService {
     private static final String LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and l.partner_id = :partnerId ";
     private static final String BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and bpd.partner_id = :partnerId ";
     private static final String WHERE_CLAUSE_BY_COUNTY_CODE_PARAM = "and cl.location_county_code = :countyCode";
+    private static final String BUSINESSES_TRAINED = "businessesTrained";
+    private static final String BUSINESSES_LOANED = "businessesLoaned";
+    private static final String AMOUNT_DISBURSED = "amountDisbursed";
+    private static final String OUT_STANDING_AMOUNT = "outStandingAmount";
 
     @Value("${jgp.dashboard.default.view.period.in.months}")
     private Integer jgpDashboardDefaultViewPeriodInMonths;
@@ -542,6 +559,220 @@ public class DashboardServiceImpl implements DashboardService {
         return getCountySummary(fromDate, toDate, partnerId).stream().collect(Collectors.toMap(CountySummaryDto::countyCode, s -> s));
     }
 
+    @Override
+    public List<PerformanceSummaryDto> getPerformanceSummary(String year, Long partnerId) {
+        final var performanceSummaryMapper = new PerformanceSummaryMapper();
+        final var today = LocalDate.now(ZoneId.systemDefault());
+        final var thisYear = Objects.nonNull(year) ? Integer.parseInt(year) : today.getYear();
+        var whereClause = Objects.nonNull(year) ? "where data_year = :fromYear " : "where data_year between :fromYear and :toYear ";
+        var parameters = new MapSqlParameterSource();
+        parameters.addValue("fromYear", (thisYear - 3));
+        parameters.addValue("toYear", thisYear);
+
+        if (Objects.nonNull(partnerId)) {
+            parameters.addValue(PARTNER_ID_PARAM, partnerId);
+            whereClause = "and partner_id = :partnerId ";
+        }
+        var sqlQuery = String.format(PerformanceSummaryMapper.PERFORMANCE_SUMMARY_SCHEMA, whereClause);
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, performanceSummaryMapper);
+    }
+
+    @Override
+    public void updateAnalyticsData(AnalyticsUpdateRequestDto analyticsUpdateRequestDto) {
+        var partners = Objects.nonNull(analyticsUpdateRequestDto.partnerId()) ? List.of(analyticsUpdateRequestDto.partnerId()) : this.partnerRepository.findAll().stream().map(Partner::getId).toList();
+        final var dataDates = Set.of(analyticsUpdateRequestDto.fromDate(), analyticsUpdateRequestDto.toDate());
+        partners.forEach(id -> this.applicationContext.publishEvent(new DataApprovedEvent(id, dataDates)));
+    }
+
+    private static final class PerformanceSummaryMapper implements ResultSetExtractor<List<PerformanceSummaryDto>> {
+
+        public static final String PERFORMANCE_SUMMARY_SCHEMA = """
+                 SELECT p.partner_name as partnerName, data_year as dataYear,\s
+                 data_month as dataMonth, sum(businesses_trained) as businessesTrained,\s
+                 sum(businesses_loaned) as businessesLoaned, sum(amount_disbursed) as amountDisbursed,\s
+                 sum(out_standing_amount) as outStandingAmount\s
+                 FROM county_summary cs \s
+                 inner join partners p on cs.partner_id = p.id\s
+                 %s group by 1, 2, 3 order by 2, 3;
+                """;
+
+        @Override
+        public List<PerformanceSummaryDto> extractData(ResultSet rs) throws SQLException, DataAccessException {
+            var dataPoints = new ArrayList<PerformanceSummaryDto>();
+            while (rs.next()){
+                final var businessesTrained = rs.getInt(BUSINESSES_TRAINED);
+                final var businessesLoaned = rs.getInt(BUSINESSES_LOANED);
+                final var amountDisbursed = rs.getBigDecimal(AMOUNT_DISBURSED);
+                final var outStandingAmount = rs.getBigDecimal(OUT_STANDING_AMOUNT);
+                final var year = rs.getInt("dataYear");
+                final var month = rs.getInt("dataMonth");
+                final var partner = rs.getString("partnerName");
+                final var quarter = getQuarterFromMonth(month);
+                dataPoints.add(new PerformanceSummaryDto(year, month, partner, quarter, StringUtils.capitalize((Month.of(month).name()).toLowerCase(Locale.ROOT))+" Totals", businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount, new ArrayList<>()));
+            }
+            return groupAndSummarizeByPartner(dataPoints);
+        }
+
+        private static String getQuarterFromMonth(Integer month) {
+            return switch (month){
+                case 1, 2, 3 -> "Qtr 1";
+                case 4, 5, 6 -> "Qtr 2";
+                case 7, 8, 9 -> "Qtr 3";
+                case 10, 11, 12 -> "Qtr 4";
+                default -> "";
+            };
+        }
+
+        public List<PerformanceSummaryDto> groupAndSummarizeByPartner(List<PerformanceSummaryDto> data) {
+            // Group the data by year
+            Map<String, List<PerformanceSummaryDto>> groupedByPartner = data.stream()
+                    .collect(Collectors.groupingBy(PerformanceSummaryDto::partner));
+
+            // Process each group
+            var perPartnerSummary =  groupedByPartner.entrySet().stream()
+                    .map(entry -> {
+                        String partner = entry.getKey();
+                        List<PerformanceSummaryDto> children = entry.getValue();
+
+                        // Calculate the totals for this year
+                        Integer totalBusinessesTrained = children.stream()
+                                .mapToInt(PerformanceSummaryDto::businessesTrained)
+                                .sum();
+
+                        Integer totalBusinessesLoaned = children.stream()
+                                .mapToInt(PerformanceSummaryDto::businessesLoaned)
+                                .sum();
+
+                        BigDecimal totalAmountDisbursed = children.stream()
+                                .map(PerformanceSummaryDto::amountDisbursed)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                        BigDecimal totalOutstandingAmount = children.stream()
+                                .map(PerformanceSummaryDto::outStandingAmount)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                        // Create a parent PerformanceSummaryDto for this year
+                        return new PerformanceSummaryDto(
+                                null,
+                                null,
+                                null,
+                                partner,
+                                String.format("%s Totals", partner),
+                                totalBusinessesTrained,
+                                totalBusinessesLoaned,
+                                totalAmountDisbursed,
+                                totalOutstandingAmount,
+                                children
+                        );
+                    }).toList();
+
+            for (PerformanceSummaryDto dto: perPartnerSummary) {
+                var newChildren = groupAndSummarizeByYear(dto.children());
+                dto.children().clear();
+                dto.children().addAll(newChildren);
+            }
+
+            return perPartnerSummary;
+        }
+
+        public List<PerformanceSummaryDto> groupAndSummarizeByYear(List<PerformanceSummaryDto> data) {
+            // Group the data by year
+            Map<Integer, List<PerformanceSummaryDto>> groupedByYear = data.stream()
+                    .collect(Collectors.groupingBy(PerformanceSummaryDto::year));
+
+            // Process each group
+            var yearlySummary =  groupedByYear.entrySet().stream()
+                    .map(entry -> {
+                        Integer year = entry.getKey();
+                        List<PerformanceSummaryDto> children = entry.getValue();
+
+                        // Calculate the totals for this year
+                        Integer totalBusinessesTrained = children.stream()
+                                .mapToInt(PerformanceSummaryDto::businessesTrained)
+                                .sum();
+
+                        Integer totalBusinessesLoaned = children.stream()
+                                .mapToInt(PerformanceSummaryDto::businessesLoaned)
+                                .sum();
+
+                        BigDecimal totalAmountDisbursed = children.stream()
+                                .map(PerformanceSummaryDto::amountDisbursed)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                        BigDecimal totalOutstandingAmount = children.stream()
+                                .map(PerformanceSummaryDto::outStandingAmount)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                        // Create a parent PerformanceSummaryDto for this year
+                        return new PerformanceSummaryDto(
+                                year,
+                                null,
+                                null,
+                                null,
+                                String.format("Year %d Totals", year),
+                                totalBusinessesTrained,
+                                totalBusinessesLoaned,
+                                totalAmountDisbursed,
+                                totalOutstandingAmount,
+                                children
+                        );
+                    }).toList();
+
+            for (PerformanceSummaryDto dto: yearlySummary) {
+                var newChildren = groupAndSummarizeYearDataPerQuarter(dto.children());
+                dto.children().clear();
+                dto.children().addAll(newChildren);
+            }
+
+            return yearlySummary;
+        }
+
+        public List<PerformanceSummaryDto> groupAndSummarizeYearDataPerQuarter(List<PerformanceSummaryDto> singleYearlyData) {
+            // Group the data by year
+                Map<String, List<PerformanceSummaryDto>> groupedByQuarter = singleYearlyData.stream()
+                        .collect(Collectors.groupingBy(PerformanceSummaryDto::quarter));
+
+            // Process each group
+            return groupedByQuarter.entrySet().stream()
+                    .map(entry -> {
+                        String quarter = entry.getKey();
+                        List<PerformanceSummaryDto> children = entry.getValue();
+
+                        // Calculate the totals for this year
+                        Integer totalBusinessesTrained = children.stream()
+                                .mapToInt(PerformanceSummaryDto::businessesTrained)
+                                .sum();
+
+                        Integer totalBusinessesLoaned = children.stream()
+                                .mapToInt(PerformanceSummaryDto::businessesLoaned)
+                                .sum();
+
+                        BigDecimal totalAmountDisbursed = children.stream()
+                                .map(PerformanceSummaryDto::amountDisbursed)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                        BigDecimal totalOutstandingAmount = children.stream()
+                                .map(PerformanceSummaryDto::outStandingAmount)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                        // Create a parent PerformanceSummaryDto for this year
+                        return new PerformanceSummaryDto(
+                                null,
+                                null,
+                                null,
+                                null,
+                                String.format("%s Totals", quarter),
+                                totalBusinessesTrained,
+                                totalBusinessesLoaned,
+                                totalAmountDisbursed,
+                                totalOutstandingAmount,
+                                children
+                        );
+                    }).toList();
+        }
+    }
+
+
     private static final class HighLevelSummaryMapper implements RowMapper<HighLevelSummaryDto> {
 
         public static final String SCHEMA = """
@@ -562,10 +793,10 @@ public class DashboardServiceImpl implements DashboardService {
 
         @Override
         public HighLevelSummaryDto mapRow(ResultSet rs, int rowNum) throws SQLException {
-            final var businessesTrained = rs.getInt("businessesTrained");
-            final var businessesLoaned = rs.getInt("businessesLoaned");
-            final var amountDisbursed = rs.getBigDecimal("amountDisbursed");
-            final var outStandingAmount = rs.getBigDecimal("outStandingAmount");
+            final var businessesTrained = rs.getInt(BUSINESSES_TRAINED);
+            final var businessesLoaned = rs.getInt(BUSINESSES_LOANED);
+            final var amountDisbursed = rs.getBigDecimal(AMOUNT_DISBURSED);
+            final var outStandingAmount = rs.getBigDecimal(OUT_STANDING_AMOUNT);
             return new HighLevelSummaryDto(businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount);
         }
     }
@@ -845,14 +1076,14 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
             var dataPoints = new ArrayList<CountySummaryDto>();
             while (rs.next()){
                 final var countyCode = rs.getString("county");
-                final var businessesTrained = rs.getInt("businessesTrained");
-                final var businessesLoaned = rs.getInt("businessesLoaned");
-                final var amountDisbursed = rs.getBigDecimal("amountDisbursed");
-                final var outStandingAmount = rs.getBigDecimal("outStandingAmount");
+                final var businessesTrained = rs.getInt(BUSINESSES_TRAINED);
+                final var businessesLoaned = rs.getInt(BUSINESSES_LOANED);
+                final var amountDisbursed = rs.getBigDecimal(AMOUNT_DISBURSED);
+                final var outStandingAmount = rs.getBigDecimal(OUT_STANDING_AMOUNT);
 
                 final var county = CommonUtil.KenyanCounty.getKenyanCountyFromCode(countyCode);
                 final var kenyaCounty = county.orElse(CommonUtil.KenyanCounty.UNKNOWN);
-                dataPoints.add(new CountySummaryDto(CommonUtil.defaultToOtherIfStringIsNull(countyCode), kenyaCounty.getCountyName(), businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount, LocalDate.now(ZoneId.systemDefault())));
+                dataPoints.add(new CountySummaryDto(CommonUtil.defaultToOtherIfStringIsNull(countyCode), kenyaCounty.getCountyName(), businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount, 2025, 2));
             }
             return dataPoints;
         }

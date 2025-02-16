@@ -261,8 +261,10 @@ public class LoanImportHandler implements ImportHandler {
 
     private void validateParticipant(ParticipantDto participantDto, Row row) {
         // Create a Validator instance
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
+        Validator validator;
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
 
         // Validate the object
         Set<ConstraintViolation<ParticipantDto>> violations = validator.validate(participantDto);
@@ -273,18 +275,20 @@ public class LoanImportHandler implements ImportHandler {
             rowErrorMap.put(row, firstViolation.getMessage());
         }
 
-        if (null == rowErrorMap.get(row) && !CommonUtil.isStringValueLengthValid(participantDto.jgpId(), 5, 10)){
+        if (null == rowErrorMap.get(row) && CommonUtil.isStringValueLengthNotValid(participantDto.jgpId(), 5, 10)){
             rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
         }
-        if (null == rowErrorMap.get(row) && !CommonUtil.isStringValueLengthValid(participantDto.phoneNumber(), 9, 12)){
+        if (null == rowErrorMap.get(row) && CommonUtil.isStringValueLengthNotValid(participantDto.phoneNumber(), 9, 12)){
             rowErrorMap.put(row, "Phone number must be 9-12 digits !!");
         }
     }
 
     private void validateLoan(Loan loan, Row row) {
         // Create a Validator instance
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
+        Validator validator;
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
 
         // Validate the object
         Set<ConstraintViolation<Loan>> violations = validator.validate(loan);

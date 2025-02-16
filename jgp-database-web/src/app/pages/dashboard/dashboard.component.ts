@@ -19,6 +19,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { GlobalService } from '@services/shared/global.service';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { FormsModule } from '@angular/forms';
+import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
+import {FlatTreeControl} from '@angular/cdk/tree';
+import { PerformanceSummaryComponent } from "./performance-summary/performance-summary.component";
 
 @Component({
   selector: 'app-dashboard',
@@ -38,8 +41,9 @@ import { FormsModule } from '@angular/forms';
     MatButtonModule,
     MatIconModule,
     MatButtonToggleModule,
-    FormsModule
-  ],
+    FormsModule,
+    PerformanceSummaryComponent
+],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -49,9 +53,10 @@ export class DashboardComponent {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   public displayedColumns = ['year', 'partnerName', 'genderName', 'value' ];
-  accessedLoanData: any
-  accessedLoanCountData: any
-  trainedBusinessesCountData: any
+
+  accessedLoanData: any;
+  accessedLoanCountData: any;
+  trainedBusinessesCountData: any;
   public accessedLoanDataDataSource: any;
   public accessedLoanCountDataDataSource: any;
   public trainedBusinessesCountDataDataSource: any;
@@ -61,6 +66,8 @@ export class DashboardComponent {
   dashBoardFilters: any;
   resetDashBoardFilters: boolean = false;
   constructor(private dashBoardService: DashboardService, public authService: AuthService, public gs: GlobalService){}
+
+  
 
   setDashBoardFilters(currentDashBoardFilters: any){
     this.dashBoardFilters = currentDashBoardFilters;
@@ -113,6 +120,7 @@ export class DashboardComponent {
         error: (error) => { }
       });
   }
+
 
   shouldDisplayAccessedLoanDataPartnerName(index: number): boolean {
     const data = this.accessedLoanDataDataSource.data; // Access the current data

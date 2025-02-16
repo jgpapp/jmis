@@ -11,6 +11,7 @@ import { DashboardService } from '@services/dashboard/dashboard.service';
 import { Subject, takeUntil } from 'rxjs';
 import { DashboardFiltersComponent } from '../dashboard-filters/dashboard-filters.component';
 import { HighLevelSummaryDto } from '../dto/highLevelSummaryDto';
+import { PerformanceSummaryComponent } from "../performance-summary/performance-summary.component";
 
 @Component({
   selector: 'app-bmo-dashboard',
@@ -23,8 +24,9 @@ import { HighLevelSummaryDto } from '../dto/highLevelSummaryDto';
     MatIconModule,
     NgxChartsModule,
     PieChartComponent,
-    DashboardFiltersComponent
-  ],
+    DashboardFiltersComponent,
+    PerformanceSummaryComponent
+],
   templateUrl: './bmo-dashboard.component.html',
   styleUrl: './bmo-dashboard.component.scss'
 })

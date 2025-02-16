@@ -13,6 +13,13 @@ export class DashboardService {
     constructor(private httpClient: HttpClient, private globalService: GlobalService, private router: Router) { }
 
 
+    updateAnalyticsDataSummary(analyticsUpdate: {partnerId: any, fromDate: any, toDate: any}, partnerId: any = undefined): Observable<any> {
+      if(partnerId){
+        analyticsUpdate.partnerId = partnerId;
+      }
+      return this.httpClient.post(`${this.globalService.BASE_API_URL}/reports/analytics-update`, JSON.stringify(analyticsUpdate));
+    }
+
     getHighLevelSummary(dashBoardFilters: any = undefined): Observable<any> {
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/high-level-summary?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
@@ -98,8 +105,29 @@ export class DashboardService {
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/county-summary-map?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
+    getPerformanceSummary(year: string | undefined, partnerId: number | undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/performance-summary${this.getPerformanceSummaryQueryParams(year, partnerId)}`);
+    }
+
     getKenyanCounties(): Observable<any> {
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/kenyan-counties`);
+    }
+
+    getPerformanceSummaryQueryParams(year: string | undefined, partnerId: number | undefined): string {
+      let queryParam = ``
+      if(!year && !partnerId){
+        return queryParam;
+      }
+
+      queryParam = '?'
+      if(!year && partnerId) {
+        return `${queryParam}partner-id=${partnerId}`
+      }
+      
+      if(year && !partnerId){
+        return `${queryParam}year=${year}`
+      }
+        return `${queryParam}partner-id=${partnerId}&year=${year}`;
     }
 
 

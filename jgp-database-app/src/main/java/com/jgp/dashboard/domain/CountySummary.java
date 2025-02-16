@@ -15,11 +15,10 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Getter
 @Entity
-@Table(name = "county_summary", uniqueConstraints = @UniqueConstraint(columnNames = {"partner_id", "county_code", "data_date"}))
+@Table(name = "county_summary", uniqueConstraints = @UniqueConstraint(columnNames = {"partner_id", "county_code", "data_year", "data_month"}))
 public class CountySummary extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -41,24 +40,28 @@ public class CountySummary extends BaseEntity {
     @Column(name = "out_standing_amount")
     private BigDecimal outStandingAmount;
 
-    @Column(name = "data_date")
-    private LocalDate dataDate;
+    @Column(name = "data_year")
+    private Integer dataYear;
+
+    @Column(name = "data_month")
+    private Integer dataMonth;
 
     public CountySummary() {
     }
 
-    private CountySummary(String countyCode, Integer businessesTrained, Integer businessesLoaned, BigDecimal amountDisbursed, BigDecimal outStandingAmount, LocalDate dataDate, Partner partner) {
+    private CountySummary(String countyCode, Integer businessesTrained, Integer businessesLoaned, BigDecimal amountDisbursed, BigDecimal outStandingAmount, Integer dataYear, Integer dataMonth, Partner partner) {
         this.countyCode = countyCode;
         this.businessesTrained = businessesTrained;
         this.businessesLoaned = businessesLoaned;
         this.amountDisbursed = amountDisbursed;
         this.outStandingAmount = outStandingAmount;
-        this.dataDate = dataDate;
+        this.dataYear = dataYear;
+        this.dataMonth = dataMonth;
         this.partner = partner;
     }
 
     public static CountySummary createCountySummary(CountySummaryDto dto, Partner partner){
-        return new CountySummary(dto.countyCode(), dto.businessesTrained(), dto.businessesLoaned(), dto.amountDisbursed(), dto.outStandingAmount(), dto.dataDate(), partner);
+        return new CountySummary(dto.countyCode(), dto.businessesTrained(), dto.businessesLoaned(), dto.amountDisbursed(), dto.outStandingAmount(), dto.dataYear(), dto.dataMonth(), partner);
     }
 
     public void updateCountySummary(CountySummaryDto dto){
@@ -79,7 +82,8 @@ public class CountySummary extends BaseEntity {
         return new EqualsBuilder()
                 .appendSuper(super.equals(o)).append(getId(), countySummary.getId())
                 .append(getCountyCode(), countySummary.getCountyCode())
-                .append(getDataDate(), countySummary.getDataDate())
+                .append(getDataYear(), countySummary.getDataYear())
+                .append(getDataMonth(), countySummary.getDataMonth())
                 .append(getPartner(), countySummary.getPartner())
                 .isEquals();
     }
@@ -87,6 +91,6 @@ public class CountySummary extends BaseEntity {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .appendSuper(super.hashCode()).append(getId()).append(getCountyCode()).append(getDataDate()).append(getPartner()).toHashCode();
+                .appendSuper(super.hashCode()).append(getId()).append(getCountyCode()).append(getDataYear()).append(getDataMonth()).append(getPartner()).toHashCode();
     }
 }

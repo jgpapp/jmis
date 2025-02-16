@@ -10,6 +10,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { FormsModule } from '@angular/forms';
+import { PerformanceSummaryComponent } from "../performance-summary/performance-summary.component";
 
 @Component({
   selector: 'app-bmo-fi-dashboard',
@@ -24,8 +25,9 @@ import { FormsModule } from '@angular/forms';
     InfoCardsComponent,
     AnalyticsComponent,
     MatButtonToggleModule,
-    FormsModule
-  ],
+    FormsModule,
+    PerformanceSummaryComponent
+],
   templateUrl: './bmo-fi-dashboard.component.html',
   styleUrl: './bmo-fi-dashboard.component.scss'
 })

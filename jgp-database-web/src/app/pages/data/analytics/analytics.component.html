@@ -1,0 +1,39 @@
+    
+    <app-content-header 
+    [icon]="'supervisor_account'" 
+    [title]="'Update Analytics Data'" 
+    [desc]="'Provide information for all required fields to update analytics.'"
+    [hideBreadcrumb]="false"
+    [hasBgImage]="true" 
+    [class]="'pb-5'"></app-content-header>
+
+
+    <div fxLayout="column" fxLayout.gt-sm="row wrap" class="p-2" fxLayoutAlign="center">
+    <div fxFlex="70" class="p-2"> 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center">                
+                <mat-card-title>Update Analytics Summary</mat-card-title>
+            </mat-card-header>
+            <mat-card-content fxLayoutAlign="center" class="pt-3">
+                <form [formGroup]="analyticsForm" class="partner-form"> 
+                    <div fxLayout="row wrap" fxLayoutGap="2%">        
+                        <mat-form-field fxFlex="97%" class="px-2">
+                            <input matInput [matDatepicker]="dateFrom" placeholder="Date From" formControlName="fromDate">
+                            <mat-datepicker-toggle matSuffix [for]="dateFrom"></mat-datepicker-toggle>
+                            <mat-datepicker #dateFrom></mat-datepicker>
+                        </mat-form-field>
+                
+                        <mat-form-field fxFlex="97%" class="px-2">
+                            <input matInput [matDatepicker]="dateTo" placeholder="Date To" formControlName="toDate">
+                            <mat-datepicker-toggle matSuffix [for]="dateTo"></mat-datepicker-toggle>
+                            <mat-datepicker #dateTo ></mat-datepicker>
+                        </mat-form-field>
+                    <div fxLayout="row" fxLayoutAlign="end center" fxFlex="100%" fxLayoutGap="2%">
+                        <button mat-raised-button color="primary" (click)="onSubmitUpdateAnalytics()" [mat-dialog-close]="analyticsForm.value" [disabled]="!analyticsForm.valid">Update Analytics</button>
+                    </div>
+                    </div>
+                </form>
+            </mat-card-content>
+        </mat-card>
+    </div>          
+</div>

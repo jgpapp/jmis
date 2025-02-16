@@ -1,7 +1,6 @@
 package com.jgp.dashboard.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 public record CountySummaryDto(
         String countyCode,
@@ -10,6 +9,7 @@ public record CountySummaryDto(
         Integer businessesLoaned,
         BigDecimal amountDisbursed,
         BigDecimal outStandingAmount,
-        LocalDate dataDate
+        Integer dataYear,
+        Integer dataMonth
 ) {
 }

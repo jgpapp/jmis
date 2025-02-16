@@ -1,19 +1,26 @@
 package com.jgp.dashboard.api;
 
+import com.jgp.dashboard.dto.AnalyticsUpdateRequestDto;
 import com.jgp.dashboard.dto.CountyDto;
 import com.jgp.dashboard.dto.CountySummaryDto;
 import com.jgp.dashboard.dto.DashboardSearchCriteria;
 import com.jgp.dashboard.dto.DataPointDto;
 import com.jgp.dashboard.dto.HighLevelSummaryDto;
 import com.jgp.dashboard.dto.PartnerYearlyDataDto;
+import com.jgp.dashboard.dto.PerformanceSummaryDto;
 import com.jgp.dashboard.dto.SeriesDataPointDto;
 import com.jgp.dashboard.service.DashboardService;
+import com.jgp.patner.dto.PartnerDto;
+import com.jgp.shared.dto.ApiResponseDto;
 import com.jgp.util.CommonUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +39,12 @@ import java.util.Map;
 public class DashboardController {
 
     private final DashboardService dashboardService;
+
+    @PostMapping("analytics-update")
+    public ResponseEntity<ApiResponseDto> updateAnalyticsData(@Valid @RequestBody AnalyticsUpdateRequestDto analyticsUpdateRequestDto){
+        this.dashboardService.updateAnalyticsData(analyticsUpdateRequestDto);
+        return new ResponseEntity<>(new ApiResponseDto(true, CommonUtil.RESOURCE_CREATED), HttpStatus.CREATED);
+    }
 
     @GetMapping("high-level-summary")
     public ResponseEntity<HighLevelSummaryDto> getHighLevelSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
@@ -202,5 +215,11 @@ public class DashboardController {
                 .stream().map(county -> new CountyDto(county.getCountyCode(), county.getCountyName()))
                 .sorted(Comparator.comparing(CountyDto::countyName))
                 .toList(), HttpStatus.OK);
+    }
+
+    @GetMapping("performance-summary")
+    public ResponseEntity<List<PerformanceSummaryDto>> getPerformanceSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                             @RequestParam(value = "year", required = false) String year){
+        return new ResponseEntity<>(this.dashboardService.getPerformanceSummary(year, partnerId), HttpStatus.OK);
     }
 }
