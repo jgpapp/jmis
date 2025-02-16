@@ -1,9 +1,12 @@
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { Component, OnInit } from '@angular/core';
+import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatTreeFlattener, MatTreeFlatDataSource } from '@angular/material/tree';
+import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { DashboardService } from '@services/dashboard/dashboard.service';
+import { GlobalService } from '@services/shared/global.service';
 import { Subject, takeUntil } from 'rxjs';
 
 interface PerformanceSummaryDto {
@@ -39,15 +42,15 @@ interface PerformanceSummaryFlatNode {
   standalone: true,
   imports: [
     MatTableModule,
-    MatIconModule
+    MatIconModule,
+    FlexLayoutModule,
+    MatCardModule
   ],
   templateUrl: './performance-summary.component.html',
   styleUrl: './performance-summary.component.scss'
 })
 export class PerformanceSummaryComponent implements OnInit {
 
-  //treeFlattener: MatTreeFlattener<PerformanceSummaryDto, PerformanceSummaryFlatNode>;
-  //dataSource: MatTreeFlatDataSource<PerformanceSummaryDto, PerformanceSummaryFlatNode>;
   displayedColumns: string[] = ['category', 'businessesTrained', 'businessesLoaned', 'amountDisbursed', 'outStandingAmount' ];
   private transformer = (node: PerformanceSummaryDto, level: number) => {
     return {
@@ -76,9 +79,7 @@ export class PerformanceSummaryComponent implements OnInit {
   dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
 
   private unsubscribe$ = new Subject<void>();
-  constructor(private dashBoardService: DashboardService){}
-
-  //hasChild = (_: number, node: PerformanceSummaryFlatNode) => node.expandable;
+  constructor(private dashBoardService: DashboardService, public gs: GlobalService){}
 
   ngOnInit(): void {
     this.getPerformanceSummary();

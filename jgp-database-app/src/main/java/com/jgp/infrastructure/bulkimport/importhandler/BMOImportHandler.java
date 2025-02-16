@@ -284,10 +284,10 @@ public class BMOImportHandler implements ImportHandler {
         }
 
         if (null == rowErrorMap.get(row)){
-            if (!CommonUtil.isStringValueLengthValid(participantDto.jgpId(), 5, 10)){
+            if (CommonUtil.isStringValueLengthNotValid(participantDto.jgpId(), 5, 10)){
                 rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
             }
-            if (null == rowErrorMap.get(row) && !CommonUtil.isStringValueLengthValid(participantDto.phoneNumber(), 9, 12)){
+            if (null == rowErrorMap.get(row) && CommonUtil.isStringValueLengthNotValid(participantDto.phoneNumber(), 9, 12)){
                 rowErrorMap.put(row, "Phone number must be 9-12 digits !!");
             }
         }

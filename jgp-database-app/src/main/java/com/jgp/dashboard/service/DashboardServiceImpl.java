@@ -1,11 +1,15 @@
 package com.jgp.dashboard.service;
 
+import com.jgp.dashboard.dto.AnalyticsUpdateRequestDto;
 import com.jgp.dashboard.dto.CountySummaryDto;
 import com.jgp.dashboard.dto.DashboardSearchCriteria;
 import com.jgp.dashboard.dto.DataPointDto;
 import com.jgp.dashboard.dto.HighLevelSummaryDto;
 import com.jgp.dashboard.dto.PartnerYearlyDataDto;
 import com.jgp.dashboard.dto.PerformanceSummaryDto;
+import com.jgp.infrastructure.bulkimport.event.DataApprovedEvent;
+import com.jgp.patner.domain.Partner;
+import com.jgp.patner.domain.PartnerRepository;
 import com.jgp.util.CommonUtil;
 
 import java.math.BigDecimal;
@@ -18,8 +22,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.jgp.dashboard.dto.SeriesDataPointDto;
@@ -29,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -42,6 +49,8 @@ import org.springframework.stereotype.Service;
 public class DashboardServiceImpl implements DashboardService {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private final ApplicationContext applicationContext;
+    private final PartnerRepository partnerRepository;
     private static final String INTEGER_DATA_POINT_TYPE = "INTEGER";
     private static final String DECIMAL_DATA_POINT_TYPE = "DECIMAL";
     private static final String PARTNER_ID_PARAM = "partnerId";
@@ -568,6 +577,13 @@ public class DashboardServiceImpl implements DashboardService {
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, performanceSummaryMapper);
     }
 
+    @Override
+    public void updateAnalyticsData(AnalyticsUpdateRequestDto analyticsUpdateRequestDto) {
+        var partners = Objects.nonNull(analyticsUpdateRequestDto.partnerId()) ? List.of(analyticsUpdateRequestDto.partnerId()) : this.partnerRepository.findAll().stream().map(Partner::getId).toList();
+        final var dataDates = Set.of(analyticsUpdateRequestDto.fromDate(), analyticsUpdateRequestDto.toDate());
+        partners.forEach(id -> this.applicationContext.publishEvent(new DataApprovedEvent(id, dataDates)));
+    }
+
     private static final class PerformanceSummaryMapper implements ResultSetExtractor<List<PerformanceSummaryDto>> {
 
         public static final String PERFORMANCE_SUMMARY_SCHEMA = """
@@ -592,7 +608,7 @@ public class DashboardServiceImpl implements DashboardService {
                 final var month = rs.getInt("dataMonth");
                 final var partner = rs.getString("partnerName");
                 final var quarter = getQuarterFromMonth(month);
-                dataPoints.add(new PerformanceSummaryDto(year, month, partner, quarter, Month.of(month).name(), businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount, new ArrayList<>()));
+                dataPoints.add(new PerformanceSummaryDto(year, month, partner, quarter, StringUtils.capitalize((Month.of(month).name()).toLowerCase(Locale.ROOT))+" Totals", businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount, new ArrayList<>()));
             }
             return groupAndSummarizeByPartner(dataPoints);
         }

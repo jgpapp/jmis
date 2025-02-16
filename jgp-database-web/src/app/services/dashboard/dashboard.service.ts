@@ -13,6 +13,13 @@ export class DashboardService {
     constructor(private httpClient: HttpClient, private globalService: GlobalService, private router: Router) { }
 
 
+    updateAnalyticsDataSummary(analyticsUpdate: {partnerId: any, fromDate: any, toDate: any}, partnerId: any = undefined): Observable<any> {
+      if(partnerId){
+        analyticsUpdate.partnerId = partnerId;
+      }
+      return this.httpClient.post(`${this.globalService.BASE_API_URL}/reports/analytics-update`, JSON.stringify(analyticsUpdate));
+    }
+
     getHighLevelSummary(dashBoardFilters: any = undefined): Observable<any> {
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/high-level-summary?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }

@@ -2,6 +2,7 @@ package com.jgp.util;
 
 import java.text.NumberFormat;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -168,15 +169,21 @@ public abstract class CommonUtil {
 
     }
 
-    public static boolean isStringValueLengthValid(String stringValue, int min, int max){
+    public static boolean isStringValueLengthNotValid(String stringValue, int min, int max){
         if (null == stringValue){
-            return true;
+            return false;
         }
         final var strLength = stringValue.length();
-        return strLength >= min && strLength <= max;
+        return strLength < min || strLength > max;
     }
 
     public static String defaultToOtherIfStringIsNull(String value){
         return null != value ? value : "Other";
+    }
+
+    public static String formatNumber(Double value){
+        NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
+        numberFormat.setMaximumFractionDigits(2);
+        return numberFormat.format(value);
     }
 }
