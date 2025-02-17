@@ -14,6 +14,7 @@ public record UserDtoV2(
         String designation,
         String username,
         String cellPhone,
-        String town
+        String town,
+        boolean isActive
 ) {
 }

@@ -23,6 +23,11 @@ export class UserService {
     return this.httpClient.put(`${this.globalService.BASE_API_URL}/users/${userId}`, JSON.stringify(user));
   }
 
+  lockOrUnlockUser(selectedUser: any): Observable<any> {
+    const newUserStatus = selectedUser.isActive ? 'INACTIVE' : 'ACTIVE';
+    return this.httpClient.put(`${this.globalService.BASE_API_URL}/users/${selectedUser.id}/change-user-status/${newUserStatus}`, '');
+  }
+
   updateUserPassword(userPassDto: {password: string, newPass: string, passConfirm: string}): Observable<any> {
     return this.httpClient.put(`${this.globalService.BASE_API_URL}/users/change-password`, JSON.stringify(userPassDto));
   }
