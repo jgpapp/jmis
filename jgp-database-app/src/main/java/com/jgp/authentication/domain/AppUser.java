@@ -136,7 +136,7 @@ public class AppUser extends BaseEntity implements PlatformUser {
         return new UserDtoV2(getId(),
                 this.firstName, this.lastName, this.gender, this.image, this.roles.stream().map(Role::getRoleName).collect(Collectors.toSet()),
                 Objects.nonNull(this.partner) ? this.partner.getPartnerName() : "GLOBAL PARTNER", Objects.nonNull(this.partner) ? this.partner.getId() : 0L, this.getDesignation(),
-                this.username, this.cellPhone, this.town);
+                this.username, this.cellPhone, this.town, this.isActive);
     }
 
     public void updateRoles(final Set<Role> allRoles) {

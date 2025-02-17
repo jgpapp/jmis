@@ -17,8 +17,8 @@
                 <button mat-raised-button color="primary"  *jgpHasPermission="'USERS_UPDATE'" (click)="resetUserPassword(selectedUser.id)">
                   <mat-icon>lock_reset</mat-icon>&nbsp;&nbsp;Reset
                 </button>
-                <button mat-raised-button color="warn" >
-                    <mat-icon>lock</mat-icon>&nbsp;&nbsp;Lock
+                <button mat-raised-button color="warn" *jgpHasPermission="'USERS_UPDATE'" (click)="lockOrUnlockUser(selectedUser)">
+                    <mat-icon>lock</mat-icon>&nbsp;&nbsp;{{selectedUser.isActive ? 'Lock' : 'Unlock'}}
                   </button>
               </div>
         </mat-toolbar>

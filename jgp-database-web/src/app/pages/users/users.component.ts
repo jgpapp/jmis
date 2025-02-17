@@ -15,7 +15,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { PipesModule } from '../../theme/pipes/pipes.module';
 import { MatCardModule } from '@angular/material/card';
-import { DatePipe, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { ContentHeaderComponent } from '../../theme/components/content-header/content-header.component';
 import { MatDividerModule } from '@angular/material/divider';
 import { UserService } from '@services/users/user.service';
@@ -43,8 +43,6 @@ import { Subject, takeUntil } from 'rxjs';
     MatDividerModule,
     NgxPaginationModule,
     PipesModule,
-    DatePipe,  
-    UserDialogComponent,
     ContentHeaderComponent,
     NgClass,
     RouterModule,
@@ -61,7 +59,6 @@ export class UsersComponent implements OnInit, OnDestroy {
   public page: any;
   public showSearch: boolean = false;
   public viewType: string = 'grid';
-  public isDeleted: boolean = false;
   public userImage = "img/users/default-user.jpg";
 
   private unsubscribe$ = new Subject<void>();

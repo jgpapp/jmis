@@ -11,5 +11,6 @@ export class User {
     username: string;
     cellPhone: string;
     town: string;
+    isActive: boolean;
 }
 

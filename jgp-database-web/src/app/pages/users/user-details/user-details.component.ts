@@ -37,6 +37,7 @@ import { UserService } from '@services/users/user.service';
 })
 export class UserDetailsComponent implements OnDestroy, OnInit{
 
+  lockButtonText: string = 'Lock';
   selectedUser: Observable<User>;
   private unsubscribe$ = new Subject<void>();
   constructor(private activatedRoute: ActivatedRoute, private gs: GlobalService, private dialog: MatDialog, private userService: UserService){}
@@ -56,6 +57,28 @@ export class UserDetailsComponent implements OnDestroy, OnInit{
     dialogRef.afterClosed().subscribe(dialogResult => {
       if(dialogResult){
         this.userService.resetUserPassword(userId)
+        .pipe(takeUntil(this.unsubscribe$))
+          .subscribe({
+            next: (response) => {
+              this.gs.openSnackBar(response.message, "X");
+            },
+            error: (error) => { }
+          });
+      }
+    });
+  }
+
+ 
+  lockOrUnlockUser(selectedUser: any): void {
+    const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to update user?`);
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      maxWidth: "400px",
+      data: dialogData
+    });
+
+    dialogRef.afterClosed().subscribe(dialogResult => {
+      if(dialogResult){
+        this.userService.lockOrUnlockUser(selectedUser)
         .pipe(takeUntil(this.unsubscribe$))
           .subscribe({
             next: (response) => {
