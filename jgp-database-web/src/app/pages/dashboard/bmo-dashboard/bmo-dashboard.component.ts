@@ -12,6 +12,9 @@ import { Subject, takeUntil } from 'rxjs';
 import { DashboardFiltersComponent } from '../dashboard-filters/dashboard-filters.component';
 import { HighLevelSummaryDto } from '../dto/highLevelSummaryDto';
 import { PerformanceSummaryComponent } from "../performance-summary/performance-summary.component";
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { GlobalService } from '@services/shared/global.service';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-bmo-dashboard',
@@ -25,7 +28,9 @@ import { PerformanceSummaryComponent } from "../performance-summary/performance-
     NgxChartsModule,
     PieChartComponent,
     DashboardFiltersComponent,
-    PerformanceSummaryComponent
+    PerformanceSummaryComponent,
+    MatTableModule,
+    MatButtonModule
 ],
   templateUrl: './bmo-dashboard.component.html',
   styleUrl: './bmo-dashboard.component.scss'
@@ -43,6 +48,11 @@ export class BmoDashboardComponent implements OnInit {
     domain: ['#2F3E9E', '#D22E2E', '#378D3B', '#7f7f7f', '#c4a678', '#6a7b6a', '#191919', '#3d144c', '#f0e1dc', '#a04324', '#00ffff', '#0e5600', '#0e9697']
   };
   public gradient = false;
+
+  selectedDashboardView: string = 'TA';
+  trainedBusinessesCountData: any;
+  public trainedBusinessesCountDataDataSource: any;
+  public displayedColumns = ['year', 'partnerName', 'genderName', 'value' ];
 
   public single: any[];
   public multi: any[];
@@ -86,7 +96,7 @@ export class BmoDashboardComponent implements OnInit {
   highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', outStandingAmount: '0'}
 
   private unsubscribe$ = new Subject<void>();
-  constructor(private authService: AuthService, private dashBoardService: DashboardService){
+  constructor(private authService: AuthService, private dashBoardService: DashboardService, public gs: GlobalService){
 
   }
 
@@ -99,6 +109,7 @@ export class BmoDashboardComponent implements OnInit {
   doResetDashBoardFilters(){
     this.dashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId}
     this.resetDashBoardFilters = true;
+    this.getLastThreeYearsTrainedBusinessesPerPartnerYearly();
   }
 
   ngOnInit(): void {
@@ -115,7 +126,20 @@ export class BmoDashboardComponent implements OnInit {
     this.getTaTrainingBySegmentSummary();
     this.getBusinessesTrainedByGenderSummary();
     this.getBusinessTrainedTopFourCountiesSummary();
+    this.getLastThreeYearsTrainedBusinessesPerPartnerYearly();
   }
+  
+    getLastThreeYearsTrainedBusinessesPerPartnerYearly() {
+      this.dashBoardService.getLastThreeYearsTrainedBusinessesPerPartnerYearly(this.dashBoardFilters)
+      .pipe(takeUntil(this.unsubscribe$))
+        .subscribe({
+          next: (response) => {
+            this.trainedBusinessesCountData = response;
+            this.trainedBusinessesCountDataDataSource = new MatTableDataSource(this.trainedBusinessesCountData);
+          },
+          error: (error) => { }
+        });
+    }
 
   getHighLevelSummary() {
     this.dashBoardService.getHighLevelSummary(this.dashBoardFilters)
@@ -183,6 +207,27 @@ export class BmoDashboardComponent implements OnInit {
         error: (error) => { }
       });
   }
+
+  shouldDisplayTrainedBusinessesCountDataPartnerName(index: number): boolean {
+    const data = this.trainedBusinessesCountDataDataSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].partnerName !== data[index - 1].partnerName;
+  }
+
+  shouldDisplayTrainedBusinessesCountDataYear(index: number): boolean {
+    const data = this.trainedBusinessesCountDataDataSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].year !== data[index - 1].year;
+  }
+
+  isTADashboard(): boolean {
+    return 'TA' === this.selectedDashboardView;
+  }
+
 
 
   public onSelect(event: any) {
