@@ -146,11 +146,53 @@
                 </div>
             </mat-card>
         </div> 
-
-        <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
-            <app-performance-summary />
-        </div>
          
+    </div>
+
+    <div fxLayout="row wrap">
+    @if(isTADashboard()){
+        <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
+            <mat-card>
+                <mat-card-header fxLayoutAlign="space-between center">                
+                    <mat-card-title>Businesses Trained By Partner</mat-card-title>
+                    <button mat-raised-button color="primary" (click)="gs.exportToExcel(trainedBusinessesCountDataDataSource, displayedColumns, 'BUSINESSES_TRAINED')"><mat-icon>download</mat-icon> Excel</button>
+                </mat-card-header>
+                <div class="p-2 table-container">
+                    <mat-table #table [dataSource]="trainedBusinessesCountDataDataSource" class="mat-elevation-z8">
+                        <ng-container matColumnDef="year">
+                            <mat-header-cell *matHeaderCellDef> Year </mat-header-cell>
+                            <mat-cell *matCellDef="let element; let i = index">
+                              {{ shouldDisplayTrainedBusinessesCountDataYear(i) ? element.year : '' }}
+                            </mat-cell>
+                          </ng-container>
+                        <ng-container matColumnDef="partnerName">
+                            <mat-header-cell *matHeaderCellDef> Partner Name </mat-header-cell>
+                            <mat-cell *matCellDef="let element; let i = index">
+                              {{ shouldDisplayTrainedBusinessesCountDataPartnerName(i) ? element.partnerName : '' }}
+                            </mat-cell>
+                          </ng-container>
+
+                          
+                        <ng-container matColumnDef="genderName">
+                            <mat-header-cell *matHeaderCellDef> Category </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{element.genderName}} </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="value">
+                            <mat-header-cell *matHeaderCellDef> Trained Businesses </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{element.value}} </mat-cell>
+                        </ng-container>
+                        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+                    </mat-table>
+                    <!-- mat-paginator #paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"></mat-paginator -->
+                </div>
+            </mat-card>
+        </div>
+    }
+
+    <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
+        <app-performance-summary />
+    </div>
     </div>
     
 

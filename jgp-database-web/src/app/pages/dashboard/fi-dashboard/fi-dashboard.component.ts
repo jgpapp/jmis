@@ -12,6 +12,9 @@ import { Subject, takeUntil } from 'rxjs';
 import { DashboardFiltersComponent } from "../dashboard-filters/dashboard-filters.component";
 import { HighLevelSummaryDto } from '../dto/highLevelSummaryDto';
 import { PerformanceSummaryComponent } from "../performance-summary/performance-summary.component";
+import { GlobalService } from '@services/shared/global.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 @Component({
   selector: 'app-fi-dashboard',
   standalone: true,
@@ -26,7 +29,9 @@ import { PerformanceSummaryComponent } from "../performance-summary/performance-
     NgxChartsModule,
     PieChartComponent,
     DashboardFiltersComponent,
-    PerformanceSummaryComponent
+    PerformanceSummaryComponent,
+    MatButtonModule,
+    MatTableModule
 ],
   templateUrl: './fi-dashboard.component.html',
   styleUrl: './fi-dashboard.component.scss'
@@ -42,6 +47,13 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   public previousWidthOfResizedDiv: number = 0;
 
   resetDashBoardFilters: boolean = false;
+
+  selectedDashboardView: string = 'FI';
+  accessedLoanData: any;
+  accessedLoanCountData: any;
+  public accessedLoanDataDataSource: any;
+  public accessedLoanCountDataDataSource: any;
+  public displayedColumns = ['year', 'partnerName', 'genderName', 'value' ];
 
   public loansDisbursedByGender: any[];
   public loansDisbursedByGenderShowLegend: boolean = false;
@@ -101,7 +113,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', outStandingAmount: '0'}
 
   private unsubscribe$ = new Subject<void>();
-  constructor(private authService: AuthService, private dashBoardService: DashboardService){
+  constructor(private authService: AuthService, private dashBoardService: DashboardService, public gs: GlobalService){
 
   }
 
@@ -114,12 +126,39 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   doResetDashBoardFilters(){
     this.dashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId}
     this.resetDashBoardFilters = true;
+    this.getLastThreeYearsAccessedLoanPerPartnerYearly();
+    this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
   }
 
   ngOnInit() {
     this.dashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId}
     this.reloadData();
   }
+
+  getLastThreeYearsAccessedLoanPerPartnerYearly() {
+      this.dashBoardService.getLastThreeYearsAccessedLoanPerPartnerYearly(this.dashBoardFilters)
+      .pipe(takeUntil(this.unsubscribe$))
+        .subscribe({
+          next: (response) => {
+            this.accessedLoanData = response;
+            this.accessedLoanDataDataSource = new MatTableDataSource(this.accessedLoanData);
+          },
+          error: (error) => { }
+        });
+    }
+  
+    getLastThreeYearsAccessedLoansCountPerPartnerYearly() {
+      this.dashBoardService.getLastThreeYearsAccessedLoansCountPerPartnerYearly(this.dashBoardFilters)
+      .pipe(takeUntil(this.unsubscribe$))
+        .subscribe({
+          next: (response) => {
+            this.accessedLoanCountData = response;
+            this.accessedLoanCountDataDataSource = new MatTableDataSource(this.accessedLoanCountData);
+          },
+          error: (error) => { }
+        });
+    }
+
 
   reloadData(){
     this.partnerName = `${this.authService.currentUser()?.partnerName} Dashboard !`;
@@ -132,6 +171,8 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
     this.getLoansAccessedVsOutStandingByGenderSummary();
     this.getLoanDisbursedByIndustrySegmentSummary();
     this.getLoanDisbursedTopFourCountiesSummary();
+    this.getLastThreeYearsAccessedLoanPerPartnerYearly();
+    this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
   }
 
   getHighLevelSummary() {
@@ -222,6 +263,43 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
         error: (error) => { }
       });
   }
+
+  shouldDisplayAccessedLoanDataPartnerName(index: number): boolean {
+    const data = this.accessedLoanDataDataSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].partnerName !== data[index - 1].partnerName;
+  }
+
+  shouldDisplayAccessedLoanDataYear(index: number): boolean {
+    const data = this.accessedLoanDataDataSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].year !== data[index - 1].year;
+  }
+
+  shouldDisplayAccessedLoanCountDataPartnerName(index: number): boolean {
+    const data = this.accessedLoanCountDataDataSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].partnerName !== data[index - 1].partnerName;
+  }
+
+  shouldDisplayAccessedLoanCountDataYear(index: number): boolean {
+    const data = this.accessedLoanCountDataDataSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].year !== data[index - 1].year;
+  }
+
+  isFinancialDashboard(): boolean {
+    return 'FI' === this.selectedDashboardView;
+  }
+
 
 
   public onSelect(event: any) {
