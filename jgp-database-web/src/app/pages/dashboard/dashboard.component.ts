@@ -78,7 +78,7 @@ export class DashboardComponent {
   }
 
   doResetDashBoardFilters(){
-    this.dashBoardFilters = undefined;
+    this.dashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId}
     this.resetDashBoardFilters = true;
     this.getLastThreeYearsAccessedLoanPerPartnerYearly();
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
@@ -171,6 +171,7 @@ export class DashboardComponent {
   }
 
   ngOnInit(): void {
+    this.dashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId}
     this.getLastThreeYearsAccessedLoanPerPartnerYearly();
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
     this.getLastThreeYearsTrainedBusinessesPerPartnerYearly();

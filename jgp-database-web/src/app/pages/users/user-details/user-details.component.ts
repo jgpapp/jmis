@@ -48,7 +48,7 @@ export class UserDetailsComponent implements OnDestroy, OnInit{
 
 
   resetUserPassword(userId: number): void {
-    const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to approve loans data?`);
+    const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to reset user password?`);
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       maxWidth: "400px",
       data: dialogData
