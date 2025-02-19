@@ -37,6 +37,7 @@ import { MatButtonModule } from '@angular/material/button';
 })
 export class BmoDashboardComponent implements OnInit {
 
+  public displayChart: boolean = false;
   dashBoardFilters: any;
   partnerName: string = '';
   partnerId: any;

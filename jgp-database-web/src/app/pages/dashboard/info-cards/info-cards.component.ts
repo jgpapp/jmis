@@ -27,6 +27,7 @@ import { ChartDialogComponent } from '../../chart-dialog/chart-dialog.component'
 export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, OnDestroy {
   @Input('dashBoardFilters') dashBoardFilters: any;
   @Input('selectedDashboardView') selectedDashboardView: any;
+  public displayChart: boolean = false;
   public colorScheme: any = {
     domain: ['rgba(255,255,255,0.8)']
   };

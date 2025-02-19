@@ -38,6 +38,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 })
 export class FiDashboardComponent implements OnInit, OnDestroy {
 
+  public displayChart: boolean = false;
   dashBoardFilters: any;
   partnerName: string = '';
   partnerId: any;
