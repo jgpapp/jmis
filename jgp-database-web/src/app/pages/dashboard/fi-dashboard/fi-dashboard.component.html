@@ -102,6 +102,7 @@
                         [showYAxisLabel]="loansDisbursedByStatusShowYAxisLabel"
                         [xAxisLabel]="loansDisbursedByStatusYAxisLabel"
                         [yAxisLabel]="loansDisbursedByStatusXAxisLabel"
+                        [showDataLabel]="true"
                         (select)="onSelect($event)"
                     />
                 } @else {
@@ -151,6 +152,7 @@
                         [showYAxisLabel]="accessedVSOutStandingAmountByGenderShowYAxisLabel"
                         [xAxisLabel]="accessedVSOutStandingAmountByGenderXAxisLabel"
                         [yAxisLabel]="accessedVSOutStandingAmountByGenderYAxisLabel"
+                        [showDataLabel]="true"
                         (select)="onSelect($event)" 
                     />
                 } @else {
@@ -285,7 +287,7 @@
         </div>
     }
     <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
-        <app-performance-summary />
+        <app-performance-summary [selectedDashboardView]="selectedDashboardView"/>
     </div>
     </div>
    

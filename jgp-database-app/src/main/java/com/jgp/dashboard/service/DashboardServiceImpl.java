@@ -13,6 +13,7 @@ import com.jgp.patner.domain.PartnerRepository;
 import com.jgp.util.CommonUtil;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -842,7 +843,7 @@ public class DashboardServiceImpl implements DashboardService {
 
         public static final String BUSINESSES_TRAINED_BY_GENDER_SCHEMA = """
                 select cl.gender_category as dataKey, count(cl.id) as dataValue,\s
-                count(cl.id) * 100.0 / count(count(cl.id)) OVER () AS percentage\s
+                count(cl.id) * 100.0 / sum(count(cl.id)) OVER () AS percentage\s
                 from participants cl inner join bmo_participants_data bpd on bpd.participant_id = cl.id\s
                 inner join partners p on p.id = bpd.partner_id %s  group by 1;\s
                 """;
@@ -861,14 +862,14 @@ public class DashboardServiceImpl implements DashboardService {
 
         public static final String BUSINESSES_TRAINED_BY_SECTOR_SCHEMA = """
                 select cl.industry_sector as dataKey, count(cl.id) as dataValue,\s
-                count(cl.id) * 100.0 / count(count(cl.id)) OVER () AS percentage\s
+                count(cl.id) * 100.0 / sum(count(cl.id)) OVER () AS percentage\s
                 from participants cl inner join bmo_participants_data bpd on bpd.participant_id = cl.id\s
                 inner join partners p on p.id = bpd.partner_id %s group by 1;\s
                 """;
 
         public static final String BUSINESSES_TRAINED_BY_SEGMENT_SCHEMA = """
                 select cl.business_segment as dataKey, count(cl.id) as dataValue,\s
-                count(cl.id) * 100.0 / count(count(cl.id)) OVER () AS percentage\s
+                count(cl.id) * 100.0 / sum(count(cl.id)) OVER () AS percentage\s
                 from participants cl inner join bmo_participants_data bpd on bpd.participant_id = cl.id\s
                 inner join partners p on p.id = bpd.partner_id %s group by 1;\s
                 """;
@@ -886,12 +887,14 @@ public class DashboardServiceImpl implements DashboardService {
             while (rs.next()){
                 final var dataKey = rs.getString("dataKey");
                 final var nullableDataKey = CommonUtil.defaultToOtherIfStringIsNull(dataKey);
+                final var percentageVal = String.valueOf(rs.getBigDecimal(DATA_PERCENTAGE_VALUE_PARAM).setScale(2, RoundingMode.HALF_UP));
+                final var nameAndPercentage = String.format("%s (%s", StringUtils.capitalize(nullableDataKey), percentageVal)+ "%)";
                 if (DashboardServiceImpl.INTEGER_DATA_POINT_TYPE.equals(this.valueDataType)){
-                    dataPoints.add(new DataPointDto(StringUtils.capitalize(nullableDataKey), String.valueOf(rs.getInt(DATA_VALUE_PARAM)), String.valueOf(rs.getBigDecimal(DATA_PERCENTAGE_VALUE_PARAM))));
+                    dataPoints.add(new DataPointDto(nameAndPercentage, String.valueOf(rs.getInt(DATA_VALUE_PARAM)), percentageVal));
                 } else if (DECIMAL_DATA_POINT_TYPE.equals(this.valueDataType)) {
-                    dataPoints.add(new DataPointDto(StringUtils.capitalize(nullableDataKey), String.valueOf(rs.getBigDecimal(DATA_VALUE_PARAM)), String.valueOf(rs.getBigDecimal(DATA_PERCENTAGE_VALUE_PARAM))));
+                    dataPoints.add(new DataPointDto(nameAndPercentage, String.valueOf(rs.getBigDecimal(DATA_VALUE_PARAM)), percentageVal));
                 }else {
-                    dataPoints.add(new DataPointDto(StringUtils.capitalize(nullableDataKey), rs.getString(DATA_VALUE_PARAM), String.valueOf(rs.getBigDecimal(DATA_PERCENTAGE_VALUE_PARAM))));
+                    dataPoints.add(new DataPointDto(nameAndPercentage, rs.getString(DATA_VALUE_PARAM), percentageVal));
                 }
             }
             return dataPoints;

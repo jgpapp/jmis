@@ -78,6 +78,7 @@
                     [xAxisLabel]="loansDisbursedByStatusXAxisLabel"
                     [yAxisLabel]="loansDisbursedByStatusYAxisLabel"
                     [dataLabelFormatting]="valueFormatting"
+                    [showDataLabel]="true"
                     (select)="onSelect($event)"
                 />
             } @else {
@@ -135,6 +136,7 @@
                     [xAxisLabel]="TANeedsByGenderXAxisLabel"
                     [yAxisLabel]="TANeedsByGenderYAxisLabel"
                     [dataLabelFormatting]="valueFormatting"
+                    [showDataLabel]="true"
                     (select)="onSelect($event)"
                 />
             } @else {
@@ -168,6 +170,7 @@
                     [xAxisLabel]="trainingByPartnerByGenderXAxisLabel"
                     [yAxisLabel]="trainingByPartnerByGenderYAxisLabel"
                     [dataLabelFormatting]="valueFormatting"
+                    [showDataLabel]="true"
                     (select)="onSelect($event)" 
                 />
             } @else {
@@ -227,6 +230,7 @@
                     [showYAxisLabel]="taTrainedBySectorShowYAxisLabel"
                     [xAxisLabel]="taTrainedBySectorYAxisLabel"
                     [yAxisLabel]="taTrainedBySectorXAxisLabel"
+                    [showDataLabel]="true"
                     (select)="onSelect($event)"
                 />
             } @else {
@@ -260,6 +264,7 @@
                     [xAxisLabel]="accessedVSOutStandingAmountXAxisLabel"
                     [yAxisLabel]="accessedVSOutStandingAmountYAxisLabel"
                     [dataLabelFormatting]="valueFormatting"
+                    [showDataLabel]="true"
                     (select)="onSelect($event)" 
                 />
             } @else {
@@ -317,6 +322,7 @@
                     [xAxisLabel]="accessedVSOutStandingAmountByGenderXAxisLabel"
                     [yAxisLabel]="accessedVSOutStandingAmountByGenderYAxisLabel"
                     [dataLabelFormatting]="valueFormatting"
+                    [showDataLabel]="true"
                     (select)="onSelect($event)" 
                 />
             } @else {
@@ -328,10 +334,7 @@
 }
 
 @if(isFinancialDashboard()){
-    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByGenderContentDiv> 
-        <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByGenderDoughnut()">
-            <mat-icon>open_in_full</mat-icon>
-          </button>
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button"> 
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
                 <mat-card-title>{{loansDisbursedBySectorChartTitle}}</mat-card-title>
