@@ -1,5 +1,5 @@
 import { FlatTreeControl } from '@angular/cdk/tree';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
@@ -54,7 +54,10 @@ interface PerformanceSummaryFlatNode {
 })
 export class PerformanceSummaryComponent implements OnInit {
 
-  displayedColumns: string[] = ['category', 'businessesTrained', 'businessesLoaned', 'amountDisbursed', 'outStandingAmount' ];
+  @Input({alias: 'selectedDashboardView', required: true}) selectedDashboardView: string
+
+  fiDisplayedColumns: string[] = ['category',  'businessesLoaned', 'amountDisbursed', 'outStandingAmount' ];
+  taDisplayedColumns: string[] = ['category', 'businessesTrained'];
   private transformer = (node: PerformanceSummaryDto, level: number) => {
     return {
       expandable: !!node.children && node.children.length > 0,
@@ -97,6 +100,14 @@ export class PerformanceSummaryComponent implements OnInit {
         },
         error: (error) => { }
       });
+  }
+
+  isFinancialDashboard(): boolean {
+    return 'FI' === this.selectedDashboardView;
+  }
+
+  isTADashboard(): boolean {
+    return 'TA' === this.selectedDashboardView;
   }
 
   ngOnDestroy(): void {

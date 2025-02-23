@@ -48,6 +48,7 @@
                         [showYAxisLabel]="TANeedsByGenderShowYAxisLabel"
                         [xAxisLabel]="TANeedsByGenderXAxisLabel"
                         [yAxisLabel]="TANeedsByGenderYAxisLabel"
+                        [showDataLabel]="true"
                         (select)="onSelect($event)"
                         />
                     } @else {
@@ -75,6 +76,7 @@
                         [showYAxisLabel]="taTrainedBySectorShowYAxisLabel"
                         [xAxisLabel]="taTrainedBySectorYAxisLabel"
                         [yAxisLabel]="taTrainedBySectorXAxisLabel"
+                        [showDataLabel]="true"
                         (select)="onSelect($event)"
                     />
                 } @else {
@@ -193,7 +195,7 @@
     }
 
     <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
-        <app-performance-summary />
+        <app-performance-summary [selectedDashboardView]="selectedDashboardView"/>
     </div>
     </div>
     
