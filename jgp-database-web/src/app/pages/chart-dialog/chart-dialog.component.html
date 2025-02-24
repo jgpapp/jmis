@@ -2,7 +2,7 @@
   <button mat-icon-button class="close-button" (click)="onCloseClick()" fxFlex="4%">
     <mat-icon class="close-icon" color="warn">close</mat-icon>
   </button>
-<div fxLayout="column" fxLayoutAlign="center center" fxFlex="88%" id="chartDiv" class="chart-props">
+<div fxLayout="column" fxLayoutAlign="center center" fxFlex="88%" class="chart-props" id="chartDiv">
 <h1 mat-dialog-title fxFlex="10%" fxFlexAlign="center center">{{data.chartTitle}}</h1>
 <div mat-dialog-content fxLayout="row" fxFlex="90%" class="chart-props">
   <div class="chart-props" fxFlex="100%" #chartContainer>
@@ -99,7 +99,7 @@
 </div>
 </div>
 <div fxLayout="row" fxLayoutAlign="center center" fxFlex="8%" fxLayoutGap="2%">
-  <button mat-raised-button color="primary">Download PDF</button>
-  <button mat-raised-button color="primary" (click)="downloadChart()">Download PNG (Image)</button>
+  <button mat-raised-button color="primary" (click)="exportAsPDF()">Export As PDF</button>
+  <button mat-raised-button color="primary" (click)="downloadChart()">Export As Image (PNG)</button>
 </div>
 </div>

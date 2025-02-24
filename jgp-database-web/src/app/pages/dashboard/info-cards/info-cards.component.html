@@ -182,10 +182,7 @@
 }
 
 @if(isTADashboard()){
-    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByGenderContentDiv> 
-        <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByGenderDoughnut()">
-            <mat-icon>open_in_full</mat-icon>
-          </button>
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button"> 
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
                 <mat-card-title>{{businessesTainedByGenderChartTitle}}</mat-card-title>
