@@ -4,6 +4,7 @@ import com.jgp.dashboard.dto.AnalyticsUpdateRequestDto;
 import com.jgp.dashboard.dto.CountySummaryDto;
 import com.jgp.dashboard.dto.DashboardSearchCriteria;
 import com.jgp.dashboard.dto.DataPointDto;
+import com.jgp.dashboard.dto.EmployeesSummaryDto;
 import com.jgp.dashboard.dto.HighLevelSummaryDto;
 import com.jgp.dashboard.dto.PartnerYearlyDataDto;
 import com.jgp.dashboard.dto.PerformanceSummaryDto;
@@ -260,6 +261,58 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    public List<DataPointDto> getDisabledBusinessOwnersTrainedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
+        final DataPointMapper rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
+        LocalDate fromDate = dashboardSearchCriteria.fromDate();
+        LocalDate toDate = dashboardSearchCriteria.toDate();
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = getDefaultQueryDates().getLeft();
+            toDate = getDefaultQueryDates().getRight();
+        }
+        var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
+            parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
+            whereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
+            parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
+            whereClause = String.format("%s%s ", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        whereClause = String.format("%s and LOWER(person_with_disability) = LOWER('YES')", whereClause);
+        var sqlQuery = String.format(DataPointMapper.BUSINESSES_TRAINED_BY_GENDER_SCHEMA, whereClause);
+
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
+    public List<DataPointDto> getRefugeeBusinessOwnersTrainedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
+        final DataPointMapper rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
+        LocalDate fromDate = dashboardSearchCriteria.fromDate();
+        LocalDate toDate = dashboardSearchCriteria.toDate();
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = getDefaultQueryDates().getLeft();
+            toDate = getDefaultQueryDates().getRight();
+        }
+        var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
+            parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
+            whereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
+            parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
+            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        whereClause = String.format("%s and LOWER(refugee_status) = LOWER('YES')", whereClause);
+        var sqlQuery = String.format(DataPointMapper.BUSINESSES_TRAINED_BY_GENDER_SCHEMA, whereClause);
+
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
     public List<DataPointDto> getLoanDisbursedByPipelineSourceSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final DataPointMapper rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -357,6 +410,41 @@ public class DashboardServiceImpl implements DashboardService {
         var sqlQuery = String.format(DataPointMapper.BUSINESSES_TRAINED_BY_SECTOR_SCHEMA, whereClause);
 
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
+    public List<DataPointDto> getParticipantsEmployeesSummary(DashboardSearchCriteria dashboardSearchCriteria) {
+        final var employeeMapper = new EmployeesSummaryMapper();
+        LocalDate fromDate = dashboardSearchCriteria.fromDate();
+        LocalDate toDate = dashboardSearchCriteria.toDate();
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = getDefaultQueryDates().getLeft();
+            toDate = getDefaultQueryDates().getRight();
+        }
+        var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
+            parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
+            whereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
+        }
+        var sqlQuery = String.format(EmployeesSummaryMapper.EMPLOYEES_SCHEMA, whereClause);
+        final var employeeSummary = this.namedParameterJdbcTemplate.queryForObject(sqlQuery, parameters, employeeMapper);
+        if (Objects.isNull(employeeSummary)){
+            return List.of();
+        }
+        final var totalEmployees = employeeSummary.totalCasualEmployeesAbove35() + employeeSummary.totalRegularEmployeesAbove35()
+                + employeeSummary.youthCasualEmployees() + employeeSummary.youthRegularEmployees();
+        final var oldRegularPercentage = CommonUtil.getPercentage(BigDecimal.valueOf(employeeSummary.totalRegularEmployeesAbove35()), BigDecimal.valueOf(totalEmployees))+"%";
+        final var youthRegularPercentage = CommonUtil.getPercentage(BigDecimal.valueOf(employeeSummary.youthRegularEmployees()), BigDecimal.valueOf(totalEmployees))+"%";
+        final var oldCasualPercentage = CommonUtil.getPercentage(BigDecimal.valueOf(employeeSummary.totalCasualEmployeesAbove35()), BigDecimal.valueOf(totalEmployees))+"%";
+        final var youthCasualPercentage = CommonUtil.getPercentage(BigDecimal.valueOf(employeeSummary.youthCasualEmployees()), BigDecimal.valueOf(totalEmployees))+"%";
+        return List.of(
+                new DataPointDto(String.format("Regular Above 35 (%s)", oldRegularPercentage), employeeSummary.totalRegularEmployeesAbove35()+"", oldRegularPercentage),
+                new DataPointDto(String.format("Regular 18-35 (%s)", youthRegularPercentage), employeeSummary.youthRegularEmployees()+"", youthRegularPercentage),
+                new DataPointDto(String.format("Casual Above 35 (%s)", oldCasualPercentage), employeeSummary.totalCasualEmployeesAbove35()+"", oldCasualPercentage),
+                new DataPointDto(String.format("Casual 18-35 (%s)", youthCasualPercentage), employeeSummary.youthCasualEmployees()+"", youthCasualPercentage)
+        );
     }
 
     @Override
@@ -799,6 +887,33 @@ public class DashboardServiceImpl implements DashboardService {
             final var amountDisbursed = rs.getBigDecimal(AMOUNT_DISBURSED);
             final var outStandingAmount = rs.getBigDecimal(OUT_STANDING_AMOUNT);
             return new HighLevelSummaryDto(businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount);
+        }
+    }
+
+
+    private static final class EmployeesSummaryMapper implements RowMapper<EmployeesSummaryDto> {
+
+        public static final String EMPLOYEES_SCHEMA = """
+                with employees as (\s
+                select sum(p.total_regular_employees) as totalRegularEmployees,\s
+                sum(p.youth_regular_employees ) as youthRegularEmployees,\s
+                sum(p.total_casual_employees ) as totalCasualEmployees,\s
+                sum(p.youth_casual_employees ) as youthCasualEmployees\s
+                from participants p inner join bmo_participants_data bpd on p.id = bpd.participant_id %s\s
+                )
+                select (totalRegularEmployees - youthRegularEmployees) as totalRegularEmployeesAbove35,
+                youthRegularEmployees,
+                (totalCasualEmployees - youthCasualEmployees) as totalCasualEmployeesAbove35,\s
+                youthCasualEmployees from employees;
+               """;
+
+        @Override
+        public EmployeesSummaryDto mapRow(ResultSet rs, int rowNum) throws SQLException {
+            final var totalRegularEmployeesAbove35 = rs.getInt("totalRegularEmployeesAbove35");
+            final var youthRegularEmployees = rs.getInt("youthRegularEmployees");
+            final var totalCasualEmployeesAbove35 = rs.getInt("totalCasualEmployeesAbove35");
+            final var youthCasualEmployees = rs.getInt("youthCasualEmployees");
+            return new EmployeesSummaryDto(totalRegularEmployeesAbove35, youthRegularEmployees, totalCasualEmployeesAbove35, youthCasualEmployees);
         }
     }
 

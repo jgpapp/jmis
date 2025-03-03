@@ -436,6 +436,82 @@
         </mat-card>
     </div> 
 }
+
+@if(isTADashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #employeesSummaryContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandEmployeesSummaryBarChart()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{employeesSummaryChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (employeesSummary && employeesSummary.length > 0) {
+                <ngx-charts-bar-horizontal
+                    [scheme]="chartSColorScheme"
+                    [results]="employeesSummary"
+                    [gradient]="gradient"
+                    [xAxis]="employeesSummaryShowXAxis"
+                    [yAxis]="employeesSummaryShowYAxis"
+                    [legend]="employeesSummaryShowLegend"
+                    [showXAxisLabel]="employeesSummaryShowXAxisLabel"
+                    [showYAxisLabel]="employeesSummaryShowYAxisLabel"
+                    [xAxisLabel]="employeesSummaryYAxisLabel"
+                    [yAxisLabel]="employeesSummaryXAxisLabel"
+                    [showDataLabel]="true"
+                    (select)="onSelect($event)"
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }          
+            </div>
+        </mat-card>
+    </div>  
+}
+
+@if(isTADashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{disabledBusinessesTainedByGenderChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (disabledBusinessesTainedByGender && disabledBusinessesTainedByGender.length > 0) {
+                <ngx-charts-tree-map 
+                [results]="disabledBusinessesTainedByGender" 
+                [scheme]="chartSColorScheme"
+                [animations]="true"
+                />
+                } @else {
+                    <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+                }      
+            </div>
+        </mat-card>
+    </div> 
+}
+
+@if(isTADashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{refugeeBusinessesTainedByGenderChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (refugeeBusinessesTainedByGender && refugeeBusinessesTainedByGender.length > 0) {
+                <ngx-charts-tree-map 
+                [results]="refugeeBusinessesTainedByGender" 
+                [scheme]="chartSColorScheme"
+                [animations]="true"
+                />
+                } @else {
+                    <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+                }      
+            </div>
+        </mat-card>
+    </div> 
+}
+
 </div>
 
 <!-- Template for no data placeholder -->

@@ -77,6 +77,16 @@ export class BmoDashboardComponent implements OnInit {
   public taTrainedBySectorYAxisLabel: string = 'Number Of Participants';
   public taTrainedBySectorChartTitle: string = 'TA Training By Industry Sector';
 
+  public employeesSummary: any[];
+  public employeesSummaryShowXAxis: boolean = true;
+  public employeesSummaryShowYAxis: boolean = true;
+  public employeesSummaryShowLegend: boolean = false;
+  public employeesSummaryShowXAxisLabel: boolean = true;
+  public employeesSummaryShowYAxisLabel: boolean = true;
+  public employeesSummaryXAxisLabel: string = 'Category';
+  public employeesSummaryYAxisLabel: string = 'Number Of Employees';
+  public employeesSummaryChartTitle: string = 'Employees Summary';
+
   public taTrainedBySegment: any[];
   public taTrainedBySegmentShowLegend: boolean = false;
   public taTrainedBySegmentShowLabels: boolean = true;
@@ -93,6 +103,12 @@ export class BmoDashboardComponent implements OnInit {
 
   public topFourCountiesBusinessesTrained: any[];
   public topFourCountiesBusinessesTrainedChartTitle: string = 'Businesses Trained Top Four Counties';
+
+  public disabledBusinessesTainedByGender: any[];
+  public disabledBusinessesTainedByGenderChartTitle: string = 'Businesses Trained With Disabilities';
+
+  public refugeeBusinessesTainedByGender: any[];
+  public refugeeBusinessesTainedByGenderChartTitle: string = 'Refugee Businesses Trained';
 
   highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', outStandingAmount: '0'}
 
@@ -128,6 +144,9 @@ export class BmoDashboardComponent implements OnInit {
     this.getBusinessesTrainedByGenderSummary();
     this.getBusinessTrainedTopFourCountiesSummary();
     this.getLastThreeYearsTrainedBusinessesPerPartnerYearly();
+    this.getParticipantsEmployeesSummary();
+    this.getDisabledBusinessOwnersTrainedByGenderSummary();
+    this.getRefugeeBusinessOwnersTrainedByGenderSummary();
   }
   
     getLastThreeYearsTrainedBusinessesPerPartnerYearly() {
@@ -198,6 +217,28 @@ export class BmoDashboardComponent implements OnInit {
       });
   }
 
+  getDisabledBusinessOwnersTrainedByGenderSummary() {
+    this.dashBoardService.getDisabledBusinessOwnersTrainedByGenderSummary(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.disabledBusinessesTainedByGender = response;
+        },
+        error: (error) => { }
+      });
+  }
+
+  getRefugeeBusinessOwnersTrainedByGenderSummary() {
+    this.dashBoardService.getRefugeeBusinessOwnersTrainedByGenderSummary(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.refugeeBusinessesTainedByGender = response;
+        },
+        error: (error) => { }
+      });
+  }
+
   getBusinessTrainedTopFourCountiesSummary() {
     this.dashBoardService.getBusinessTrainedTopFourCountiesSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
@@ -206,6 +247,19 @@ export class BmoDashboardComponent implements OnInit {
           this.topFourCountiesBusinessesTrained = response;
         },
         error: (error) => { }
+      });
+  }
+
+  getParticipantsEmployeesSummary() {
+    this.dashBoardService.getParticipantsEmployeesSummary(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.employeesSummary = response;
+        },
+        error: (error) => { 
+          console.log(error)
+        }
       });
   }
 
