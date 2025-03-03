@@ -128,6 +128,16 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   public taTrainedBySectorYAxisLabel: string = 'Number Of Participants';
   public taTrainedBySectorChartTitle: string = 'TA Training By Industry Sector';
 
+  public employeesSummary: any[];
+  public employeesSummaryShowXAxis: boolean = true;
+  public employeesSummaryShowYAxis: boolean = true;
+  public employeesSummaryShowLegend: boolean = false;
+  public employeesSummaryShowXAxisLabel: boolean = true;
+  public employeesSummaryShowYAxisLabel: boolean = true;
+  public employeesSummaryXAxisLabel: string = 'Category';
+  public employeesSummaryYAxisLabel: string = 'Number Of Employees';
+  public employeesSummaryChartTitle: string = 'Employees Summary';
+
   public accessedVSOutStandingAmount: any[]
   public accessedVSOutStandingAmountShowXAxis = true;
   public accessedVSOutStandingAmountShowYAxis = true;
@@ -187,6 +197,12 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
 
   public topFourCountiesBusinessesTrained: any[];
   public topFourCountiesBusinessesTrainedChartTitle: string = 'Businesses Trained Top Four Counties';
+
+  public disabledBusinessesTainedByGender: any[];
+  public disabledBusinessesTainedByGenderChartTitle: string = 'Businesses Trained With Disabilities';
+
+  public refugeeBusinessesTainedByGender: any[];
+  public refugeeBusinessesTainedByGenderChartTitle: string = 'Refugee Businesses Trained';
   
   public countyData: Map<number, any>;
   public businessesTrained: string;
@@ -203,6 +219,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   @ViewChild('taNeedsByGenderContentDiv', { static: false }) taNeedsByGenderContentDiv!: ElementRef;
   @ViewChild('trainingByPartnerByGenderContentDiv', { static: false }) trainingByPartnerByGenderContentDiv!: ElementRef;
   @ViewChild('taTrainedBySectorContentDiv', { static: false }) taTrainedBySectorContentDiv!: ElementRef;
+  @ViewChild('employeesSummaryContentDiv', { static: false }) employeesSummaryContentDiv!: ElementRef;
   @ViewChild('accessedVSOutStandingAmountContentDiv', { static: false }) accessedVSOutStandingAmountContentDiv!: ElementRef;
   @ViewChild('taTrainedBySegmentContentDiv', { static: false }) taTrainedBySegmentContentDiv!: ElementRef;
 
@@ -243,6 +260,9 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
     this.getLoanDisbursedTopFourPartnersSummary();
     this.getLoanDisbursedTopFourCountiesSummary();
     this.getBusinessTrainedTopFourCountiesSummary();
+    this.getParticipantsEmployeesSummary();
+    this.getDisabledBusinessOwnersTrainedByGenderSummary();
+    this.getRefugeeBusinessOwnersTrainedByGenderSummary();
   }
 
   getLoansDisbursedByGenderSummary() {
@@ -300,6 +320,28 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       });
   }
 
+  getDisabledBusinessOwnersTrainedByGenderSummary() {
+    this.dashBoardService.getDisabledBusinessOwnersTrainedByGenderSummary(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.disabledBusinessesTainedByGender = response;
+        },
+        error: (error) => { }
+      });
+  }
+
+  getRefugeeBusinessOwnersTrainedByGenderSummary() {
+    this.dashBoardService.getRefugeeBusinessOwnersTrainedByGenderSummary(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.refugeeBusinessesTainedByGender = response;
+        },
+        error: (error) => { }
+      });
+  }
+
   getTaNeedsByGenderSummary() {
     this.dashBoardService.getTaNeedsByGenderSummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
@@ -319,6 +361,19 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
           this.taTrainedBySector = response;
         },
         error: (error) => { }
+      });
+  }
+
+  getParticipantsEmployeesSummary() {
+    this.dashBoardService.getParticipantsEmployeesSummary(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.employeesSummary = response;
+        },
+        error: (error) => { 
+          console.log(error)
+        }
       });
   }
 
@@ -601,6 +656,27 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartXAxisLabel: this.taTrainedBySectorYAxisLabel,
       chartFormatLabel: this.valueFormatting,
       chartTitle: this.taTrainedBySectorChartTitle,
+    };
+    this.openExpandedChartDialog(data);
+  }
+
+  expandEmployeesSummaryBarChart(){
+    const data = { 
+      content: this.employeesSummaryContentDiv.nativeElement.cloneNode(true),
+      mapContainerElement: this.employeesSummaryContentDiv,
+      chartType: 'ngx-charts-bar-horizontal',
+      chartData: this.employeesSummary,
+      chartGradient: this.gradient,
+      chartShowXAxis: this.employeesSummaryShowXAxis,
+      chartShowYAxis: this.employeesSummaryShowYAxis,
+      chartSColorScheme: this.chartSColorScheme,
+      chartShowLegend: true,
+      chartShowXAxisLabel: this.employeesSummaryShowXAxisLabel,
+      chartShowYAxisLabel: this.employeesSummaryShowYAxisLabel,
+      chartYAxisLabel: this.employeesSummaryXAxisLabel,
+      chartXAxisLabel: this.employeesSummaryYAxisLabel,
+      chartFormatLabel: this.valueFormatting,
+      chartTitle: this.employeesSummaryChartTitle,
     };
     this.openExpandedChartDialog(data);
   }

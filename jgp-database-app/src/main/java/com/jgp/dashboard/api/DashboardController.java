@@ -107,6 +107,22 @@ public class DashboardController {
         return new ResponseEntity<>(this.dashboardService.getBusinessOwnersTrainedByGenderSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode)), HttpStatus.OK);
     }
 
+    @GetMapping("disabled-businesses-trained-by-gender")
+    public ResponseEntity<List<DataPointDto>> getDisabledBusinessOwnersTrainedByGenderSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                           @RequestParam(value = "county-code", required = false) String countyCode,
+                                                                           @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                           @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        return new ResponseEntity<>(this.dashboardService.getDisabledBusinessOwnersTrainedByGenderSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode)), HttpStatus.OK);
+    }
+
+    @GetMapping("refugee-businesses-trained-by-gender")
+    public ResponseEntity<List<DataPointDto>> getRefugeeBusinessOwnersTrainedByGenderSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                           @RequestParam(value = "county-code", required = false) String countyCode,
+                                                                           @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                           @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        return new ResponseEntity<>(this.dashboardService.getRefugeeBusinessOwnersTrainedByGenderSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode)), HttpStatus.OK);
+    }
+
     @GetMapping("loans-disbursed-by-pipeline")
     public ResponseEntity<List<DataPointDto>> getLoansDisbursedByPipelineSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
                                                                                  @RequestParam(value = "county-code", required = false) String countyCode,
@@ -137,6 +153,13 @@ public class DashboardController {
                                                                            @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                            @RequestParam(value = "to-date", required = false) LocalDate toDate){
         return new ResponseEntity<>(this.dashboardService.getTaTrainingBySectorSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode)), HttpStatus.OK);
+    }
+
+    @GetMapping("employees-summary")
+    public ResponseEntity<List<DataPointDto>> getParticipantsEmployeesSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                           @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                           @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        return new ResponseEntity<>(this.dashboardService.getParticipantsEmployeesSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, null)), HttpStatus.OK);
     }
 
     @GetMapping("ta-training-by-segment")

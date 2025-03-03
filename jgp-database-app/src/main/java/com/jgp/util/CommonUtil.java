@@ -1,5 +1,7 @@
 package com.jgp.util;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Locale;
@@ -179,5 +181,9 @@ public abstract class CommonUtil {
 
     public static String defaultToOtherIfStringIsNull(String value){
         return null != value ? value : "Other";
+    }
+
+    public static BigDecimal getPercentage(BigDecimal value, BigDecimal total){
+        return (value.divide(total, 2, RoundingMode.HALF_UP)).multiply(BigDecimal.valueOf(100));
     }
 }
