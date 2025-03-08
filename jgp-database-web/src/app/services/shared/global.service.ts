@@ -11,7 +11,7 @@ import * as XLSX from 'xlsx';
 export class GlobalService {
   //API_HOST = '68.183.21.53';
   //API_HOST = '20.242.125.65';
-  API_HOST = 'jmis.dt-global.com';
+  API_HOST = 'data-yangu.crabdance.com';
   HTTP_SCHEMA = 'https';
   WS_SCHEMA = 'wss';
   //API_HOST = 'localhost';
