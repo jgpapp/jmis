@@ -14,7 +14,7 @@ import { HighLevelSummaryDto } from '../dto/highLevelSummaryDto';
 import { PerformanceSummaryComponent } from "../performance-summary/performance-summary.component";
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { GlobalService } from '@services/shared/global.service';
-import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-bmo-dashboard',
@@ -29,8 +29,7 @@ import { MatButtonModule } from '@angular/material/button';
     PieChartComponent,
     DashboardFiltersComponent,
     PerformanceSummaryComponent,
-    MatTableModule,
-    MatButtonModule
+    MatTableModule
 ],
   templateUrl: './bmo-dashboard.component.html',
   styleUrl: './bmo-dashboard.component.scss'
@@ -121,7 +120,13 @@ export class BmoDashboardComponent implements OnInit {
   highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', outStandingAmount: '0'}
 
   private unsubscribe$ = new Subject<void>();
-  constructor(private authService: AuthService, private dashBoardService: DashboardService, public gs: GlobalService){
+
+  @ViewChild('bmoTaNeedsByGenderContentDiv', { static: false }) bmoTaNeedsByGenderContentDiv!: ElementRef;
+  constructor(
+    private authService: AuthService, 
+    private dashBoardService: DashboardService, 
+    public gs: GlobalService, 
+    public dialog: MatDialog){
 
   }
 
@@ -270,6 +275,32 @@ export class BmoDashboardComponent implements OnInit {
         }
       });
   }
+
+
+  expandTANeedsByGenderBarChart(){
+    const data = { 
+      content: this.bmoTaNeedsByGenderContentDiv.nativeElement.cloneNode(true),
+      mapContainerElement: this.bmoTaNeedsByGenderContentDiv,
+      chartType: 'ngx-charts-bar-vertical-2d',
+      chartData: this.TANeedsByGender,
+      chartGradient: this.gradient,
+      chartShowXAxis: this.TANeedsByGenderShowXAxis,
+      chartShowYAxis: this.TANeedsByGenderShowYAxis,
+      chartSColorScheme: this.chartSColorScheme,
+      chartShowLegend: true,
+      chartShowXAxisLabel: this.TANeedsByGenderShowXAxisLabel,
+      chartShowYAxisLabel: this.TANeedsByGenderShowYAxisLabel,
+      chartYAxisLabel: this.TANeedsByGenderYAxisLabel,
+      chartXAxisLabel: this.TANeedsByGenderXAxisLabel,
+      chartFormatLabel: this.valueFormatting,
+      chartTitle: this.TANeedsByGenderChartTitle,
+    };
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
+  }
+
+  valueFormatting = (value: number) => {
+    return this.dashBoardService.formatNumberToShortForm(Number(value)); // Outputs as "8.94M"
+  };
 
   shouldDisplayTrainedBusinessesCountDataPartnerName(index: number): boolean {
     const data = this.trainedBusinessesCountDataDataSource.data; // Access the current data

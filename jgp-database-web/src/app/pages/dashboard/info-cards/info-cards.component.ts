@@ -8,7 +8,6 @@ import { multi, single } from '@data/charts.data';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { Subject, takeUntil } from 'rxjs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { ChartDialogComponent } from '../../chart-dialog/chart-dialog.component';
 
 @Component({
   selector: 'app-info-cards',
@@ -153,7 +152,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   public accessedVSOutStandingAmountByGenderShowYAxis = true;
   public accessedVSOutStandingAmountByGenderShowLegend = false;
   public accessedVSOutStandingAmountByGenderShowXAxisLabel = true;
-  public accessedVSOutStandingAmountByGenderXAxisLabel = 'Partners';
+  public accessedVSOutStandingAmountByGenderXAxisLabel = 'Genders';
   public accessedVSOutStandingAmountByGenderShowYAxisLabel = true;
   public accessedVSOutStandingAmountByGenderYAxisLabel = 'Amount';
   public accessedVSOutStandingAmountByGenderChartTitle: string = 'Accessed Vs OutStanding By Gender';
@@ -202,7 +201,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   public disabledBusinessesTainedByGenderShowLegend: boolean = false;
   public disabledBusinessesTainedByGenderShowLabels: boolean = true;
   public disabledBusinessesTainedByGenderExplodeSlices: boolean = false;
-  public disabledBusinessesTainedByGenderDoughnut: boolean = true;
+  public disabledBusinessesTainedByGenderDoughnut: boolean = false;
   public disabledBusinessesTainedByGenderChartTitle: string = 'Businesses Trained With Disabilities';
 
   public refugeeBusinessesTainedByGender: any[];
@@ -221,15 +220,21 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   private unsubscribe$ = new Subject<void>();
 
   @ViewChild('loansDisbursedByGenderContentDiv', { static: false }) loansDisbursedByGenderContentDiv!: ElementRef;
+  @ViewChild('businessesTainedByGenderContentDiv', { static: false }) businessesTainedByGenderContentDiv!: ElementRef;
   @ViewChild('loansDisbursedByPipelineContentDiv', { static: false }) loansDisbursedByPipelineContentDiv!: ElementRef;
   @ViewChild('countyTrainedBusinessesMapContentDiv', { static: false }) countyTrainedBusinessesMapContentDiv!: ElementRef;
   @ViewChild('loansDisbursedByStatusContentDiv', { static: false }) loansDisbursedByStatusContentDiv!: ElementRef;
   @ViewChild('taNeedsByGenderContentDiv', { static: false }) taNeedsByGenderContentDiv!: ElementRef;
+  @ViewChild('loansDisbursedBySegmentContentDiv', { static: false }) loansDisbursedBySegmentContentDiv!: ElementRef;
+  @ViewChild('loansDisbursedBySectorContentDiv', { static: false }) loansDisbursedBySectorContentDiv!: ElementRef;
   @ViewChild('trainingByPartnerByGenderContentDiv', { static: false }) trainingByPartnerByGenderContentDiv!: ElementRef;
   @ViewChild('taTrainedBySectorContentDiv', { static: false }) taTrainedBySectorContentDiv!: ElementRef;
   @ViewChild('employeesSummaryContentDiv', { static: false }) employeesSummaryContentDiv!: ElementRef;
   @ViewChild('accessedVSOutStandingAmountContentDiv', { static: false }) accessedVSOutStandingAmountContentDiv!: ElementRef;
+  @ViewChild('accessedVSOutStandingAmountByGenderContentDiv', { static: false }) accessedVSOutStandingAmountByGenderContentDiv!: ElementRef;
   @ViewChild('taTrainedBySegmentContentDiv', { static: false }) taTrainedBySegmentContentDiv!: ElementRef;
+  @ViewChild('refugeeBusinessesTainedByGenderContentDiv', { static: false }) refugeeBusinessesTainedByGenderContentDiv!: ElementRef;
+  @ViewChild('disabledBusinessesTainedByGenderContentDiv', { static: false }) disabledBusinessesTainedByGenderContentDiv!: ElementRef;
 
   constructor(private dashBoardService: DashboardService, public dialog: MatDialog){
     Object.assign(this, { single, multi });
@@ -515,22 +520,6 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
     this.previousWidthOfResizedDiv = this.resizedDiv.nativeElement.clientWidth;
   }
 
-  openExpandedChartDialog(chartData: any): void {
-    // Dynamically calculate dialog size
-    const dialogWidth = window.innerWidth;
-    const dialogHeight = window.innerHeight;
-    const dialogRef = this.dialog.open(ChartDialogComponent, {
-      width: `${dialogWidth}px`,
-      height: `${dialogHeight}px`,
-      data: chartData,
-      panelClass: 'custom-dialog-container',
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('Dialog was closed');
-    });
-  }
-
   expandLoansDisbursedByGenderDoughnut(){
     const data = { 
       content: this.loansDisbursedByGenderContentDiv.nativeElement.cloneNode(true),
@@ -542,14 +531,78 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartExplodeSlices: this.loansDisbursedByGenderExplodeSlices,
       chartIsDoughnut: this.loansDisbursedByGenderDoughnut,
       labelFormatting: this.valueFormatting,
-      chartTitle: 'Loan Disbursed by Gender',
+      chartTitle: this.loansDisbursedByGenderChartTitle,
       chartFormatLabel: (label: string): string => {
         // Find the data object by name and return the value instead of name
         const item = this.loansDisbursedByGender.find(data => data.name === label);
         return item ? `${this.valueFormatting(item.value)}` : label; // If found, return the value; otherwise return the name as fallback
       }
     };
-    this.openExpandedChartDialog(data);
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
+  }
+
+  expandBusinessesTainedByGenderDoughnut(){
+    const data = { 
+      content: this.businessesTainedByGenderContentDiv.nativeElement.cloneNode(true),
+      chartType: 'app-pie-chart',
+      chartData: this.businessesTainedByGender,
+      chartShowLegend: this.businessesTainedByGenderShowLegend,
+      chartSColorScheme: this.chartSColorScheme,
+      chartShowLabels: this.businessesTainedByGenderShowLabels,
+      chartExplodeSlices: this.businessesTainedByGenderExplodeSlices,
+      chartIsDoughnut: this.businessesTainedByGenderDoughnut,
+      labelFormatting: this.valueFormatting,
+      chartTitle: this.businessesTainedByGenderChartTitle,
+      chartFormatLabel: (label: string): string => {
+        // Find the data object by name and return the value instead of name
+        const item = this.businessesTainedByGender.find(data => data.name === label);
+        return item ? `${this.valueFormatting(item.value)}` : label; // If found, return the value; otherwise return the name as fallback
+      }
+    };
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
+  }
+
+  expandLoansDisbursedBySegmentDoughnut(){
+    const data = { 
+      content: this.loansDisbursedBySegmentContentDiv.nativeElement.cloneNode(true),
+      chartType: 'app-pie-chart',
+      chartData: this.loansDisbursedBySegment,
+      chartShowLegend: this.loansDisbursedBySegmentShowLegend,
+      chartSColorScheme: this.chartSColorScheme,
+      chartShowLabels: this.loansDisbursedBySegmentShowLabels,
+      chartExplodeSlices: this.loansDisbursedBySegmentExplodeSlices,
+      chartIsDoughnut: this.loansDisbursedBySegmentDoughnut,
+      labelFormatting: this.valueFormatting,
+      chartTitle: this.loansDisbursedBySegmentChartTitle,
+      chartFormatLabel: (label: string): string => {
+        // Find the data object by name and return the value instead of name
+        const item = this.loansDisbursedBySegment.find(data => data.name === label);
+        return item ? `${this.valueFormatting(item.value)}` : label; // If found, return the value; otherwise return the name as fallback
+      }
+    };
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
+  }
+
+
+  expandLoansDisbursedBySectorDoughnut(){
+    const data = { 
+      content: this.loansDisbursedBySectorContentDiv.nativeElement.cloneNode(true),
+      chartType: 'app-pie-chart',
+      chartData: this.loansDisbursedBySector,
+      chartShowLegend: this.loansDisbursedBySectorShowLegend,
+      chartSColorScheme: this.chartSColorScheme,
+      chartShowLabels: this.loansDisbursedBySectorShowLabels,
+      chartExplodeSlices: this.loansDisbursedBySectorExplodeSlices,
+      chartIsDoughnut: this.loansDisbursedBySectorDoughnut,
+      labelFormatting: this.valueFormatting,
+      chartTitle: this.loansDisbursedBySectorChartTitle,
+      chartFormatLabel: (label: string): string => {
+        // Find the data object by name and return the value instead of name
+        const item = this.loansDisbursedBySector.find(data => data.name === label);
+        return item ? `${this.valueFormatting(item.value)}` : label; // If found, return the value; otherwise return the name as fallback
+      }
+    };
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
   }
 
   expandLoansDisbursedByPipelinePieChart(){
@@ -569,7 +622,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
         return item ? `${this.valueFormatting(item.value)}` : label; // If found, return the value; otherwise return the name as fallback
       }
     };
-    this.openExpandedChartDialog(data);
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
   }
 
   expandCountyTrainedBusinessesMap(){
@@ -581,7 +634,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       countyDataToBePicked: 'businessesTrained',
       chartTitle: 'Training By County'
     };
-    this.openExpandedChartDialog(data);
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
   }
 
   expandLoansDisbursedByStatusBarChart(){
@@ -602,7 +655,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartFormatLabel: this.valueFormatting,
       chartTitle: this.loansDisbursedByStatusChartTitle,
     };
-    this.openExpandedChartDialog(data);
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
   }
 
   expandTANeedsByGenderBarChart(){
@@ -623,7 +676,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartFormatLabel: this.valueFormatting,
       chartTitle: this.TANeedsByGenderChartTitle,
     };
-    this.openExpandedChartDialog(data);
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
   }
 
   expandTrainingByPartnerByGenderBarChart(){
@@ -644,7 +697,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartFormatLabel: this.valueFormatting,
       chartTitle: this.trainingByPartnerByGenderChartTitle,
     };
-    this.openExpandedChartDialog(data);
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
   }
 
   expandTaTrainedBySectorBarChart(){
@@ -665,7 +718,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartFormatLabel: this.valueFormatting,
       chartTitle: this.taTrainedBySectorChartTitle,
     };
-    this.openExpandedChartDialog(data);
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
   }
 
   expandEmployeesSummaryBarChart(){
@@ -686,7 +739,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartFormatLabel: this.valueFormatting,
       chartTitle: this.employeesSummaryChartTitle,
     };
-    this.openExpandedChartDialog(data);
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
   }
 
   expandAccessedVSOutStandingAmountBarChart(){
@@ -707,7 +760,28 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartFormatLabel: this.valueFormatting,
       chartTitle: this.accessedVSOutStandingAmountChartTitle,
     };
-    this.openExpandedChartDialog(data);
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
+  }
+
+  expandAccessedVSOutStandingAmountByGenderBarChart(){
+    const data = { 
+      content: this.accessedVSOutStandingAmountByGenderContentDiv.nativeElement.cloneNode(true),
+      mapContainerElement: this.accessedVSOutStandingAmountByGenderContentDiv,
+      chartType: 'ngx-charts-bar-vertical-2d',
+      chartData: this.accessedVSOutStandingAmountByGender,
+      chartGradient: this.gradient,
+      chartShowXAxis: this.accessedVSOutStandingAmountByGenderShowXAxis,
+      chartShowYAxis: this.accessedVSOutStandingAmountByGenderShowYAxis,
+      chartSColorScheme: this.chartSColorScheme,
+      chartShowLegend: true,
+      chartShowXAxisLabel: this.accessedVSOutStandingAmountByGenderShowXAxisLabel,
+      chartShowYAxisLabel: this.accessedVSOutStandingAmountByGenderShowYAxisLabel,
+      chartYAxisLabel: this.accessedVSOutStandingAmountByGenderYAxisLabel,
+      chartXAxisLabel: this.accessedVSOutStandingAmountByGenderXAxisLabel,
+      chartFormatLabel: this.valueFormatting,
+      chartTitle: this.accessedVSOutStandingAmountByGenderChartTitle,
+    };
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
   }
 
   expandTaTrainedBySegmentPieChart(){
@@ -723,11 +797,51 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartTitle: this.taTrainedBySegmentChartTitle,
       chartFormatLabel: (label: string): string => {
         // Find the data object by name and return the value instead of name
-        const item = this.loansDisbursedByPipeline.find(data => data.name === label);
+        const item = this.taTrainedBySegment.find(data => data.name === label);
         return item ? `${item.value}` : label; // If found, return the value; otherwise return the name as fallback
       }
     };
-    this.openExpandedChartDialog(data);
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
+  }
+
+  expandRefugeeBusinessesTainedByGenderPieChart(){
+    const data = { 
+      content: this.refugeeBusinessesTainedByGenderContentDiv.nativeElement.cloneNode(true),
+      chartType: 'app-pie-chart',
+      chartData: this.refugeeBusinessesTainedByGender,
+      chartShowLegend: true,
+      chartSColorScheme: this.chartSColorScheme,
+      chartShowLabels: this.refugeeBusinessesTainedByGenderShowLabels,
+      chartExplodeSlices: this.refugeeBusinessesTainedByGenderExplodeSlices,
+      chartIsDoughnut: this.refugeeBusinessesTainedByGenderDoughnut,
+      chartTitle: this.refugeeBusinessesTainedByGenderChartTitle,
+      chartFormatLabel: (label: string): string => {
+        // Find the data object by name and return the value instead of name
+        const item = this.refugeeBusinessesTainedByGender.find(data => data.name === label);
+        return item ? `${item.value}` : label; // If found, return the value; otherwise return the name as fallback
+      }
+    };
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
+  }
+
+  expandDisabledBusinessesTainedByGenderPieChart(){
+    const data = { 
+      content: this.disabledBusinessesTainedByGenderContentDiv.nativeElement.cloneNode(true),
+      chartType: 'app-pie-chart',
+      chartData: this.disabledBusinessesTainedByGender,
+      chartShowLegend: true,
+      chartSColorScheme: this.chartSColorScheme,
+      chartShowLabels: this.disabledBusinessesTainedByGenderShowLabels,
+      chartExplodeSlices: this.disabledBusinessesTainedByGenderExplodeSlices,
+      chartIsDoughnut: this.disabledBusinessesTainedByGenderDoughnut,
+      chartTitle: this.disabledBusinessesTainedByGenderChartTitle,
+      chartFormatLabel: (label: string): string => {
+        // Find the data object by name and return the value instead of name
+        const item = this.disabledBusinessesTainedByGender.find(data => data.name === label);
+        return item ? `${item.value}` : label; // If found, return the value; otherwise return the name as fallback
+      }
+    };
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
   }
   
 

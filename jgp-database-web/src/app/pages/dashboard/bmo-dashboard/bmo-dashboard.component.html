@@ -30,7 +30,10 @@
     </div>
     <div fxLayout="row wrap" #resizedDiv>
      
-        <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
+        <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #bmoTaNeedsByGenderContentDiv> 
+            <button mat-icon-button class="top-right-button" (click)="expandTANeedsByGenderBarChart()">
+                <mat-icon>open_in_full</mat-icon>
+              </button>
             <mat-card>
                 <mat-card-header fxLayoutAlign="center center">                
                     <mat-card-title>{{TANeedsByGenderChartTitle}}</mat-card-title>
@@ -48,6 +51,7 @@
                         [showYAxisLabel]="TANeedsByGenderShowYAxisLabel"
                         [xAxisLabel]="TANeedsByGenderXAxisLabel"
                         [yAxisLabel]="TANeedsByGenderYAxisLabel"
+                        [dataLabelFormatting]="valueFormatting"
                         [showDataLabel]="true"
                         (select)="onSelect($event)"
                         />

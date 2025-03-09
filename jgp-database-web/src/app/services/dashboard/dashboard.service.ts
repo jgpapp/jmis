@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { GlobalService } from '@services/shared/global.service';
 import { Observable } from 'rxjs';
 import { HighLevelSummaryDto } from '../../pages/dashboard/dto/highLevelSummaryDto';
+import { ChartDialogComponent } from '../../pages/chart-dialog/chart-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Injectable({
   providedIn: 'root'
@@ -181,6 +183,23 @@ export class DashboardService {
         notation: 'compact',
         compactDisplay: 'short'
       }) : '0';
+    }
+
+
+    openExpandedChartDialog(dialog: MatDialog, chartData: any): void {
+      // Dynamically calculate dialog size
+      const dialogWidth = window.innerWidth;
+      const dialogHeight = window.innerHeight;
+      const dialogRef = dialog.open(ChartDialogComponent, {
+        width: `${dialogWidth}px`,
+        height: `${dialogHeight}px`,
+        data: chartData,
+        panelClass: 'custom-dialog-container',
+      });
+  
+      dialogRef.afterClosed().subscribe(result => {
+        console.log('Dialog was closed');
+      });
     }
 
     getFormattedTileData(highLevelSummary: any): HighLevelSummaryDto {
