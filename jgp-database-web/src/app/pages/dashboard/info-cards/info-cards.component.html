@@ -471,42 +471,48 @@
 }
 
 @if(isTADashboard()){
-    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
-        <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
-                <mat-card-title>{{disabledBusinessesTainedByGenderChartTitle}}</mat-card-title>
-            </mat-card-header>
-            <div class="w-100 h-300p">
-                @if (disabledBusinessesTainedByGender && disabledBusinessesTainedByGender.length > 0) {
-                <ngx-charts-tree-map 
-                [results]="disabledBusinessesTainedByGender" 
-                [scheme]="chartSColorScheme"
-                [animations]="true"
-                />
-                } @else {
-                    <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
-                }      
-            </div>
-        </mat-card>
-    </div> 
-}
-
-@if(isTADashboard()){
-    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button"> 
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
                 <mat-card-title>{{refugeeBusinessesTainedByGenderChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
                 @if (refugeeBusinessesTainedByGender && refugeeBusinessesTainedByGender.length > 0) {
-                <ngx-charts-tree-map 
-                [results]="refugeeBusinessesTainedByGender" 
-                [scheme]="chartSColorScheme"
-                [animations]="true"
+                <app-pie-chart 
+                [data]="refugeeBusinessesTainedByGender" 
+                [showLegend]="refugeeBusinessesTainedByGenderShowLegend" 
+                [colorScheme]="chartSColorScheme" 
+                [showLabels]="refugeeBusinessesTainedByGenderShowLabels" 
+                [explodeSlices]="refugeeBusinessesTainedByGenderExplodeSlices" 
+                [doughnut]="refugeeBusinessesTainedByGenderDoughnut"
                 />
-                } @else {
-                    <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
-                }      
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }        
+            </div>
+        </mat-card>
+    </div> 
+}
+
+@if(isTADashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button"> 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{disabledBusinessesTainedByGenderChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (disabledBusinessesTainedByGender && disabledBusinessesTainedByGender.length > 0) {
+                <app-pie-chart 
+                [data]="disabledBusinessesTainedByGender" 
+                [showLegend]="disabledBusinessesTainedByGenderShowLegend" 
+                [colorScheme]="chartSColorScheme" 
+                [showLabels]="disabledBusinessesTainedByGenderShowLabels" 
+                [explodeSlices]="disabledBusinessesTainedByGenderExplodeSlices" 
+                [doughnut]="disabledBusinessesTainedByGenderDoughnut"
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }        
             </div>
         </mat-card>
     </div> 

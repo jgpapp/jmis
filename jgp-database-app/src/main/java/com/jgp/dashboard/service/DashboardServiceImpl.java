@@ -433,17 +433,11 @@ public class DashboardServiceImpl implements DashboardService {
         if (Objects.isNull(employeeSummary)){
             return List.of();
         }
-        final var totalEmployees = employeeSummary.totalCasualEmployeesAbove35() + employeeSummary.totalRegularEmployeesAbove35()
-                + employeeSummary.youthCasualEmployees() + employeeSummary.youthRegularEmployees();
-        final var oldRegularPercentage = CommonUtil.getPercentage(BigDecimal.valueOf(employeeSummary.totalRegularEmployeesAbove35()), BigDecimal.valueOf(totalEmployees))+"%";
-        final var youthRegularPercentage = CommonUtil.getPercentage(BigDecimal.valueOf(employeeSummary.youthRegularEmployees()), BigDecimal.valueOf(totalEmployees))+"%";
-        final var oldCasualPercentage = CommonUtil.getPercentage(BigDecimal.valueOf(employeeSummary.totalCasualEmployeesAbove35()), BigDecimal.valueOf(totalEmployees))+"%";
-        final var youthCasualPercentage = CommonUtil.getPercentage(BigDecimal.valueOf(employeeSummary.youthCasualEmployees()), BigDecimal.valueOf(totalEmployees))+"%";
         return List.of(
-                new DataPointDto(String.format("Regular Above 35 (%s)", oldRegularPercentage), employeeSummary.totalRegularEmployeesAbove35()+"", oldRegularPercentage),
-                new DataPointDto(String.format("Regular 18-35 (%s)", youthRegularPercentage), employeeSummary.youthRegularEmployees()+"", youthRegularPercentage),
-                new DataPointDto(String.format("Casual Above 35 (%s)", oldCasualPercentage), employeeSummary.totalCasualEmployeesAbove35()+"", oldCasualPercentage),
-                new DataPointDto(String.format("Casual 18-35 (%s)", youthCasualPercentage), employeeSummary.youthCasualEmployees()+"", youthCasualPercentage)
+                new DataPointDto("Regular Above 35", employeeSummary.totalRegularEmployeesAbove35()+"", BigDecimal.ZERO.toString()),
+                new DataPointDto("Regular 18-35", employeeSummary.youthRegularEmployees()+"", BigDecimal.ZERO.toString()),
+                new DataPointDto("Casual Above 35", employeeSummary.totalCasualEmployeesAbove35()+"", BigDecimal.ZERO.toString()),
+                new DataPointDto("Casual 18-35", employeeSummary.youthCasualEmployees()+"", BigDecimal.ZERO.toString())
         );
     }
 

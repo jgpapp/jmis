@@ -105,9 +105,17 @@ export class BmoDashboardComponent implements OnInit {
   public topFourCountiesBusinessesTrainedChartTitle: string = 'Businesses Trained Top Four Counties';
 
   public disabledBusinessesTainedByGender: any[];
+  public disabledBusinessesTainedByGenderShowLegend: boolean = false;
+  public disabledBusinessesTainedByGenderShowLabels: boolean = true;
+  public disabledBusinessesTainedByGenderExplodeSlices: boolean = false;
+  public disabledBusinessesTainedByGenderDoughnut: boolean = true;
   public disabledBusinessesTainedByGenderChartTitle: string = 'Businesses Trained With Disabilities';
 
   public refugeeBusinessesTainedByGender: any[];
+  public refugeeBusinessesTainedByGenderShowLegend: boolean = false;
+  public refugeeBusinessesTainedByGenderShowLabels: boolean = true;
+  public refugeeBusinessesTainedByGenderExplodeSlices: boolean = false;
+  public refugeeBusinessesTainedByGenderDoughnut: boolean = true;
   public refugeeBusinessesTainedByGenderChartTitle: string = 'Refugee Businesses Trained';
 
   highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', outStandingAmount: '0'}
