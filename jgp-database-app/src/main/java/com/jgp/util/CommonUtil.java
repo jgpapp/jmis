@@ -184,6 +184,9 @@ public abstract class CommonUtil {
     }
 
     public static BigDecimal getPercentage(BigDecimal value, BigDecimal total){
+        if (value.compareTo(BigDecimal.ZERO) <= 0 || total.compareTo(BigDecimal.ZERO) <= 0){
+            return BigDecimal.ZERO;
+        }
         return (value.divide(total, 2, RoundingMode.HALF_UP)).multiply(BigDecimal.valueOf(100));
     }
 }

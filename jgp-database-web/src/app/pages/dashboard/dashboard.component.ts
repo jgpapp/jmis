@@ -49,7 +49,7 @@ import { PerformanceSummaryComponent } from "./performance-summary/performance-s
 })
 export class DashboardComponent {
 
-  selectedDashboardView: string = 'TA';
+  selectedDashboardView: string = 'FI';
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   public displayedColumns = ['year', 'partnerName', 'genderName', 'value' ];

@@ -42,7 +42,7 @@ import { DashboardService } from '@services/dashboard/dashboard.service';
 })
 export class BmoFiDashboardComponent implements OnInit{
  
-  selectedDashboardView: string = 'TA';
+  selectedDashboardView: string = 'FI';
   dashBoardFilters: any;
   partnerName: string = '';
   resetDashBoardFilters: boolean = false;
