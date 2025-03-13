@@ -1,6 +1,7 @@
 package com.jgp.infrastructure.bulkimport.populator.bmo;
 
 import com.jgp.infrastructure.bulkimport.constants.BMOConstants;
+import com.jgp.infrastructure.bulkimport.constants.LoanConstants;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import com.jgp.infrastructure.bulkimport.populator.AbstractWorkbookPopulator;
 import org.apache.poi.ss.usermodel.Row;
@@ -24,6 +25,7 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         worksheet.setColumnWidth(BMOConstants.BUSINESS_PHONE_NUMBER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.GENDER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.AGE_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(BMOConstants.PASS_PORT_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.BUSINESS_LOCATION_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.INDUSTRY_SECTOR_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.BUSINESS_SEGMENT_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
@@ -47,12 +49,13 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         worksheet.setColumnWidth(BMOConstants.REFERRED_FI_BUSINESS_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.DATE_RECORD_ENTERED_BY_PARTNER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
 
-        writeString(BMOConstants.BUSINESS_NAME_COL, rowHeader, "Name of business*");
+        writeString(BMOConstants.BUSINESS_NAME_COL, rowHeader, "Participant Name*");
         writeString(BMOConstants.TRAINING_PARTNER, rowHeader, "Training Partner*");
         writeString(BMOConstants.JGP_ID_COL, rowHeader, "Unique JGP ID (National ID)*");
         writeString(BMOConstants.BUSINESS_PHONE_NUMBER_COL, rowHeader, "Business phone number");
         writeString(BMOConstants.GENDER_COL, rowHeader, "Gender of owner*");
         writeString(BMOConstants.AGE_COL, rowHeader, "Age of owner (full years)*");
+        writeString(BMOConstants.PASS_PORT_COL, rowHeader, "Passport");
         writeString(BMOConstants.BUSINESS_LOCATION_COL, rowHeader, "Business Location (County)*");
         writeString(BMOConstants.INDUSTRY_SECTOR_COL, rowHeader, "Industry sector(Agriculture, Artists/artisans, Manufacturing, Trading & Retail, Other)");
         writeString(BMOConstants.BUSINESS_SEGMENT_COL, rowHeader, "Business segment*");

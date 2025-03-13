@@ -45,7 +45,7 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         worksheet.setColumnWidth(LoanConstants.TRANCH_AMOUNT_DISBURSED_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
 
 
-        writeString(LoanConstants.BUSINESS_NAME_COL, rowHeader, "Name of business*");
+        writeString(LoanConstants.BUSINESS_NAME_COL, rowHeader, "Participant Name*");
         writeString(LoanConstants.JGP_ID_COL, rowHeader, "Unique JGP ID (National ID)*");
         writeString(LoanConstants.BUSINESS_PHONE_NUMBER_COL, rowHeader, "Business phone number*");
         writeString(LoanConstants.GENDER_COL, rowHeader, "Gender of owner*");
@@ -60,7 +60,7 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(LoanConstants.LOAN_DURATION, rowHeader, "Loan duration (months)*");
         writeString(LoanConstants.OUT_STANDING_AMOUNT, rowHeader, "Outstanding amount*");
         writeString(LoanConstants.REPAID_LOAN_AMOUNT, rowHeader, "Repaid Loan Amount (KES)");
-        writeString(LoanConstants.LOAN_QUALITY, rowHeader, "Loan quality*");
+        writeString(LoanConstants.LOAN_QUALITY, rowHeader, "Loan quality*(Normal, Watch, Substandard, Doubtful and Loss)");
         writeString(LoanConstants.TOTAL_REGULAR_EMPLOYEES_COL, rowHeader, "Total number of regular employees including owner*");
         writeString(LoanConstants.YOUTH_REGULAR_EMPLOYEES_COL, rowHeader, "Regular, of which are youth (18-35)*");
         writeString(LoanConstants.TOTAL_CASUAL_EMPLOYEES_COL, rowHeader, "Total number of casual employees excluding owner*");

@@ -19,8 +19,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { GlobalService } from '@services/shared/global.service';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { FormsModule } from '@angular/forms';
-import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
-import {FlatTreeControl} from '@angular/cdk/tree';
 import { PerformanceSummaryComponent } from "./performance-summary/performance-summary.component";
 
 @Component({
@@ -64,6 +62,7 @@ export class DashboardComponent {
 
 
   dashBoardFilters: any;
+  partnerSpecificDashBoardFilters: any;
   resetDashBoardFilters: boolean = false;
   constructor(private dashBoardService: DashboardService, public authService: AuthService, public gs: GlobalService){}
 
@@ -71,6 +70,7 @@ export class DashboardComponent {
 
   setDashBoardFilters(currentDashBoardFilters: any){
     this.dashBoardFilters = currentDashBoardFilters;
+    this.partnerSpecificDashBoardFilters = currentDashBoardFilters;
     this.resetDashBoardFilters = false;
     this.getLastThreeYearsAccessedLoanPerPartnerYearly();
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
@@ -78,7 +78,8 @@ export class DashboardComponent {
   }
 
   doResetDashBoardFilters(){
-    this.dashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId}
+    this.dashBoardFilters = {};
+    this.partnerSpecificDashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId};
     this.resetDashBoardFilters = true;
     this.getLastThreeYearsAccessedLoanPerPartnerYearly();
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
@@ -86,7 +87,7 @@ export class DashboardComponent {
   }
 
   getLastThreeYearsAccessedLoanPerPartnerYearly() {
-    this.dashBoardService.getLastThreeYearsAccessedLoanPerPartnerYearly(this.dashBoardFilters)
+    this.dashBoardService.getLastThreeYearsAccessedLoanPerPartnerYearly(this.partnerSpecificDashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -98,7 +99,7 @@ export class DashboardComponent {
   }
 
   getLastThreeYearsAccessedLoansCountPerPartnerYearly() {
-    this.dashBoardService.getLastThreeYearsAccessedLoansCountPerPartnerYearly(this.dashBoardFilters)
+    this.dashBoardService.getLastThreeYearsAccessedLoansCountPerPartnerYearly(this.partnerSpecificDashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -110,7 +111,7 @@ export class DashboardComponent {
   }
 
   getLastThreeYearsTrainedBusinessesPerPartnerYearly() {
-    this.dashBoardService.getLastThreeYearsTrainedBusinessesPerPartnerYearly(this.dashBoardFilters)
+    this.dashBoardService.getLastThreeYearsTrainedBusinessesPerPartnerYearly(this.partnerSpecificDashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -171,7 +172,8 @@ export class DashboardComponent {
   }
 
   ngOnInit(): void {
-    this.dashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId}
+    this.dashBoardFilters = {};
+    this.partnerSpecificDashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId};
     this.getLastThreeYearsAccessedLoanPerPartnerYearly();
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
     this.getLastThreeYearsTrainedBusinessesPerPartnerYearly();
