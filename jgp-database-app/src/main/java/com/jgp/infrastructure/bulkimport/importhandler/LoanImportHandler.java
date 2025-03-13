@@ -110,7 +110,11 @@ public class LoanImportHandler implements ImportHandler {
             rowErrorMap.put(row, "Loan Accessed and Outstanding can not be both 0! !");
         }
         final var loanQuality = ImportHandlerUtils.readAsString(LoanConstants.LOAN_QUALITY, row);
-        final var loanQualityEnum = null != loanQuality ? Loan.LoanQuality.valueOf(loanQuality.toUpperCase()) : Loan.LoanQuality.NORMAL;
+        validateLoanQuality(loanQuality, row);
+        var loanQualityEnum = Loan.LoanQuality.NORMAL;
+        if (null == rowErrorMap.get(row)){
+            loanQualityEnum = (null != loanQuality) ? Loan.LoanQuality.valueOf(loanQuality.toUpperCase()) : Loan.LoanQuality.NORMAL;
+        }
         final var recordedToJGPDBOnDate = ImportHandlerUtils.readAsDate(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, row);
         final var loanAmountRepaidDouble = ImportHandlerUtils.readAsDouble(LoanConstants.REPAID_LOAN_AMOUNT, row);
         final var loanAmountRepaid = BigDecimal.valueOf(loanAmountRepaidDouble);
@@ -121,6 +125,7 @@ public class LoanImportHandler implements ImportHandler {
         final var tranchAmountDisbursed = BigDecimal.valueOf(tranchAmountDisbursedDouble);
         final var loanerType = ImportHandlerUtils.readAsString(LoanConstants.LOANER_TYPE_COL, row);
         final var loanProduct = ImportHandlerUtils.readAsString(LoanConstants.LOAN_PRODUCT_COL, row);
+        validateLoanProduct(loanProduct, row);
 
         statuses.add(status);
         String jgpId = ImportHandlerUtils.readAsString(LoanConstants.JGP_ID_COL, row);
@@ -159,6 +164,7 @@ public class LoanImportHandler implements ImportHandler {
         final var phoneNumber = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_PHONE_NUMBER_COL, row);
         final var gender = ImportHandlerUtils.readAsString(LoanConstants.GENDER_COL, row);
         final var age = ImportHandlerUtils.readAsInt(LoanConstants.AGE_COL, row);
+        final var passport = ImportHandlerUtils.readAsString(LoanConstants.PASS_PORT_COL, row);
         final var businessLocation = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_LOCATION_COL, row);
         final var locationCountyCode = CommonUtil.KenyanCounty.getKenyanCountyFromName(businessLocation);
         final var industrySector = ImportHandlerUtils.readAsString(LoanConstants.INDUSTRY_SECTOR_COL, row);
@@ -178,7 +184,8 @@ public class LoanImportHandler implements ImportHandler {
                 .totalRegularEmployees(totalRegularEmployees)
                 .youthRegularEmployees(youthRegularEmployees).totalCasualEmployees(totalCasualEmployees)
                 .youthCasualEmployees(youthCasualEmployees).jgpId(jgpId)
-                .locationCountyCode(locationCountyCode.isPresent() ? locationCountyCode.get().getCountyCode() : "999").build();
+                .locationCountyCode(locationCountyCode.isPresent() ? locationCountyCode.get().getCountyCode() : "999")
+                .passport(passport).build();
     }
 
     public Count importEntity() {
@@ -215,6 +222,9 @@ public class LoanImportHandler implements ImportHandler {
                 errorCount++;
                 log.error("Problem occurred When Uploading Lending Data: {}", ex.getMessage());
                 errorMessage = ImportHandlerUtils.getErrorMessage(ex);
+                if (errorMessage.contains("unique_loan")){
+                    errorMessage = "Row with same partner/participant/disburse date already exist !!";
+                }
                 writeGroupErrorMessage(errorMessage, progressLevel, statusCell, errorReportCell);
             }finally {
                 updateImportProgress(this.documentImportProgressUUId, false, 0);
@@ -304,6 +314,20 @@ public class LoanImportHandler implements ImportHandler {
         final var deliveryModes = Set.of("TRANCH 1", "TRANCH 2", "TRANCH 3", "NOT APPLICABLE");
         if (null == rowErrorMap.get(row) && null != value && !deliveryModes.contains(value.toUpperCase())){
             rowErrorMap.put(row, "Invalid Value for Allocated Tranch (Must be Tranch 1/Tranch 2/Tranch 3/Not Applicable) !!");
+        }
+    }
+
+    private void validateLoanQuality(String value, Row row) {
+        final var loanQualities = Set.of("NORMAL", "WATCH", "SUBSTANDARD", "DOUBTFUL", "LOSS");
+        if (null == rowErrorMap.get(row) && null != value && !loanQualities.contains(value.toUpperCase())){
+            rowErrorMap.put(row, "Invalid Value for Loan quality (Must be Normal/Watch/Substandard/Doubtful/Loss) !!");
+        }
+    }
+
+    private void validateLoanProduct(String value, Row row) {
+        final var loanProducts = Set.of("WORKING CAPITAL", "ASSET FINANCE", "STAHIMILI", "PURCHASE ORDER", "CONSIGNMENT FINANCE", "SHARIAH COMPLIANT");
+        if (null == rowErrorMap.get(row) && null != value && !loanProducts.contains(value.toUpperCase())){
+            rowErrorMap.put(row, "Invalid Value for Loan quality (Must be Working Capital/Asset Finance/Stahimili/Purchase Order/Consignment Finance/Shariah Compliant) !!");
         }
     }
 }

@@ -149,6 +149,7 @@ public class BMOImportHandler implements ImportHandler {
         final var jgpId = ImportHandlerUtils.readAsString(BMOConstants.JGP_ID_COL, row);
         final var phoneNumber = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_PHONE_NUMBER_COL, row);
         final var gender = ImportHandlerUtils.readAsString(BMOConstants.GENDER_COL, row);
+        final var passport = ImportHandlerUtils.readAsString(BMOConstants.PASS_PORT_COL, row);
         final var age = ImportHandlerUtils.readAsInt(BMOConstants.AGE_COL, row);
         final var businessLocation = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_LOCATION_COL, row);
         final var locationCountyCode = CommonUtil.KenyanCounty.getKenyanCountyFromName(businessLocation);
@@ -184,7 +185,8 @@ public class BMOImportHandler implements ImportHandler {
                 .youthRegularEmployees(youthRegularEmployees).totalCasualEmployees(totalCasualEmployees)
                 .youthCasualEmployees(youthCasualEmployees).sampleRecords(sampleRecordsKept)
                 .personWithDisability(personWithDisability).refugeeStatus(refugeeStatus).jgpId(jgpId)
-                .locationCountyCode(locationCountyCode.isPresent() ? locationCountyCode.get().getCountyCode() : "999").build();
+                .locationCountyCode(locationCountyCode.isPresent() ? locationCountyCode.get().getCountyCode() : "999")
+                .passport(passport).build();
 
     }
 
@@ -221,6 +223,9 @@ public class BMOImportHandler implements ImportHandler {
                 errorCount++;
                 log.error("Problem occurred When Uploading TA: {}", ex.getMessage());
                 errorMessage = ImportHandlerUtils.getErrorMessage(ex);
+                if (errorMessage.contains("unique_bmo_participant_data")){
+                    errorMessage = "Row with same partner/participant/training date already exist !!";
+                }
                 writeGroupErrorMessage(errorMessage, progressLevel, statusCell, errorReportCell);
             }finally {
                 updateImportProgress(this.documentImportProgressUUId, false, 0);

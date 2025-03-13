@@ -139,10 +139,10 @@ public class Participant extends BaseEntity {
 
     public static Participant createClient(ParticipantDto dto){
         String gender = dto.ownerGender();
-        if ("M".equalsIgnoreCase(gender)){
+        if ("M".equalsIgnoreCase(gender.trim()) || "MALE".equalsIgnoreCase(gender.trim())){
             gender = "MALE";
         }
-        if ("F".equalsIgnoreCase(gender)){
+        if ("F".equalsIgnoreCase(gender.trim()) || "FEMALE".equalsIgnoreCase(gender.trim())){
             gender = "FEMALE";
         }
         Participant.Gender genderEnum = null;
