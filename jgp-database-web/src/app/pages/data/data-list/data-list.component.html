@@ -44,6 +44,10 @@
                                 <mat-header-cell *matHeaderCellDef> Business Name </mat-header-cell>
                                 <mat-cell *matCellDef="let element"> {{element.participantName}} </mat-cell>
                             </ng-container>
+                            <ng-container matColumnDef="participantJGPID">
+                                <mat-header-cell *matHeaderCellDef> Participant JGPID </mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.participantJGPID}} </mat-cell>
+                            </ng-container>
                             <ng-container matColumnDef="tasAttended">
                                 <mat-header-cell *matHeaderCellDef> TAs Attended </mat-header-cell>
                                 <mat-cell *matCellDef="let element"> {{element.tasAttended}} </mat-cell>

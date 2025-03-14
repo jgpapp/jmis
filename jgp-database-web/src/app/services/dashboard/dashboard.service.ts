@@ -19,6 +19,8 @@ export class DashboardService {
       if(partnerId){
         analyticsUpdate.partnerId = partnerId;
       }
+      analyticsUpdate.fromDate.setMinutes(analyticsUpdate.fromDate.getMinutes() - analyticsUpdate.fromDate.getTimezoneOffset());
+      analyticsUpdate.toDate.setMinutes(analyticsUpdate.toDate.getMinutes() - analyticsUpdate.toDate.getTimezoneOffset());
       return this.httpClient.post(`${this.globalService.BASE_API_URL}/reports/analytics-update`, JSON.stringify(analyticsUpdate));
     }
 

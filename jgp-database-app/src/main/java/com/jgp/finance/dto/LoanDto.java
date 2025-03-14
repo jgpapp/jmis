@@ -6,6 +6,8 @@ import java.time.LocalDate;
 public record LoanDto(
          Long id,
 
+         String participantJGPID,
+
          String participantName,
 
          Long partnerId,

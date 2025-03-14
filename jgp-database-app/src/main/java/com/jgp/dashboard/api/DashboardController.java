@@ -10,7 +10,6 @@ import com.jgp.dashboard.dto.PartnerYearlyDataDto;
 import com.jgp.dashboard.dto.PerformanceSummaryDto;
 import com.jgp.dashboard.dto.SeriesDataPointDto;
 import com.jgp.dashboard.service.DashboardService;
-import com.jgp.patner.dto.PartnerDto;
 import com.jgp.shared.dto.ApiResponseDto;
 import com.jgp.util.CommonUtil;
 import jakarta.validation.Valid;

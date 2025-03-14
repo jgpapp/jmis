@@ -3,6 +3,7 @@ package com.jgp.participant.mapper;
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.dto.ParticipantResponseDto;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ public class ParticipantMapper {
         ParticipantResponseDto participantResponseDto = new ParticipantResponseDto();
 
         if ( participant != null ) {
+            participantResponseDto.setId( participant.getId() );
             if ( participant.getBusinessName() != null ) {
                 participantResponseDto.setBusinessName( participant.getBusinessName() );
             }
@@ -28,6 +30,9 @@ public class ParticipantMapper {
             }
             if ( participant.getBusinessLocation() != null ) {
                 participantResponseDto.setBusinessLocation( participant.getBusinessLocation() );
+            }
+            if ( participant.getLocationCountyCode() != null ) {
+                participantResponseDto.setLocationCountyCode( participant.getLocationCountyCode() );
             }
             if ( participant.getIndustrySector() != null ) {
                 participantResponseDto.setIndustrySector( participant.getIndustrySector() );
@@ -66,7 +71,7 @@ public class ParticipantMapper {
                 participantResponseDto.setYouthCasualEmployees( participant.getYouthCasualEmployees() );
             }
             if ( participant.getSampleRecords() != null ) {
-                participantResponseDto.setSampleRecords( participant.getSampleRecords() );
+                participantResponseDto.setSampleRecords( Arrays.stream(participant.getSampleRecords().split(",")).map(String::trim).toList() );
             }
             if ( participant.getPersonWithDisability() != null ) {
                 participantResponseDto.setPersonWithDisability( participant.getPersonWithDisability() );
@@ -75,6 +80,7 @@ public class ParticipantMapper {
                 participantResponseDto.setRefugeeStatus( participant.getRefugeeStatus() );
             }
             participantResponseDto.setOwnerGender( null != participant.getOwnerGender() ? participant.getOwnerGender().getName() : null );
+            participantResponseDto.setPassport( null != participant.getPassport() ? participant.getPassport() : null );
         }
 
 
