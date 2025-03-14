@@ -16,6 +16,7 @@ public interface LoanMapper {
     @Mapping(target = "partnerId", expression = "java(null != loan.getPartner() ? loan.getPartner().getId() : null)")
     @Mapping(target = "partnerName", expression = "java(null != loan.getPartner() ? loan.getPartner().getPartnerName() : null)")
     @Mapping(target = "participantName", expression = "java(null != loan.getParticipant() ? loan.getParticipant().getBusinessName() : null)")
+    @Mapping(target = "participantJGPID", expression = "java(null != loan.getParticipant() ? loan.getParticipant().getJgpId() : null)")
     @Mapping(target = "loanNumber", expression = "java(null != loan.getLoanNumber() ? loan.getLoanNumber() : null)")
     @Mapping(target = "loanStatus", expression = "java(null != loan.getLoanStatus() ? loan.getLoanStatus().getName() : null)")
     @Mapping(target = "loanQuality", expression = "java(null != loan.getLoanQuality() ? loan.getLoanQuality().getName() : null)")

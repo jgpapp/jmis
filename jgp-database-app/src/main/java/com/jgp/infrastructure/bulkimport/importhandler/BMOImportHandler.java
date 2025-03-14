@@ -32,6 +32,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -183,8 +184,8 @@ public class BMOImportHandler implements ImportHandler {
                 .registrationNumber("10001").isBusinessRegistered(registrationNumber != null && registrationNumber.trim().equalsIgnoreCase("YES"))
                 .worstMonthlyRevenue(worstMonthlyRevenue).totalRegularEmployees(totalRegularEmployees)
                 .youthRegularEmployees(youthRegularEmployees).totalCasualEmployees(totalCasualEmployees)
-                .youthCasualEmployees(youthCasualEmployees).sampleRecords(sampleRecordsKept)
-                .personWithDisability(personWithDisability).refugeeStatus(refugeeStatus).jgpId(jgpId)
+                .youthCasualEmployees(youthCasualEmployees).sampleRecords(sampleRecordsKept != null ? Arrays.stream(sampleRecordsKept.split(",")).map(String::trim).toList() : null)
+                .personWithDisability("YES".equalsIgnoreCase(personWithDisability) ? "Yes" : "No").refugeeStatus("YES".equalsIgnoreCase(refugeeStatus) ? "Yes" : "No").jgpId(jgpId)
                 .locationCountyCode(locationCountyCode.isPresent() ? locationCountyCode.get().getCountyCode() : "999")
                 .passport(passport).build();
 

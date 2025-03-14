@@ -7,6 +7,8 @@ public record BMOClientDto(
 
          Long partnerId,
 
+         String participantJGPID,
+
          String partnerName,
 
          Long participantId,

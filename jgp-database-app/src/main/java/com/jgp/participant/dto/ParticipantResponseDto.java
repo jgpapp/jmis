@@ -12,6 +12,8 @@ import java.util.List;
 @Getter
 @Setter
 public class ParticipantResponseDto implements Serializable {
+    private Long id;
+
     private String businessName;
 
     private String jgpId;
@@ -23,6 +25,8 @@ public class ParticipantResponseDto implements Serializable {
     private Integer ownerAge;
 
     private String businessLocation;
+
+    private String locationCountyCode;
 
     private String industrySector;
 
@@ -48,11 +52,13 @@ public class ParticipantResponseDto implements Serializable {
 
     private Integer youthCasualEmployees;
 
-    private String sampleRecords;
+    private List<String> sampleRecords;
 
     private String personWithDisability;
 
     private String refugeeStatus;
+
+    private String passport;
 
     private List<BMOClientDto> bmoClientDtos;
 

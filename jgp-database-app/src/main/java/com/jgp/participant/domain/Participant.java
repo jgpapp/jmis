@@ -2,6 +2,7 @@ package com.jgp.participant.domain;
 
 import com.jgp.participant.dto.ParticipantDto;
 import com.jgp.shared.domain.BaseEntity;
+import com.jgp.util.CommonUtil;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,6 +15,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.math.BigDecimal;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Getter
 @Entity
@@ -138,30 +141,102 @@ public class Participant extends BaseEntity {
     }
 
     public static Participant createClient(ParticipantDto dto){
-        String gender = dto.ownerGender();
-        if ("M".equalsIgnoreCase(gender.trim()) || "MALE".equalsIgnoreCase(gender.trim())){
-            gender = "MALE";
-        }
-        if ("F".equalsIgnoreCase(gender.trim()) || "FEMALE".equalsIgnoreCase(gender.trim())){
-            gender = "FEMALE";
-        }
-        Participant.Gender genderEnum = null;
-        try {
-            genderEnum = StringUtils.isBlank(gender) ? Participant.Gender.OTHER : Participant.Gender.valueOf(gender.toUpperCase());
-        }catch (Exception e){
-            genderEnum = Participant.Gender.OTHER;
-        }
-        return new Participant(dto.businessName(), dto.jgpId(), dto.phoneNumber(), genderEnum,
+        return new Participant(dto.businessName(), dto.jgpId(), dto.phoneNumber(), translateGender(dto.ownerGender()),
                 dto.ownerAge(), dto.businessLocation(), dto.industrySector(), dto.businessSegment(),
                 dto.isBusinessRegistered(), dto.registrationNumber(), dto.hasBMOMembership(),
                 dto.bmoMembership(), dto.bestMonthlyRevenue(), dto.worstMonthlyRevenue(),
                 dto.totalRegularEmployees(), dto.youthRegularEmployees(), dto.totalCasualEmployees(),
-                dto.youthCasualEmployees(), dto.sampleRecords(),
+                dto.youthCasualEmployees(), String.join(",", dto.sampleRecords()),
                 dto.personWithDisability(), dto.refugeeStatus(), dto.locationCountyCode(), dto.passport());
+    }
+
+    public void updateParticipant(ParticipantDto dto){
+        if (StringUtils.isNotBlank(dto.businessName())){
+            this.businessName = dto.businessName().trim();
+        }
+        if (StringUtils.isNotBlank(dto.jgpId())){
+            this.jgpId = dto.jgpId().trim();
+        }
+        if (StringUtils.isNotBlank(dto.phoneNumber())){
+            this.phoneNumber = dto.phoneNumber().trim();
+        }
+        if (StringUtils.isNotBlank(dto.ownerGender())){
+            this.ownerGender = translateGender(dto.ownerGender().trim());
+        }
+        if (Objects.nonNull(dto.ownerAge())){
+            this.ownerAge = dto.ownerAge();
+        }
+        if (StringUtils.isNotBlank(dto.industrySector())){
+            this.industrySector = dto.industrySector();
+        }
+        if (StringUtils.isNotBlank(dto.businessSegment())){
+            this.businessSegment = dto.businessSegment();
+        }
+        if (Objects.nonNull(dto.isBusinessRegistered())){
+            this.isBusinessRegistered = dto.isBusinessRegistered();
+            this.hasBMOMembership = Boolean.TRUE;
+        }
+        if (StringUtils.isNotBlank(dto.bmoMembership())){
+            this.bmoMembership = dto.bmoMembership();
+        }
+        if (Objects.nonNull(dto.bestMonthlyRevenue())){
+            this.bestMonthlyRevenue = dto.bestMonthlyRevenue();
+        }
+        if (Objects.nonNull(dto.worstMonthlyRevenue())){
+            this.worstMonthlyRevenue = dto.worstMonthlyRevenue();
+        }
+        if (Objects.nonNull(dto.totalRegularEmployees())){
+            this.totalRegularEmployees = dto.totalRegularEmployees();
+        }
+        if (Objects.nonNull(dto.youthRegularEmployees())){
+            this.youthRegularEmployees = dto.youthRegularEmployees();
+        }
+        if (Objects.nonNull(dto.totalCasualEmployees())){
+            this.totalCasualEmployees = dto.totalCasualEmployees();
+        }
+        if (Objects.nonNull(dto.youthCasualEmployees())){
+            this.youthCasualEmployees = dto.youthCasualEmployees();
+        }
+        if (Objects.nonNull(dto.sampleRecords())){
+            this.sampleRecords = String.join(",", dto.sampleRecords());
+        }
+        if (StringUtils.isNotBlank(dto.personWithDisability())){
+            this.personWithDisability = dto.personWithDisability();
+        }
+        if (StringUtils.isNotBlank(dto.refugeeStatus())){
+            this.refugeeStatus = dto.refugeeStatus();
+        }
+        if (StringUtils.isNotBlank(dto.locationCountyCode())){
+            final var county = CommonUtil.getCountyByCode(dto.locationCountyCode().trim());
+            if (null != county){
+                this.locationCountyCode = dto.locationCountyCode().trim();
+                this.businessLocation = county;
+            }
+
+        }
+        if (StringUtils.isNotBlank(dto.passport()) && !StringUtils.equals(this.passport, dto.passport())){
+            this.passport = dto.passport();
+        }
     }
 
     public void activateParticipant(){
         this.isActive = Boolean.TRUE;
+    }
+
+    private static Gender translateGender(String genderString){
+        if ("M".equalsIgnoreCase(genderString.trim()) || "MALE".equalsIgnoreCase(genderString.trim())){
+            genderString = "MALE";
+        }
+        if ("F".equalsIgnoreCase(genderString.trim()) || "FEMALE".equalsIgnoreCase(genderString.trim())){
+            genderString = "FEMALE";
+        }
+        Participant.Gender genderEnum = null;
+        try {
+            genderEnum = StringUtils.isBlank(genderString) ? Participant.Gender.OTHER : Participant.Gender.valueOf(genderString.toUpperCase());
+        }catch (Exception e){
+            genderEnum = Participant.Gender.OTHER;
+        }
+        return genderEnum;
     }
 
     @Getter

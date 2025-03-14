@@ -11,6 +11,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
+import { HasPermissionDirective } from '../../../directives/has-permission.directive';
 
 @Component({
   selector: 'app-client-details',
@@ -26,7 +27,8 @@ import { MatTableModule } from '@angular/material/table';
     MatDividerModule,
     RouterModule,
     MatTableModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    HasPermissionDirective
   ],
   templateUrl: './client-details.component.html',
   styleUrl: './client-details.component.scss'

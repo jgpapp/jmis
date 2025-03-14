@@ -40,6 +40,15 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
+    @Transactional
+    public Participant updateParticipant(Long participantId, ParticipantDto participantDto) {
+        var participant =  this.participantRepository.findById(participantId)
+                .orElseThrow(() -> new ParticipantNotFoundException(participantId));
+        participant.updateParticipant(participantDto);
+        return this.participantRepository.save(participant);
+    }
+
+    @Override
     public Optional<Participant> findOneParticipantByJGPID(String jgpId) {
         return this.participantRepository.findByJgpId(jgpId);
     }

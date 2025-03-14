@@ -1,0 +1,153 @@
+<app-content-header 
+[icon]="'supervisor_account'" 
+[title]="'Edit Participant'" 
+[desc]="'Provide information for all required fields to edit a participant.'"
+[hideBreadcrumb]="false"
+[hasBgImage]="true" 
+[class]="'pb-5'"/>
+
+
+<div fxLayout="column" fxLayout.gt-sm="row wrap" class="p-2" fxLayoutAlign="center">
+    <div fxFlex="80" class="p-2"> 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center">                
+                <mat-card-title>Update  Participant</mat-card-title>
+            </mat-card-header>
+            <mat-card-content fxLayoutAlign="center" class="pt-3">
+                <form [formGroup]="editParticipantForm" class="partner-form">  
+                  <div fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">     
+
+                    <mat-form-field fxFlex="48%">
+                        <mat-label>Participant Name</mat-label>
+                        <input matInput formControlName="businessName">
+                    </mat-form-field>
+
+                    <mat-form-field fxFlex="48%">
+                        <mat-label>JGP ID</mat-label>
+                        <input matInput formControlName="jgpId">
+                    </mat-form-field>
+
+                    <mat-form-field fxFlex="48%">
+                        <mat-label>Passport</mat-label>
+                        <input matInput formControlName="passport">
+                    </mat-form-field>
+
+                    <mat-form-field fxFlex="48%">
+                        <mat-label>Owner Age</mat-label>
+                        <input type="number" min="18" max="200" matInput formControlName="ownerAge">
+                    </mat-form-field>
+
+                    <mat-form-field fxFlex="48%">
+                        <mat-label>Phone Number</mat-label>
+                        <input matInput formControlName="phoneNumber">
+                    </mat-form-field>
+                    
+
+
+                    <div fxFlex="48%" fxLayoutGap="2%">
+                      <mat-label>Owner Gender: </mat-label>
+                      <mat-radio-group formControlName="ownerGender">
+                        <mat-radio-button value="Male" labelPosition="before">Male</mat-radio-button>
+                        <mat-radio-button value="Female" labelPosition="before">Female</mat-radio-button>
+                    </mat-radio-group>
+                  </div>
+
+                  <mat-form-field appearance="outline" fxFlex="48%" fxLayoutGap="2%">
+                    <mat-label>Select County</mat-label>
+                    <mat-select formControlName="locationCountyCode">
+                        @for (county of counties; track county) {
+                            <mat-option [value]="county.countyCode">{{county.countyName}}</mat-option>
+                          }
+                    </mat-select>
+                </mat-form-field>
+
+                  <mat-form-field appearance="fill" fxFlex="48%">
+                      <mat-label>Industry Sector</mat-label>
+                      <mat-select formControlName="industrySector">
+                          <mat-option value="Agriculture">Agriculture</mat-option>
+                          <mat-option value="Artists/artisans">Artists/artisans</mat-option>
+                          <mat-option value="Manufacturing">Manufacturing</mat-option>
+                          <mat-option value="Trading & Retail">Trading & Retail</mat-option>
+                          <mat-option value="Other">Other</mat-option>
+                        
+                      </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="fill" fxFlex="48%">
+                        <mat-label>Business Segment</mat-label>
+                        <mat-select formControlName="businessSegment">
+                            <mat-option value="MICRO">Micro (Less than 10 Employees)</mat-option>
+                            <mat-option value="SME">SME (10+ Employees)</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+
+                      <mat-form-field fxFlex="48%">
+                        <mat-label>Best Monthly Revenue</mat-label>
+                        <input matInput type="number" min="0" formControlName="bestMonthlyRevenue">
+                    </mat-form-field>
+
+                    <mat-form-field fxFlex="48%">
+                        <mat-label>Worst Monthly Revenue</mat-label>
+                        <input matInput type="number" min="0" formControlName="worstMonthlyRevenue">
+                    </mat-form-field>
+
+                    <mat-form-field fxFlex="48%">
+                        <mat-label>Total Regular Employees</mat-label>
+                        <input matInput type="number" min="0" formControlName="totalRegularEmployees">
+                    </mat-form-field>
+
+                    <mat-form-field fxFlex="48%">
+                        <mat-label>Youth Regular Employees</mat-label>
+                        <input matInput type="number" min="0" formControlName="youthRegularEmployees">
+                    </mat-form-field>
+
+                    <mat-form-field fxFlex="48%">
+                        <mat-label>Total Casual Employees</mat-label>
+                        <input matInput type="number" min="0" formControlName="totalCasualEmployees">
+                    </mat-form-field>
+
+                    <mat-form-field fxFlex="48%">
+                        <mat-label>Youth Casual Employees</mat-label>
+                        <input matInput type="number" min="0" formControlName="youthCasualEmployees">
+                    </mat-form-field>
+
+                    <mat-form-field appearance="fill" fxFlex="48%">
+                        <mat-label>Sample Records</mat-label>
+                        <mat-select formControlName="sampleRecords" multiple>
+                            <mat-option value="Purchase record">Purchase record</mat-option>
+                            <mat-option value="Record of sales">Record of sales</mat-option>
+                            <mat-option value="Delivery records">Delivery records</mat-option>
+                            <mat-option value="Record of expenses">Record of expenses</mat-option>
+                            <mat-option value="Receipts">Record of expenses</mat-option>
+                            <mat-option value="Other">Other</mat-option>
+                          
+                        </mat-select>
+                      </mat-form-field>
+
+                      <div fxFlex="48%" fxLayoutGap="2%">
+                        <mat-label>Living With Disability: </mat-label>
+                        <mat-radio-group formControlName="personWithDisability">
+                          <mat-radio-button value="Yes" labelPosition="before">Yes</mat-radio-button>
+                          <mat-radio-button value="No" labelPosition="before">No</mat-radio-button>
+                      </mat-radio-group>
+                    </div>
+
+                    <div fxFlex="48%" fxLayoutGap="2%">
+                        <mat-label>Is A refugee: </mat-label>
+                        <mat-radio-group formControlName="refugeeStatus">
+                          <mat-radio-button value="Yes" labelPosition="before">Yes</mat-radio-button>
+                          <mat-radio-button value="No" labelPosition="before">No</mat-radio-button>
+                      </mat-radio-group>
+                    </div>
+
+              <div fxLayout="row" fxLayoutAlign="end center" fxFlex="100%" fxLayoutGap="2%">
+                      <button mat-raised-button color="warn">Cancel</button>
+                      <button mat-raised-button color="primary" (click)="onSubmitEditParticipant()" [mat-dialog-close]="editParticipantForm.value" [disabled]="!editParticipantForm.valid">Update</button>
+                        
+                    </div>
+                  </div>
+                </form>
+            </mat-card-content>
+        </mat-card>
+    </div>        
+</div>

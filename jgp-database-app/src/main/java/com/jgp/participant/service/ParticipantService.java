@@ -10,7 +10,9 @@ import java.util.Optional;
 
 public interface ParticipantService {
 
-    Participant createParticipant(ParticipantDto clientDto);
+    Participant createParticipant(ParticipantDto participantDto);
+
+    Participant updateParticipant(Long participantId, ParticipantDto participantDto);
 
     Optional<Participant> findOneParticipantByJGPID(String jgpId);
 

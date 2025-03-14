@@ -28,4 +28,8 @@ export class ClientService {
     getParticipantById(participantId: number | string | null): Observable<any> {
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/participants/${participantId}?includeAccounts=true`);
     }
+
+    updateParticipant(participantId: number, participantDto: any): Observable<any> {
+        return this.httpClient.put(`${this.globalService.BASE_API_URL}/participants/${participantId}`, JSON.stringify(participantDto));
+      }
 }
