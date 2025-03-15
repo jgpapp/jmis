@@ -41,11 +41,11 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     @Override
     @Transactional
-    public Participant updateParticipant(Long participantId, ParticipantDto participantDto) {
+    public void updateParticipant(Long participantId, ParticipantDto participantDto) {
         var participant =  this.participantRepository.findById(participantId)
                 .orElseThrow(() -> new ParticipantNotFoundException(participantId));
         participant.updateParticipant(participantDto);
-        return this.participantRepository.save(participant);
+        this.participantRepository.save(participant);
     }
 
     @Override
@@ -60,8 +60,8 @@ public class ParticipantServiceImpl implements ParticipantService {
                 .orElseThrow(() -> new ParticipantNotFoundException(participantId));
 
         if (includeAccounts){
-            participant.setLoanDtos(this.loanService.getLoans(LoanSearchCriteria.builder().participantId(participantId).approvedByPartner(true).build(), Pageable.unpaged()));
-            participant.setBmoClientDtos(this.bmoClientDataService.getBMODataRecords(BMOParticipantSearchCriteria.builder().approvedByPartner(true).participantId(participantId).build(), Pageable.unpaged()));
+            participant.setLoanDtos(this.loanService.getLoans(LoanSearchCriteria.builder().participantId(participantId).approvedByPartner(true).build(), Pageable.unpaged()).stream().toList());
+            participant.setBmoClientDtos(this.bmoClientDataService.getBMODataRecords(BMOParticipantSearchCriteria.builder().approvedByPartner(true).participantId(participantId).build(), Pageable.unpaged()).stream().toList());
         }
 
         return participant;

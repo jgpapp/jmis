@@ -10,6 +10,7 @@ import com.jgp.shared.dto.ApiResponseDto;
 import com.jgp.util.CommonUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -37,13 +38,13 @@ public class BMOClientController {
     private final BulkImportWorkbookService bulkImportWorkbookService;
 
     @GetMapping
-    public ResponseEntity<List<BMOClientDto>> getAvailableBMODataRecords(@RequestParam(name = "partnerId", required = false) Long partnerId,
+    public ResponseEntity<Page<BMOClientDto>> getAvailableBMODataRecords(@RequestParam(name = "partnerId", required = false) Long partnerId,
                                                                          @RequestParam(name = "participantId", required = false) Long participantId,
-                                                                        @RequestParam(name = "approvedByPartner", required = false) Boolean approvedByPartner,
-                                                                        @RequestParam(name = "pageNumber", defaultValue = "1") Integer pageNumber,
-                                                                          @RequestParam(name = "pageSize", defaultValue = "200") Integer pageSize){
+                                                                         @RequestParam(name = "approvedByPartner", required = false) Boolean approvedByPartner,
+                                                                         @RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
+                                                                         @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
         final var sortedByDateCreated =
-                PageRequest.of(pageNumber - 1, pageSize, Sort.by("dateCreated").descending());
+                PageRequest.of(pageNumber, pageSize, Sort.by("dateCreated").descending());
         return new ResponseEntity<>(this.bmoDataService.getBMODataRecords(new BMOParticipantSearchCriteria(partnerId, participantId, approvedByPartner), sortedByDateCreated), HttpStatus.OK);
     }
 

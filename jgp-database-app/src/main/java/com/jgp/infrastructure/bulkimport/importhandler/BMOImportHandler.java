@@ -40,6 +40,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -104,6 +105,7 @@ public class BMOImportHandler implements ImportHandler {
         String referredFIBusiness = ImportHandlerUtils.readAsString(BMOConstants.REFERRED_FI_BUSINESS_COL, row);
         LocalDate dateRecordedByPartner = ImportHandlerUtils.readAsDate(BMOConstants.DATE_RECORD_ENTERED_BY_PARTNER_COL, row);
         final var taNeeds = ImportHandlerUtils.readAsString(BMOConstants.TA_NEEDS_COL, row);
+        validateTANeeds(taNeeds, row);
         final var trainingPartner = ImportHandlerUtils.readAsString(BMOConstants.TRAINING_PARTNER, row);
         final var taDeliveryMode = ImportHandlerUtils.readAsString(BMOConstants.TA_DELIVERY_MODE, row);
         validateTADeliveryMode(taDeliveryMode, row);
@@ -124,7 +126,8 @@ public class BMOImportHandler implements ImportHandler {
                 null,
                 LocalDate.now(ZoneId.systemDefault()), isApplicantEligible, 0,
                 0, isRecommendedForFinance, pipelineDecisionDate,
-                referredFIBusiness, dateRecordedByPartner, LocalDate.now(ZoneId.systemDefault()), taNeeds,
+                referredFIBusiness, dateRecordedByPartner, LocalDate.now(ZoneId.systemDefault()),
+                taNeeds != null ? Arrays.stream(taNeeds.split(",")).map(String::trim).collect(Collectors.joining(",")) : null,
                 row.getRowNum(), trainingPartner, taDeliveryMode, otherTaNeeds, taType, rowErrorMap.get(row));
 
         if (null == rowErrorMap.get(row)){
@@ -156,9 +159,7 @@ public class BMOImportHandler implements ImportHandler {
         final var locationCountyCode = CommonUtil.KenyanCounty.getKenyanCountyFromName(businessLocation);
         final var industrySector = ImportHandlerUtils.readAsString(BMOConstants.INDUSTRY_SECTOR_COL, row);
         final var businessSegment = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_SEGMENT_COL, row);
-        if (null == businessSegment && null == rowErrorMap.get(row)){
-            rowErrorMap.put(row, "Business segment is required !!");
-        }
+        validateBusinessSegment(businessSegment, row);
         final var registrationNumber = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_IS_REGISTERED, row);
         final var bestMonthlyRevenueD = ImportHandlerUtils.readAsDouble(BMOConstants.BEST_MONTH_MONTHLY_REVENUE_COL, row);
         final var bestMonthlyRevenue = Objects.nonNull(bestMonthlyRevenueD) ? BigDecimal.valueOf(bestMonthlyRevenueD) : null;
@@ -172,6 +173,7 @@ public class BMOImportHandler implements ImportHandler {
         final var totalCasualEmployees = ImportHandlerUtils.readAsInt(BMOConstants.TOTAL_CASUAL_EMPLOYEES_COL, row);
         final var youthCasualEmployees = ImportHandlerUtils.readAsInt(BMOConstants.YOUTH_CASUAL_EMPLOYEES_COL, row);
         final var sampleRecordsKept = ImportHandlerUtils.readAsString(BMOConstants.SAMPLE_RECORDS_KEPT_COL, row);
+        validateSampleRecords(sampleRecordsKept, row);
         final var personWithDisability = ImportHandlerUtils.readAsString(BMOConstants.PERSON_WITH_DISABILITY_COL, row);
         validatePersonWithDisability(personWithDisability, row);
         final var refugeeStatus = ImportHandlerUtils.readAsString(BMOConstants.REFUGEE_STATUS_COL, row);
@@ -341,6 +343,31 @@ public class BMOImportHandler implements ImportHandler {
         final var deliveryModes = Set.of("YES", "NO");
         if (null == rowErrorMap.get(row) && (null == value || !deliveryModes.contains(value.toUpperCase()))){
             rowErrorMap.put(row, "Invalid Value for Refugee Status (Must be Yes/No) !!");
+        }
+    }
+
+    private void validateBusinessSegment(String value, Row row){
+        if (null == value && null == rowErrorMap.get(row)){
+            rowErrorMap.put(row, "Business segment is required !!");
+            return;
+        }
+        final var businessSegments = Set.of("MICRO", "SME");
+        if (null == rowErrorMap.get(row) && (null == value || !businessSegments.contains(value.toUpperCase()))){
+            rowErrorMap.put(row, "Invalid Value for Business segment (Must be Micro/SME) !!");
+        }
+    }
+
+    private void validateTANeeds(String value, Row row){
+        final var taNeeds = Set.of("FINANCIAL LITERACY", "RECORD KEEPING", "DIGITIZATION", "MARKET ACCESS", "OTHER");
+        if (null == rowErrorMap.get(row) && (null == value || !taNeeds.containsAll(Arrays.stream(value.split(",")).map(String::toUpperCase).toList()))){
+            rowErrorMap.put(row, "Invalid Value for TA needs (Must be Financial Literacy/Record Keeping/Digitization/Market Access/Other) !!");
+        }
+    }
+
+    private void validateSampleRecords(String value, Row row){
+        final var sampleRecords = Set.of("PURCHASE RECORD", "RECORD OF SALES", "DELIVERY RECORDS", "RECORD OF EXPENSES", "RECEIPTS", "OTHER");
+        if (null == rowErrorMap.get(row) && (null == value || !sampleRecords.containsAll(Arrays.stream(value.split(",")).map(String::toUpperCase).toList()))){
+            rowErrorMap.put(row, "Invalid Value for TA needs (Must be Purchase record/Record of sales/Delivery records/Record of expenses/Receipts/Other) !!");
         }
     }
 
