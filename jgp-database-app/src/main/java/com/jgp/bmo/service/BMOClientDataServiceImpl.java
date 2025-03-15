@@ -77,7 +77,8 @@ public class BMOClientDataServiceImpl implements BMOClientDataService {
 
     @Override
     public Page<BMOClientDto> getBMODataRecords(BMOParticipantSearchCriteria searchCriteria, Pageable pageable) {
-        return new PageImpl<>(this.bmoClientMapper.toDto(this.bmoDataRepository.findAll(this.bmoPredicateBuilder.buildPredicateForSearchTAData(searchCriteria), pageable).stream().toList()));
+        final var bmoData = this.bmoDataRepository.findAll(this.bmoPredicateBuilder.buildPredicateForSearchTAData(searchCriteria), pageable);
+        return new PageImpl<>(this.bmoClientMapper.toDto(bmoData.stream().toList()), pageable, bmoData.getTotalElements());
     }
 
     @Override

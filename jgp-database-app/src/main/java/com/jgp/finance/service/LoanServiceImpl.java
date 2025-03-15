@@ -77,7 +77,8 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     public Page<LoanDto> getLoans(LoanSearchCriteria searchCriteria, Pageable pageable) {
-        return new PageImpl<>(this.loanMapper.toDto(this.loanRepository.findAll(loanPredicateBuilder.buildPredicateForSearchLoans(searchCriteria), pageable).stream().toList()));
+        final var loans = this.loanRepository.findAll(loanPredicateBuilder.buildPredicateForSearchLoans(searchCriteria), pageable);
+        return new PageImpl<>(this.loanMapper.toDto(loans.stream().toList()), pageable, loans.getTotalElements());
     }
 
     @Override
