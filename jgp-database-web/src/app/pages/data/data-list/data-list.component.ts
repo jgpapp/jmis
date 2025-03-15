@@ -5,7 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { BMOClientDataService } from '@services/data-management/bmo-client-data.service';
@@ -45,6 +45,10 @@ export class DataListComponent implements OnDestroy{
   public displayedColumns = ['select', 'participantName', 'participantJGPID', 'tasAttended', 'taSessionsAttended', 'isRecommendedForFinance', 'dateFormSubmitted', 'decisionDate'];
   public dataSource: any;
 
+  pageSize = 10;
+  pageIndex = 0;
+  totalItems = 0;
+
   bmoClientsData: any
   public selection = new SelectionModel<any>(true, []);
 
@@ -52,12 +56,13 @@ export class DataListComponent implements OnDestroy{
   constructor(private bmoClientDataService: BMOClientDataService, public authService: AuthService, private gs: GlobalService, private dialog: MatDialog) { }
 
   getAvailableBMOClientData() {
-    this.bmoClientDataService.getAvailableBMOClientData(false, this.authService.currentUser()?.partnerId)
+    this.bmoClientDataService.getAvailableBMOClientData(this.pageIndex, this.pageSize, false, this.authService.currentUser()?.partnerId)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
-          this.bmoClientsData = response;
+          this.bmoClientsData = response.content;
           this.dataSource = new MatTableDataSource(this.bmoClientsData);
+          this.totalItems = response.page.totalElements;
         },
         error: (error) => { }
       });
@@ -129,6 +134,12 @@ export class DataListComponent implements OnDestroy{
   approveAllPartnerTAData(){
     this.approveTAData([]);
   }
+
+  onPageChange(event: PageEvent) {
+      this.pageIndex = event.pageIndex;
+      this.pageSize = event.pageSize;
+      this.getAvailableBMOClientData();
+    }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();

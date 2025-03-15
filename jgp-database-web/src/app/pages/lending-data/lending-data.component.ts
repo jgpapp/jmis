@@ -4,7 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { ContentHeaderComponent } from '../../theme/components/content-header/content-header.component';
@@ -50,6 +50,10 @@ export class LendingDataComponent implements OnDestroy, OnInit {
   ];
   public dataSource: any;
 
+  pageSize = 10;
+  pageIndex = 0;
+  totalItems = 0;
+
   newLoansData: any
   public selection = new SelectionModel<any>(true, []);
 
@@ -57,12 +61,13 @@ export class LendingDataComponent implements OnDestroy, OnInit {
   constructor(private loanService: LoanService, public authService: AuthService, private gs: GlobalService, private dialog: MatDialog) { }
 
   getAvailableNewLendingData() {
-    this.loanService.getAvailableLendingData(false, this.authService.currentUser()?.partnerId)
+    this.loanService.getAvailableLendingData(this.pageIndex, this.pageSize, false, this.authService.currentUser()?.partnerId)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
-          this.newLoansData = response;
+          this.newLoansData = response.content;
           this.dataSource = new MatTableDataSource(this.newLoansData);
+          this.totalItems = response.page.totalElements;
         },
         error: (error) => { }
       });
@@ -115,19 +120,6 @@ export class LendingDataComponent implements OnDestroy, OnInit {
     });
   }
 
-
-  approveLoansData222222(loanIds: number[]){
-    this.loanService.approveLoansData(loanIds)
-    .pipe(takeUntil(this.unsubscribe$))
-      .subscribe({
-        next: (response) => {
-          this.gs.openSnackBar(response.message, "Dismiss");
-          this.getAvailableNewLendingData();
-        },
-        error: (error) => { }
-      });
-  }
-
   approveSelectedRows(){
     this.approveLoansData(this.selection.selected.map(row => row.id));
   }
@@ -135,6 +127,13 @@ export class LendingDataComponent implements OnDestroy, OnInit {
   approveAllPartnerLoansData(){
     this.approveLoansData([]);
   }
+
+  onPageChange(event: PageEvent) {
+    console.log(event);
+      this.pageIndex = event.pageIndex;
+      this.pageSize = event.pageSize;
+      this.getAvailableNewLendingData();
+    }
 
 
   ngOnDestroy(): void {

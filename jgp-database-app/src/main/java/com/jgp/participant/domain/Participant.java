@@ -207,9 +207,16 @@ public class Participant extends BaseEntity {
             this.refugeeStatus = dto.refugeeStatus();
         }
         if (StringUtils.isNotBlank(dto.locationCountyCode())){
-            final var county = CommonUtil.getCountyByCode(dto.locationCountyCode().trim());
+            var countyCode = dto.locationCountyCode().trim();
+            if (countyCode.length() == 1){
+                countyCode = String.format("00%s", countyCode);
+            }
+            if (countyCode.length() == 2){
+                countyCode = String.format("0%s", countyCode);
+            }
+            final var county = CommonUtil.getCountyByCode(countyCode);
             if (null != county){
-                this.locationCountyCode = dto.locationCountyCode().trim();
+                this.locationCountyCode = countyCode;
                 this.businessLocation = county;
             }
 

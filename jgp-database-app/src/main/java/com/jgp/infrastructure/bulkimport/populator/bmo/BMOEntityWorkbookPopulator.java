@@ -67,8 +67,8 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(BMOConstants.YOUTH_REGULAR_EMPLOYEES_COL, rowHeader, "Regular, of which are youth (18-35)*");
         writeString(BMOConstants.TOTAL_CASUAL_EMPLOYEES_COL, rowHeader, "Total number of casual employees excluding owner*");
         writeString(BMOConstants.YOUTH_CASUAL_EMPLOYEES_COL, rowHeader, "Casual, of which are youth (18-35)*");
-        writeString(BMOConstants.SAMPLE_RECORDS_KEPT_COL, rowHeader, "Sample records kept*(Purchase record, Record of sales, Delivery records, Record of expenses, Receipts, Other)");
-        writeString(BMOConstants.TA_NEEDS_COL, rowHeader, "TA needs*");
+        writeString(BMOConstants.SAMPLE_RECORDS_KEPT_COL, rowHeader, "Sample records kept*(Purchase record/Record of sales/Delivery records/Record of expenses/Receipts/Other)");
+        writeString(BMOConstants.TA_NEEDS_COL, rowHeader, "TA needs*(Financial Literacy/Record Keeping/Digitization/Market Access/Other)");
         writeString(BMOConstants.OTHER_TA_NEEDS_COL, rowHeader, "Other TA Needs");
         writeString(BMOConstants.TYPE_OF_TA_COL, rowHeader, "Type of TA*(Post-lending/Pre-lending/Non-lending/Mentorship/Voucher scheme)");
         writeString(BMOConstants.PERSON_WITH_DISABILITY_COL, rowHeader, "Person with Disability*(Yes/No)");

@@ -13,6 +13,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -74,8 +76,8 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
-    public List<LoanDto> getLoans(LoanSearchCriteria searchCriteria, Pageable pageable) {
-        return this.loanMapper.toDto(this.loanRepository.findAll(loanPredicateBuilder.buildPredicateForSearchLoans(searchCriteria), pageable).stream().toList());
+    public Page<LoanDto> getLoans(LoanSearchCriteria searchCriteria, Pageable pageable) {
+        return new PageImpl<>(this.loanMapper.toDto(this.loanRepository.findAll(loanPredicateBuilder.buildPredicateForSearchLoans(searchCriteria), pageable).stream().toList()));
     }
 
     @Override

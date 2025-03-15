@@ -12,7 +12,7 @@ public interface ParticipantService {
 
     Participant createParticipant(ParticipantDto participantDto);
 
-    Participant updateParticipant(Long participantId, ParticipantDto participantDto);
+    void updateParticipant(Long participantId, ParticipantDto participantDto);
 
     Optional<Participant> findOneParticipantByJGPID(String jgpId);
 

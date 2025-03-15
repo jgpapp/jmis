@@ -11,6 +11,7 @@ import com.jgp.shared.dto.ApiResponseDto;
 import com.jgp.util.CommonUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -38,15 +39,15 @@ public class LoanController {
     private final BulkImportWorkbookService bulkImportWorkbookService;
 
     @GetMapping
-    public ResponseEntity<List<LoanDto>> getAvailableLoanRecords(@RequestParam(name = "partnerId", required = false) Long partnerId,
+    public ResponseEntity<Page<LoanDto>> getAvailableLoanRecords(@RequestParam(name = "partnerId", required = false) Long partnerId,
                                                                  @RequestParam(name = "participantId", required = false) Long participantId,
                                                                  @RequestParam(name = "status", required = false) Loan.LoanStatus status,
                                                                  @RequestParam(name = "quality", required = false) Loan.LoanQuality quality,
                                                                  @RequestParam(name = "approvedByPartner", required = false) Boolean approvedByPartner,
-                                                                 @RequestParam(name = "pageNumber", defaultValue = "1") Integer pageNumber,
-                                                                 @RequestParam(name = "pageSize", defaultValue = "200") Integer pageSize){
+                                                                 @RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
+                                                                 @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
         final var sortedByDateCreated =
-                PageRequest.of(pageNumber - 1, pageSize, Sort.by("dateCreated").descending());
+                PageRequest.of(pageNumber, pageSize, Sort.by("dateCreated").descending());
         return new ResponseEntity<>(this.loanService.getLoans(new LoanSearchCriteria(partnerId, participantId, status, quality, approvedByPartner, null, null), sortedByDateCreated), HttpStatus.OK);
     }
 
