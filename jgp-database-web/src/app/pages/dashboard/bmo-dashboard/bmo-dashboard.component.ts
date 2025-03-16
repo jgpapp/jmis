@@ -132,6 +132,7 @@ export class BmoDashboardComponent implements OnInit {
 
   setDashBoardFilters(currentDashBoardFilters: any){
     this.dashBoardFilters = currentDashBoardFilters;
+    this.dashBoardFilters['selectedPartnerId'] = this.partnerId;
     this.resetDashBoardFilters = false;
     this.reloadData();
   }
@@ -143,13 +144,13 @@ export class BmoDashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.partnerId = this.authService.currentUser()?.partnerId;
+    this.partnerName = `${this.authService.currentUser()?.partnerName} Dashboard !`;
     this.dashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId}
     this.reloadData();
   }
 
   reloadData(): void {
-    this.partnerName = `${this.authService.currentUser()?.partnerName} Dashboard !`;
-    this.partnerId = this.authService.currentUser()?.partnerId;
     this.getHighLevelSummary();
     this.getTaNeedsByGenderSummary();
     this.getTaTrainingBySectorSummary();

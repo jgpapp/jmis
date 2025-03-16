@@ -55,11 +55,13 @@ export class BmoFiDashboardComponent implements OnInit{
   public trainedBusinessesCountDataDataSource: any;
   public displayedColumns = ['year', 'partnerName', 'genderName', 'value' ];
   private unsubscribe$ = new Subject<void>();
+  partnerId: any;
 
   constructor(private authService: AuthService, public gs: GlobalService, private dashBoardService: DashboardService){}
 
   setDashBoardFilters(currentDashBoardFilters: any){
     this.dashBoardFilters = currentDashBoardFilters;
+    this.dashBoardFilters['selectedPartnerId'] = this.partnerId;
     this.resetDashBoardFilters = false;
     this.getLastThreeYearsAccessedLoanPerPartnerYearly();
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
@@ -77,6 +79,7 @@ export class BmoFiDashboardComponent implements OnInit{
   ngOnInit(): void {
     this.dashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId}
     this.partnerName = `${this.authService.currentUser()?.partnerName} Dashboard !`;
+    this.partnerId = this.authService.currentUser()?.partnerId;
     this.getLastThreeYearsAccessedLoanPerPartnerYearly();
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
     this.getLastThreeYearsTrainedBusinessesPerPartnerYearly();
