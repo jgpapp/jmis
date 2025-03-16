@@ -120,6 +120,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
 
   setDashBoardFilters(currentDashBoardFilters: any){
     this.dashBoardFilters = currentDashBoardFilters;
+    this.dashBoardFilters['selectedPartnerId'] = this.partnerId;
     this.resetDashBoardFilters = false;
     this.reloadData();
   }
@@ -132,7 +133,9 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.dashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId}
+    this.partnerName = `${this.authService.currentUser()?.partnerName} Dashboard !`;
+    this.partnerId = this.authService.currentUser()?.partnerId;
+    this.dashBoardFilters = {'selectedPartnerId': this.partnerId}
     this.reloadData();
   }
 
@@ -162,8 +165,6 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
 
 
   reloadData(){
-    this.partnerName = `${this.authService.currentUser()?.partnerName} Dashboard !`;
-    this.partnerId = this.authService.currentUser()?.partnerId;
     this.getHighLevelSummary();
     this.getLoansDisbursedByGenderSummary();
     this.getLoansDisbursedByPipelineSummary();
