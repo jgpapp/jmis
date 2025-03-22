@@ -60,6 +60,8 @@ public record ParticipantDto(
         @NotNull(message = "Youth casual employees is required !!")
         Integer youthCasualEmployees,
 
+        String corpPinNumber,
+
         List<String> sampleRecords,
 
         String personWithDisability,

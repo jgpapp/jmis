@@ -58,7 +58,7 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(BMOConstants.PASS_PORT_COL, rowHeader, "Passport");
         writeString(BMOConstants.BUSINESS_LOCATION_COL, rowHeader, "Business Location (County)*");
         writeString(BMOConstants.INDUSTRY_SECTOR_COL, rowHeader, "Industry sector(Agriculture, Artists/artisans, Manufacturing, Trading & Retail, Other)");
-        writeString(BMOConstants.BUSINESS_SEGMENT_COL, rowHeader, "Business segment*");
+        writeString(BMOConstants.BUSINESS_SEGMENT_COL, rowHeader, "Business segment*(Micro/SME)");
         writeString(BMOConstants.TA_DELIVERY_MODE, rowHeader, "TA delivery mode*(In person/Virtual/Mixed)");
         writeString(BMOConstants.BUSINESS_IS_REGISTERED, rowHeader, "Is your business registered?* (Yes/No)");
         writeString(BMOConstants.BEST_MONTH_MONTHLY_REVENUE_COL, rowHeader, "Monthly revenues in best month (KES)");

@@ -16,7 +16,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.math.BigDecimal;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Getter
 @Entity
@@ -25,6 +24,9 @@ public class Participant extends BaseEntity {
 
     @Column(name = "business_name")
     private String businessName;
+
+    @Column(name = "corp_pin_number")
+    private String corpPinNumber;
 
     @Column(name = "jgp_id")
     private String jgpId;
@@ -112,7 +114,7 @@ public class Participant extends BaseEntity {
             Boolean hasBMOMembership, String bmoMembership, BigDecimal bestMonthlyRevenue, BigDecimal worstMonthlyRevenue,
             Integer totalRegularEmployees, Integer youthRegularEmployees, Integer totalCasualEmployees,
             Integer youthCasualEmployees, String sampleRecords, String personWithDisability,
-            String refugeeStatus, String locationCountyCode, String passport) {
+            String refugeeStatus, String locationCountyCode, String passport, String corpPinNumber) {
         this.businessName = businessName;
         this.jgpId = jgpId;
         this.phoneNumber = phoneNumber;
@@ -138,6 +140,7 @@ public class Participant extends BaseEntity {
         this.genderCategory = GenderCategory.getGenderCategory(this.ownerGender, ownerAge).getName();
         this.locationCountyCode = locationCountyCode;
         this.passport = passport;
+        this.corpPinNumber = corpPinNumber;
     }
 
     public static Participant createClient(ParticipantDto dto){
@@ -147,7 +150,7 @@ public class Participant extends BaseEntity {
                 dto.bmoMembership(), dto.bestMonthlyRevenue(), dto.worstMonthlyRevenue(),
                 dto.totalRegularEmployees(), dto.youthRegularEmployees(), dto.totalCasualEmployees(),
                 dto.youthCasualEmployees(), String.join(",", dto.sampleRecords()),
-                dto.personWithDisability(), dto.refugeeStatus(), dto.locationCountyCode(), dto.passport());
+                dto.personWithDisability(), dto.refugeeStatus(), dto.locationCountyCode(), dto.passport(), dto.corpPinNumber());
     }
 
     public void updateParticipant(ParticipantDto dto){
