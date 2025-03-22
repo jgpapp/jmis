@@ -1,0 +1,1 @@
+ALTER TABLE participants ADD COLUMN corp_pin_number VARCHAR(50) DEFAULT NULL;

@@ -160,6 +160,7 @@ public class LoanImportHandler implements ImportHandler {
 
     private ParticipantDto getParticipantDto(Row row){
         String businessName = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_NAME_COL, row);
+        String corpPinNumber = ImportHandlerUtils.readAsString(LoanConstants.CORP_PIN_NUMBER, row);
         String jgpId = ImportHandlerUtils.readAsString(LoanConstants.JGP_ID_COL, row);
         final var phoneNumber = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_PHONE_NUMBER_COL, row);
         final var gender = ImportHandlerUtils.readAsString(LoanConstants.GENDER_COL, row);
@@ -185,7 +186,7 @@ public class LoanImportHandler implements ImportHandler {
                 .youthRegularEmployees(youthRegularEmployees).totalCasualEmployees(totalCasualEmployees)
                 .youthCasualEmployees(youthCasualEmployees).jgpId(jgpId)
                 .locationCountyCode(locationCountyCode.isPresent() ? locationCountyCode.get().getCountyCode() : "999")
-                .passport(passport).build();
+                .passport(passport).corpPinNumber(corpPinNumber).build();
     }
 
     public Count importEntity() {

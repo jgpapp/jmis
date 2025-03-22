@@ -185,20 +185,26 @@ public class DashboardController {
 
     @GetMapping("loan-accessed-per-partner-yearly")
     public ResponseEntity<List<PartnerYearlyDataDto>> getLastThreeYearsAccessedLoanPerPartnerYearly(@RequestParam(value = "partner-id", required = false) Long partnerId,
-                                                                                                    @RequestParam(value = "county-code", required = false) String countyCode){
-        return new ResponseEntity<>(this.dashboardService.getLastThreeYearsAccessedLoanAmountPerPartnerYearly(new DashboardSearchCriteria(null, null, partnerId, countyCode)), HttpStatus.OK);
+                                                                                                    @RequestParam(value = "county-code", required = false) String countyCode,
+                                                                                                    @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                                                    @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        return new ResponseEntity<>(this.dashboardService.getLastThreeYearsAccessedLoanAmountPerPartnerYearly(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode)), HttpStatus.OK);
     }
 
     @GetMapping("accessed-loans-count-per-partner-yearly")
     public ResponseEntity<List<PartnerYearlyDataDto>> getLastThreeYearsAccessedLoansCountPerPartnerYearly(@RequestParam(value = "partner-id", required = false) Long partnerId,
-                                                                                                    @RequestParam(value = "county-code", required = false) String countyCode){
-        return new ResponseEntity<>(this.dashboardService.getLastThreeYearsAccessedLoansCountPerPartnerYearly(new DashboardSearchCriteria(null, null, partnerId, countyCode)), HttpStatus.OK);
+                                                                                                          @RequestParam(value = "county-code", required = false) String countyCode,
+                                                                                                          @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                                                          @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        return new ResponseEntity<>(this.dashboardService.getLastThreeYearsAccessedLoansCountPerPartnerYearly(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode)), HttpStatus.OK);
     }
 
     @GetMapping("trained_businesses-per-partner-yearly")
     public ResponseEntity<List<PartnerYearlyDataDto>> getLastThreeYearsTrainedBusinessesPerPartnerYearly(@RequestParam(value = "partner-id", required = false) Long partnerId,
-                                                                                                    @RequestParam(value = "county-code", required = false) String countyCode){
-        return new ResponseEntity<>(this.dashboardService.getLastThreeYearsTrainedBusinessesPerPartnerYearly(new DashboardSearchCriteria(null, null, partnerId, countyCode)), HttpStatus.OK);
+                                                                                                         @RequestParam(value = "county-code", required = false) String countyCode,
+                                                                                                         @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                                                         @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        return new ResponseEntity<>(this.dashboardService.getLastThreeYearsTrainedBusinessesPerPartnerYearly(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode)), HttpStatus.OK);
     }
 
     @GetMapping("loans-accessed-vs-out-standing-per-partner")

@@ -19,6 +19,7 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         Row rowHeader = worksheet.createRow(TemplatePopulateImportConstants.ROWHEADER_INDEX);
         rowHeader.setHeight(TemplatePopulateImportConstants.ROW_HEADER_HEIGHT);
         worksheet.setColumnWidth(LoanConstants.BUSINESS_NAME_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.CORP_PIN_NUMBER, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.JGP_ID_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.BUSINESS_PHONE_NUMBER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.GENDER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
@@ -46,6 +47,7 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
 
 
         writeString(LoanConstants.BUSINESS_NAME_COL, rowHeader, "Participant Name*");
+        writeString(LoanConstants.CORP_PIN_NUMBER, rowHeader, "Corporation PIN Number");
         writeString(LoanConstants.JGP_ID_COL, rowHeader, "Unique JGP ID (National ID)*");
         writeString(LoanConstants.BUSINESS_PHONE_NUMBER_COL, rowHeader, "Business phone number*");
         writeString(LoanConstants.GENDER_COL, rowHeader, "Gender of owner*");
@@ -67,7 +69,7 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(LoanConstants.YOUTH_CASUAL_EMPLOYEES_COL, rowHeader, "Casual, of which are youth (18-35)*");
         writeString(LoanConstants.LOANER_TYPE_COL, rowHeader, "Loaner Type");
         writeString(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, rowHeader, "Date added to JGP database(yyyy-MM-dd)*");
-        writeString(LoanConstants.LOAN_PRODUCT_COL, rowHeader, "Loan product (Working Capital, Asset Finance, Stahimili, Purchase Order, Consignment Finance, Shariah Compliant)*");
+        writeString(LoanConstants.LOAN_PRODUCT_COL, rowHeader, "Loan product* (Working Capital/Asset Finance/Stahimili/Purchase Order/Consignment Finance/Shariah Compliant)");
         writeString(LoanConstants.TRANCH_AMOUNT_ALLOCATED_COL, rowHeader, "Tranch amount allocated(Tranch 1/Tranch 2/Tranch 3/Not Applicable)");
         writeString(LoanConstants.TRANCH_AMOUNT_DISBURSED_COL, rowHeader, "Tranch Amount Disbursed (KES)");
 
