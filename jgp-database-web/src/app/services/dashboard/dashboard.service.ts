@@ -167,6 +167,10 @@ export class DashboardService {
       if(dashBoardFilters.selectedCountyCode){
         queryParam = `${queryParam}&county-code=${dashBoardFilters.selectedCountyCode}`
       }
+      if(dashBoardFilters.selectedTrainingPartner){
+        queryParam = `${queryParam}&training-partner=${dashBoardFilters.selectedTrainingPartner}`
+      }
+      console.log(queryParam)
         return queryParam;
     }
 

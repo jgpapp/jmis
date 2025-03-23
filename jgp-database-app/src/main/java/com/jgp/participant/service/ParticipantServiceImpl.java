@@ -70,10 +70,10 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Override
     public Page<Participant> availableParticipants(String searchText, Pageable pageable) {
         if (null != searchText) {
-            QParticipant qParticipant = QParticipant.participant;
-            var businessNamePredicate = qParticipant.businessName.likeIgnoreCase("%"+searchText+"%s");
-            var jgpPredicate = qParticipant.jgpId.likeIgnoreCase("%"+searchText+"%s");
-            var phoneNumberPredicate = qParticipant.phoneNumber.likeIgnoreCase("%"+searchText+"%s");
+            final var qParticipant = QParticipant.participant;
+            var businessNamePredicate = qParticipant.businessName.containsIgnoreCase(searchText);
+            var jgpPredicate = qParticipant.jgpId.containsIgnoreCase(searchText);
+            var phoneNumberPredicate = qParticipant.phoneNumber.containsIgnoreCase(searchText);
             return this.participantRepository.findAll(businessNamePredicate.or(jgpPredicate).or(phoneNumberPredicate), pageable);
         }
         return this.participantRepository.findAll(pageable);

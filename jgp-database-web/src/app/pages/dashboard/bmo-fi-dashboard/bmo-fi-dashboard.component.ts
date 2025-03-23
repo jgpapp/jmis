@@ -178,6 +178,10 @@ export class BmoFiDashboardComponent implements OnInit{
     return 'TA' === this.selectedDashboardView;
   }
 
+  get filterFieldFlex(): number {
+    return this.isFinancialDashboard() ? 33.3 : 25;
+  }
+
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();

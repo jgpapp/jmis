@@ -33,6 +33,7 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit, OnChanges{
 
   @Output() dashBoardFilters: EventEmitter<any> = new EventEmitter();
   @Input({required: true, alias: 'isPartnerDashBoard'}) isPartnerDashBoard: boolean;
+  @Input({required: true, alias: 'showTADashboard'}) showTADashboard: boolean;
   @Input('partnerId') partnerId: number;
   @Input({required: true, alias: 'fieldFlex'}) fieldFlex: number;
   @Input({required: true, alias: 'resetDashBoardFilters'}) resetDashBoardFilters: boolean;
@@ -52,6 +53,7 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit, OnChanges{
 
     this.dashFilterForm = this.fb.group({
       selectedPartnerId: [null],
+      selectedTrainingPartner: [null],
       selectedCountyCode: [null],
       selectedDateFrom: [null],
       selectedDateTo: [null]
@@ -62,6 +64,7 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit, OnChanges{
     if(changes['resetDashBoardFilters'] && true === changes['resetDashBoardFilters']['currentValue']){
       this.dashFilterForm = this.fb.group({
         selectedPartnerId: [null],
+        selectedTrainingPartner: [null],
         selectedCountyCode: [null],
         selectedDateFrom: [null],
         selectedDateTo: [null]
@@ -126,6 +129,11 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit, OnChanges{
     if(this.dashFilterForm.controls['selectedCountyCode'].value == '0'){
       this.dashFilterForm.patchValue({
         'selectedCountyCode': null
+      });
+    }
+    if(this.dashFilterForm.controls['selectedTrainingPartner'].value == 'OO'){
+      this.dashFilterForm.patchValue({
+        'selectedTrainingPartner': null
       });
     }
 
