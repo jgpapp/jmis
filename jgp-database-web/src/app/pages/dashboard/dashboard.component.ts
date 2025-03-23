@@ -192,4 +192,22 @@ export class DashboardComponent {
   isTADashboard(): boolean {
     return 'TA' === this.selectedDashboardView;
   }
+
+  get filterFieldFlex(): number {
+    if(this.isFinancialDashboard()){
+      if(this.authService.hasPermission('SPECIFIC_PARTNER_DATA_ON_OVERVIEW_VIEW')){
+        return 25;
+      } else {
+        return 33.3;
+      }
+    } else if(this.isTADashboard()){
+      if(this.authService.hasPermission('SPECIFIC_PARTNER_DATA_ON_OVERVIEW_VIEW')){
+        return 20;
+      } else {
+        return 25;
+      }
+    } else {
+      return 25;
+    }
+  }
 }

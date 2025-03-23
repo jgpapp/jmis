@@ -59,13 +59,15 @@ public class DashboardServiceImpl implements DashboardService {
     private static final String FROM_DATE_PARAM = "fromDate";
     private static final String TO_DATE_PARAM = "toDate";
     private static final String COUNTY_CODE_PARAM = "countyCode";
+    private static final String TRAINING_PARTNER_PARAM = "trainingPartner";
     private static final String DATA_VALUE_PARAM = "dataValue";
     private static final String DATA_PERCENTAGE_VALUE_PARAM = "percentage";
     private static final String LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM = "WHERE l.date_disbursed between :fromDate and :toDate  and l.data_is_approved = true ";
     private static final String BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM = "WHERE bpd.date_partner_recorded between :fromDate and :toDate and bpd.data_is_approved = true ";
     private static final String LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and l.partner_id = :partnerId ";
     private static final String BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and bpd.partner_id = :partnerId ";
-    private static final String WHERE_CLAUSE_BY_COUNTY_CODE_PARAM = "and cl.location_county_code = :countyCode";
+    private static final String WHERE_CLAUSE_BY_COUNTY_CODE_PARAM = "and cl.location_county_code = :countyCode ";
+    private static final String WHERE_CLAUSE_BY_TRAINING_PARTNER_PARAM = "and LOWER(bpd.training_partner) = :trainingPartner";
     private static final String BUSINESSES_TRAINED = "businessesTrained";
     private static final String BUSINESSES_LOANED = "businessesLoaned";
     private static final String AMOUNT_DISBURSED = "amountDisbursed";
@@ -97,6 +99,10 @@ public class DashboardServiceImpl implements DashboardService {
             parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
             bpdWhereClause = String.format("%s%s", bpdWhereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
             loanWhereClause = String.format("%s%s", loanWhereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.trainingPartner())) {
+            parameters.addValue(TRAINING_PARTNER_PARAM, dashboardSearchCriteria.trainingPartner().toLowerCase(Locale.getDefault()));
+            bpdWhereClause = String.format("%s%s", bpdWhereClause, WHERE_CLAUSE_BY_TRAINING_PARTNER_PARAM);
         }
         var sqlQuery = String.format(HighLevelSummaryMapper.SCHEMA, bpdWhereClause, loanWhereClause);
         return this.namedParameterJdbcTemplate.queryForObject(sqlQuery, parameters, highLevelSummaryMapper);
@@ -255,6 +261,10 @@ public class DashboardServiceImpl implements DashboardService {
             parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
             whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
         }
+        if (Objects.nonNull(dashboardSearchCriteria.trainingPartner())) {
+            parameters.addValue(TRAINING_PARTNER_PARAM, dashboardSearchCriteria.trainingPartner().toLowerCase(Locale.getDefault()));
+            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_TRAINING_PARTNER_PARAM);
+        }
         var sqlQuery = String.format(DataPointMapper.BUSINESSES_TRAINED_BY_GENDER_SCHEMA, whereClause);
 
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
@@ -279,6 +289,10 @@ public class DashboardServiceImpl implements DashboardService {
         if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
             parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
             whereClause = String.format("%s%s ", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.trainingPartner())) {
+            parameters.addValue(TRAINING_PARTNER_PARAM, dashboardSearchCriteria.trainingPartner().toLowerCase(Locale.getDefault()));
+            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_TRAINING_PARTNER_PARAM);
         }
         whereClause = String.format("%s and LOWER(person_with_disability) = LOWER('YES')", whereClause);
         var sqlQuery = String.format(DataPointMapper.BUSINESSES_TRAINED_BY_GENDER_SCHEMA, whereClause);
@@ -305,6 +319,10 @@ public class DashboardServiceImpl implements DashboardService {
         if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
             parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
             whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.trainingPartner())) {
+            parameters.addValue(TRAINING_PARTNER_PARAM, dashboardSearchCriteria.trainingPartner().toLowerCase(Locale.getDefault()));
+            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_TRAINING_PARTNER_PARAM);
         }
         whereClause = String.format("%s and LOWER(refugee_status) = LOWER('YES')", whereClause);
         var sqlQuery = String.format(DataPointMapper.BUSINESSES_TRAINED_BY_GENDER_SCHEMA, whereClause);
@@ -382,6 +400,10 @@ public class DashboardServiceImpl implements DashboardService {
             parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
             whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
         }
+        if (Objects.nonNull(dashboardSearchCriteria.trainingPartner())) {
+            parameters.addValue(TRAINING_PARTNER_PARAM, dashboardSearchCriteria.trainingPartner().toLowerCase(Locale.getDefault()));
+            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_TRAINING_PARTNER_PARAM);
+        }
         var sqlQuery = String.format(SeriesDataPointMapper.TA_NEEDS_BY_GENDER_SCHEMA, whereClause);
 
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
@@ -406,6 +428,10 @@ public class DashboardServiceImpl implements DashboardService {
         if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
             parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
             whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.trainingPartner())) {
+            parameters.addValue(TRAINING_PARTNER_PARAM, dashboardSearchCriteria.trainingPartner().toLowerCase(Locale.getDefault()));
+            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_TRAINING_PARTNER_PARAM);
         }
         var sqlQuery = String.format(DataPointMapper.BUSINESSES_TRAINED_BY_SECTOR_SCHEMA, whereClause);
 
@@ -461,6 +487,10 @@ public class DashboardServiceImpl implements DashboardService {
             parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
             whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
         }
+        if (Objects.nonNull(dashboardSearchCriteria.trainingPartner())) {
+            parameters.addValue(TRAINING_PARTNER_PARAM, dashboardSearchCriteria.trainingPartner().toLowerCase(Locale.getDefault()));
+            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_TRAINING_PARTNER_PARAM);
+        }
         var sqlQuery = String.format(DataPointMapper.BUSINESSES_TRAINED_BY_SEGMENT_SCHEMA, whereClause);
 
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
@@ -485,6 +515,10 @@ public class DashboardServiceImpl implements DashboardService {
         if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
             parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
             whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.trainingPartner())) {
+            parameters.addValue(TRAINING_PARTNER_PARAM, dashboardSearchCriteria.trainingPartner().toLowerCase(Locale.getDefault()));
+            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_TRAINING_PARTNER_PARAM);
         }
         var sqlQuery = String.format(SeriesDataPointMapper.TRAINING_BY_PARTNER_BY_GENDER_SCHEMA, whereClause);
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
@@ -578,6 +612,10 @@ public class DashboardServiceImpl implements DashboardService {
         if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
             parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
             whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.trainingPartner())) {
+            parameters.addValue(TRAINING_PARTNER_PARAM, dashboardSearchCriteria.trainingPartner().toLowerCase(Locale.getDefault()));
+            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_TRAINING_PARTNER_PARAM);
         }
         var sqlQuery = String.format(PartnerYearlyDataMapper.BUSINESSES_TRAINED_COUNT_BY_PARTNER_BY_YEAR_SCHEMA, whereClause);
 

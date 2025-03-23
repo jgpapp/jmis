@@ -10,13 +10,13 @@
         <div fxLayout="row" fxLayoutAlign="center center">
             <mat-button-toggle-group [(ngModel)]="selectedDashboardView" name="fontStyle" aria-label="Font Style">
                 <mat-button-toggle value="FI">Financial Summary</mat-button-toggle>
-                <mat-button-toggle value="TA">Technical Assitance Summary</mat-button-toggle>
+                <mat-button-toggle value="TA">Technical Assistance Summary</mat-button-toggle>
               </mat-button-toggle-group>
         </div>
         <div fxLayout="row" fxLayoutAlign="center center">
             <a class="dash-board-reset-link" mat-menu-item (click)="doResetDashBoardFilters()">Reset Filters</a>
         </div>
-        <app-dashboard-filters (dashBoardFilters)="setDashBoardFilters($event)" [isPartnerDashBoard]="true" [resetDashBoardFilters]="resetDashBoardFilters" [fieldFlex]="33.3"/>
+        <app-dashboard-filters (dashBoardFilters)="setDashBoardFilters($event)" [isPartnerDashBoard]="true" [showTADashboard]="isTADashboard()" [resetDashBoardFilters]="resetDashBoardFilters" [fieldFlex]="filterFieldFlex"/>
         <app-tiles [dashBoardFilters]="dashBoardFilters" [selectedDashboardView]="selectedDashboardView"/>
         <app-info-cards [dashBoardFilters]="dashBoardFilters" [selectedDashboardView]="selectedDashboardView"/>
         

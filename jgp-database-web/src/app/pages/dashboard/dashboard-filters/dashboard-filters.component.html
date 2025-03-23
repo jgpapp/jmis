@@ -1,13 +1,29 @@
 
     <form [formGroup]="dashFilterForm" fxLayout="row wrap" fxLayoutAlign="center center"> 
         @if(!isPartnerDashBoard && authService.hasPermission('SPECIFIC_PARTNER_DATA_ON_OVERVIEW_VIEW')){
-            <mat-form-field appearance="outline" fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
+            <mat-form-field appearance="outline" fxFlex="100" [fxFlex.xl]="fieldFlex" [fxFlex.lg]="fieldFlex" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
                 <mat-label>Select Partner</mat-label>
                 <mat-select formControlName="selectedPartnerId" (selectionChange)="filterFormChanged()">
                     <mat-option value="0">All</mat-option>
                     @for (partner of partners; track partner) {
                         <mat-option [value]="partner.id">{{partner.partnerName}}</mat-option>
                       }
+                </mat-select>
+            </mat-form-field>
+        }
+
+        @if(showTADashboard){
+            <mat-form-field appearance="outline" fxFlex="100" [fxFlex.xl]="fieldFlex" [fxFlex.lg]="fieldFlex" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
+                <mat-label>Select Training Partner</mat-label>
+                <mat-select formControlName="selectedTrainingPartner" (selectionChange)="filterFormChanged()">
+                    <mat-option value="OO">None Selected</mat-option>
+                    <mat-option value="4G">4G</mat-option>
+                    <mat-option value="GBF">GBF</mat-option>
+                    <mat-option value="PBP">PBP</mat-option>
+                    <mat-option value="KEPSA">KEPSA</mat-option>
+                    <mat-option value="JIINUE_KNCCI">JIINUE_KNCCI</mat-option>
+                    <mat-option value="GROOTS">GROOTS</mat-option>
+                    <mat-option value="JETS">JETS</mat-option>
                 </mat-select>
             </mat-form-field>
         }
