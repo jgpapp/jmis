@@ -62,6 +62,8 @@ public record ParticipantDto(
 
         String corpPinNumber,
 
+        String participantName,
+
         List<String> sampleRecords,
 
         String personWithDisability,

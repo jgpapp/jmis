@@ -159,6 +159,10 @@ public class LoanImportHandler implements ImportHandler {
     }
 
     private ParticipantDto getParticipantDto(Row row){
+        String participantName = ImportHandlerUtils.readAsString(LoanConstants.PARTICIPANT_NAME_COL, row);
+        if (null == participantName && null == rowErrorMap.get(row)){
+            rowErrorMap.put(row, "Participant Name Is Required !!");
+        }
         String businessName = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_NAME_COL, row);
         String corpPinNumber = ImportHandlerUtils.readAsString(LoanConstants.CORP_PIN_NUMBER, row);
         String jgpId = ImportHandlerUtils.readAsString(LoanConstants.JGP_ID_COL, row);
@@ -186,7 +190,7 @@ public class LoanImportHandler implements ImportHandler {
                 .youthRegularEmployees(youthRegularEmployees).totalCasualEmployees(totalCasualEmployees)
                 .youthCasualEmployees(youthCasualEmployees).jgpId(jgpId)
                 .locationCountyCode(locationCountyCode.isPresent() ? locationCountyCode.get().getCountyCode() : "999")
-                .passport(passport).corpPinNumber(corpPinNumber).build();
+                .passport(passport).corpPinNumber(corpPinNumber).participantName(participantName).build();
     }
 
     public Count importEntity() {

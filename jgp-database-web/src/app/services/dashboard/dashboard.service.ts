@@ -19,8 +19,7 @@ export class DashboardService {
       if(partnerId){
         analyticsUpdate.partnerId = partnerId;
       }
-      analyticsUpdate.fromDate.setMinutes(analyticsUpdate.fromDate.getMinutes() - analyticsUpdate.fromDate.getTimezoneOffset());
-      analyticsUpdate.toDate.setMinutes(analyticsUpdate.toDate.getMinutes() - analyticsUpdate.toDate.getTimezoneOffset());
+      console.log('analyticsUpdate', analyticsUpdate);
       return this.httpClient.post(`${this.globalService.BASE_API_URL}/reports/analytics-update`, JSON.stringify(analyticsUpdate));
     }
 
@@ -154,11 +153,7 @@ export class DashboardService {
       }
 
       if(dashBoardFilters.selectedDateFrom && dashBoardFilters.selectedDateTo) {
-        let dateFrom = dashBoardFilters.selectedDateFrom;
-        dateFrom.setMinutes(dateFrom.getMinutes() - dateFrom.getTimezoneOffset());
-        let dateTo = dashBoardFilters.selectedDateTo;
-        dateTo.setMinutes(dateTo.getMinutes() - dateTo.getTimezoneOffset());
-        queryParam = `from-date=${dateFrom.toISOString().split('T')[0]}&to-date=${dateTo.toISOString().split('T')[0]}`
+        queryParam = `from-date=${dashBoardFilters.selectedDateFrom}&to-date=${dashBoardFilters.selectedDateTo}`
       }
       
       if(dashBoardFilters.selectedPartnerId){
@@ -170,8 +165,7 @@ export class DashboardService {
       if(dashBoardFilters.selectedTrainingPartner){
         queryParam = `${queryParam}&training-partner=${dashBoardFilters.selectedTrainingPartner}`
       }
-      console.log(queryParam)
-        return queryParam;
+      return queryParam;
     }
 
 

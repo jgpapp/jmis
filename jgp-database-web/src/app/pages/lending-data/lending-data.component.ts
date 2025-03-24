@@ -44,7 +44,7 @@ export class LendingDataComponent implements OnDestroy, OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   public displayedColumns = [
-    'select', 'participantName', 'participantJGPID', 'pipeLineSource', 
+    'select', 'participantName', 'businessName', 'participantJGPID', 'pipeLineSource', 
     'loanAmountAccessed', 'loanOutStandingAmount', 
     'loanDuration', 'dateApplied'
   ];

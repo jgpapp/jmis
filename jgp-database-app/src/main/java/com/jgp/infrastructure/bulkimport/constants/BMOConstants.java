@@ -5,7 +5,7 @@ public final class BMOConstants {
     private BMOConstants() {
     }
 
-    public static final int BUSINESS_NAME_COL = 0; // A
+    public static final int PARTICIPANT_NAME_COL = 0; // A
     public static final int JGP_ID_COL = 1; // B
     public static final int TRAINING_PARTNER = 2;// C
     public static final int BUSINESS_PHONE_NUMBER_COL = 3;// D
