@@ -22,6 +22,9 @@ import java.util.Objects;
 @Table(name = "participants")
 public class Participant extends BaseEntity {
 
+    @Column(name = "participant_name")
+    private String participantName;
+
     @Column(name = "business_name")
     private String businessName;
 
@@ -114,7 +117,7 @@ public class Participant extends BaseEntity {
             Boolean hasBMOMembership, String bmoMembership, BigDecimal bestMonthlyRevenue, BigDecimal worstMonthlyRevenue,
             Integer totalRegularEmployees, Integer youthRegularEmployees, Integer totalCasualEmployees,
             Integer youthCasualEmployees, String sampleRecords, String personWithDisability,
-            String refugeeStatus, String locationCountyCode, String passport, String corpPinNumber) {
+            String refugeeStatus, String locationCountyCode, String passport, String corpPinNumber, String participantName) {
         this.businessName = businessName;
         this.jgpId = jgpId;
         this.phoneNumber = phoneNumber;
@@ -141,6 +144,7 @@ public class Participant extends BaseEntity {
         this.locationCountyCode = locationCountyCode;
         this.passport = passport;
         this.corpPinNumber = corpPinNumber;
+        this.participantName = participantName;
     }
 
     public static Participant createClient(ParticipantDto dto){
@@ -150,7 +154,7 @@ public class Participant extends BaseEntity {
                 dto.bmoMembership(), dto.bestMonthlyRevenue(), dto.worstMonthlyRevenue(),
                 dto.totalRegularEmployees(), dto.youthRegularEmployees(), dto.totalCasualEmployees(),
                 dto.youthCasualEmployees(), String.join(",", dto.sampleRecords()),
-                dto.personWithDisability(), dto.refugeeStatus(), dto.locationCountyCode(), dto.passport(), dto.corpPinNumber());
+                dto.personWithDisability(), dto.refugeeStatus(), dto.locationCountyCode(), dto.passport(), dto.corpPinNumber(), dto.participantName());
     }
 
     public void updateParticipant(ParticipantDto dto){

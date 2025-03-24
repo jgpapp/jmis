@@ -18,6 +18,7 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
     private void setLayout(Sheet worksheet) {
         Row rowHeader = worksheet.createRow(TemplatePopulateImportConstants.ROWHEADER_INDEX);
         rowHeader.setHeight(TemplatePopulateImportConstants.ROW_HEADER_HEIGHT);
+        worksheet.setColumnWidth(LoanConstants.PARTICIPANT_NAME_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.BUSINESS_NAME_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.CORP_PIN_NUMBER, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.JGP_ID_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
@@ -46,7 +47,8 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         worksheet.setColumnWidth(LoanConstants.TRANCH_AMOUNT_DISBURSED_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
 
 
-        writeString(LoanConstants.BUSINESS_NAME_COL, rowHeader, "Participant Name*");
+        writeString(LoanConstants.PARTICIPANT_NAME_COL, rowHeader, "Participant Name*");
+        writeString(LoanConstants.BUSINESS_NAME_COL, rowHeader, "Business Name");
         writeString(LoanConstants.CORP_PIN_NUMBER, rowHeader, "Corporation PIN Number");
         writeString(LoanConstants.JGP_ID_COL, rowHeader, "Unique JGP ID (National ID)*");
         writeString(LoanConstants.BUSINESS_PHONE_NUMBER_COL, rowHeader, "Business phone number*");

@@ -17,6 +17,7 @@ import { MatCardModule } from '@angular/material/card';
 import { Subject, takeUntil } from 'rxjs';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { AuthService } from '@services/users/auth.service';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-analytics',
@@ -36,6 +37,7 @@ import { AuthService } from '@services/users/auth.service';
       MatSelectModule,
       MatOptionModule,
       MatCardModule],
+  providers: [DatePipe],
   templateUrl: './analytics.component.html',
   styleUrl: './analytics.component.scss'
 })
@@ -48,7 +50,8 @@ export class AnalyticsComponent implements OnInit, OnDestroy{
     public fb: FormBuilder, 
     private authService: AuthService,
     private dashBoardService: DashboardService,
-    private gs: GlobalService
+    private gs: GlobalService, 
+    private datePipe: DatePipe
   ){
     this.analyticsForm = this.fb.group({
       fromDate: [null, Validators.compose([Validators.required])],
@@ -63,6 +66,12 @@ export class AnalyticsComponent implements OnInit, OnDestroy{
 
   onSubmitUpdateAnalytics(): void {
     if (this.analyticsForm.valid) {
+      if(this.analyticsForm.controls['fromDate'].value && this.analyticsForm.controls['toDate'].value){
+        this.analyticsForm.patchValue({
+          'fromDate': this.forMatDateToISO(this.analyticsForm.controls['fromDate'].value),
+          'toDate': this.forMatDateToISO(this.analyticsForm.controls['toDate'].value)
+        });
+      }
         this.dashBoardService.updateAnalyticsDataSummary(this.analyticsForm.value, this.authService.currentUser()?.partnerId)
         .pipe(takeUntil(this.unsubscribe$))
         .subscribe({
@@ -75,6 +84,10 @@ export class AnalyticsComponent implements OnInit, OnDestroy{
         });
       
     }
+  }
+
+  forMatDateToISO(selectedDate: any): any {
+    return this.datePipe.transform(selectedDate, 'yyyy-MM-dd');
   }
 
   ngOnDestroy(): void {

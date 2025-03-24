@@ -12,6 +12,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { GlobalService } from '@services/shared/global.service';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { AuthService } from '@services/users/auth.service';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard-filters',
@@ -26,6 +27,7 @@ import { AuthService } from '@services/users/auth.service';
     MatDatepickerModule,
     MatNativeDateModule
   ],
+  providers: [DatePipe], // Add DatePipe to providers
   templateUrl: './dashboard-filters.component.html',
   styleUrl: './dashboard-filters.component.scss'
 })
@@ -49,7 +51,8 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit, OnChanges{
     private partnerService: PartnerService,
     private gs: GlobalService,
     private dashBoardService: DashboardService,
-  public authService: AuthService){
+    public authService: AuthService, 
+    private datePipe: DatePipe){
 
     this.dashFilterForm = this.fb.group({
       selectedPartnerId: [null],
@@ -137,6 +140,18 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit, OnChanges{
       });
     }
 
+    if(this.dashFilterForm.controls['selectedDateTo'].value && this.dashFilterForm.controls['selectedDateFrom'].value){
+      this.dashFilterForm.patchValue({
+        'selectedDateFrom': this.forMatDateToISO(this.dashFilterForm.controls['selectedDateFrom'].value),
+        'selectedDateTo': this.forMatDateToISO(this.dashFilterForm.controls['selectedDateTo'].value)
+      });
+    }
+    
     this.dashBoardFilters.emit(this.dashFilterForm.value);
   }
+
+  forMatDateToISO(selectedDate: any): any {
+    return this.datePipe.transform(selectedDate, 'yyyy-MM-dd');
+  }
+
 }

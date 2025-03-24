@@ -10,6 +10,8 @@ public record LoanDto(
 
          String participantName,
 
+         String businessName,
+
          Long partnerId,
 
          String partnerName,
