@@ -153,7 +153,7 @@ public class Participant extends BaseEntity {
                 dto.isBusinessRegistered(), dto.registrationNumber(), dto.hasBMOMembership(),
                 dto.bmoMembership(), dto.bestMonthlyRevenue(), dto.worstMonthlyRevenue(),
                 dto.totalRegularEmployees(), dto.youthRegularEmployees(), dto.totalCasualEmployees(),
-                dto.youthCasualEmployees(), String.join(",", dto.sampleRecords()),
+                dto.youthCasualEmployees(), null == dto.sampleRecords() ? null : String.join(",", dto.sampleRecords()),
                 dto.personWithDisability(), dto.refugeeStatus(), dto.locationCountyCode(), dto.passport(), dto.corpPinNumber(), dto.participantName());
     }
 

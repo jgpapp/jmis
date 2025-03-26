@@ -149,7 +149,7 @@ public class BMOImportHandler implements ImportHandler {
     }
 
     private ParticipantDto getParticipantDto(Row row){
-        final var businessName = ImportHandlerUtils.readAsString(BMOConstants.PARTICIPANT_NAME_COL, row);
+        final var participantName = ImportHandlerUtils.readAsString(BMOConstants.PARTICIPANT_NAME_COL, row);
         final var jgpId = ImportHandlerUtils.readAsString(BMOConstants.JGP_ID_COL, row);
         final var phoneNumber = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_PHONE_NUMBER_COL, row);
         final var gender = ImportHandlerUtils.readAsString(BMOConstants.GENDER_COL, row);
@@ -181,7 +181,7 @@ public class BMOImportHandler implements ImportHandler {
 
         return ParticipantDto.builder()
                 .phoneNumber(phoneNumber).bestMonthlyRevenue(bestMonthlyRevenue).bmoMembership(null)
-                .hasBMOMembership(Boolean.TRUE).businessLocation(businessLocation).businessName(businessName)
+                .hasBMOMembership(Boolean.TRUE).businessLocation(businessLocation).participantName(participantName)
                 .ownerGender(gender).ownerAge(age).industrySector(industrySector).businessSegment(businessSegment)
                 .registrationNumber("10001").isBusinessRegistered(registrationNumber != null && registrationNumber.trim().equalsIgnoreCase("YES"))
                 .worstMonthlyRevenue(worstMonthlyRevenue).totalRegularEmployees(totalRegularEmployees)
@@ -294,6 +294,9 @@ public class BMOImportHandler implements ImportHandler {
         if (null == rowErrorMap.get(row)){
             if (CommonUtil.isStringValueLengthNotValid(participantDto.jgpId(), 5, 10)){
                 rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
+            }
+            if (null == rowErrorMap.get(row) && CommonUtil.stringDoesNotContainOnlyDigits(participantDto.jgpId())){
+                rowErrorMap.put(row, "Provided JGP ID is invalid (must contain only numbers) !!");
             }
             if (null == rowErrorMap.get(row) && CommonUtil.isStringValueLengthNotValid(participantDto.phoneNumber(), 9, 12)){
                 rowErrorMap.put(row, "Phone number must be 9-12 digits !!");

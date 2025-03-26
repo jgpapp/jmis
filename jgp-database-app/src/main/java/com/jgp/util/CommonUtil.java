@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -177,6 +177,12 @@ public abstract class CommonUtil {
         }
         final var strLength = stringValue.length();
         return strLength < min || strLength > max;
+    }
+
+    public static boolean stringDoesNotContainOnlyDigits(String input) {
+        return !Pattern.compile(".*\\d.*")
+                .matcher(input)
+                .matches();
     }
 
     public static String defaultToOtherIfStringIsNull(String value){

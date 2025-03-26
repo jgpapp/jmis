@@ -12,7 +12,6 @@ import java.util.List;
 
 @Builder
 public record ParticipantDto(
-        @NotNull(message = "Business Name is required !!")
         String businessName,
 
         @NotNull(message = "JGP Id is required !!")
@@ -62,6 +61,7 @@ public record ParticipantDto(
 
         String corpPinNumber,
 
+        @NotNull(message = "Participant Name is required !!")
         String participantName,
 
         List<String> sampleRecords,
