@@ -293,6 +293,9 @@ public class LoanImportHandler implements ImportHandler {
         if (null == rowErrorMap.get(row) && CommonUtil.isStringValueLengthNotValid(participantDto.jgpId(), 5, 10)){
             rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
         }
+        if (null == rowErrorMap.get(row) && CommonUtil.stringDoesNotContainOnlyDigits(participantDto.jgpId())){
+            rowErrorMap.put(row, "Provided JGP ID is invalid (must contain only numbers) !!");
+        }
         if (null == rowErrorMap.get(row) && CommonUtil.isStringValueLengthNotValid(participantDto.phoneNumber(), 9, 12)){
             rowErrorMap.put(row, "Phone number must be 9-12 digits !!");
         }
