@@ -63,6 +63,10 @@ export class DashboardService {
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/refugee-businesses-trained-by-gender?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
+    getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/refugee-and-plwd-businesses-trained-by-gender?${this.getDashBoardQueryParams(dashBoardFilters)}`);
+    }
+
     getLoansDisbursedByPipelineSummary(dashBoardFilters: any = undefined): Observable<any> {
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-by-pipeline?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
@@ -105,6 +109,10 @@ export class DashboardService {
 
     getLastThreeYearsTrainedBusinessesPerPartnerYearly(dashBoardFilters: any = undefined): Observable<any> {
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/trained_businesses-per-partner-yearly?${this.getDashBoardQueryParams(dashBoardFilters)}`);
+    }
+
+    getTaTypeTrainedBusinesses(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/trained_businesses-per-ta-type?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
 

@@ -71,10 +71,11 @@ public class ParticipantServiceImpl implements ParticipantService {
     public Page<Participant> availableParticipants(String searchText, Pageable pageable) {
         if (null != searchText) {
             final var qParticipant = QParticipant.participant;
+            var partnerNamePredicate = qParticipant.participantName.containsIgnoreCase(searchText);
             var businessNamePredicate = qParticipant.businessName.containsIgnoreCase(searchText);
             var jgpPredicate = qParticipant.jgpId.containsIgnoreCase(searchText);
             var phoneNumberPredicate = qParticipant.phoneNumber.containsIgnoreCase(searchText);
-            return this.participantRepository.findAll(businessNamePredicate.or(jgpPredicate).or(phoneNumberPredicate), pageable);
+            return this.participantRepository.findAll(businessNamePredicate.or(jgpPredicate).or(phoneNumberPredicate).or(partnerNamePredicate), pageable);
         }
         return this.participantRepository.findAll(pageable);
     }

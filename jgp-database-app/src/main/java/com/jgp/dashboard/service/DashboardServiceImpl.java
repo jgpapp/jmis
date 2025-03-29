@@ -8,6 +8,7 @@ import com.jgp.dashboard.dto.EmployeesSummaryDto;
 import com.jgp.dashboard.dto.HighLevelSummaryDto;
 import com.jgp.dashboard.dto.PartnerYearlyDataDto;
 import com.jgp.dashboard.dto.PerformanceSummaryDto;
+import com.jgp.dashboard.dto.TaTypeTrainedBusinessDto;
 import com.jgp.infrastructure.bulkimport.event.DataApprovedEvent;
 import com.jgp.patner.domain.Partner;
 import com.jgp.patner.domain.PartnerRepository;
@@ -110,7 +111,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<DataPointDto> getLoanDisbursedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
-        final DataPointMapper rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
+        final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -134,7 +135,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<DataPointDto> getLoanDisbursedByIndustrySectorSummary(DashboardSearchCriteria dashboardSearchCriteria) {
-        final DataPointMapper rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
+        final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -158,7 +159,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<DataPointDto> getLoanDisbursedByIndustrySegmentSummary(DashboardSearchCriteria dashboardSearchCriteria) {
-        final DataPointMapper rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
+        final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -182,7 +183,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<DataPointDto> getLoanDisbursedTopFourPartnersSummary(DashboardSearchCriteria dashboardSearchCriteria) {
-        final DataPointMapper rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
+        final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -202,7 +203,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<DataPointDto> getLoanDisbursedTopFourCountiesSummary(DashboardSearchCriteria dashboardSearchCriteria) {
-        final DataPointMapper rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
+        final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -222,7 +223,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<DataPointDto> getBusinessTrainedTopFourCountiesSummary(DashboardSearchCriteria dashboardSearchCriteria) {
-        final DataPointMapper rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
+        final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -243,7 +244,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<DataPointDto> getBusinessOwnersTrainedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
-        final DataPointMapper rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
+        final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -271,8 +272,38 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    public List<DataPointDto> getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
+        final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
+        LocalDate fromDate = dashboardSearchCriteria.fromDate();
+        LocalDate toDate = dashboardSearchCriteria.toDate();
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = getDefaultQueryDates().getLeft();
+            toDate = getDefaultQueryDates().getRight();
+        }
+        var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
+            parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
+            whereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
+            parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
+            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.trainingPartner())) {
+            parameters.addValue(TRAINING_PARTNER_PARAM, dashboardSearchCriteria.trainingPartner().toLowerCase(Locale.getDefault()));
+            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_TRAINING_PARTNER_PARAM);
+        }
+        whereClause = String.format("%s and (LOWER(person_with_disability) = LOWER('YES') or LOWER(refugee_status) = LOWER('YES'))", whereClause);
+        var sqlQuery = String.format(DataPointMapper.BUSINESSES_TRAINED_BY_GENDER_SCHEMA, whereClause);
+
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
     public List<DataPointDto> getDisabledBusinessOwnersTrainedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
-        final DataPointMapper rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
+        final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -302,7 +333,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<DataPointDto> getRefugeeBusinessOwnersTrainedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
-        final DataPointMapper rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
+        final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -332,7 +363,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<DataPointDto> getLoanDisbursedByPipelineSourceSummary(DashboardSearchCriteria dashboardSearchCriteria) {
-        final DataPointMapper rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
+        final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -357,7 +388,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<DataPointDto> getLoansDisbursedByQualitySummary(DashboardSearchCriteria dashboardSearchCriteria) {
-        final DataPointMapper rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
+        final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -382,7 +413,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<SeriesDataPointDto> getTaNeedsByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
-        final SeriesDataPointMapper rm = new SeriesDataPointMapper();
+        final var rm = new SeriesDataPointMapper();
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -411,7 +442,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<DataPointDto> getTaTrainingBySectorSummary(DashboardSearchCriteria dashboardSearchCriteria) {
-        final DataPointMapper rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
+        final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -469,7 +500,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<DataPointDto> getTaTrainingBySegmentSummary(DashboardSearchCriteria dashboardSearchCriteria) {
-        final DataPointMapper rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
+        final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -498,7 +529,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<SeriesDataPointDto> getTrainingByPartnerByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
-        final SeriesDataPointMapper rm = new SeriesDataPointMapper();
+        final var rm = new SeriesDataPointMapper();
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -526,7 +557,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<SeriesDataPointDto> getLastThreeYearsAccessedLoanPerPartnerSummary(DashboardSearchCriteria dashboardSearchCriteria) {
-        final SeriesDataPointMapper rm = new SeriesDataPointMapper();
+        final var rm = new SeriesDataPointMapper();
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         var whereClause = "";
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
@@ -545,7 +576,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<PartnerYearlyDataDto> getLastThreeYearsAccessedLoanAmountPerPartnerYearly(DashboardSearchCriteria dashboardSearchCriteria) {
-        final PartnerYearlyDataMapper rm = new PartnerYearlyDataMapper(DECIMAL_DATA_POINT_TYPE);
+        final var rm = new PartnerYearlyDataMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -570,7 +601,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<PartnerYearlyDataDto> getLastThreeYearsAccessedLoansCountPerPartnerYearly(DashboardSearchCriteria dashboardSearchCriteria) {
-        final PartnerYearlyDataMapper rm = new PartnerYearlyDataMapper(INTEGER_DATA_POINT_TYPE);
+        final var rm = new PartnerYearlyDataMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -595,7 +626,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<PartnerYearlyDataDto> getLastThreeYearsTrainedBusinessesPerPartnerYearly(DashboardSearchCriteria dashboardSearchCriteria) {
-        final PartnerYearlyDataMapper rm = new PartnerYearlyDataMapper(INTEGER_DATA_POINT_TYPE);
+        final var rm = new PartnerYearlyDataMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -618,6 +649,36 @@ public class DashboardServiceImpl implements DashboardService {
             whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_TRAINING_PARTNER_PARAM);
         }
         var sqlQuery = String.format(PartnerYearlyDataMapper.BUSINESSES_TRAINED_COUNT_BY_PARTNER_BY_YEAR_SCHEMA, whereClause);
+
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
+    public List<TaTypeTrainedBusinessDto> getTaTypeTrainedBusinesses(DashboardSearchCriteria dashboardSearchCriteria) {
+        final var rm = new TaTypeTrainedBusinessMapper();
+        LocalDate fromDate = dashboardSearchCriteria.fromDate();
+        LocalDate toDate = dashboardSearchCriteria.toDate();
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = getDefaultQueryDates().getLeft();
+            toDate = getDefaultQueryDates().getRight();
+        }
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
+        if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
+            parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
+            whereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
+            parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
+            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.trainingPartner())) {
+            parameters.addValue(TRAINING_PARTNER_PARAM, dashboardSearchCriteria.trainingPartner().toLowerCase(Locale.getDefault()));
+            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_TRAINING_PARTNER_PARAM);
+        }
+        whereClause = String.format("%s  and bpd.ta_type IS NOT NULL", whereClause);
+        var sqlQuery = String.format(TaTypeTrainedBusinessMapper.BUSINESSES_TRAINED_COUNT_BY_TA_TYPE_SCHEMA, whereClause);
 
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
     }
@@ -1210,6 +1271,31 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
                 final var value = INTEGER_DATA_POINT_TYPE.equals(valueDataType) ? rs.getInt("value") : rs.getBigDecimal("value");
                 dataPoints.add(new PartnerYearlyDataDto(StringUtils.capitalize(CommonUtil.defaultToOtherIfStringIsNull(partnerName)), StringUtils.capitalize(CommonUtil.defaultToOtherIfStringIsNull(genderName)), year, CommonUtil.NUMBER_FORMAT.format(value)));
 
+            }
+            return dataPoints;
+        }
+    }
+
+    private static final class TaTypeTrainedBusinessMapper implements ResultSetExtractor<List<TaTypeTrainedBusinessDto>> {
+
+        public static final String BUSINESSES_TRAINED_COUNT_BY_TA_TYPE_SCHEMA = """
+             select p2.partner_name as partnerName , bpd.ta_type as taType, p.gender_category as genderCategory, count(p.id) as businessesTrained\s
+             from participants p inner join bmo_participants_data bpd on p.id = bpd.participant_id\s
+             inner join partners p2 on p2.id = bpd.partner_id %s\s
+             GROUP BY 1, 2, 3\s
+             ORDER BY 1 ASC, 2, 3;
+           \s""";
+
+
+        @Override
+        public List<TaTypeTrainedBusinessDto> extractData(ResultSet rs) throws SQLException, DataAccessException {
+            var dataPoints = new ArrayList<TaTypeTrainedBusinessDto>();
+            while (rs.next()){
+                final var partnerName = rs.getString("partnerName");
+                final var taType = rs.getString("taType");
+                final var genderCategory = rs.getString("genderCategory");
+                final var businessesTrained = rs.getInt(BUSINESSES_TRAINED);
+                dataPoints.add(new TaTypeTrainedBusinessDto(StringUtils.capitalize(CommonUtil.defaultToOtherIfStringIsNull(partnerName)), taType, genderCategory, CommonUtil.NUMBER_FORMAT.format(businessesTrained)));
             }
             return dataPoints;
         }

@@ -57,6 +57,10 @@ export class BmoFiDashboardComponent implements OnInit{
   private unsubscribe$ = new Subject<void>();
   partnerId: any;
 
+  trainedBusinessesCountDataPerTaType: any;
+  trainedBusinessesCountDataPerTaTypeSource: any;
+  public displayedColumnsTrainedPerTaType = ['partnerName', 'taType', 'genderCategory', 'businessesTrained' ];
+
   constructor(private authService: AuthService, public gs: GlobalService, private dashBoardService: DashboardService){}
 
   setDashBoardFilters(currentDashBoardFilters: any){
@@ -66,6 +70,7 @@ export class BmoFiDashboardComponent implements OnInit{
     this.getLastThreeYearsAccessedLoanPerPartnerYearly();
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
     this.getLastThreeYearsTrainedBusinessesPerPartnerYearly();
+    this.getTaTypeTrainedBusinesses();
   }
 
   doResetDashBoardFilters(){
@@ -74,6 +79,7 @@ export class BmoFiDashboardComponent implements OnInit{
     this.getLastThreeYearsAccessedLoanPerPartnerYearly();
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
     this.getLastThreeYearsTrainedBusinessesPerPartnerYearly();
+    this.getTaTypeTrainedBusinesses();
   }
 
   ngOnInit(): void {
@@ -83,7 +89,37 @@ export class BmoFiDashboardComponent implements OnInit{
     this.getLastThreeYearsAccessedLoanPerPartnerYearly();
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
     this.getLastThreeYearsTrainedBusinessesPerPartnerYearly();
+    this.getTaTypeTrainedBusinesses();
   }
+
+  getTaTypeTrainedBusinesses() {
+    this.dashBoardService.getTaTypeTrainedBusinesses(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.trainedBusinessesCountDataPerTaType = response;
+          this.trainedBusinessesCountDataPerTaTypeSource = new MatTableDataSource(this.trainedBusinessesCountDataPerTaType);
+        },
+        error: (error) => { }
+      });
+  }
+
+  shouldDisplayPartnerTrainedBusinessesCountPerTaType(index: number): boolean {
+    const data = this.trainedBusinessesCountDataPerTaTypeSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].partnerName !== data[index - 1].partnerName;
+  }
+
+  shouldDisplayTaTypeTrainedBusinessesCountPerTaType(index: number): boolean {
+    const data = this.trainedBusinessesCountDataPerTaTypeSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].taType !== data[index - 1].taType;
+  }
+
 
   getLastThreeYearsAccessedLoanPerPartnerYearly() {
       this.dashBoardService.getLastThreeYearsAccessedLoanPerPartnerYearly(this.dashBoardFilters)

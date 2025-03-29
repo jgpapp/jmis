@@ -31,6 +31,45 @@
       
 
         <div fxLayout="row wrap">
+            @if(isTADashboard()){
+                <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
+                    <mat-card>
+                        <mat-card-header fxLayoutAlign="space-between center">                
+                            <mat-card-title>Businesses Trained By TA Type</mat-card-title>
+                            <button mat-raised-button color="primary" (click)="gs.exportToExcel(trainedBusinessesCountDataPerTaTypeSource, displayedColumnsTrainedPerTaType, 'BUSINESSES_TRAINED_TA_TYPE')"><mat-icon>download</mat-icon> Excel</button>
+                        </mat-card-header>
+                        <div class="p-2 table-container">
+                            <mat-table #table [dataSource]="trainedBusinessesCountDataPerTaTypeSource" class="mat-elevation-z8">
+                                <ng-container matColumnDef="partnerName">
+                                    <mat-header-cell *matHeaderCellDef> Partner Name </mat-header-cell>
+                                    <mat-cell *matCellDef="let element; let i = index">
+                                      {{ shouldDisplayPartnerTrainedBusinessesCountPerTaType(i) ? element.partnerName : '' }}
+                                    </mat-cell>
+                                  </ng-container>
+                                <ng-container matColumnDef="taType">
+                                    <mat-header-cell *matHeaderCellDef> TA Type </mat-header-cell>
+                                    <mat-cell *matCellDef="let element; let i = index">
+                                      {{ shouldDisplayTaTypeTrainedBusinessesCountPerTaType(i) ? element.taType : '' }}
+                                    </mat-cell>
+                                  </ng-container>
+        
+                                  
+                                <ng-container matColumnDef="genderCategory">
+                                    <mat-header-cell *matHeaderCellDef> Gender Category </mat-header-cell>
+                                    <mat-cell *matCellDef="let element"> {{element.genderCategory}} </mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="businessesTrained">
+                                    <mat-header-cell *matHeaderCellDef> Trained Businesses </mat-header-cell>
+                                    <mat-cell *matCellDef="let element"> {{element.businessesTrained}} </mat-cell>
+                                </ng-container>
+                                <mat-header-row *matHeaderRowDef="displayedColumnsTrainedPerTaType"></mat-header-row>
+                                <mat-row *matRowDef="let row; columns: displayedColumnsTrainedPerTaType;"></mat-row>
+                            </mat-table>
+                            <!-- mat-paginator #paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"></mat-paginator -->
+                        </div>
+                    </mat-card>
+                </div>
+            }
             @if(isFinancialDashboard()){
             <div fxFlex="100" fxFlex.gt-sm="50" fxFlex.gt-md="50" class="p-2"> 
                 <mat-card>
