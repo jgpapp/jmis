@@ -66,6 +66,31 @@
         <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
             <mat-card>
                 <mat-card-header fxLayoutAlign="space-between center">                
+                    <mat-card-title>Number of refugees and PLWD benefitted from JGP technical Assistance</mat-card-title>
+                    <button mat-raised-button color="primary" (click)="gs.exportToExcel(refugeesAndPlwdtrainedBusinessesCountDataPerGenderSource, refugeesAndPlwdDisplayedColumnsTrainedPerGender, 'BUSINESSES_TRAINED_PLWD')"><mat-icon>download</mat-icon> Excel</button>
+                </mat-card-header>
+                <div class="p-2 table-container">
+                    <mat-table #table [dataSource]="refugeesAndPlwdtrainedBusinessesCountDataPerGenderSource" class="mat-elevation-z8">
+                        <ng-container matColumnDef="name">
+                            <mat-header-cell *matHeaderCellDef> Gender Category </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="value">
+                            <mat-header-cell *matHeaderCellDef> Number of Trained Businesses </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{element.value}} </mat-cell>
+                        </ng-container>
+                        <mat-header-row *matHeaderRowDef="refugeesAndPlwdDisplayedColumnsTrainedPerGender"></mat-header-row>
+                        <mat-row *matRowDef="let row; columns: refugeesAndPlwdDisplayedColumnsTrainedPerGender;"></mat-row>
+                    </mat-table>
+                </div>
+            </mat-card>
+        </div>
+    }
+
+    @if(isTADashboard()){
+        <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
+            <mat-card>
+                <mat-card-header fxLayoutAlign="space-between center">                
                     <mat-card-title>Businesses Trained By TA Type</mat-card-title>
                     <button mat-raised-button color="primary" (click)="gs.exportToExcel(trainedBusinessesCountDataPerTaTypeSource, displayedColumnsTrainedPerTaType, 'BUSINESSES_TRAINED_TA_TYPE')"><mat-icon>download</mat-icon> Excel</button>
                 </mat-card-header>

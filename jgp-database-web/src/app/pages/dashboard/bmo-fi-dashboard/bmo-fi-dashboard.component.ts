@@ -54,6 +54,8 @@ export class BmoFiDashboardComponent implements OnInit{
   public accessedLoanCountDataDataSource: any;
   public trainedBusinessesCountDataDataSource: any;
   public displayedColumns = ['year', 'partnerName', 'genderName', 'value' ];
+  refugeesAndPlwdtrainedBusinessesCountDataPerGenderSource: any;
+  public refugeesAndPlwdDisplayedColumnsTrainedPerGender = ['name', 'value'];
   private unsubscribe$ = new Subject<void>();
   partnerId: any;
 
@@ -71,6 +73,7 @@ export class BmoFiDashboardComponent implements OnInit{
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
     this.getLastThreeYearsTrainedBusinessesPerPartnerYearly();
     this.getTaTypeTrainedBusinesses();
+    this.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary();
   }
 
   doResetDashBoardFilters(){
@@ -80,6 +83,7 @@ export class BmoFiDashboardComponent implements OnInit{
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
     this.getLastThreeYearsTrainedBusinessesPerPartnerYearly();
     this.getTaTypeTrainedBusinesses();
+    this.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary();
   }
 
   ngOnInit(): void {
@@ -90,6 +94,19 @@ export class BmoFiDashboardComponent implements OnInit{
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
     this.getLastThreeYearsTrainedBusinessesPerPartnerYearly();
     this.getTaTypeTrainedBusinesses();
+    this.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary();
+  }
+
+
+  getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary() {
+    this.dashBoardService.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.refugeesAndPlwdtrainedBusinessesCountDataPerGenderSource = response;
+        },
+        error: (error) => { }
+      });
   }
 
   getTaTypeTrainedBusinesses() {

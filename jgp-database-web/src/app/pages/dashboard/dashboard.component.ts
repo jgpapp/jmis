@@ -56,6 +56,8 @@ export class DashboardComponent {
   trainedBusinessesCountData: any;
   trainedBusinessesCountDataPerTaType: any;
   trainedBusinessesCountDataPerTaTypeSource: any;
+  refugeesAndPlwdtrainedBusinessesCountDataPerGenderSource: any;
+  public refugeesAndPlwdDisplayedColumnsTrainedPerGender = ['name', 'value'];
   public accessedLoanDataDataSource: any;
   public accessedLoanCountDataDataSource: any;
   public trainedBusinessesCountDataDataSource: any;
@@ -77,6 +79,7 @@ export class DashboardComponent {
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
     this.getLastThreeYearsTrainedBusinessesPerPartnerYearly();
     this.getTaTypeTrainedBusinesses();
+    this.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary();
   }
 
   doResetDashBoardFilters(){
@@ -87,6 +90,7 @@ export class DashboardComponent {
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
     this.getLastThreeYearsTrainedBusinessesPerPartnerYearly();
     this.getTaTypeTrainedBusinesses();
+    this.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary();
   }
 
   getLastThreeYearsAccessedLoanPerPartnerYearly() {
@@ -132,6 +136,17 @@ export class DashboardComponent {
         next: (response) => {
           this.trainedBusinessesCountDataPerTaType = response;
           this.trainedBusinessesCountDataPerTaTypeSource = new MatTableDataSource(this.trainedBusinessesCountDataPerTaType);
+        },
+        error: (error) => { }
+      });
+  }
+
+  getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary() {
+    this.dashBoardService.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary(this.partnerSpecificDashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.refugeesAndPlwdtrainedBusinessesCountDataPerGenderSource = response;
         },
         error: (error) => { }
       });
@@ -209,6 +224,7 @@ export class DashboardComponent {
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
     this.getLastThreeYearsTrainedBusinessesPerPartnerYearly();
     this.getTaTypeTrainedBusinesses();
+    this.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary();
   }
 
 

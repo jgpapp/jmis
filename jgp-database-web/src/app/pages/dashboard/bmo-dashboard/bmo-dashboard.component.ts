@@ -120,6 +120,8 @@ export class BmoDashboardComponent implements OnInit {
   trainedBusinessesCountDataPerTaType: any;
   trainedBusinessesCountDataPerTaTypeSource: any;
   public displayedColumnsTrainedPerTaType = ['partnerName', 'taType', 'genderCategory', 'businessesTrained' ];
+  refugeesAndPlwdtrainedBusinessesCountDataPerGenderSource: any;
+  public refugeesAndPlwdDisplayedColumnsTrainedPerGender = ['name', 'value'];
 
   highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', outStandingAmount: '0'}
 
@@ -146,6 +148,7 @@ export class BmoDashboardComponent implements OnInit {
     this.resetDashBoardFilters = true;
     this.getLastThreeYearsTrainedBusinessesPerPartnerYearly();
     this.getTaTypeTrainedBusinesses();
+    this.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary();
   }
 
   ngOnInit(): void {
@@ -167,6 +170,18 @@ export class BmoDashboardComponent implements OnInit {
     this.getDisabledBusinessOwnersTrainedByGenderSummary();
     this.getRefugeeBusinessOwnersTrainedByGenderSummary();
     this.getTaTypeTrainedBusinesses();
+    this.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary();
+  }
+
+  getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary() {
+    this.dashBoardService.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.refugeesAndPlwdtrainedBusinessesCountDataPerGenderSource = response;
+        },
+        error: (error) => { }
+      });
   }
 
   getTaTypeTrainedBusinesses() {
