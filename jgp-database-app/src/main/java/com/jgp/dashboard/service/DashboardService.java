@@ -8,6 +8,7 @@ import com.jgp.dashboard.dto.HighLevelSummaryDto;
 import com.jgp.dashboard.dto.PartnerYearlyDataDto;
 import com.jgp.dashboard.dto.PerformanceSummaryDto;
 import com.jgp.dashboard.dto.SeriesDataPointDto;
+import com.jgp.dashboard.dto.TaTypeTrainedBusinessDto;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,6 +31,8 @@ public interface DashboardService {
     List<DataPointDto> getBusinessTrainedTopFourCountiesSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
     List<DataPointDto> getBusinessOwnersTrainedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);
+
+    List<DataPointDto> getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
     List<DataPointDto> getDisabledBusinessOwnersTrainedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
@@ -56,6 +59,8 @@ public interface DashboardService {
     List<PartnerYearlyDataDto> getLastThreeYearsAccessedLoansCountPerPartnerYearly(DashboardSearchCriteria dashboardSearchCriteria);
 
     List<PartnerYearlyDataDto> getLastThreeYearsTrainedBusinessesPerPartnerYearly(DashboardSearchCriteria dashboardSearchCriteria);
+
+    List<TaTypeTrainedBusinessDto> getTaTypeTrainedBusinesses(DashboardSearchCriteria dashboardSearchCriteria);
 
     List<SeriesDataPointDto> getLoansAccessedVsOutStandingByPartnerSummary(DashboardSearchCriteria dashboardSearchCriteria);
 

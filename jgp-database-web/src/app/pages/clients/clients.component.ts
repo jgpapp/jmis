@@ -38,7 +38,7 @@ export class ClientsComponent implements OnInit, OnDestroy{
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-  public displayedColumns = ['businessName', 'jgpId', 'phoneNumber', 'ownerGender', 'businessLocation'];
+  public displayedColumns = ['participantName', 'jgpId', 'phoneNumber', 'ownerGender', 'businessLocation'];
   public dataSource: any;
 
   participants: any

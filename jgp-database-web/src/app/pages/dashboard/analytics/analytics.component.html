@@ -1,27 +1,6 @@
 
 <div fxLayout="row wrap" #resizedDiv>
-    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2" #lastThreeYearLoansAccessedPerPartnerContentDiv (click)="expandLastThreeYearLoansAccessedPerPartnerLineChart()"> 
-        <mat-card class="p-0 gradient-purple">
-            <mat-card-header fxLayoutAlign="center center">                
-                <mat-card-title>{{lastThreeYearLoansAccessedPerPartnerTitle}}</mat-card-title>
-            </mat-card-header>
-            <div class="w-100 h-300p">
-            <ngx-charts-line-chart
-                [scheme]="chartSColorScheme"
-                [results]="lastThreeYearLoansAccessedPerPartner"
-                [gradient]="gradient"
-                [xAxis]="lastThreeYearLoansAccessedPerPartnerShowXAxis"
-                [yAxis]="lastThreeYearLoansAccessedPerPartnerShowYAxis"
-                [legend]="lastThreeYearLoansAccessedPerPartnerShowLegend"
-                [showXAxisLabel]="lastThreeYearLoansAccessedPerPartnerShowXAxisLabel"
-                [showYAxisLabel]="lastThreeYearLoansAccessedPerPartnerShowYAxisLabel"
-                [xAxisLabel]="lastThreeYearLoansAccessedPerPartnerXAxisLabel"
-                [yAxisLabel]="lastThreeYearLoansAccessedPerPartnerYAxisLabel"
-                [autoScale]="autoScale"
-                [roundDomains]="roundDomains" 
-                (select)="onSelect($event)"
-            /> 
-        </div>
-        </mat-card>
+    <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
+       
     </div>
 </div>

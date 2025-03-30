@@ -117,6 +117,12 @@ export class BmoDashboardComponent implements OnInit {
   public refugeeBusinessesTainedByGenderDoughnut: boolean = true;
   public refugeeBusinessesTainedByGenderChartTitle: string = 'Refugee Businesses Trained';
 
+  trainedBusinessesCountDataPerTaType: any;
+  trainedBusinessesCountDataPerTaTypeSource: any;
+  public displayedColumnsTrainedPerTaType = ['partnerName', 'taType', 'genderCategory', 'businessesTrained' ];
+  refugeesAndPlwdtrainedBusinessesCountDataPerGenderSource: any;
+  public refugeesAndPlwdDisplayedColumnsTrainedPerGender = ['name', 'value'];
+
   highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', outStandingAmount: '0'}
 
   private unsubscribe$ = new Subject<void>();
@@ -141,6 +147,8 @@ export class BmoDashboardComponent implements OnInit {
     this.dashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId}
     this.resetDashBoardFilters = true;
     this.getLastThreeYearsTrainedBusinessesPerPartnerYearly();
+    this.getTaTypeTrainedBusinesses();
+    this.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary();
   }
 
   ngOnInit(): void {
@@ -161,7 +169,49 @@ export class BmoDashboardComponent implements OnInit {
     this.getParticipantsEmployeesSummary();
     this.getDisabledBusinessOwnersTrainedByGenderSummary();
     this.getRefugeeBusinessOwnersTrainedByGenderSummary();
+    this.getTaTypeTrainedBusinesses();
+    this.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary();
   }
+
+  getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary() {
+    this.dashBoardService.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.refugeesAndPlwdtrainedBusinessesCountDataPerGenderSource = response;
+        },
+        error: (error) => { }
+      });
+  }
+
+  getTaTypeTrainedBusinesses() {
+    this.dashBoardService.getTaTypeTrainedBusinesses(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.trainedBusinessesCountDataPerTaType = response;
+          this.trainedBusinessesCountDataPerTaTypeSource = new MatTableDataSource(this.trainedBusinessesCountDataPerTaType);
+        },
+        error: (error) => { }
+      });
+  }
+
+  shouldDisplayPartnerTrainedBusinessesCountPerTaType(index: number): boolean {
+    const data = this.trainedBusinessesCountDataPerTaTypeSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].partnerName !== data[index - 1].partnerName;
+  }
+
+  shouldDisplayTaTypeTrainedBusinessesCountPerTaType(index: number): boolean {
+    const data = this.trainedBusinessesCountDataPerTaTypeSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].taType !== data[index - 1].taType;
+  }
+
   
     getLastThreeYearsTrainedBusinessesPerPartnerYearly() {
       this.dashBoardService.getLastThreeYearsTrainedBusinessesPerPartnerYearly(this.dashBoardFilters)

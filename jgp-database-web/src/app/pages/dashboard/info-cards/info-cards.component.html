@@ -116,73 +116,6 @@
     </div>
 }
 
-@if(isTADashboard()){
-    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #taNeedsByGenderContentDiv> 
-        <button mat-icon-button class="top-right-button" (click)="expandTANeedsByGenderBarChart()">
-            <mat-icon>open_in_full</mat-icon>
-          </button>
-        <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
-                <mat-card-title>{{TANeedsByGenderChartTitle}}</mat-card-title>
-            </mat-card-header>
-            <div class="w-100 h-300p">
-                @if (TANeedsByGender && TANeedsByGender.length > 0) {
-                <ngx-charts-bar-vertical-2d
-                    [scheme]="chartSColorScheme"
-                    [results]="TANeedsByGender"
-                    [gradient]="gradient"
-                    [xAxis]="TANeedsByGenderShowXAxis"
-                    [yAxis]="TANeedsByGenderShowYAxis"
-                    [legend]="TANeedsByGenderShowLegend"
-                    [showXAxisLabel]="TANeedsByGenderShowXAxisLabel"
-                    [showYAxisLabel]="TANeedsByGenderShowYAxisLabel"
-                    [xAxisLabel]="TANeedsByGenderXAxisLabel"
-                    [yAxisLabel]="TANeedsByGenderYAxisLabel"
-                    [dataLabelFormatting]="valueFormatting"
-                    [showDataLabel]="true"
-                    (select)="onSelect($event)"
-                />
-            } @else {
-                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
-            }         
-            </div>
-        </mat-card>
-    </div>
-}
-
-@if(isTADashboard()){
-    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #trainingByPartnerByGenderContentDiv> 
-        <button mat-icon-button class="top-right-button" (click)="expandTrainingByPartnerByGenderBarChart()">
-            <mat-icon>open_in_full</mat-icon>
-          </button>
-        <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
-                <mat-card-title>{{trainingByPartnerByGenderChartTitle}}</mat-card-title>
-            </mat-card-header>
-            <div class="w-100 h-300p">
-                @if (trainingByPartnerByGender && trainingByPartnerByGender.length > 0) {
-                <ngx-charts-bar-vertical-2d
-                    [scheme]="chartSColorScheme"
-                    [results]="trainingByPartnerByGender"
-                    [gradient]="gradient"
-                    [xAxis]="trainingByPartnerByGenderShowXAxis"
-                    [yAxis]="trainingByPartnerByGenderShowYAxis"
-                    [legend]="trainingByPartnerByGenderShowLegend"
-                    [showXAxisLabel]="trainingByPartnerByGenderShowXAxisLabel"
-                    [showYAxisLabel]="trainingByPartnerByGenderShowYAxisLabel"
-                    [xAxisLabel]="trainingByPartnerByGenderXAxisLabel"
-                    [yAxisLabel]="trainingByPartnerByGenderYAxisLabel"
-                    [dataLabelFormatting]="valueFormatting"
-                    [showDataLabel]="true"
-                    (select)="onSelect($event)" 
-                />
-            } @else {
-                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
-            }         
-            </div>
-        </mat-card>
-    </div> 
-}
 
 @if(isTADashboard()){
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #businessesTainedByGenderContentDiv> 
@@ -531,6 +464,75 @@
             } @else {
                 <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
             }        
+            </div>
+        </mat-card>
+    </div> 
+}
+
+
+@if(isTADashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #taNeedsByGenderContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandTANeedsByGenderBarChart()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{TANeedsByGenderChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (TANeedsByGender && TANeedsByGender.length > 0) {
+                <ngx-charts-bar-vertical-2d
+                    [scheme]="chartSColorScheme"
+                    [results]="TANeedsByGender"
+                    [gradient]="gradient"
+                    [xAxis]="TANeedsByGenderShowXAxis"
+                    [yAxis]="TANeedsByGenderShowYAxis"
+                    [legend]="TANeedsByGenderShowLegend"
+                    [showXAxisLabel]="TANeedsByGenderShowXAxisLabel"
+                    [showYAxisLabel]="TANeedsByGenderShowYAxisLabel"
+                    [xAxisLabel]="TANeedsByGenderXAxisLabel"
+                    [yAxisLabel]="TANeedsByGenderYAxisLabel"
+                    [dataLabelFormatting]="valueFormatting"
+                    [showDataLabel]="true"
+                    (select)="onSelect($event)"
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }         
+            </div>
+        </mat-card>
+    </div>
+}
+
+@if(isTADashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #trainingByPartnerByGenderContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandTrainingByPartnerByGenderBarChart()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{trainingByPartnerByGenderChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (trainingByPartnerByGender && trainingByPartnerByGender.length > 0) {
+                <ngx-charts-bar-vertical-2d
+                    [scheme]="chartSColorScheme"
+                    [results]="trainingByPartnerByGender"
+                    [gradient]="gradient"
+                    [xAxis]="trainingByPartnerByGenderShowXAxis"
+                    [yAxis]="trainingByPartnerByGenderShowYAxis"
+                    [legend]="trainingByPartnerByGenderShowLegend"
+                    [showXAxisLabel]="trainingByPartnerByGenderShowXAxisLabel"
+                    [showYAxisLabel]="trainingByPartnerByGenderShowYAxisLabel"
+                    [xAxisLabel]="trainingByPartnerByGenderXAxisLabel"
+                    [yAxisLabel]="trainingByPartnerByGenderYAxisLabel"
+                    [dataLabelFormatting]="valueFormatting"
+                    [showDataLabel]="true"
+                    (select)="onSelect($event)" 
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }         
             </div>
         </mat-card>
     </div> 

@@ -9,6 +9,7 @@ import com.jgp.dashboard.dto.HighLevelSummaryDto;
 import com.jgp.dashboard.dto.PartnerYearlyDataDto;
 import com.jgp.dashboard.dto.PerformanceSummaryDto;
 import com.jgp.dashboard.dto.SeriesDataPointDto;
+import com.jgp.dashboard.dto.TaTypeTrainedBusinessDto;
 import com.jgp.dashboard.service.DashboardService;
 import com.jgp.shared.dto.ApiResponseDto;
 import com.jgp.util.CommonUtil;
@@ -126,6 +127,15 @@ public class DashboardController {
         return new ResponseEntity<>(this.dashboardService.getRefugeeBusinessOwnersTrainedByGenderSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, trainingPartner)), HttpStatus.OK);
     }
 
+    @GetMapping("refugee-and-plwd-businesses-trained-by-gender")
+    public ResponseEntity<List<DataPointDto>> getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                                             @RequestParam(value = "county-code", required = false) String countyCode,
+                                                                                             @RequestParam(value = "training-partner", required = false) String trainingPartner,
+                                                                                             @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                                             @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        return new ResponseEntity<>(this.dashboardService.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, trainingPartner)), HttpStatus.OK);
+    }
+
     @GetMapping("loans-disbursed-by-pipeline")
     public ResponseEntity<List<DataPointDto>> getLoansDisbursedByPipelineSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
                                                                                  @RequestParam(value = "county-code", required = false) String countyCode,
@@ -214,6 +224,15 @@ public class DashboardController {
                                                                                                          @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                                                          @RequestParam(value = "to-date", required = false) LocalDate toDate){
         return new ResponseEntity<>(this.dashboardService.getLastThreeYearsTrainedBusinessesPerPartnerYearly(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, trainingPartner)), HttpStatus.OK);
+    }
+
+    @GetMapping("trained_businesses-per-ta-type")
+    public ResponseEntity<List<TaTypeTrainedBusinessDto>> getTaTypeTrainedBusinesses(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                                                             @RequestParam(value = "county-code", required = false) String countyCode,
+                                                                                                             @RequestParam(value = "training-partner", required = false) String trainingPartner,
+                                                                                                             @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                                                             @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        return new ResponseEntity<>(this.dashboardService.getTaTypeTrainedBusinesses(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, trainingPartner)), HttpStatus.OK);
     }
 
     @GetMapping("loans-accessed-vs-out-standing-per-partner")

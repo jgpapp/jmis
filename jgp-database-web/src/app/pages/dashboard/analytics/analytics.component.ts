@@ -5,7 +5,7 @@ import { analytics } from '@data/dashboard-data';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { GlobalService } from '@services/shared/global.service';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-analytics',
@@ -25,16 +25,6 @@ export class AnalyticsComponent implements OnInit, OnChanges, OnDestroy {
   public autoScale = true;
   public roundDomains = true;
   public gradient = false;
-
-  public lastThreeYearLoansAccessedPerPartner: any[];
-  public lastThreeYearLoansAccessedPerPartnerShowXAxis = true;
-  public lastThreeYearLoansAccessedPerPartnerShowYAxis = true;
-  public lastThreeYearLoansAccessedPerPartnerShowLegend = false;
-  public lastThreeYearLoansAccessedPerPartnerShowXAxisLabel = true;
-  public lastThreeYearLoansAccessedPerPartnerXAxisLabel = 'Year';
-  public lastThreeYearLoansAccessedPerPartnerShowYAxisLabel = true;
-  public lastThreeYearLoansAccessedPerPartnerYAxisLabel = 'Accessed Loans';
-  public lastThreeYearLoansAccessedPerPartnerTitle = 'Loans Accessed Per Partner Vs Last 2 Years';
   
 
   public analytics: any[];
@@ -50,8 +40,6 @@ export class AnalyticsComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild('resizedDiv') resizedDiv: ElementRef;
   public previousWidthOfResizedDiv: number = 0;
   private unsubscribe$ = new Subject<void>();
-
-  @ViewChild('lastThreeYearLoansAccessedPerPartnerContentDiv', { static: true }) lastThreeYearLoansAccessedPerPartnerContentDiv!: ElementRef;
 
   constructor(private dashBoardService: DashboardService, private gs: GlobalService, private dialog: MatDialog){
     
@@ -72,19 +60,9 @@ export class AnalyticsComponent implements OnInit, OnChanges, OnDestroy {
 
   reloadData() {
     this.analytics = analytics;
-    this.getLastThreeYearsAccessedLoanPerPartnerSummary();
   }
 
-  getLastThreeYearsAccessedLoanPerPartnerSummary() {
-    this.dashBoardService.getLastThreeYearsAccessedLoanPerPartnerSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
-      .subscribe({
-        next: (response) => {
-          this.lastThreeYearLoansAccessedPerPartner = response;
-        },
-        error: (error) => { }
-      });
-  }
+
 
   onSelect(event: any) {
     console.log(event);
@@ -95,28 +73,6 @@ export class AnalyticsComponent implements OnInit, OnChanges, OnDestroy {
       this.analytics = [...analytics];
     }
     this.previousWidthOfResizedDiv = this.resizedDiv.nativeElement.clientWidth;
-  }
-
-  expandLastThreeYearLoansAccessedPerPartnerLineChart(){
-    const data = { 
-      content: this.lastThreeYearLoansAccessedPerPartnerContentDiv.nativeElement.cloneNode(true),
-      mapContainerElement: this.lastThreeYearLoansAccessedPerPartnerContentDiv,
-      chartType: 'ngx-charts-line-chart',
-      chartData: this.lastThreeYearLoansAccessedPerPartner,
-      chartGradient: this.gradient,
-      chartShowXAxis: this.lastThreeYearLoansAccessedPerPartnerShowXAxis,
-      chartShowYAxis: this.lastThreeYearLoansAccessedPerPartnerShowYAxis,
-      chartSColorScheme: this.chartSColorScheme,
-      chartShowLegend: true,
-      chartShowXAxisLabel: this.lastThreeYearLoansAccessedPerPartnerShowXAxisLabel,
-      chartShowYAxisLabel: this.lastThreeYearLoansAccessedPerPartnerShowYAxisLabel,
-      chartYAxisLabel: this.lastThreeYearLoansAccessedPerPartnerYAxisLabel,
-      chartXAxisLabel: this.lastThreeYearLoansAccessedPerPartnerXAxisLabel,
-      chartAutoScale: this.autoScale,
-      chartRoundDomains: this.roundDomains,
-      chartTitle: this.lastThreeYearLoansAccessedPerPartnerTitle,
-    };
-    this.gs.openExpandedChartDialog(data, this.dialog);
   }
 
 }

@@ -5,7 +5,6 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { TilesComponent } from './tiles/tiles.component';
 import { InfoCardsComponent } from './info-cards/info-cards.component';
-import { AnalyticsComponent } from './analytics/analytics.component';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { NoPermissionComponent } from '../errors/no-permission/no-permission.component';
 import { AuthService } from '@services/users/auth.service';
@@ -33,7 +32,6 @@ import { PerformanceSummaryComponent } from "./performance-summary/performance-s
     MatProgressBarModule,
     TilesComponent,
     InfoCardsComponent,
-    AnalyticsComponent,
     NoPermissionComponent,
     DashboardFiltersComponent,
     MatButtonModule,
@@ -51,10 +49,15 @@ export class DashboardComponent {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   public displayedColumns = ['year', 'partnerName', 'genderName', 'value' ];
+  public displayedColumnsTrainedPerTaType = ['partnerName', 'taType', 'genderCategory', 'businessesTrained' ];
 
   accessedLoanData: any;
   accessedLoanCountData: any;
   trainedBusinessesCountData: any;
+  trainedBusinessesCountDataPerTaType: any;
+  trainedBusinessesCountDataPerTaTypeSource: any;
+  refugeesAndPlwdtrainedBusinessesCountDataPerGenderSource: any;
+  public refugeesAndPlwdDisplayedColumnsTrainedPerGender = ['name', 'value'];
   public accessedLoanDataDataSource: any;
   public accessedLoanCountDataDataSource: any;
   public trainedBusinessesCountDataDataSource: any;
@@ -75,6 +78,8 @@ export class DashboardComponent {
     this.getLastThreeYearsAccessedLoanPerPartnerYearly();
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
     this.getLastThreeYearsTrainedBusinessesPerPartnerYearly();
+    this.getTaTypeTrainedBusinesses();
+    this.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary();
   }
 
   doResetDashBoardFilters(){
@@ -84,6 +89,8 @@ export class DashboardComponent {
     this.getLastThreeYearsAccessedLoanPerPartnerYearly();
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
     this.getLastThreeYearsTrainedBusinessesPerPartnerYearly();
+    this.getTaTypeTrainedBusinesses();
+    this.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary();
   }
 
   getLastThreeYearsAccessedLoanPerPartnerYearly() {
@@ -117,6 +124,29 @@ export class DashboardComponent {
         next: (response) => {
           this.trainedBusinessesCountData = response;
           this.trainedBusinessesCountDataDataSource = new MatTableDataSource(this.trainedBusinessesCountData);
+        },
+        error: (error) => { }
+      });
+  }
+
+  getTaTypeTrainedBusinesses() {
+    this.dashBoardService.getTaTypeTrainedBusinesses(this.partnerSpecificDashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.trainedBusinessesCountDataPerTaType = response;
+          this.trainedBusinessesCountDataPerTaTypeSource = new MatTableDataSource(this.trainedBusinessesCountDataPerTaType);
+        },
+        error: (error) => { }
+      });
+  }
+
+  getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary() {
+    this.dashBoardService.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary(this.partnerSpecificDashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.refugeesAndPlwdtrainedBusinessesCountDataPerGenderSource = response;
         },
         error: (error) => { }
       });
@@ -171,12 +201,30 @@ export class DashboardComponent {
     return data[index].year !== data[index - 1].year;
   }
 
+  shouldDisplayPartnerTrainedBusinessesCountPerTaType(index: number): boolean {
+    const data = this.trainedBusinessesCountDataPerTaTypeSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].partnerName !== data[index - 1].partnerName;
+  }
+
+  shouldDisplayTaTypeTrainedBusinessesCountPerTaType(index: number): boolean {
+    const data = this.trainedBusinessesCountDataPerTaTypeSource.data; // Access the current data
+    if (index === 0) {
+      return true;
+    }
+    return data[index].taType !== data[index - 1].taType;
+  }
+
   ngOnInit(): void {
     this.dashBoardFilters = {};
     this.partnerSpecificDashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId};
     this.getLastThreeYearsAccessedLoanPerPartnerYearly();
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
     this.getLastThreeYearsTrainedBusinessesPerPartnerYearly();
+    this.getTaTypeTrainedBusinesses();
+    this.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary();
   }
 
 

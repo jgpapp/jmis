@@ -16,9 +16,9 @@
     </form>
     <div class="p-2">
         <mat-table #table [dataSource]="dataSource" class="mat-elevation-z8">
-            <ng-container matColumnDef="businessName">
+            <ng-container matColumnDef="participantName">
                 <mat-header-cell *matHeaderCellDef> Participant Name </mat-header-cell>
-                <mat-cell *matCellDef="let element"> {{element.businessName}} </mat-cell>
+                <mat-cell *matCellDef="let element"> {{element.participantName}} </mat-cell>
             </ng-container>
             <ng-container matColumnDef="jgpId">
                 <mat-header-cell *matHeaderCellDef> JGP / National ID </mat-header-cell>
