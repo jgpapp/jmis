@@ -89,7 +89,7 @@ public final class ImportHandlerUtils {
 
                 String res = trimEmptyDecimalPortion(val.getStringValue());
                 if (res != null) {
-                    if (!res.equals("")) {
+                    if (!res.isEmpty()) {
                         return res.trim();
                     } else {
                         return null;
@@ -102,7 +102,7 @@ public final class ImportHandlerUtils {
             }
         } else if (c.getCellType() == CellType.STRING) {
             String res = trimEmptyDecimalPortion(c.getStringCellValue().trim());
-            return res.trim();
+            return null == res ? null : res.trim();
 
         } else if (c.getCellType() == CellType.NUMERIC) {
             return ((Double) row.getCell(colIndex).getNumericCellValue()).longValue() + "";

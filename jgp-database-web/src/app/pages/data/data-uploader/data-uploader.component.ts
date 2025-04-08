@@ -197,6 +197,10 @@ export class DataUploaderComponent implements OnDestroy {
       .subscribe({
         next: (response) => {
             this.dataUploadService.downloadFileFromAPIResponse(response);
+        },
+        error: (error) => {
+          console.error('Error downloading template:', error);
+          this.gs.openSnackBar('Error downloading template', "Dismiss");
         }
       });
     }
