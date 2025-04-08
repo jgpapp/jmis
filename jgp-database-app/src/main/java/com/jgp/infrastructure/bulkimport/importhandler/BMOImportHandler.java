@@ -110,7 +110,8 @@ public class BMOImportHandler implements ImportHandler {
         final var taDeliveryMode = ImportHandlerUtils.readAsString(BMOConstants.TA_DELIVERY_MODE, row);
         validateTADeliveryMode(taDeliveryMode, row);
         final var otherTaNeeds = ImportHandlerUtils.readAsString(BMOConstants.OTHER_TA_NEEDS_COL, row);
-        final var taType = ImportHandlerUtils.readAsString(BMOConstants.TYPE_OF_TA_COL, row);
+        var taType = ImportHandlerUtils.readAsString(BMOConstants.TYPE_OF_TA_COL, row);
+        taType = null == taType ? null : taType.trim();
         validateTATypes(taType, row);
 
         statuses.add(status);
