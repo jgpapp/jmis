@@ -7,6 +7,7 @@ public class TemplatePopulateImportConstants {
 
     public static final String BMO_SHEET_NAME = "bmos";
     public static final String LOAN_SHEET_NAME = "loans";
+    public static final String OPTIONS_SHEET_NAME = "options";
 
     // columns sizes
     public static final int SMALL_COL_SIZE = 4000;

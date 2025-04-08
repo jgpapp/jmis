@@ -1,19 +1,31 @@
 package com.jgp.infrastructure.bulkimport.populator.bmo;
 
 import com.jgp.infrastructure.bulkimport.constants.BMOConstants;
-import com.jgp.infrastructure.bulkimport.constants.LoanConstants;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import com.jgp.infrastructure.bulkimport.populator.AbstractWorkbookPopulator;
+import com.jgp.util.CommonUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.SpreadsheetVersion;
+import org.apache.poi.ss.usermodel.DataValidation;
+import org.apache.poi.ss.usermodel.DataValidationConstraint;
+import org.apache.poi.ss.usermodel.DataValidationHelper;
+import org.apache.poi.ss.usermodel.Name;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.usermodel.XSSFDataValidationHelper;
 
+import java.util.List;
+
+@Slf4j
 public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
 
     @Override
     public void populate(Workbook workbook) {
         Sheet bmoSheet = workbook.createSheet(TemplatePopulateImportConstants.BMO_SHEET_NAME);
         setLayout(bmoSheet);
+        setRules(bmoSheet);
     }
 
     private void setLayout(Sheet worksheet) {
@@ -74,11 +86,92 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(BMOConstants.PERSON_WITH_DISABILITY_COL, rowHeader, "Person with Disability*(Yes/No)");
 
         writeString(BMOConstants.REFUGEE_STATUS_COL, rowHeader, "Refugee status*(Yes/No)");
-        writeString(BMOConstants.IS_APPLICANT_ELIGIBLE_COL, rowHeader, "Is applicant eligible?");
-        writeString(BMOConstants.RECOMMENDED_FOR_FINANCE_COL, rowHeader, "Recommended for finance");
+        writeString(BMOConstants.IS_APPLICANT_ELIGIBLE_COL, rowHeader, "Is applicant eligible?(Yes/No)");
+        writeString(BMOConstants.RECOMMENDED_FOR_FINANCE_COL, rowHeader, "Recommended for finance (Yes/No)");
         writeString(BMOConstants.DATE_OF_PIPELINE_DECISION_COL, rowHeader, "Pipeline Decision Date (yyyy-MM-dd)");
         writeString(BMOConstants.REFERRED_FI_BUSINESS_COL, rowHeader, "FI business is referred to*");
         writeString(BMOConstants.DATE_RECORD_ENTERED_BY_PARTNER_COL, rowHeader, "Training date(yyyy-MM-dd)*");
 
+    }
+
+    private void setRules(Sheet worksheet){
+        try {
+            CellRangeAddressList isRefugeeRange = new CellRangeAddressList(1, SpreadsheetVersion.EXCEL97.getLastRowIndex(),
+                    BMOConstants.REFUGEE_STATUS_COL, BMOConstants.REFUGEE_STATUS_COL);
+            CellRangeAddressList genderRange = new CellRangeAddressList(1, SpreadsheetVersion.EXCEL97.getLastRowIndex(),
+                    BMOConstants.GENDER_COL, BMOConstants.GENDER_COL);
+            CellRangeAddressList countyRange = new CellRangeAddressList(1, SpreadsheetVersion.EXCEL97.getLastRowIndex(),
+                    BMOConstants.BUSINESS_LOCATION_COL, BMOConstants.BUSINESS_LOCATION_COL);
+
+            CellRangeAddressList industrySectorRange = new CellRangeAddressList(1, SpreadsheetVersion.EXCEL97.getLastRowIndex(),
+                    BMOConstants.INDUSTRY_SECTOR_COL, BMOConstants.INDUSTRY_SECTOR_COL);
+            CellRangeAddressList businessSegmentRange = new CellRangeAddressList(1, SpreadsheetVersion.EXCEL97.getLastRowIndex(),
+                    BMOConstants.BUSINESS_SEGMENT_COL, BMOConstants.BUSINESS_SEGMENT_COL);
+            CellRangeAddressList taDeliveryModeRange = new CellRangeAddressList(1, SpreadsheetVersion.EXCEL97.getLastRowIndex(),
+                    BMOConstants.TA_DELIVERY_MODE, BMOConstants.TA_DELIVERY_MODE);
+            CellRangeAddressList isBusinessRegisteredRange = new CellRangeAddressList(1, SpreadsheetVersion.EXCEL97.getLastRowIndex(),
+                    BMOConstants.BUSINESS_IS_REGISTERED, BMOConstants.BUSINESS_IS_REGISTERED);
+            CellRangeAddressList taTypeRange = new CellRangeAddressList(1, SpreadsheetVersion.EXCEL97.getLastRowIndex(),
+                    BMOConstants.TYPE_OF_TA_COL, BMOConstants.TYPE_OF_TA_COL);
+            CellRangeAddressList personWithDisabilityRange = new CellRangeAddressList(1, SpreadsheetVersion.EXCEL97.getLastRowIndex(),
+                    BMOConstants.PERSON_WITH_DISABILITY_COL, BMOConstants.PERSON_WITH_DISABILITY_COL);
+            CellRangeAddressList applicantEligibleRange = new CellRangeAddressList(1, SpreadsheetVersion.EXCEL97.getLastRowIndex(),
+                    BMOConstants.IS_APPLICANT_ELIGIBLE_COL, BMOConstants.IS_APPLICANT_ELIGIBLE_COL);
+            CellRangeAddressList recommendedForFinanceRange = new CellRangeAddressList(1, SpreadsheetVersion.EXCEL97.getLastRowIndex(),
+                    BMOConstants.RECOMMENDED_FOR_FINANCE_COL, BMOConstants.RECOMMENDED_FOR_FINANCE_COL);
+
+            DataValidationHelper validationHelper = new XSSFDataValidationHelper((org.apache.poi.xssf.usermodel.XSSFSheet) worksheet);
+            final var counties = CommonUtil.getKenyanCountiesMap().values().stream().toList();
+
+            setNames(worksheet, counties);
+
+            DataValidationConstraint yesNoConstraint = validationHelper.createExplicitListConstraint(new String[] { "Yes", "No" });
+            DataValidationConstraint genderConstraint = validationHelper.createExplicitListConstraint(new String[] { "Male", "Female", "Other" });
+            DataValidationConstraint countyNameConstraint = validationHelper.createFormulaListConstraint("County");
+            DataValidationConstraint industrySectorConstraint = validationHelper.createExplicitListConstraint(new String[] { "Agriculture", "Artists/artisans", "Manufacturing", " Trading & Retail", "Other" });
+            DataValidationConstraint businessSegmentsConstraint = validationHelper.createExplicitListConstraint(new String[] { "Micro", "SME" });
+            DataValidationConstraint taDeliveryModeConstraint = validationHelper.createExplicitListConstraint(new String[] { "In person", "Virtual", "Mixed" });
+            DataValidationConstraint taTypeConstraint = validationHelper.createExplicitListConstraint(new String[] { "Post-lending", "Pre-lending", "Non-lending", "Mentorship", "Voucher scheme" });
+
+            DataValidation isRefugeeValidation = validationHelper.createValidation(yesNoConstraint, isRefugeeRange);
+            DataValidation genderValidation = validationHelper.createValidation(genderConstraint, genderRange);
+            DataValidation countyValidation = validationHelper.createValidation(countyNameConstraint, countyRange);
+            DataValidation industrySectorValidation = validationHelper.createValidation(industrySectorConstraint, industrySectorRange);
+            DataValidation businessSegmentValidation = validationHelper.createValidation(businessSegmentsConstraint, businessSegmentRange);
+            DataValidation taDeliveryModeValidation = validationHelper.createValidation(taDeliveryModeConstraint, taDeliveryModeRange);
+            DataValidation isBusinessRegisteredValidation = validationHelper.createValidation(yesNoConstraint, isBusinessRegisteredRange);
+            DataValidation taTypeValidation = validationHelper.createValidation(taTypeConstraint, taTypeRange);
+            DataValidation personWithDisabilityValidation = validationHelper.createValidation(yesNoConstraint, personWithDisabilityRange);
+            DataValidation applicantEligibleValidation = validationHelper.createValidation(yesNoConstraint, applicantEligibleRange);
+            DataValidation recommendedForFinanceValidation = validationHelper.createValidation(yesNoConstraint, recommendedForFinanceRange);
+
+            worksheet.addValidationData(isRefugeeValidation);
+            worksheet.addValidationData(genderValidation);
+            worksheet.addValidationData(countyValidation);
+            worksheet.addValidationData(industrySectorValidation);
+            worksheet.addValidationData(businessSegmentValidation);
+            worksheet.addValidationData(taDeliveryModeValidation);
+            worksheet.addValidationData(isBusinessRegisteredValidation);
+            worksheet.addValidationData(taTypeValidation);
+            worksheet.addValidationData(personWithDisabilityValidation);
+            worksheet.addValidationData(applicantEligibleValidation);
+            worksheet.addValidationData(recommendedForFinanceValidation);
+        } catch (Exception e) {
+            log.error("Error setting BMO template rules: {}", e.getMessage(), e);
+        }
+    }
+
+    private void setNames(Sheet workSheet, List<String> counties) {
+        Workbook bmoWorkbook = workSheet.getWorkbook();
+        Sheet optionsSheet = bmoWorkbook.createSheet(TemplatePopulateImportConstants.OPTIONS_SHEET_NAME);
+        Name officeGroup = bmoWorkbook.createName();
+        officeGroup.setNameName("County");
+        officeGroup.setRefersToFormula(TemplatePopulateImportConstants.OPTIONS_SHEET_NAME + "!$A$1:$A$" + (counties.size() + 1));
+
+
+        for (int i = 0; i < counties.size(); i++) {
+            Row row = optionsSheet.createRow(i);
+            row.createCell(0).setCellValue(counties.get(i));
+        }
     }
 }
