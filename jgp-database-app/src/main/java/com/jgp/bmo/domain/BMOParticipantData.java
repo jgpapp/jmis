@@ -1,6 +1,7 @@
 package com.jgp.bmo.domain;
 
 
+import com.jgp.authentication.domain.AppUser;
 import com.jgp.participant.domain.Participant;
 import com.jgp.patner.domain.Partner;
 import com.jgp.shared.domain.BaseEntity;
@@ -18,6 +19,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 @Getter
 @Entity
@@ -84,6 +86,13 @@ public class BMOParticipantData extends BaseEntity {
     @Column(name = "ta_type")
     private String taType;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "approval_by_id")
+    private AppUser approvalBy;
+
+    @Column(name = "date_approved")
+    private LocalDate dateApproved;
+
     private transient Integer rowIndex;
 
     private transient String rowErrorMessage;
@@ -96,7 +105,7 @@ public class BMOParticipantData extends BaseEntity {
                               Boolean isRecommendedForFinance, LocalDate decisionDate, String fiBusinessReferred,
                               LocalDate dateRecordedByPartner, LocalDate dateRecordedToJGPDB,
                               String taNeeds, Integer rowIndex, String trainingPartner, String taDeliveryMode,
-                              String otherTaNeeds, String taType, String rowErrorMessage) {
+                              String otherTaNeeds, String taType, AppUser createdBy, String rowErrorMessage) {
         this.partner = partner;
         this.participant = participant;
         this.dateFormSubmitted = dateFormSubmitted;
@@ -116,10 +125,13 @@ public class BMOParticipantData extends BaseEntity {
         this.otherTaNeeds = otherTaNeeds;
         this.taType = taType;
         this.rowErrorMessage = rowErrorMessage;
+        this.setCreatedBy(createdBy);
     }
 
-    public void approveData(Boolean approval){
+    public void approveData(Boolean approval, AppUser user){
         this.isDataApprovedByPartner = approval;
+        this.approvalBy = user;
+        this.dateApproved = LocalDate.now(ZoneId.systemDefault());
     }
 
     @Override

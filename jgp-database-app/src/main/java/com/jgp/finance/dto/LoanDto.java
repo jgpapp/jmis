@@ -40,6 +40,14 @@ public record LoanDto(
 
          String loanStatus,
 
-         String loanQuality
+         String loanQuality,
+
+         String uploadedBy,
+
+         LocalDate dateUploaded,
+
+         String approvedBy,
+
+         LocalDate dateApproved
 ) {
 }

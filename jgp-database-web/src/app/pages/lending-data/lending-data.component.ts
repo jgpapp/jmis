@@ -46,7 +46,7 @@ export class LendingDataComponent implements OnDestroy, OnInit {
   public displayedColumns = [
     'select', 'participantName', 'businessName', 'participantJGPID', 'pipeLineSource', 
     'loanAmountAccessed', 'loanOutStandingAmount', 
-    'loanDuration', 'dateApplied'
+    'loanDuration', 'dateApplied', 'dateUploaded', 'uploadedBy'
   ];
   public dataSource: any;
 

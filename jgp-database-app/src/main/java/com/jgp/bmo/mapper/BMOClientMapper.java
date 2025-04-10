@@ -27,6 +27,10 @@ public interface BMOClientMapper {
     @Mapping(target = "dateRecordedByPartner", ignore = true)
     @Mapping(target = "dateRecordedToJGPDB", expression = "java(null != bmoClientData.getDateCreated() ? bmoClientData.getDateCreated() : null)")
     @Mapping(target = "taNeeds", expression = "java(null != bmoClientData.getTaNeeds() ? bmoClientData.getTaNeeds() : null)")
+    @Mapping(target = "uploadedBy", expression = "java(null != bmoClientData.getCreatedBy() ? bmoClientData.getCreatedBy().getUserFullName() : null)")
+    @Mapping(target = "dateUploaded", expression = "java(null != bmoClientData.getDateCreated() ? bmoClientData.getDateCreated() : null)")
+    @Mapping(target = "approvedBy", expression = "java(null != bmoClientData.getApprovalBy() ? bmoClientData.getApprovalBy().getUserFullName() : null)")
+    @Mapping(target = "dateApproved", expression = "java(null != bmoClientData.getDateApproved() ? bmoClientData.getDateApproved() : null)")
     BMOClientDto toDto(BMOParticipantData bmoClientData);
 
     List<BMOClientDto> toDto(List<BMOParticipantData> bmoClientDataList);

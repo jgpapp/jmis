@@ -1,5 +1,6 @@
 package com.jgp.finance.domain;
 
+import com.jgp.authentication.domain.AppUser;
 import com.jgp.participant.domain.Participant;
 import com.jgp.patner.domain.Partner;
 import com.jgp.shared.domain.BaseEntity;
@@ -21,6 +22,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 @Getter
 @Entity
@@ -117,6 +119,13 @@ public class Loan extends BaseEntity {
     @Column(name = "data_is_approved")
     private boolean isDataApprovedByPartner;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "approval_by_id")
+    private AppUser approvalBy;
+
+    @Column(name = "date_approved")
+    private LocalDate dateApproved;
+
     private transient Integer rowIndex;
 
     public Loan() {
@@ -130,7 +139,7 @@ public class Loan extends BaseEntity {
                 LocalDate dateRecordedByPartner, String uniqueValues,
                 LocalDate dateAddedToDB, BigDecimal loanAmountRepaid,
                 String loanerType, BigDecimal tranchAmountAllocated,
-                BigDecimal tranchAmountDisbursed, String loanProduct, Integer rowIndex) {
+                BigDecimal tranchAmountDisbursed, String loanProduct, AppUser createdBy, Integer rowIndex) {
         this.partner = partner;
         this.participant = participant;
         this.loanNumber = loanNumber;
@@ -154,10 +163,13 @@ public class Loan extends BaseEntity {
         this.tranchAmountDisbursed = tranchAmountDisbursed;
         this.loanProduct = loanProduct;
         this.isDataApprovedByPartner = false;
+        this.setCreatedBy(createdBy);
     }
 
-    public void approveData(Boolean approval){
+    public void approveData(Boolean approval, AppUser user){
         this.isDataApprovedByPartner = approval;
+        this.approvalBy = user;
+        this.dateApproved = LocalDate.now(ZoneId.systemDefault());
     }
 
     @Getter

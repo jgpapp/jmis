@@ -33,5 +33,13 @@ public record BMOClientDto(
 
          LocalDate dateRecordedToJGPDB,
 
+         String uploadedBy,
+
+         LocalDate dateUploaded,
+
+         String approvedBy,
+
+         LocalDate dateApproved,
+
          String taNeeds
 ) {}

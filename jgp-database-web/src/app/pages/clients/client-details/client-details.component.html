@@ -183,6 +183,22 @@
                                 <mat-header-cell *matHeaderCellDef> FI Business Referred </mat-header-cell>
                                 <mat-cell *matCellDef="let element"> {{element.fiBusinessReferred}} </mat-cell>
                             </ng-container>
+                            <ng-container matColumnDef="dateUploaded">
+                              <mat-header-cell *matHeaderCellDef> Date Uploaded </mat-header-cell>
+                              <mat-cell *matCellDef="let element"> {{element.dateUploaded}} </mat-cell>
+                          </ng-container>
+                          <ng-container matColumnDef="uploadedBy">
+                            <mat-header-cell *matHeaderCellDef> Uploaded By </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{element.uploadedBy}} </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="dateApproved">
+                          <mat-header-cell *matHeaderCellDef> Date Approved </mat-header-cell>
+                          <mat-cell *matCellDef="let element"> {{element.dateApproved}} </mat-cell>
+                      </ng-container>
+                      <ng-container matColumnDef="approvedBy">
+                        <mat-header-cell *matHeaderCellDef> Approved By </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{element.approvedBy}} </mat-cell>
+                    </ng-container>
                               <mat-header-row *matHeaderRowDef="bmoDisplayedColumns"></mat-header-row>
                               <mat-row *matRowDef="let row; columns: bmoDisplayedColumns;"></mat-row>
                           </mat-table>
@@ -236,6 +252,22 @@
                             <mat-header-cell *matHeaderCellDef> Date Disbursed </mat-header-cell>
                             <mat-cell *matCellDef="let element"> {{element.dateDisbursed}} </mat-cell>
                         </ng-container>
+                        <ng-container matColumnDef="dateUploaded">
+                          <mat-header-cell *matHeaderCellDef> Date Uploaded </mat-header-cell>
+                          <mat-cell *matCellDef="let element"> {{element.dateUploaded}} </mat-cell>
+                      </ng-container>
+                      <ng-container matColumnDef="uploadedBy">
+                        <mat-header-cell *matHeaderCellDef> Uploaded By </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{element.uploadedBy}} </mat-cell>
+                    </ng-container>
+                        <ng-container matColumnDef="dateApproved">
+                          <mat-header-cell *matHeaderCellDef> Date Approved </mat-header-cell>
+                          <mat-cell *matCellDef="let element"> {{element.dateApproved}} </mat-cell>
+                      </ng-container>
+                      <ng-container matColumnDef="approvedBy">
+                        <mat-header-cell *matHeaderCellDef> Approved By </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{element.approvedBy}} </mat-cell>
+                    </ng-container>
                       <mat-header-row *matHeaderRowDef="loansDisplayedColumns"></mat-header-row>
                       <mat-row *matRowDef="let row; columns: loansDisplayedColumns;"></mat-row>
                         </mat-table>
