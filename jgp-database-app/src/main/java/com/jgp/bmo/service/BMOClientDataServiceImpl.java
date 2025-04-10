@@ -55,7 +55,7 @@ public class BMOClientDataServiceImpl implements BMOClientDataService {
         var bmoToSave = new ArrayList<BMOParticipantData>();
         Set<LocalDate> dataDates = new HashSet<>();
         for(BMOParticipantData bmo : bmoData) {
-            bmo.approveData(approval);
+            bmo.approveData(approval, currentUser);
             var participant = bmo.getParticipant();
             if (Boolean.TRUE.equals(approval) && Boolean.FALSE.equals(participant.getIsActive())){
                 participant.activateParticipant();

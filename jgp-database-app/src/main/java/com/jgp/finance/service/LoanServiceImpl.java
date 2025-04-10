@@ -55,7 +55,7 @@ public class LoanServiceImpl implements LoanService {
         var loansToSave = new ArrayList<Loan>();
         Set<LocalDate> dataDates = new HashSet<>();
         for(Loan loan : loans) {
-            loan.approveData(approval);
+            loan.approveData(approval, currentUser);
             var participant = loan.getParticipant();
             if (Boolean.TRUE.equals(approval) && Boolean.FALSE.equals(participant.getIsActive())){
                 participant.activateParticipant();

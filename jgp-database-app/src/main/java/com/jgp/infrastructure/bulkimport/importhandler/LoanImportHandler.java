@@ -20,6 +20,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
@@ -88,7 +89,7 @@ public class LoanImportHandler implements ImportHandler {
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
             Row row;
             row = loanSheet.getRow(rowIndex);
-            if (ImportHandlerUtils.isNotImported(row, LoanConstants.STATUS_COL)) {
+            if (null != row && ImportHandlerUtils.isNotImported(row, LoanConstants.STATUS_COL)) {
                 loanDataList.add(readLoanData(row));
             }
         }
@@ -109,8 +110,8 @@ public class LoanImportHandler implements ImportHandler {
         if (null == rowErrorMap.get(row) && accessedPlusOutStanding.compareTo(BigDecimal.ZERO) < 1){
             rowErrorMap.put(row, "Loan Accessed and Outstanding can not be both 0! !");
         }
-        final var loanQuality = ImportHandlerUtils.readAsString(LoanConstants.LOAN_QUALITY, row);
-        validateLoanQuality(loanQuality, row);
+        var loanQuality = ImportHandlerUtils.readAsString(LoanConstants.LOAN_QUALITY, row);
+        loanQuality = validateLoanQuality(loanQuality, row);
         var loanQualityEnum = Loan.LoanQuality.NORMAL;
         if (null == rowErrorMap.get(row)){
             loanQualityEnum = (null != loanQuality) ? Loan.LoanQuality.valueOf(loanQuality.toUpperCase()) : Loan.LoanQuality.NORMAL;
@@ -118,14 +119,14 @@ public class LoanImportHandler implements ImportHandler {
         final var recordedToJGPDBOnDate = ImportHandlerUtils.readAsDate(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, row);
         final var loanAmountRepaidDouble = ImportHandlerUtils.readAsDouble(LoanConstants.REPAID_LOAN_AMOUNT, row);
         final var loanAmountRepaid = BigDecimal.valueOf(loanAmountRepaidDouble);
-        final var tranchAllocatedAmount = ImportHandlerUtils.readAsString(LoanConstants.TRANCH_AMOUNT_ALLOCATED_COL, row);
-        validateTranchAllocated(tranchAllocatedAmount, row);
+        var tranchAllocatedAmount = ImportHandlerUtils.readAsString(LoanConstants.TRANCH_AMOUNT_ALLOCATED_COL, row);
+        tranchAllocatedAmount = validateTranchAllocated(tranchAllocatedAmount, row);
         final var tranchAmountAllocated = BigDecimal.ONE;
         final var tranchAmountDisbursedDouble = ImportHandlerUtils.readAsDouble(LoanConstants.TRANCH_AMOUNT_DISBURSED_COL, row);
         final var tranchAmountDisbursed = BigDecimal.valueOf(tranchAmountDisbursedDouble);
         final var loanerType = ImportHandlerUtils.readAsString(LoanConstants.LOANER_TYPE_COL, row);
-        final var loanProduct = ImportHandlerUtils.readAsString(LoanConstants.LOAN_PRODUCT_COL, row);
-        validateLoanProduct(loanProduct, row);
+        var loanProduct = ImportHandlerUtils.readAsString(LoanConstants.LOAN_PRODUCT_COL, row);
+        loanProduct = validateLoanProduct(loanProduct, row);
 
         statuses.add(status);
         String jgpId = ImportHandlerUtils.readAsString(LoanConstants.JGP_ID_COL, row);
@@ -139,7 +140,7 @@ public class LoanImportHandler implements ImportHandler {
         var loanData = new Loan(Objects.nonNull(userService.currentUser()) ? userService.currentUser().getPartner() : null,
                 null, "1001", pipeLineSource, loanQualityEnum, Loan.LoanStatus.APPROVED, applicationDate, dateDisbursed, valueAccessed,
                 loanDuration, outStandingAmount, LocalDate.now(ZoneId.systemDefault()), null, recordedToJGPDBOnDate,
-                loanAmountRepaid, loanerType, tranchAmountAllocated, tranchAmountDisbursed, loanProduct, row.getRowNum());
+                loanAmountRepaid, loanerType, tranchAmountAllocated, tranchAmountDisbursed, loanProduct, userService.currentUser(), row.getRowNum());
 
         if (null == rowErrorMap.get(row)){
             validateLoan(loanData, row);
@@ -318,24 +319,36 @@ public class LoanImportHandler implements ImportHandler {
         }
     }
 
-    private void validateTranchAllocated(String value, Row row) {
+    private String validateTranchAllocated(String value, Row row) {
         final var deliveryModes = Set.of("TRANCH 1", "TRANCH 2", "TRANCH 3", "NOT APPLICABLE");
-        if (null == rowErrorMap.get(row) && null != value && !deliveryModes.contains(value.toUpperCase())){
+        var modifiedValue = null == value ? null : value.replaceAll("[^a-zA-Z ]+", "").replaceAll("\\s+", " ").toUpperCase().trim();
+        if (null == rowErrorMap.get(row) && null != modifiedValue && !deliveryModes.contains(modifiedValue)){
             rowErrorMap.put(row, "Invalid Value for Allocated Tranch (Must be Tranch 1/Tranch 2/Tranch 3/Not Applicable) !!");
+        }else {
+            return StringUtils.capitalize(modifiedValue);
         }
+        return null;
     }
 
-    private void validateLoanQuality(String value, Row row) {
+    private String validateLoanQuality(String value, Row row) {
         final var loanQualities = Set.of("NORMAL", "WATCH", "SUBSTANDARD", "DOUBTFUL", "LOSS");
-        if (null == rowErrorMap.get(row) && null != value && !loanQualities.contains(value.toUpperCase())){
+        var modifiedValue = null == value ? null : value.replaceAll("[^a-zA-Z]+", "").toUpperCase().trim();
+        if (null == rowErrorMap.get(row) && null != modifiedValue && !loanQualities.contains(modifiedValue)){
             rowErrorMap.put(row, "Invalid Value for Loan quality (Must be Normal/Watch/Substandard/Doubtful/Loss) !!");
+        }else {
+            return StringUtils.capitalize(modifiedValue);
         }
+        return null;
     }
 
-    private void validateLoanProduct(String value, Row row) {
+    private String validateLoanProduct(String value, Row row) {
         final var loanProducts = Set.of("WORKING CAPITAL", "ASSET FINANCE", "STAHIMILI", "PURCHASE ORDER", "CONSIGNMENT FINANCE", "SHARIAH COMPLIANT");
-        if (null == rowErrorMap.get(row) && null != value && !loanProducts.contains(value.toUpperCase())){
+        var modifiedValue = null == value ? null : value.replaceAll("[^a-zA-Z ]+", "").replaceAll("\\s+", " ").toUpperCase().trim();
+        if (null == rowErrorMap.get(row) && null != modifiedValue && !loanProducts.contains(modifiedValue)){
             rowErrorMap.put(row, "Invalid Value for Loan quality (Must be Working Capital/Asset Finance/Stahimili/Purchase Order/Consignment Finance/Shariah Compliant) !!");
+        }else {
+            return StringUtils.capitalize(modifiedValue);
         }
+        return null;
     }
 }

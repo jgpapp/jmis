@@ -42,7 +42,7 @@ export class DataListComponent implements OnDestroy{
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-  public displayedColumns = ['select', 'participantName', 'participantJGPID', 'tasAttended', 'taSessionsAttended', 'isRecommendedForFinance', 'dateFormSubmitted', 'decisionDate'];
+  public displayedColumns = ['select', 'participantName', 'participantJGPID', 'tasAttended', 'taSessionsAttended', 'isRecommendedForFinance', 'dateFormSubmitted', 'decisionDate', 'dateUploaded', 'uploadedBy'];
   public dataSource: any;
 
   pageSize = 10;

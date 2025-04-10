@@ -68,6 +68,14 @@
                                 <mat-header-cell *matHeaderCellDef> Decision Date </mat-header-cell>
                                 <mat-cell *matCellDef="let element"> {{element.decisionDate}} </mat-cell>
                             </ng-container>
+                            <ng-container matColumnDef="dateUploaded">
+                                <mat-header-cell *matHeaderCellDef> Date Uploaded </mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.dateUploaded}} </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="uploadedBy">
+                              <mat-header-cell *matHeaderCellDef> Uploaded By </mat-header-cell>
+                              <mat-cell *matCellDef="let element"> {{element.uploadedBy}} </mat-cell>
+                          </ng-container>
                             <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
                             <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)"></mat-row>
                         </mat-table>

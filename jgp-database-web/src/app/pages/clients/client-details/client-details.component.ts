@@ -35,8 +35,8 @@ import { HasPermissionDirective } from '../../../directives/has-permission.direc
 })
 export class ClientDetailsComponent {
 
-  public bmoDisplayedColumns = ['partnerName', 'dateFormSubmitted', 'isApplicantEligible', 'taSessionsAttended', 'isRecommendedForFinance', 'decisionDate', 'fiBusinessReferred'];
-  public loansDisplayedColumns = ['partnerName', 'loanNumber', 'pipeLineSource', 'loanAmountAccessed', 'loanOutStandingAmount', 'loanDuration', 'dateApplied', 'dateDisbursed'];
+  public bmoDisplayedColumns = ['partnerName', 'dateFormSubmitted', 'isApplicantEligible', 'taSessionsAttended', 'isRecommendedForFinance', 'decisionDate', 'fiBusinessReferred', 'dateUploaded', 'uploadedBy', 'dateApproved', 'approvedBy'];
+  public loansDisplayedColumns = ['partnerName', 'loanNumber', 'pipeLineSource', 'loanAmountAccessed', 'loanOutStandingAmount', 'loanDuration', 'dateApplied', 'dateDisbursed', 'dateUploaded', 'uploadedBy', 'dateApproved', 'approvedBy'];
   selectedParticipant: Observable<any>;
   constructor(private activatedRoute: ActivatedRoute){}
 
