@@ -16,7 +16,7 @@ public interface BMOClientMapper {
     @Mapping(target = "partnerName", expression = "java(null != bmoClientData.getPartner() ? bmoClientData.getPartner().getPartnerName() : null)")
     @Mapping(target = "participantId", expression = "java(null != bmoClientData.getParticipant() ? bmoClientData.getParticipant().getId() : null)")
     @Mapping(target = "participantJGPID", expression = "java(null != bmoClientData.getParticipant() ? bmoClientData.getParticipant().getJgpId() : null)")
-    @Mapping(target = "participantName", expression = "java(null != bmoClientData.getParticipant() ? bmoClientData.getParticipant().getBusinessName() : null)")
+    @Mapping(target = "participantName", expression = "java(null != bmoClientData.getParticipant() ? bmoClientData.getParticipant().getParticipantName() : null)")
     @Mapping(target = "tasAttended", expression = "java(null != bmoClientData.getTasAttended() ? bmoClientData.getTasAttended() : null)")
     @Mapping(target = "taSessionsAttended", expression = "java(null != bmoClientData.getTaSessionsAttended() ? bmoClientData.getTaSessionsAttended() : null)")
     @Mapping(target = "isRecommendedForFinance", expression = "java(null != bmoClientData.getIsRecommendedForFinance() ? bmoClientData.getIsRecommendedForFinance() : null)")

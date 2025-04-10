@@ -371,7 +371,7 @@ public class BMOImportHandler implements ImportHandler {
     private void validateSampleRecords(String value, Row row){
         final var sampleRecords = Set.of("PURCHASE RECORD", "RECORD OF SALES", "DELIVERY RECORDS", "RECORD OF EXPENSES", "RECEIPTS", "OTHER");
         if (null == rowErrorMap.get(row) && (null == value || !sampleRecords.containsAll(Arrays.stream(value.split(",")).map(String::toUpperCase).toList()))){
-            rowErrorMap.put(row, "Invalid Value for TA needs (Must be Purchase record/Record of sales/Delivery records/Record of expenses/Receipts/Other) !!");
+            rowErrorMap.put(row, "Invalid Value for Sample Records (Must be Purchase record/Record of sales/Delivery records/Record of expenses/Receipts/Other) !!");
         }
     }
 
