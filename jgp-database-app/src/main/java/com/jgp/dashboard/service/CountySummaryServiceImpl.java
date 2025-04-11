@@ -77,16 +77,11 @@ public class CountySummaryServiceImpl implements CountySummaryService {
         }
 
         for (CountySummaryDto dto: countySummaries){
+            this.countySummaryRepository.deleteCountySummary(partnerId, dto.dataYear(), dto.dataMonth());
             this.countySummaryRepository.insertOrUpdateCountySummary(partnerId, dto.countyCode(), dto.dataYear(), dto.dataMonth(),
                     dto.businessesTrained(), dto.businessesLoaned(), dto.amountDisbursed(), dto.outStandingAmount(), LocalDate.now(ZoneId.systemDefault()));
         }
     }
-
-    @Override
-    public List<CountySummaryDto> getCountySummary(LocalDate fromDate, LocalDate toDate, Long partnerId) {
-            return List.of();
-    }
-
 
     private static final class CountySummaryDataMapper implements ResultSetExtractor<List<CountySummaryDto>> {
 

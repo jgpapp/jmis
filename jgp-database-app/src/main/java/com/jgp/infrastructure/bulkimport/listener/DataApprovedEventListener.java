@@ -26,7 +26,7 @@ public class DataApprovedEventListener {
             return;
         }
         var fromDateOptional = dataApprovedEvent.dates().stream().findFirst();
-        var fromDate = fromDateOptional.orElse(LocalDate.now(ZoneId.systemDefault()).plusYears(10));
+        var fromDate = fromDateOptional.orElse(LocalDate.now(ZoneId.systemDefault()).plusYears(100));
         var toDate = fromDate;
 
         for (LocalDate localDate: dataApprovedEvent.dates()){
