@@ -28,4 +28,10 @@ public interface CountySummaryRepository extends JpaRepository<CountySummary, Lo
                                      @Param("amountDisbursed") BigDecimal amountDisbursed,
                                      @Param("outStandingAmount") BigDecimal outStandingAmount,
                                      @Param("lastModified") LocalDate lastModified);
+
+    @Modifying
+    @Query(value = "DELETE FROM county_summary WHERE  partner_id = :partnerId AND data_year = :dataYear AND data_month = :dataMonth", nativeQuery = true)
+    void deleteCountySummary(@Param("partnerId") Long partnerId, @Param("dataYear") Integer dataYear, @Param("dataMonth") Integer dataMonth);
+
+
 }
