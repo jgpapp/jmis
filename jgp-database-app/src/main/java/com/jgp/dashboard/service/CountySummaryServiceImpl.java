@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -39,6 +40,7 @@ public class CountySummaryServiceImpl implements CountySummaryService {
     private static final String BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM = "WHERE bpd.date_partner_recorded between :fromDate and :toDate and bpd.data_is_approved = true ";
     private static final String LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and l.partner_id = :partnerId ";
     private static final String BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and bpd.partner_id = :partnerId ";
+    private static final BigDecimal ZERO = BigDecimal.ZERO;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -78,8 +80,10 @@ public class CountySummaryServiceImpl implements CountySummaryService {
 
         for (CountySummaryDto dto: countySummaries){
             this.countySummaryRepository.deleteCountySummary(partnerId, dto.dataYear(), dto.dataMonth());
-            this.countySummaryRepository.insertOrUpdateCountySummary(partnerId, dto.countyCode(), dto.dataYear(), dto.dataMonth(),
-                    dto.businessesTrained(), dto.businessesLoaned(), dto.amountDisbursed(), dto.outStandingAmount(), LocalDate.now(ZoneId.systemDefault()));
+            if (0 < dto.businessesTrained() || 0 < dto.businessesLoaned() || ZERO.compareTo(dto.amountDisbursed()) < 0 || ZERO.compareTo(dto.outStandingAmount()) < 0) {
+                this.countySummaryRepository.insertOrUpdateCountySummary(partnerId, dto.countyCode(), dto.dataYear(), dto.dataMonth(),
+                        dto.businessesTrained(), dto.businessesLoaned(), dto.amountDisbursed(), dto.outStandingAmount(), LocalDate.now(ZoneId.systemDefault()));
+            }
         }
     }
 
