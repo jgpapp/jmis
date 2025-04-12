@@ -26,7 +26,7 @@
                         <mat-form-field fxFlex="97%" class="px-2">
                             <input matInput [matDatepicker]="dateTo" placeholder="Date To" formControlName="toDate">
                             <mat-datepicker-toggle matSuffix [for]="dateTo"></mat-datepicker-toggle>
-                            <mat-datepicker #dateTo ></mat-datepicker>
+                            <mat-datepicker #dateTo></mat-datepicker>
                         </mat-form-field>
                     <div fxLayout="row" fxLayoutAlign="end center" fxFlex="100%" fxLayoutGap="2%">
                         <button mat-raised-button color="primary" (click)="onSubmitUpdateAnalytics()" [mat-dialog-close]="analyticsForm.value" [disabled]="!analyticsForm.valid">Update Analytics</button>

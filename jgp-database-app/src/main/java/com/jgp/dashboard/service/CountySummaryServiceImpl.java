@@ -18,7 +18,6 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
@@ -48,17 +47,17 @@ public class CountySummaryServiceImpl implements CountySummaryService {
     @Transactional
     @Override
     public void updateCountySummary(LocalDate fromDate, LocalDate toDate, Long partnerId) {
-        LocalDate startDate = LocalDate.of(fromDate.getYear(), Month.JANUARY, 1);
-        LocalDate endDate = LocalDate.of(toDate.getYear(), Month.DECEMBER, 31);
-        LocalDate currentMonth = startDate.withDayOfMonth(1); // Set the currentMonth to the first day of the start month
+        LocalDate startDate = fromDate.with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate endDate = toDate.with(TemporalAdjusters.lastDayOfMonth());
+        log.info("Updating summary between  {} and {}", startDate, endDate);
 
         var countySummaries = new ArrayList<CountySummaryDto>();
         // Iterate while the current month is before or equal to the end date's month
-        while (!currentMonth.isAfter(endDate)) {
+        while (!startDate.isAfter(endDate)) {
             // Get the start date of the month
-            LocalDate monthStartDate = currentMonth;
+            LocalDate monthStartDate = startDate;
             // Get the last day of the month
-            LocalDate monthEndDate = currentMonth.with(TemporalAdjusters.lastDayOfMonth());
+            LocalDate monthEndDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
 
             final var summaryMapper = new CountySummaryDataMapper(monthStartDate.getYear(), monthStartDate.getMonthValue());
             var bpdWhereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
@@ -75,7 +74,7 @@ public class CountySummaryServiceImpl implements CountySummaryService {
             countySummaries.addAll(this.namedParameterJdbcTemplate.query(sqlQuery, parameters, summaryMapper));
 
             // Move to the next month
-            currentMonth = currentMonth.plusMonths(1);
+            startDate = startDate.plusMonths(1);
         }
 
         for (CountySummaryDto dto: countySummaries){
