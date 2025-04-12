@@ -19,7 +19,6 @@ export class DashboardService {
       if(partnerId){
         analyticsUpdate.partnerId = partnerId;
       }
-      console.log('analyticsUpdate', analyticsUpdate);
       return this.httpClient.post(`${this.globalService.BASE_API_URL}/reports/analytics-update`, JSON.stringify(analyticsUpdate));
     }
 
