@@ -81,7 +81,7 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(LoanConstants.LOANER_TYPE_COL, rowHeader, "Loaner Type");
         writeString(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, rowHeader, "Date added to JGP database(yyyy-MM-dd)*");
         writeString(LoanConstants.LOAN_PRODUCT_COL, rowHeader, "Loan product* (Working Capital/Asset Finance/Stahimili/Purchase Order/Consignment Finance/Shariah Compliant)");
-        writeString(LoanConstants.TRANCH_AMOUNT_ALLOCATED_COL, rowHeader, "Tranch amount allocated(Tranch 1/Tranch 2/Tranch 3/Not Applicable)");
+        writeString(LoanConstants.TRANCH_AMOUNT_ALLOCATED_COL, rowHeader, "Tranch amount allocated(Tranch 1/Tranch 2/Tranch 3/Tranch 4/Tranch 5/Not Applicable)");
         writeString(LoanConstants.TRANCH_AMOUNT_DISBURSED_COL, rowHeader, "Tranch Amount Disbursed (KES)");
 
 
