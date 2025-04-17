@@ -35,6 +35,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -320,12 +321,12 @@ public class LoanImportHandler implements ImportHandler {
     }
 
     private String validateTranchAllocated(String value, Row row) {
-        final var deliveryModes = Set.of("TRANCH 1", "TRANCH 2", "TRANCH 3", "NOT APPLICABLE");
-        var modifiedValue = null == value ? null : value.replaceAll("[^a-zA-Z ]+", "").replaceAll("\\s+", " ").toUpperCase().trim();
+        final var deliveryModes = Set.of("TRANCH 1", "TRANCH 2", "TRANCH 3", "TRANCH 4", "TRANCH 5", "NOT APPLICABLE");
+        var modifiedValue = null == value ? null : value.replaceAll("[^a-zA-Z1-9 ]+", "").replaceAll("\\s+", " ").toUpperCase().trim();
         if (null == rowErrorMap.get(row) && null != modifiedValue && !deliveryModes.contains(modifiedValue)){
-            rowErrorMap.put(row, "Invalid Value for Allocated Tranch (Must be Tranch 1/Tranch 2/Tranch 3/Not Applicable) !!");
+            rowErrorMap.put(row, "Invalid Value for Allocated Tranch (Must be Tranch 1/Tranch 2/Tranch 3/Tranch 4/Tranch 5/Not Applicable) !!");
         }else {
-            return StringUtils.capitalize(modifiedValue);
+            return null != modifiedValue ? StringUtils.capitalize(modifiedValue.toLowerCase(Locale.ROOT)) : null;
         }
         return null;
     }
@@ -336,7 +337,7 @@ public class LoanImportHandler implements ImportHandler {
         if (null == rowErrorMap.get(row) && null != modifiedValue && !loanQualities.contains(modifiedValue)){
             rowErrorMap.put(row, "Invalid Value for Loan quality (Must be Normal/Watch/Substandard/Doubtful/Loss) !!");
         }else {
-            return StringUtils.capitalize(modifiedValue);
+            return null != modifiedValue ? StringUtils.capitalize(modifiedValue.toLowerCase(Locale.ROOT)) : null;
         }
         return null;
     }
@@ -347,7 +348,7 @@ public class LoanImportHandler implements ImportHandler {
         if (null == rowErrorMap.get(row) && null != modifiedValue && !loanProducts.contains(modifiedValue)){
             rowErrorMap.put(row, "Invalid Value for Loan quality (Must be Working Capital/Asset Finance/Stahimili/Purchase Order/Consignment Finance/Shariah Compliant) !!");
         }else {
-            return StringUtils.capitalize(modifiedValue);
+            return null != modifiedValue ? StringUtils.capitalize(modifiedValue.toLowerCase(Locale.ROOT)) : null;
         }
         return null;
     }
