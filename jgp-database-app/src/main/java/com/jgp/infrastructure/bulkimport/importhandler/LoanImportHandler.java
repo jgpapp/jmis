@@ -3,6 +3,7 @@ package com.jgp.infrastructure.bulkimport.importhandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jgp.authentication.service.UserService;
 import com.jgp.finance.domain.Loan;
+import com.jgp.finance.domain.LoanTransaction;
 import com.jgp.finance.service.LoanService;
 import com.jgp.infrastructure.bulkimport.constants.LoanConstants;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
@@ -32,6 +33,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -102,13 +104,12 @@ public class LoanImportHandler implements ImportHandler {
         final var pipeLineSource = ImportHandlerUtils.readAsString(LoanConstants.PIPELINE_SOURCE, row);
         final var applicationDate = ImportHandlerUtils.readAsDate(LoanConstants.DATE_APPLIED, row);
         final var dateDisbursed = ImportHandlerUtils.readAsDate(LoanConstants.DATE_DISBURSED, row);
-        final var amountAccessed = ImportHandlerUtils.readAsDouble(LoanConstants.LOAN_AMOUNT_KES, row);
-        final var valueAccessed = BigDecimal.valueOf(amountAccessed);
+        final var amountApproved = ImportHandlerUtils.readAsDouble(LoanConstants.LOAN_AMOUNT_KES, row);
+        final var loanAmount = BigDecimal.valueOf(amountApproved);
         final var loanDuration = ImportHandlerUtils.readAsInt(LoanConstants.LOAN_DURATION, row);
         final var outStandingAmountDouble = ImportHandlerUtils.readAsDouble(LoanConstants.OUT_STANDING_AMOUNT, row);
         final var outStandingAmount = BigDecimal.valueOf(outStandingAmountDouble);
-        final var accessedPlusOutStanding = valueAccessed.add(outStandingAmount);
-        if (null == rowErrorMap.get(row) && accessedPlusOutStanding.compareTo(BigDecimal.ZERO) < 1){
+        if (null == rowErrorMap.get(row) && loanAmount.compareTo(BigDecimal.ZERO) < 1){
             rowErrorMap.put(row, "Loan Accessed and Outstanding can not be both 0! !");
         }
         var loanQuality = ImportHandlerUtils.readAsString(LoanConstants.LOAN_QUALITY, row);
@@ -120,14 +121,14 @@ public class LoanImportHandler implements ImportHandler {
         final var recordedToJGPDBOnDate = ImportHandlerUtils.readAsDate(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, row);
         final var loanAmountRepaidDouble = ImportHandlerUtils.readAsDouble(LoanConstants.REPAID_LOAN_AMOUNT, row);
         final var loanAmountRepaid = BigDecimal.valueOf(loanAmountRepaidDouble);
-        var tranchAllocatedAmount = ImportHandlerUtils.readAsString(LoanConstants.TRANCH_AMOUNT_ALLOCATED_COL, row);
-        tranchAllocatedAmount = validateTranchAllocated(tranchAllocatedAmount, row);
-        final var tranchAmountAllocated = BigDecimal.ONE;
-        final var tranchAmountDisbursedDouble = ImportHandlerUtils.readAsDouble(LoanConstants.TRANCH_AMOUNT_DISBURSED_COL, row);
-        final var tranchAmountDisbursed = BigDecimal.valueOf(tranchAmountDisbursedDouble);
+        var tranchAllocated = ImportHandlerUtils.readAsString(LoanConstants.TRANCH_ALLOCATED_COL, row);
+        tranchAllocated = validateTranchAllocated(tranchAllocated, row);
+        final var tranchAmountDouble = ImportHandlerUtils.readAsDouble(LoanConstants.TRANCH_AMOUNT_COL, row);
+        final var tranchAmount = BigDecimal.valueOf(tranchAmountDouble);
         final var loanerType = ImportHandlerUtils.readAsString(LoanConstants.LOANER_TYPE_COL, row);
         var loanProduct = ImportHandlerUtils.readAsString(LoanConstants.LOAN_PRODUCT_COL, row);
         loanProduct = validateLoanProduct(loanProduct, row);
+        var loanNumber = ImportHandlerUtils.readAsString(LoanConstants.LOAN_IDENTIFIER_COL, row);
 
         statuses.add(status);
         String jgpId = ImportHandlerUtils.readAsString(LoanConstants.JGP_ID_COL, row);
@@ -138,14 +139,25 @@ public class LoanImportHandler implements ImportHandler {
             existingParticipant = this.participantService.findOneParticipantByJGPID(jgpId);
         }
 
+        final var now = LocalDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_DATE_TIME);
+        final  var loanIdentifier = Objects.requireNonNullElseGet(loanNumber, () -> jgpId != null ? "LOAN_".concat(jgpId).concat(now) : "LOAN_".concat(now));
         var loanData = new Loan(Objects.nonNull(userService.currentUser()) ? userService.currentUser().getPartner() : null,
-                null, "1001", pipeLineSource, loanQualityEnum, Loan.LoanStatus.APPROVED, applicationDate, dateDisbursed, valueAccessed,
+                null, loanIdentifier, pipeLineSource, loanQualityEnum, Loan.LoanStatus.APPROVED, applicationDate, dateDisbursed, loanAmount,
                 loanDuration, outStandingAmount, LocalDate.now(ZoneId.systemDefault()), null, recordedToJGPDBOnDate,
-                loanAmountRepaid, loanerType, tranchAmountAllocated, tranchAmountDisbursed, loanProduct, userService.currentUser(), row.getRowNum());
+                loanAmountRepaid, loanerType, loanProduct, userService.currentUser(), row.getRowNum());
+        final var transactionAmount = tranchAmount.compareTo(BigDecimal.ZERO) <= 0 ? loanAmount : BigDecimal.ZERO;
+        loanData.addLoanTransaction(new LoanTransaction(loanData, LoanTransaction.TransactionType.DISBURSEMENT,
+                null != tranchAllocated ? tranchAllocated : "Full Loan", recordedToJGPDBOnDate, transactionAmount, outStandingAmount));
 
         if (null == rowErrorMap.get(row)){
             validateLoan(loanData, row);
         }
+
+        final var prePayment = BigDecimal.ZERO.compareTo(outStandingAmount) > 0 ? outStandingAmount.negate() : BigDecimal.ZERO;
+        existingParticipant.ifPresent(participant -> {
+            participant.incrementPrePaidAmount(prePayment);
+            this.participantService.saveParticipant(participant);
+        });
 
         if (existingParticipant.isEmpty() && null == rowErrorMap.get(row)){
             final var participantDto = getParticipantDto(row);
@@ -184,6 +196,10 @@ public class LoanImportHandler implements ImportHandler {
         final var totalCasualEmployees = ImportHandlerUtils.readAsInt(LoanConstants.TOTAL_CASUAL_EMPLOYEES_COL, row);
         final var youthCasualEmployees = ImportHandlerUtils.readAsInt(LoanConstants.YOUTH_CASUAL_EMPLOYEES_COL, row);
 
+        final var outStandingAmountDouble = ImportHandlerUtils.readAsDouble(LoanConstants.OUT_STANDING_AMOUNT, row);
+        final var outStandingAmount = BigDecimal.valueOf(outStandingAmountDouble);
+        final var prePayment = BigDecimal.ZERO.compareTo(outStandingAmount) > 0 ? outStandingAmount.negate() : BigDecimal.ZERO;
+
         return ParticipantDto.builder()
                 .phoneNumber(phoneNumber).bmoMembership(null)
                 .hasBMOMembership(Boolean.TRUE).businessLocation(businessLocation).businessName(businessName)
@@ -192,7 +208,7 @@ public class LoanImportHandler implements ImportHandler {
                 .youthRegularEmployees(youthRegularEmployees).totalCasualEmployees(totalCasualEmployees)
                 .youthCasualEmployees(youthCasualEmployees).jgpId(jgpId)
                 .locationCountyCode(locationCountyCode.isPresent() ? locationCountyCode.get().getCountyCode() : "999")
-                .passport(passport).corpPinNumber(corpPinNumber).participantName(participantName).build();
+                .passport(passport).corpPinNumber(corpPinNumber).participantName(participantName).prePayment(prePayment).build();
     }
 
     public Count importEntity() {
@@ -219,7 +235,7 @@ public class LoanImportHandler implements ImportHandler {
                     throw new InvalidDataException(validationError);
                 }
                 if (progressLevel == 0) {
-                    this.loanService.createLoans(List.of(loanData));
+                    this.loanService.createOrUpdateLoan(loanData);
                     progressLevel = 1;
                 }
                 statusCell.setCellValue(TemplatePopulateImportConstants.STATUS_CELL_IMPORTED);

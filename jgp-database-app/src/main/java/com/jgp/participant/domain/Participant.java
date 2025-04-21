@@ -107,6 +107,9 @@ public class Participant extends BaseEntity {
     @Column(name = "is_eligible")
     private Boolean isEligible;
 
+    @Column(name = "pre_payment", scale = 4, precision = 19, nullable = false)
+    private BigDecimal prePayment;
+
     public Participant() {
     }
 
@@ -117,7 +120,8 @@ public class Participant extends BaseEntity {
             Boolean hasBMOMembership, String bmoMembership, BigDecimal bestMonthlyRevenue, BigDecimal worstMonthlyRevenue,
             Integer totalRegularEmployees, Integer youthRegularEmployees, Integer totalCasualEmployees,
             Integer youthCasualEmployees, String sampleRecords, String personWithDisability,
-            String refugeeStatus, String locationCountyCode, String passport, String corpPinNumber, String participantName) {
+            String refugeeStatus, String locationCountyCode, String passport,
+            String corpPinNumber, String participantName, Boolean isEligible, BigDecimal prePayment) {
         this.businessName = businessName;
         this.jgpId = jgpId;
         this.phoneNumber = phoneNumber;
@@ -145,6 +149,7 @@ public class Participant extends BaseEntity {
         this.passport = passport;
         this.corpPinNumber = corpPinNumber;
         this.participantName = participantName;
+        this.prePayment = prePayment;
     }
 
     public static Participant createClient(ParticipantDto dto){
@@ -154,7 +159,8 @@ public class Participant extends BaseEntity {
                 dto.bmoMembership(), dto.bestMonthlyRevenue(), dto.worstMonthlyRevenue(),
                 dto.totalRegularEmployees(), dto.youthRegularEmployees(), dto.totalCasualEmployees(),
                 dto.youthCasualEmployees(), null == dto.sampleRecords() ? null : String.join(",", dto.sampleRecords()),
-                dto.personWithDisability(), dto.refugeeStatus(), dto.locationCountyCode(), dto.passport(), dto.corpPinNumber(), dto.participantName());
+                dto.personWithDisability(), dto.refugeeStatus(), dto.locationCountyCode(), dto.passport(),
+                dto.corpPinNumber(), dto.participantName(), dto.isEligible(), dto.prePayment());
     }
 
     public void updateParticipant(ParticipantDto dto){
@@ -235,6 +241,14 @@ public class Participant extends BaseEntity {
 
     public void activateParticipant(){
         this.isActive = Boolean.TRUE;
+    }
+
+    public void updatePrePaidAmount(BigDecimal newAmount){
+        this.prePayment = newAmount;
+    }
+
+    public void incrementPrePaidAmount(BigDecimal additionalAmount){
+        this.prePayment = Objects.nonNull(this.prePayment) ? this.prePayment.add(additionalAmount) : additionalAmount;
     }
 
     private static Gender translateGender(String genderString){

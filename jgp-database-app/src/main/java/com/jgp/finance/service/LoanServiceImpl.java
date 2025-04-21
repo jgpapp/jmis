@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -36,9 +37,17 @@ public class LoanServiceImpl implements LoanService {
     private final PlatformSecurityContext platformSecurityContext;
     private final ApplicationContext applicationContext;
 
+    @Transactional
     @Override
-    public void createLoans(List<Loan> loans) {
-        this.loanRepository.saveAll(loans);
+    public void createOrUpdateLoan(Loan loan) {
+        final var existingLoanOptional = null != loan.getLoanNumber() ? this.loanRepository.findByLoanNumber(loan.getLoanNumber()) : Optional.<Loan>empty();
+        if (existingLoanOptional.isPresent()){
+            var existingLoan = existingLoanOptional.get();
+            existingLoan.addLoanTransaction(loan.getLoanTransactions().stream().findFirst().orElse(null));
+            this.loanRepository.save(existingLoan);
+        }else {
+            this.loanRepository.save(loan);
+        }
     }
 
     @Transactional

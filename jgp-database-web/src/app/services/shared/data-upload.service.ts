@@ -27,6 +27,12 @@ export class DataUploadService {
         return of(null);
       }
 
+      uploadResourceFile(file: File, legalFormType: string): Observable<any> {
+        const formData = new FormData();
+        formData.append('fileDetail', file, file.name);
+        return this.httpClient.post(`${this.gs.BASE_API_URL}/imports/upload-resource-file/${legalFormType}`, formData);
+      }
+
       downloadDataTemplate(templateName: string): Observable<any> {
         if(templateName.toUpperCase().includes('TA_IMPORT_TEMPLATE')){
             return this.httpClient.get(`${this.gs.BASE_API_URL}/bmos/template/download`, {
@@ -43,8 +49,8 @@ export class DataUploadService {
       }
 
 
-      downloadDataImportedFile(row: any): Observable<any> {
-            return this.httpClient.get(`${this.gs.BASE_API_URL}/imports/downloadOutputTemplate?importDocumentId=${row.documentId}`, {
+      downloadDataImportedFile(row: any, fileType: string): Observable<any> {
+            return this.httpClient.get(`${this.gs.BASE_API_URL}/imports/downloadOutputTemplate/${fileType}?importDocumentId=${row.documentId}`, {
               responseType: 'arraybuffer',
               observe: 'response',
             });
@@ -74,6 +80,30 @@ export class DataUploadService {
     }, 0);
   }
 
+  openPdfFileOnNewBrowserTab(res: any) {
+    const headers = res.headers;
+    const contentType = headers.get('Content-Type');
+    const blob = new Blob([res.body], { type: contentType });
+    const fileName = this.getFileNameFromHttpHeaders(headers);
+    const fileURL = URL.createObjectURL(blob);
+
+    // Open the Blob URL in a new tab
+    const pdfWindow = window.open(fileURL, '_blank');
+
+    // Optional: Revoke the object URL after a short delay
+    // This frees up memory, but the browser needs a moment to load the content.
+    // Adjust the delay if needed.
+    if (pdfWindow) {
+        pdfWindow.onload = () => {
+          setTimeout(() => URL.revokeObjectURL(fileURL), 100);
+        };
+    } else {
+        // Handle cases where the pop-up was blocked
+        console.error('Pop-up blocked. Please allow pop-ups for this site.');
+        URL.revokeObjectURL(fileURL); // Clean up immediately if window didn't open
+    }
+  }
+
   /**
    * Get file name from HTTP headers
    * @param headers the HTTP headers
@@ -86,12 +116,14 @@ export class DataUploadService {
   }
 
 
-  getAvailableDocuments(partnerId: number, entityType: string, page: number, size: number): Observable<any> {
+  getAvailableDocuments(partnerId: number | undefined, entityType: string, page: number, size: number): Observable<any> {
     let params = new HttpParams()
     .set('pageNumber', page.toString())
     .set('pageSize', size.toString())
-    .set('entityType', entityType)
-    .set('partnerId', partnerId);
+    .set('entityType', entityType);
+    if(undefined !== partnerId){
+      params.set('partnerId', partnerId);
+    }
     return this.httpClient.get(`${this.gs.BASE_API_URL}/imports`, { params });
   }
 

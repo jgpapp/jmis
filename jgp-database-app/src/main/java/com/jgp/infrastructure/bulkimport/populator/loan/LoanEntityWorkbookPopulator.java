@@ -52,8 +52,9 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         worksheet.setColumnWidth(LoanConstants.LOANER_TYPE_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.LOAN_PRODUCT_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(LoanConstants.TRANCH_AMOUNT_ALLOCATED_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(LoanConstants.TRANCH_AMOUNT_DISBURSED_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.TRANCH_ALLOCATED_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.TRANCH_AMOUNT_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.LOAN_IDENTIFIER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
 
 
         writeString(LoanConstants.PARTICIPANT_NAME_COL, rowHeader, "Participant Name*");
@@ -81,26 +82,10 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(LoanConstants.LOANER_TYPE_COL, rowHeader, "Loaner Type");
         writeString(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, rowHeader, "Date added to JGP database(yyyy-MM-dd)*");
         writeString(LoanConstants.LOAN_PRODUCT_COL, rowHeader, "Loan product* (Working Capital/Asset Finance/Stahimili/Purchase Order/Consignment Finance/Shariah Compliant)");
-        writeString(LoanConstants.TRANCH_AMOUNT_ALLOCATED_COL, rowHeader, "Tranch amount allocated(Tranch 1/Tranch 2/Tranch 3/Tranch 4/Tranch 5/Not Applicable)");
-        writeString(LoanConstants.TRANCH_AMOUNT_DISBURSED_COL, rowHeader, "Tranch Amount Disbursed (KES)");
+        writeString(LoanConstants.TRANCH_ALLOCATED_COL, rowHeader, "Tranch Allocated (Tranch 1/Tranch 2/Tranch 3/Tranch 4/Tranch 5/Not Applicable)");
+        writeString(LoanConstants.TRANCH_AMOUNT_COL, rowHeader, "Tranch Amount (KES)");
+        writeString(LoanConstants.LOAN_IDENTIFIER_COL, rowHeader, "Loan Identifier");
 
 
-    }
-
-    private void setRules(Sheet worksheet){
-        try {
-            CellRangeAddressList isRefugeeRange = new CellRangeAddressList(1, SpreadsheetVersion.EXCEL97.getLastRowIndex(),
-                    BMOConstants.REFUGEE_STATUS_COL, BMOConstants.REFUGEE_STATUS_COL);
-
-            DataValidationHelper validationHelper = new XSSFDataValidationHelper((org.apache.poi.xssf.usermodel.XSSFSheet) worksheet);
-
-            DataValidationConstraint isRefugeeConstraint = validationHelper.createExplicitListConstraint(new String[] { "Yes", "No" });
-
-            DataValidation isRefugeeValidation = validationHelper.createValidation(isRefugeeConstraint, isRefugeeRange);
-
-            worksheet.addValidationData(isRefugeeValidation);
-        } catch (Exception e) {
-            log.error("Error setting BMO template rules: {}", e.getMessage(), e);
-        }
     }
 }

@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface LoanService {
 
-    void createLoans(List<Loan> loans);
+    void createOrUpdateLoan(Loan loan);
 
     void approvedParticipantsLoansData(List<Long> dataIds, Boolean approval);
 

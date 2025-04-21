@@ -1,3 +1,4 @@
+
 <app-content-header 
     [icon]="'engineering'" 
     [title]="'System Resources'" 
@@ -6,3 +7,82 @@
     [hasBgImage]="true" 
     [class]="'pb-5'"></app-content-header>
 
+    <div fxLayout="column" class="p-2">
+      @if(authService.hasPermission('SYSTEM_RESOURCE_UPLOAD')){
+        <div class="p-2">
+            <div fxLayoutGap="2%" class="m-b-20">
+                <mat-card fxLayout="column" fxLayoutGap="2%" fxFlex="50%" class="upload-container-padding">
+                  <h3>
+                    <strong>Select Document Type</strong>
+                  </h3>
+            
+                  <form [formGroup]="legalFormTypeForm">
+                    <mat-card-content>
+                      <div>
+                        <mat-form-field fxFlex>
+                          <mat-label>Document Type</mat-label>
+                          <mat-select required formControlName="legalFormType" [(ngModel)]="legalFormType">
+                            <mat-option value="USER_MANUAL">User Manual</mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                    </mat-card-content>
+                  </form>
+            
+                </mat-card>
+            
+                <mat-card fxLayout="column" fxLayoutGap="2%" fxFlex="50%" class="upload-container-padding">
+                  <h3>
+                    <strong>{{ bulkImport.name }}</strong>
+                  </h3>
+            
+                  <h4>Select PDF File</h4>
+            
+                  <jgp-file-upload flex="75%" (change)="onFileSelect($event)"></jgp-file-upload>
+            
+                  <mat-hint>Please <strong>DO NOT</strong> change the names of the data template as they were downloaded.</mat-hint>
+            
+                  <div fxFlex="13%">
+                    <button mat-raised-button color="primary" [disabled]="buttonIsDisabled" (click)="uploadResourceFile()">
+                      <mat-icon>cloud_upload</mat-icon>&nbsp;&nbsp;Upload
+                    </button>
+                  </div>
+            
+                </mat-card>
+              </div>
+        </div>
+      }
+    
+        <div class="p-2">
+          <mat-table #table [dataSource]="dataSource" class="mat-elevation-z8">
+              <ng-container matColumnDef="name">
+                  <mat-header-cell *matHeaderCellDef> Document Name </mat-header-cell>
+                  <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="endTime">
+                  <mat-header-cell *matHeaderCellDef> Last Updated </mat-header-cell>
+                  <mat-cell *matCellDef="let element"> {{element.endTime}} </mat-cell>
+              </ng-container>
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> </th>
+              <td mat-cell *matCellDef="let row">
+                <button mat-icon-button (click)="viewDocument(row)" #tooltip="matTooltip"
+                matTooltip="Download" matTooltipPosition="above"
+                aria-tooltip="Button that displays and hides a tooltip triggered by other buttons">
+                  <mat-icon>cloud_download</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+              <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+              <mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'success-row': row.totalRecords === row.successCount, 'failed-row': row.totalRecords !== row.successCount }"></mat-row>
+          </mat-table>
+          <mat-paginator 
+          #paginator 
+          [length]="totalItems" 
+          [pageSize]="pageSize" 
+          [pageIndex]="pageIndex"
+          [pageSizeOptions]="[2, 3, 5, 10, 20]" 
+          (page)="onPageChange($event)"
+          />
+      </div>
+    </div>

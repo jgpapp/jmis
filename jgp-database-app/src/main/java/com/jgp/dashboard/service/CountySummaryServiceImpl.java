@@ -100,7 +100,7 @@ public class CountySummaryServiceImpl implements CountySummaryService {
                                      group by 1
                                      union
                                      select p.location_county_code as county, 0 as businessesTrained, count(*) as businessesLoaned,
-                                     sum(loan_amount_accessed) as amountDisbursed, sum(loan_outstanding_amount) as outStandingAmount from loans l\s
+                                     sum(loan_amount) as amountDisbursed, sum(loan_outstanding_amount) as outStandingAmount from loans l\s
                                      inner join participants p on p.id = l.participant_id %s\s
                                      group by 1
                                      )

@@ -88,16 +88,6 @@ public class FileSystemContentPathSanitizer implements ContentPathSanitizer {
                 if (StringUtils.isEmpty(contentMimeType)) {
                     throw new RuntimeException(String.format("Could not detect content mime type for %s!", fileName));
                 }
-
-                /*if (!mimeWhitelist.contains(contentMimeType)) {
-                    throw new RuntimeException(
-                            String.format("Detected content mime type %s for %s not allowed!", contentMimeType, fileName));
-                }
-
-                if (!contentMimeType.equalsIgnoreCase(extensionMimeType)) {
-                    throw new RuntimeException(String.format("Detected filename (%s) and content (%s) mime type do not match!",
-                            extensionMimeType, contentMimeType));
-                }*/
             }
 
             Path target = Path.of(sanitizedPath);

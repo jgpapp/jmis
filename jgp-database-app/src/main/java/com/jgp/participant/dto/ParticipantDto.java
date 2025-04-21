@@ -76,5 +76,9 @@ public record ParticipantDto(
 
         List<LoanDto> loanDtos,
 
-        String locationCountyCode) {
+        String locationCountyCode,
+
+        Boolean isEligible,
+
+        BigDecimal prePayment) {
 }

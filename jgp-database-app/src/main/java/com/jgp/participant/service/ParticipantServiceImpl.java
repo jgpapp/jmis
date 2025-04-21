@@ -33,6 +33,12 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final BMOClientDataService bmoClientDataService;
     private final ParticipantsPredicateBuilder participantsPredicateBuilder;
 
+    @Transactional
+    @Override
+    public void saveParticipant(Participant participant) {
+        this.participantRepository.save(participant);
+    }
+
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Participant createParticipant(ParticipantDto clientDto) {
