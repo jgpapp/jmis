@@ -2,6 +2,8 @@ package com.jgp.participant.mapper;
 
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.dto.ParticipantResponseDto;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -79,6 +81,7 @@ public class ParticipantMapper {
             if ( participant.getRefugeeStatus() != null ) {
                 participantResponseDto.setRefugeeStatus( participant.getRefugeeStatus() );
             }
+            participantResponseDto.setSavings( null != participant.getPrePayment() ? participant.getPrePayment() : BigDecimal.ZERO);
             participantResponseDto.setOwnerGender( null != participant.getOwnerGender() ? participant.getOwnerGender().getName() : null );
             participantResponseDto.setPassport( null != participant.getPassport() ? participant.getPassport() : null );
         }

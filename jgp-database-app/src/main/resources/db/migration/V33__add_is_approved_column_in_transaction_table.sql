@@ -1,0 +1,1 @@
+ALTER TABLE loan_transactions ADD COLUMN is_approved BOOLEAN DEFAULT false;

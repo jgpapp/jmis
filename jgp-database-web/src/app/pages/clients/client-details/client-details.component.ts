@@ -12,6 +12,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { HasPermissionDirective } from '../../../directives/has-permission.directive';
+import { DashboardService } from '@services/dashboard/dashboard.service';
 
 @Component({
   selector: 'app-client-details',
@@ -38,10 +39,14 @@ export class ClientDetailsComponent {
   public bmoDisplayedColumns = ['partnerName', 'dateFormSubmitted', 'isApplicantEligible', 'taSessionsAttended', 'isRecommendedForFinance', 'decisionDate', 'fiBusinessReferred', 'dateUploaded', 'uploadedBy', 'dateApproved', 'approvedBy'];
   public loansDisplayedColumns = ['partnerName', 'loanNumber', 'pipeLineSource', 'loanAmountAccessed', 'loanOutStandingAmount', 'loanDuration', 'dateApplied', 'dateDisbursed', 'dateUploaded', 'uploadedBy', 'dateApproved', 'approvedBy'];
   selectedParticipant: Observable<any>;
-  constructor(private activatedRoute: ActivatedRoute){}
+  constructor(private activatedRoute: ActivatedRoute, private dashBoardService: DashboardService){}
 
   ngOnInit(): void {
     this.selectedParticipant = this.activatedRoute.data.pipe(map(data => data['selectedParticipant']));
   }
+
+  valueFormatting = (value: number) => {
+    return this.dashBoardService.formatNumberToShortForm(Number(value)); // Outputs as "8.94M"
+  };
 
 }

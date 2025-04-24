@@ -5,5 +5,5 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.Set;
 
-public record DataApprovedEvent(@NotNull Long partnerId, Set<LocalDate> dates) {
+public record DataApprovedEvent(@NotNull Set<Long> partnerIds, Set<LocalDate> dates) {
 }

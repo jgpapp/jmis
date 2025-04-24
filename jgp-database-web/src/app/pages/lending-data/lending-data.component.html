@@ -56,21 +56,17 @@
                                 <mat-header-cell *matHeaderCellDef> PipeLine Source </mat-header-cell>
                                 <mat-cell *matCellDef="let element"> {{element.pipeLineSource}} </mat-cell>
                             </ng-container>
-                            <ng-container matColumnDef="loanAmountAccessed">
-                                <mat-header-cell *matHeaderCellDef> Amount Accessed </mat-header-cell>
-                                <mat-cell *matCellDef="let element"> {{element.loanAmountAccessed}} </mat-cell>
+                            <ng-container matColumnDef="tranch">
+                                <mat-header-cell *matHeaderCellDef> Tranch </mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.tranch}} </mat-cell>
                             </ng-container>
-                            <ng-container matColumnDef="loanOutStandingAmount">
-                                <mat-header-cell *matHeaderCellDef> Outstanding Amount </mat-header-cell>
-                                <mat-cell *matCellDef="let element"> {{element.loanOutStandingAmount}} </mat-cell>
+                            <ng-container matColumnDef="amount">
+                                <mat-header-cell *matHeaderCellDef> Amount Accessed </mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.amount}} </mat-cell>
                             </ng-container>
                             <ng-container matColumnDef="loanDuration">
                                 <mat-header-cell *matHeaderCellDef> Loan Duration </mat-header-cell>
                                 <mat-cell *matCellDef="let element"> {{element.loanDuration}} </mat-cell>
-                            </ng-container>
-                            <ng-container matColumnDef="dateApplied">
-                                <mat-header-cell *matHeaderCellDef> Date Applied </mat-header-cell>
-                                <mat-cell *matCellDef="let element"> {{element.dateApplied}} </mat-cell>
                             </ng-container>
                             <ng-container matColumnDef="dateUploaded">
                                 <mat-header-cell *matHeaderCellDef> Date Uploaded </mat-header-cell>

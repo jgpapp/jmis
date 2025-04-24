@@ -10,5 +10,5 @@ public interface LoanTransactionService {
 
     void createLoanTransaction(LoanTransaction loanTransaction);
 
-    Page<LoanTransactionResponseDto> getLoanTransactions(Loan loan, Pageable pageable);
+    Page<LoanTransactionResponseDto> getLoanTransactions(Long loanId, Boolean isApproved, Pageable pageable);
 }

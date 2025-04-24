@@ -1,5 +1,6 @@
 package com.jgp.finance.domain;
 
+import com.jgp.authentication.domain.AppUser;
 import com.jgp.shared.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,7 +20,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Getter
 @Entity
@@ -47,16 +48,34 @@ public class LoanTransaction extends BaseEntity implements Comparable<LoanTransa
     @Column(name = "out_standing_amount", scale = 4, precision = 19, nullable = false)
     private BigDecimal outStandingAmount;
 
+    @Column(name = "is_approved")
+    private boolean isApproved;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "approval_by_id")
+    private AppUser approvalBy;
+
+    @Column(name = "date_approved")
+    private LocalDate dateApproved;
+
     public LoanTransaction() {
     }
 
-    public LoanTransaction(Loan loan, TransactionType transactionType, String tranchName, LocalDate transactionDate, BigDecimal amount, BigDecimal outStandingAmount) {
+    public LoanTransaction(Loan loan, TransactionType transactionType, String tranchName, LocalDate transactionDate, BigDecimal amount, BigDecimal outStandingAmount, AppUser createdBy) {
         this.loan = loan;
         this.transactionType = transactionType;
         this.transactionDate = transactionDate;
         this.amount = amount;
         this.outStandingAmount = outStandingAmount;
         this.tranchName = tranchName;
+        this.isApproved = false;
+        this.setCreatedBy(createdBy);
+    }
+
+    public void approveData(Boolean approval, AppUser user){
+        this.isApproved = approval;
+        this.approvalBy = user;
+        this.dateApproved = LocalDate.now(ZoneId.systemDefault());
     }
 
     @Override

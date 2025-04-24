@@ -26,8 +26,6 @@ public record LoanDto(
 
          BigDecimal loanAmountAccessed,
 
-         BigDecimal loanOutStandingAmount,
-
          Integer loanDuration,
 
          LocalDate dateApplied,

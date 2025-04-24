@@ -1,7 +1,7 @@
 package com.jgp.dashboard.service;
 
 import com.jgp.dashboard.dto.AnalyticsUpdateRequestDto;
-import com.jgp.dashboard.dto.CountySummaryDto;
+import com.jgp.dashboard.dto.DataSummaryDto;
 import com.jgp.dashboard.dto.DashboardSearchCriteria;
 import com.jgp.dashboard.dto.DataPointDto;
 import com.jgp.dashboard.dto.HighLevelSummaryDto;
@@ -66,9 +66,9 @@ public interface DashboardService {
 
     List<SeriesDataPointDto> getLoansAccessedVsOutStandingByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
-    List<CountySummaryDto> getCountySummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
+    List<DataSummaryDto> getDataSummary(LocalDate fromDate, LocalDate toDate, Long partnerId);
 
-    Map<String, CountySummaryDto> getCountySummaryMap(LocalDate fromDate, LocalDate toDate, Long partnerId);
+    Map<String, DataSummaryDto> getDataSummaryMap(LocalDate fromDate, LocalDate toDate, Long partnerId);
 
     List<PerformanceSummaryDto> getPerformanceSummary(String year, Long partnerId);
 

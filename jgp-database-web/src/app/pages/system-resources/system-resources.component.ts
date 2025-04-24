@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { ContentHeaderComponent } from "../../theme/components/content-header/content-header.component";
 import { AuthService } from '@services/users/auth.service';
-import { NoPermissionComponent } from '../errors/no-permission/no-permission.component';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -23,7 +22,6 @@ import { GlobalService } from '@services/shared/global.service';
   standalone: true,
   imports: [
     ContentHeaderComponent,
-    NoPermissionComponent,
     FlexLayoutModule,
     MatButtonModule,
     MatIconModule,

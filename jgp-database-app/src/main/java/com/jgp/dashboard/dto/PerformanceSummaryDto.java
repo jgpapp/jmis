@@ -6,6 +6,7 @@ import java.util.List;
 public record PerformanceSummaryDto(
         Integer year,
         Integer month,
+        String genderCategory,
         String partner,
         String quarter,
         String category,

@@ -1,8 +1,6 @@
 package com.jgp.finance.domain;
 
 import com.jgp.authentication.domain.AppUser;
-import com.jgp.finance.dto.LoanTransactionResponseDto;
-import com.jgp.finance.mapper.LoanTransactionMapper;
 import com.jgp.participant.domain.Participant;
 import com.jgp.patner.domain.Partner;
 import com.jgp.shared.domain.BaseEntity;
@@ -23,18 +21,13 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeSet;
 
 @Getter
 @Entity
@@ -63,7 +56,6 @@ public class Loan extends BaseEntity {
     private BigDecimal loanAmount;
 
     @NotNull(message = "Outstanding Loan Amount is required !!")
-    @Min(value = 0, message = "Outstanding Loan Amount is required !!")
     @Column(name = "loan_outstanding_amount")
     private BigDecimal loanOutStandingAmount;
 
@@ -166,10 +158,6 @@ public class Loan extends BaseEntity {
         this.isDataApprovedByPartner = approval;
         this.approvalBy = user;
         this.dateApproved = LocalDate.now(ZoneId.systemDefault());
-    }
-
-    public Page<LoanTransactionResponseDto> getLoanTransactionResponseDtos(LoanTransactionMapper loanTransactionMapper, Pageable pageable) {
-        return new PageImpl<>(loanTransactionMapper.toDto(new ArrayList<>(this.loanTransactions)), pageable, this.loanTransactions.size());
     }
 
     @Getter

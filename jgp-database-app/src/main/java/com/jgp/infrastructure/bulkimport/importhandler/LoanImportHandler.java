@@ -145,19 +145,13 @@ public class LoanImportHandler implements ImportHandler {
                 null, loanIdentifier, pipeLineSource, loanQualityEnum, Loan.LoanStatus.APPROVED, applicationDate, dateDisbursed, loanAmount,
                 loanDuration, outStandingAmount, LocalDate.now(ZoneId.systemDefault()), null, recordedToJGPDBOnDate,
                 loanAmountRepaid, loanerType, loanProduct, userService.currentUser(), row.getRowNum());
-        final var transactionAmount = tranchAmount.compareTo(BigDecimal.ZERO) <= 0 ? loanAmount : BigDecimal.ZERO;
+        final var transactionAmount = tranchAmount.compareTo(BigDecimal.ZERO) <= 0 ? loanAmount : tranchAmount;
         loanData.addLoanTransaction(new LoanTransaction(loanData, LoanTransaction.TransactionType.DISBURSEMENT,
-                null != tranchAllocated ? tranchAllocated : "Full Loan", recordedToJGPDBOnDate, transactionAmount, outStandingAmount));
+                null != tranchAllocated ? tranchAllocated : "Full Loan", dateDisbursed, transactionAmount, outStandingAmount, userService.currentUser()));
 
         if (null == rowErrorMap.get(row)){
             validateLoan(loanData, row);
         }
-
-        final var prePayment = BigDecimal.ZERO.compareTo(outStandingAmount) > 0 ? outStandingAmount.negate() : BigDecimal.ZERO;
-        existingParticipant.ifPresent(participant -> {
-            participant.incrementPrePaidAmount(prePayment);
-            this.participantService.saveParticipant(participant);
-        });
 
         if (existingParticipant.isEmpty() && null == rowErrorMap.get(row)){
             final var participantDto = getParticipantDto(row);

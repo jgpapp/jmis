@@ -122,7 +122,7 @@ export class DataUploadService {
     .set('pageSize', size.toString())
     .set('entityType', entityType);
     if(undefined !== partnerId){
-      params.set('partnerId', partnerId);
+      params = params.set('partnerId', partnerId);
     }
     return this.httpClient.get(`${this.gs.BASE_API_URL}/imports`, { params });
   }
