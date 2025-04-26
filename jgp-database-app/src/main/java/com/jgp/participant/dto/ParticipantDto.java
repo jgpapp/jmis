@@ -30,17 +30,9 @@ public record ParticipantDto(
 
         String industrySector,
 
-        //@NotBlank(message = "business segment is required !!")
         String businessSegment,
 
-        //@NotNull(message = "Business registration is required !!")
-        Boolean isBusinessRegistered,
-
-        String registrationNumber,
-
-        Boolean hasBMOMembership,
-
-        String bmoMembership,
+        String businessRegNumber,
 
         BigDecimal bestMonthlyRevenue,
 
@@ -59,8 +51,6 @@ public record ParticipantDto(
         @NotNull(message = "Youth casual employees is required !!")
         Integer youthCasualEmployees,
 
-        String corpPinNumber,
-
         @NotNull(message = "Participant Name is required !!")
         String participantName,
 
@@ -78,7 +68,5 @@ public record ParticipantDto(
 
         String locationCountyCode,
 
-        Boolean isEligible,
-
-        BigDecimal prePayment) {
+        Boolean isEligible) {
 }

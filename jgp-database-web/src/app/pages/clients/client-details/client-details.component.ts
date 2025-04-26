@@ -45,8 +45,4 @@ export class ClientDetailsComponent {
     this.selectedParticipant = this.activatedRoute.data.pipe(map(data => data['selectedParticipant']));
   }
 
-  valueFormatting = (value: number) => {
-    return this.dashBoardService.formatNumberToShortForm(Number(value)); // Outputs as "8.94M"
-  };
-
 }

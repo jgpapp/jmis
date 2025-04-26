@@ -51,6 +51,9 @@ public class LoanTransaction extends BaseEntity implements Comparable<LoanTransa
     @Column(name = "is_approved")
     private boolean isApproved;
 
+    @Column(name = "is_given_in_tranches")
+    private boolean isGivenInTranches;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "approval_by_id")
     private AppUser approvalBy;
@@ -61,7 +64,7 @@ public class LoanTransaction extends BaseEntity implements Comparable<LoanTransa
     public LoanTransaction() {
     }
 
-    public LoanTransaction(Loan loan, TransactionType transactionType, String tranchName, LocalDate transactionDate, BigDecimal amount, BigDecimal outStandingAmount, AppUser createdBy) {
+    public LoanTransaction(Loan loan, TransactionType transactionType, String tranchName, LocalDate transactionDate, BigDecimal amount, BigDecimal outStandingAmount, AppUser createdBy, boolean isGivenInTranches) {
         this.loan = loan;
         this.transactionType = transactionType;
         this.transactionDate = transactionDate;
@@ -70,6 +73,7 @@ public class LoanTransaction extends BaseEntity implements Comparable<LoanTransa
         this.tranchName = tranchName;
         this.isApproved = false;
         this.setCreatedBy(createdBy);
+        this.isGivenInTranches = isGivenInTranches;
     }
 
     public void approveData(Boolean approval, AppUser user){

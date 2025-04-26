@@ -22,7 +22,7 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         rowHeader.setHeight(TemplatePopulateImportConstants.ROW_HEADER_HEIGHT);
         worksheet.setColumnWidth(LoanConstants.PARTICIPANT_NAME_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.BUSINESS_NAME_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(LoanConstants.CORP_PIN_NUMBER, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.BUSINESS_REGISTRATION_NUMBER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.JGP_ID_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.BUSINESS_PHONE_NUMBER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.GENDER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
@@ -52,7 +52,7 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
 
         writeString(LoanConstants.PARTICIPANT_NAME_COL, rowHeader, "Participant Name*");
         writeString(LoanConstants.BUSINESS_NAME_COL, rowHeader, "Business Name");
-        writeString(LoanConstants.CORP_PIN_NUMBER, rowHeader, "Corporation PIN Number");
+        writeString(LoanConstants.BUSINESS_REGISTRATION_NUMBER_COL, rowHeader, "Business Registration Number");
         writeString(LoanConstants.JGP_ID_COL, rowHeader, "Unique JGP ID (National ID)*");
         writeString(LoanConstants.BUSINESS_PHONE_NUMBER_COL, rowHeader, "Business phone number*");
         writeString(LoanConstants.GENDER_COL, rowHeader, "Gender of owner*");

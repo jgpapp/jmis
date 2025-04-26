@@ -1059,7 +1059,7 @@ public class DashboardServiceImpl implements DashboardService {
             final var businessesLoaned = rs.getInt(BUSINESSES_LOANED);
             final var amountDisbursed = rs.getBigDecimal(AMOUNT_DISBURSED);
             final var outStandingAmount = rs.getBigDecimal(OUT_STANDING_AMOUNT);
-            return new HighLevelSummaryDto(businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount);
+            return new HighLevelSummaryDto(CommonUtil.NUMBER_FORMAT.format(businessesTrained), CommonUtil.NUMBER_FORMAT.format(businessesLoaned), amountDisbursed, outStandingAmount);
         }
     }
 

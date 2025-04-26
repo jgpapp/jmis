@@ -162,7 +162,7 @@ public class BMOImportHandler implements ImportHandler {
         final var industrySector = ImportHandlerUtils.readAsString(BMOConstants.INDUSTRY_SECTOR_COL, row);
         var businessSegment = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_SEGMENT_COL, row);
         businessSegment = validateBusinessSegment(businessSegment, row);
-        final var registrationNumber = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_IS_REGISTERED, row);
+        final var registrationNumber = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_REGISTRATION_NUMBER_COL, row);
         final var bestMonthlyRevenueD = ImportHandlerUtils.readAsDouble(BMOConstants.BEST_MONTH_MONTHLY_REVENUE_COL, row);
         final var bestMonthlyRevenue = Objects.nonNull(bestMonthlyRevenueD) ? BigDecimal.valueOf(bestMonthlyRevenueD) : null;
         final var worstMonthlyRevenueD = ImportHandlerUtils.readAsDouble(BMOConstants.WORST_MONTH_MONTHLY_REVENUE_COL, row);
@@ -182,16 +182,15 @@ public class BMOImportHandler implements ImportHandler {
         validateRefugeeStatus(refugeeStatus, row);
 
         return ParticipantDto.builder()
-                .phoneNumber(phoneNumber).bestMonthlyRevenue(bestMonthlyRevenue).bmoMembership(null)
-                .hasBMOMembership(Boolean.TRUE).businessLocation(businessLocation).participantName(participantName)
+                .phoneNumber(phoneNumber).bestMonthlyRevenue(bestMonthlyRevenue)
+                .businessLocation(businessLocation).participantName(participantName)
                 .ownerGender(gender).ownerAge(age).industrySector(industrySector).businessSegment(businessSegment)
-                .registrationNumber("10001").isBusinessRegistered(registrationNumber != null && registrationNumber.trim().equalsIgnoreCase("YES"))
                 .worstMonthlyRevenue(worstMonthlyRevenue).totalRegularEmployees(totalRegularEmployees)
                 .youthRegularEmployees(youthRegularEmployees).totalCasualEmployees(totalCasualEmployees)
                 .youthCasualEmployees(youthCasualEmployees).sampleRecords(sampleRecordsKept != null ? Arrays.stream(sampleRecordsKept.split(",")).map(String::trim).toList() : null)
                 .personWithDisability("YES".equalsIgnoreCase(personWithDisability) ? "Yes" : "No").refugeeStatus("YES".equalsIgnoreCase(refugeeStatus) ? "Yes" : "No").jgpId(jgpId)
                 .locationCountyCode(locationCountyCode.isPresent() ? locationCountyCode.get().getCountyCode() : "999")
-                .passport(passport).build();
+                .passport(passport).businessRegNumber(registrationNumber).build();
 
     }
 

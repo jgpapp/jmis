@@ -109,9 +109,6 @@ public class LoanImportHandler implements ImportHandler {
         final var loanDuration = ImportHandlerUtils.readAsInt(LoanConstants.LOAN_DURATION, row);
         final var outStandingAmountDouble = ImportHandlerUtils.readAsDouble(LoanConstants.OUT_STANDING_AMOUNT, row);
         final var outStandingAmount = BigDecimal.valueOf(outStandingAmountDouble);
-        if (null == rowErrorMap.get(row) && loanAmount.compareTo(BigDecimal.ZERO) < 1){
-            rowErrorMap.put(row, "Loan Accessed and Outstanding can not be both 0! !");
-        }
         var loanQuality = ImportHandlerUtils.readAsString(LoanConstants.LOAN_QUALITY, row);
         loanQuality = validateLoanQuality(loanQuality, row);
         var loanQualityEnum = Loan.LoanQuality.NORMAL;
@@ -121,14 +118,18 @@ public class LoanImportHandler implements ImportHandler {
         final var recordedToJGPDBOnDate = ImportHandlerUtils.readAsDate(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, row);
         final var loanAmountRepaidDouble = ImportHandlerUtils.readAsDouble(LoanConstants.REPAID_LOAN_AMOUNT, row);
         final var loanAmountRepaid = BigDecimal.valueOf(loanAmountRepaidDouble);
-        var tranchAllocated = ImportHandlerUtils.readAsString(LoanConstants.TRANCH_ALLOCATED_COL, row);
-        tranchAllocated = validateTranchAllocated(tranchAllocated, row);
         final var tranchAmountDouble = ImportHandlerUtils.readAsDouble(LoanConstants.TRANCH_AMOUNT_COL, row);
         final var tranchAmount = BigDecimal.valueOf(tranchAmountDouble);
-        final var loanerType = ImportHandlerUtils.readAsString(LoanConstants.LOANER_TYPE_COL, row);
+        var tranchAllocated = ImportHandlerUtils.readAsString(LoanConstants.TRANCH_ALLOCATED_COL, row);
+        tranchAllocated = validateTranchAllocated(tranchAllocated, tranchAmount, row);
+        var loanerType = ImportHandlerUtils.readAsString(LoanConstants.LOANER_TYPE_COL, row);
+        loanerType = validateLoanerType(loanerType, row);
         var loanProduct = ImportHandlerUtils.readAsString(LoanConstants.LOAN_PRODUCT_COL, row);
         loanProduct = validateLoanProduct(loanProduct, row);
         var loanNumber = ImportHandlerUtils.readAsString(LoanConstants.LOAN_IDENTIFIER_COL, row);
+        if (null == rowErrorMap.get(row) && null == loanNumber && tranchAmount.compareTo(BigDecimal.ZERO) > 0){
+            rowErrorMap.put(row, "Loan Identifier is required If Tranch Amount Is Provided!!");
+        }
 
         statuses.add(status);
         String jgpId = ImportHandlerUtils.readAsString(LoanConstants.JGP_ID_COL, row);
@@ -146,8 +147,15 @@ public class LoanImportHandler implements ImportHandler {
                 loanDuration, outStandingAmount, LocalDate.now(ZoneId.systemDefault()), null, recordedToJGPDBOnDate,
                 loanAmountRepaid, loanerType, loanProduct, userService.currentUser(), row.getRowNum());
         final var transactionAmount = tranchAmount.compareTo(BigDecimal.ZERO) <= 0 ? loanAmount : tranchAmount;
+        if (null == rowErrorMap.get(row) && transactionAmount.compareTo(BigDecimal.ZERO) < 1){
+            rowErrorMap.put(row, "Loan Amount and Tranch Amount can not be both 0!!");
+        }
+        if (null == rowErrorMap.get(row) && loanAmount.compareTo(BigDecimal.ZERO) > 0 && tranchAmount.compareTo(loanAmount) >= 0){
+            rowErrorMap.put(row, "Loan Amount Must Be Greater Than Tranch Amount If Both Are Provided!!");
+        }
         loanData.addLoanTransaction(new LoanTransaction(loanData, LoanTransaction.TransactionType.DISBURSEMENT,
-                null != tranchAllocated ? tranchAllocated : "Full Loan", dateDisbursed, transactionAmount, outStandingAmount, userService.currentUser()));
+                null != tranchAllocated ? tranchAllocated : "Full Loan", dateDisbursed, transactionAmount,
+                outStandingAmount, userService.currentUser(), null != tranchAllocated));
 
         if (null == rowErrorMap.get(row)){
             validateLoan(loanData, row);
@@ -172,7 +180,7 @@ public class LoanImportHandler implements ImportHandler {
             rowErrorMap.put(row, "Participant Name Is Required !!");
         }
         String businessName = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_NAME_COL, row);
-        String corpPinNumber = ImportHandlerUtils.readAsString(LoanConstants.CORP_PIN_NUMBER, row);
+        String businessRegNumber = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_REGISTRATION_NUMBER_COL, row);
         String jgpId = ImportHandlerUtils.readAsString(LoanConstants.JGP_ID_COL, row);
         final var phoneNumber = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_PHONE_NUMBER_COL, row);
         final var gender = ImportHandlerUtils.readAsString(LoanConstants.GENDER_COL, row);
@@ -190,19 +198,14 @@ public class LoanImportHandler implements ImportHandler {
         final var totalCasualEmployees = ImportHandlerUtils.readAsInt(LoanConstants.TOTAL_CASUAL_EMPLOYEES_COL, row);
         final var youthCasualEmployees = ImportHandlerUtils.readAsInt(LoanConstants.YOUTH_CASUAL_EMPLOYEES_COL, row);
 
-        final var outStandingAmountDouble = ImportHandlerUtils.readAsDouble(LoanConstants.OUT_STANDING_AMOUNT, row);
-        final var outStandingAmount = BigDecimal.valueOf(outStandingAmountDouble);
-        final var prePayment = BigDecimal.ZERO.compareTo(outStandingAmount) > 0 ? outStandingAmount.negate() : BigDecimal.ZERO;
-
         return ParticipantDto.builder()
-                .phoneNumber(phoneNumber).bmoMembership(null)
-                .hasBMOMembership(Boolean.TRUE).businessLocation(businessLocation).businessName(businessName)
+                .phoneNumber(phoneNumber).businessLocation(businessLocation).businessName(businessName)
                 .ownerGender(gender).ownerAge(age).industrySector(industrySector).businessSegment("Other")
                 .totalRegularEmployees(totalRegularEmployees)
                 .youthRegularEmployees(youthRegularEmployees).totalCasualEmployees(totalCasualEmployees)
                 .youthCasualEmployees(youthCasualEmployees).jgpId(jgpId)
                 .locationCountyCode(locationCountyCode.isPresent() ? locationCountyCode.get().getCountyCode() : "999")
-                .passport(passport).corpPinNumber(corpPinNumber).participantName(participantName).prePayment(prePayment).build();
+                .passport(passport).businessRegNumber(businessRegNumber).participantName(participantName).build();
     }
 
     public Count importEntity() {
@@ -330,10 +333,10 @@ public class LoanImportHandler implements ImportHandler {
         }
     }
 
-    private String validateTranchAllocated(String value, Row row) {
+    private String validateTranchAllocated(String allocatedTranch, BigDecimal tranchAmount, Row row) {
         final var deliveryModes = Set.of("TRANCH 1", "TRANCH 2", "TRANCH 3", "TRANCH 4", "TRANCH 5", "NOT APPLICABLE");
-        var modifiedValue = null == value ? null : value.replaceAll("[^a-zA-Z1-9 ]+", "").replaceAll("\\s+", " ").toUpperCase().trim();
-        if (null == rowErrorMap.get(row) && null != modifiedValue && !deliveryModes.contains(modifiedValue)){
+        var modifiedValue = null == allocatedTranch ? null : allocatedTranch.replaceAll("[^a-zA-Z1-9 ]+", "").replaceAll("\\s+", " ").toUpperCase().trim();
+        if (null == rowErrorMap.get(row) && ((null == modifiedValue && Objects.nonNull(tranchAmount) && tranchAmount.compareTo(BigDecimal.ZERO) > 0) || !deliveryModes.contains(modifiedValue))){
             rowErrorMap.put(row, "Invalid Value for Allocated Tranch (Must be Tranch 1/Tranch 2/Tranch 3/Tranch 4/Tranch 5/Not Applicable) !!");
         }else {
             return null != modifiedValue ? StringUtils.capitalize(modifiedValue.toLowerCase(Locale.ROOT)) : null;
@@ -357,6 +360,17 @@ public class LoanImportHandler implements ImportHandler {
         var modifiedValue = null == value ? null : value.replaceAll("[^a-zA-Z ]+", "").replaceAll("\\s+", " ").toUpperCase().trim();
         if (null == rowErrorMap.get(row) && null != modifiedValue && !loanProducts.contains(modifiedValue)){
             rowErrorMap.put(row, "Invalid Value for Loan quality (Must be Working Capital/Asset Finance/Stahimili/Purchase Order/Consignment Finance/Shariah Compliant) !!");
+        }else {
+            return null != modifiedValue ? StringUtils.capitalize(modifiedValue.toLowerCase(Locale.ROOT)) : null;
+        }
+        return null;
+    }
+
+    private String validateLoanerType(String value, Row row) {
+        final var loanProducts = Set.of("NEW", "REPEAT");
+        var modifiedValue = null == value ? null : value.replaceAll("[^a-zA-Z]+", "").replaceAll("\\s+", " ").toUpperCase().trim();
+        if (null == rowErrorMap.get(row) && null != modifiedValue && !loanProducts.contains(modifiedValue)){
+            rowErrorMap.put(row, "Invalid Value for Loaner Type (Must be New/Repeat) !!");
         }else {
             return null != modifiedValue ? StringUtils.capitalize(modifiedValue.toLowerCase(Locale.ROOT)) : null;
         }
