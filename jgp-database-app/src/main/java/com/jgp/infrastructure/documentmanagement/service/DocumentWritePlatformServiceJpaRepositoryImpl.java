@@ -1,7 +1,6 @@
 
 package com.jgp.infrastructure.documentmanagement.service;
 
-import com.jgp.authentication.service.PlatformSecurityContext;
 import com.jgp.infrastructure.core.domain.Base64EncodedFile;
 import com.jgp.infrastructure.documentmanagement.command.DocumentCommand;
 import com.jgp.infrastructure.documentmanagement.contentrepository.ContentRepository;
@@ -23,7 +22,6 @@ import java.io.InputStream;
 @Service
 public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWritePlatformService {
 
-    private final PlatformSecurityContext context;
     private final DocumentRepository documentRepository;
     private final ContentRepositoryFactory contentRepositoryFactory;
 
@@ -31,9 +29,8 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
     private static final String DOCUMENT_ERROR_MESSAGE = "Unknown data integrity issue with resource.";
 
     @Autowired
-    public DocumentWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final DocumentRepository documentRepository,
+    public DocumentWritePlatformServiceJpaRepositoryImpl(final DocumentRepository documentRepository,
             final ContentRepositoryFactory documentStoreFactory) {
-        this.context = context;
         this.documentRepository = documentRepository;
         this.contentRepositoryFactory = documentStoreFactory;
     }
@@ -54,7 +51,7 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
 
             return document.getId();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-            log.error("Error occured.", dve);
+            log.error("Error occurred: {}", dve.getMessage(), dve);
             throw new ContentManagementException(DOCUMENT_ERROR_MESSAGE_CODE, DOCUMENT_ERROR_MESSAGE, dve);
         }
     }
@@ -67,9 +64,7 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
         final DocumentCommand documentCommand = new DocumentCommand(null, null, entityType, entityId, name, fileName, fileSize, mimeType,
                 description, null);
 
-        final Long documentId = createDocument(documentCommand, inputStream);
-
-        return documentId;
+        return createDocument(documentCommand, inputStream);
 
     }
 
@@ -90,7 +85,7 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
 
             return document.getId();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-            log.error("Error occured.", dve);
+            log.error("Error occurred:", dve);
             throw new ContentManagementException(DOCUMENT_ERROR_MESSAGE_CODE, DOCUMENT_ERROR_MESSAGE, dve);
         }
     }
@@ -116,8 +111,6 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
         try {
 
             String oldLocation = null;
-            // TODO check if entity id is valid and within data scope for the
-            // user
             final Document documentForUpdate = this.documentRepository.findById(documentCommand.getId())
                     .orElseThrow(() -> new DocumentNotFoundException(documentCommand.getParentEntityType(),
                             documentCommand.getParentEntityId(), documentCommand.getId()));
@@ -156,7 +149,6 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
     public void deleteDocument(final DocumentCommand documentCommand) {
 
         validateParentEntityType(documentCommand);
-        // TODO: Check document is present under this entity Id
         final Document document = this.documentRepository.findById(documentCommand.getId())
                 .orElseThrow(() -> new DocumentNotFoundException(documentCommand.getParentEntityType(), documentCommand.getParentEntityId(),
                         documentCommand.getId()));

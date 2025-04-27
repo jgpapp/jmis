@@ -2,9 +2,8 @@ package com.jgp.dashboard.dto;
 
 import java.math.BigDecimal;
 
-public record CountySummaryDto(
-        String countyCode,
-        String countyName,
+public record DataSummaryDto(
+        String genderCategory,
         Integer businessesTrained,
         Integer businessesLoaned,
         BigDecimal amountDisbursed,

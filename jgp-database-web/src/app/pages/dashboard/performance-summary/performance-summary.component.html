@@ -38,11 +38,6 @@
                 <th mat-header-cell *matHeaderCellDef> Amount Disbursed </th>
                 <td mat-cell *matCellDef="let data"> {{data.amountDisbursed | number:'1.0-2'}} </td>
               </ng-container> 
-        
-              <ng-container matColumnDef="outStandingAmount">
-                <th mat-header-cell *matHeaderCellDef> Out-Standing Amount </th>
-                <td mat-cell *matCellDef="let data"> {{data.outStandingAmount | number:'1.0-2'}} </td>
-              </ng-container> 
           
             <tr mat-header-row *matHeaderRowDef="isFinancialDashboard() ? fiDisplayedColumns : taDisplayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: isFinancialDashboard() ? fiDisplayedColumns : taDisplayedColumns;"></tr>

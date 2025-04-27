@@ -1,6 +1,6 @@
 package com.jgp.infrastructure.bulkimport.listener;
 
-import com.jgp.dashboard.service.CountySummaryService;
+import com.jgp.dashboard.service.DataSummaryService;
 import com.jgp.infrastructure.bulkimport.event.DataApprovedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ import java.util.Objects;
 @Slf4j
 public class DataApprovedEventListener {
 
-    private final CountySummaryService countySummaryService;
+    private final DataSummaryService countySummaryService;
 
     @EventListener
     @Async
@@ -37,7 +37,9 @@ public class DataApprovedEventListener {
                 toDate = localDate;
             }
         }
-        this.countySummaryService.updateCountySummary(fromDate, toDate, dataApprovedEvent.partnerId());
+        for (var partnerId: dataApprovedEvent.partnerIds()){
+            this.countySummaryService.updateDataSummary(fromDate, toDate, partnerId);
+        }
 
     }
 }

@@ -50,6 +50,7 @@ export class DataUploaderComponent implements OnDestroy {
 
   bulkImport: any = {};
   template: File;
+  legalFormType: string | undefined;
   bulkImportForm: UntypedFormGroup;
   partnerType: string | undefined = 'NONE';
   public docsFilterForm: FormGroup;
@@ -153,36 +154,28 @@ export class DataUploaderComponent implements OnDestroy {
   onFileSelect($event: any) {
     if ($event.target.files.length > 0) {
       this.template = $event.target.files[0];
+      if (this.template.name.toUpperCase().includes('LOAN_IMPORT_TEMPLATE')) {
+        this.legalFormType = 'LOAN_IMPORT_TEMPLATE';
+      } else if (this.template.name.toUpperCase().includes('TA_IMPORT_TEMPLATE')) {
+        this.legalFormType = 'TA_IMPORT_TEMPLATE';
+      }
     }
   }
 
   uploadTemplate() {
-    let legalFormType = '';
-    let entityType = '';
-    /** Only for Client Bulk Imports */
-    if(this.authService.currentUser()?.partnerId){
-      if (this.template.name.toUpperCase().includes('LOAN_IMPORT_TEMPLATE')) {
-        legalFormType = 'LOAN_IMPORT_TEMPLATE';
-        entityType = 'loans';
-      } else if (this.template.name.toUpperCase().includes('TA_IMPORT_TEMPLATE')) {
-        legalFormType = 'TA_IMPORT_TEMPLATE';
-        entityType = 'bmos';
-      }else {
-        this.gs.openSnackBar('Invalid Template', "Dismiss");
-      }
-    }else{
+    if(!this.authService.currentUser()?.partnerId){
       this.gs.openSnackBar('User must be assigned to a patner!!', "Dismiss");
     }
 
-    if('' !== legalFormType){
+    if(this.legalFormType){
       let uploadProgressID = uuidv4();
       this.subscribeToUploadProgress(uploadProgressID);
-    this.dataUploadService.uploadDataTemplate(this.template, legalFormType, uploadProgressID)
+    this.dataUploadService.uploadDataTemplate(this.template, this.legalFormType, uploadProgressID)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
           this.importDocumentId = response.message;
-          this.entityType = legalFormType;
+          this.entityType = this.legalFormType;
           this.getAvailableDocuments();
         }
       });
@@ -207,13 +200,27 @@ export class DataUploaderComponent implements OnDestroy {
   }
 
   downLoadDocument(row: any){
-      this.dataUploadService.downloadDataImportedFile(row)
+      this.dataUploadService.downloadDataImportedFile(row, 'EXCEL')
         .pipe(takeUntil(this.unsubscribe$))
         .subscribe({
           next: (response) => {
               this.dataUploadService.downloadFileFromAPIResponse(response);
           }
         });
+  }
+
+  get buttonIsDisabled(): boolean {
+    return !this.template || !this.isExcelFile(this.template) || !this.authService.currentUser()?.partnerId || !this.legalFormType;
+  }
+
+  isExcelFile(file: File): boolean {
+    if (!file || !file.name) {
+      return false;
+    }
+    // Check if the file name ends with .xls or .xlsx (case insensitive)
+    const fileName = file.name;
+    const lowerCaseFileName = fileName.toLowerCase();
+    return lowerCaseFileName.endsWith('.xls') || lowerCaseFileName.endsWith('.xlsx');
   }
 
   ngOnDestroy(): void {

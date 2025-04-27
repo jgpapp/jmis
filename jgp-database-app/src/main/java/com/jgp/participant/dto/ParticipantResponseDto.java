@@ -60,6 +60,8 @@ public class ParticipantResponseDto implements Serializable {
 
     private String passport;
 
+    private String savings;
+
     private List<BMOClientDto> bmoClientDtos;
 
     private List<LoanDto> loanDtos;

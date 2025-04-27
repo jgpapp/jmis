@@ -1,19 +1,12 @@
 package com.jgp.infrastructure.bulkimport.populator.loan;
 
-import com.jgp.infrastructure.bulkimport.constants.BMOConstants;
 import com.jgp.infrastructure.bulkimport.constants.LoanConstants;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import com.jgp.infrastructure.bulkimport.populator.AbstractWorkbookPopulator;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.SpreadsheetVersion;
-import org.apache.poi.ss.usermodel.DataValidation;
-import org.apache.poi.ss.usermodel.DataValidationConstraint;
-import org.apache.poi.ss.usermodel.DataValidationHelper;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.util.CellRangeAddressList;
-import org.apache.poi.xssf.usermodel.XSSFDataValidationHelper;
 
 @Slf4j
 public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
@@ -29,7 +22,7 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         rowHeader.setHeight(TemplatePopulateImportConstants.ROW_HEADER_HEIGHT);
         worksheet.setColumnWidth(LoanConstants.PARTICIPANT_NAME_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.BUSINESS_NAME_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(LoanConstants.CORP_PIN_NUMBER, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.BUSINESS_REGISTRATION_NUMBER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.JGP_ID_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.BUSINESS_PHONE_NUMBER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.GENDER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
@@ -52,13 +45,14 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         worksheet.setColumnWidth(LoanConstants.LOANER_TYPE_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.LOAN_PRODUCT_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(LoanConstants.TRANCH_AMOUNT_ALLOCATED_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(LoanConstants.TRANCH_AMOUNT_DISBURSED_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.TRANCH_ALLOCATED_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.TRANCH_AMOUNT_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(LoanConstants.LOAN_IDENTIFIER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
 
 
         writeString(LoanConstants.PARTICIPANT_NAME_COL, rowHeader, "Participant Name*");
         writeString(LoanConstants.BUSINESS_NAME_COL, rowHeader, "Business Name");
-        writeString(LoanConstants.CORP_PIN_NUMBER, rowHeader, "Corporation PIN Number");
+        writeString(LoanConstants.BUSINESS_REGISTRATION_NUMBER_COL, rowHeader, "Business Registration Number");
         writeString(LoanConstants.JGP_ID_COL, rowHeader, "Unique JGP ID (National ID)*");
         writeString(LoanConstants.BUSINESS_PHONE_NUMBER_COL, rowHeader, "Business phone number*");
         writeString(LoanConstants.GENDER_COL, rowHeader, "Gender of owner*");
@@ -81,26 +75,10 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(LoanConstants.LOANER_TYPE_COL, rowHeader, "Loaner Type");
         writeString(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, rowHeader, "Date added to JGP database(yyyy-MM-dd)*");
         writeString(LoanConstants.LOAN_PRODUCT_COL, rowHeader, "Loan product* (Working Capital/Asset Finance/Stahimili/Purchase Order/Consignment Finance/Shariah Compliant)");
-        writeString(LoanConstants.TRANCH_AMOUNT_ALLOCATED_COL, rowHeader, "Tranch amount allocated(Tranch 1/Tranch 2/Tranch 3/Tranch 4/Tranch 5/Not Applicable)");
-        writeString(LoanConstants.TRANCH_AMOUNT_DISBURSED_COL, rowHeader, "Tranch Amount Disbursed (KES)");
+        writeString(LoanConstants.TRANCH_ALLOCATED_COL, rowHeader, "Tranch Allocated (Tranch 1/Tranch 2/Tranch 3/Tranch 4/Tranch 5/Not Applicable)");
+        writeString(LoanConstants.TRANCH_AMOUNT_COL, rowHeader, "Tranch Amount (KES)");
+        writeString(LoanConstants.LOAN_IDENTIFIER_COL, rowHeader, "Loan Identifier");
 
 
-    }
-
-    private void setRules(Sheet worksheet){
-        try {
-            CellRangeAddressList isRefugeeRange = new CellRangeAddressList(1, SpreadsheetVersion.EXCEL97.getLastRowIndex(),
-                    BMOConstants.REFUGEE_STATUS_COL, BMOConstants.REFUGEE_STATUS_COL);
-
-            DataValidationHelper validationHelper = new XSSFDataValidationHelper((org.apache.poi.xssf.usermodel.XSSFSheet) worksheet);
-
-            DataValidationConstraint isRefugeeConstraint = validationHelper.createExplicitListConstraint(new String[] { "Yes", "No" });
-
-            DataValidation isRefugeeValidation = validationHelper.createValidation(isRefugeeConstraint, isRefugeeRange);
-
-            worksheet.addValidationData(isRefugeeValidation);
-        } catch (Exception e) {
-            log.error("Error setting BMO template rules: {}", e.getMessage(), e);
-        }
     }
 }

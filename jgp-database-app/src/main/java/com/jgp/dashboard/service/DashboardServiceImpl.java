@@ -1,7 +1,7 @@
 package com.jgp.dashboard.service;
 
 import com.jgp.dashboard.dto.AnalyticsUpdateRequestDto;
-import com.jgp.dashboard.dto.CountySummaryDto;
+import com.jgp.dashboard.dto.DataSummaryDto;
 import com.jgp.dashboard.dto.DashboardSearchCriteria;
 import com.jgp.dashboard.dto.DataPointDto;
 import com.jgp.dashboard.dto.EmployeesSummaryDto;
@@ -63,7 +63,7 @@ public class DashboardServiceImpl implements DashboardService {
     private static final String TRAINING_PARTNER_PARAM = "trainingPartner";
     private static final String DATA_VALUE_PARAM = "dataValue";
     private static final String DATA_PERCENTAGE_VALUE_PARAM = "percentage";
-    private static final String LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM = "WHERE l.date_disbursed between :fromDate and :toDate  and l.data_is_approved = true ";
+    private static final String LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM = "WHERE lt.transaction_date between :fromDate and :toDate  and l.data_is_approved = true and lt.is_approved = true ";
     private static final String BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM = "WHERE bpd.date_partner_recorded between :fromDate and :toDate and bpd.data_is_approved = true ";
     private static final String LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and l.partner_id = :partnerId ";
     private static final String BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and bpd.partner_id = :partnerId ";
@@ -73,6 +73,10 @@ public class DashboardServiceImpl implements DashboardService {
     private static final String BUSINESSES_LOANED = "businessesLoaned";
     private static final String AMOUNT_DISBURSED = "amountDisbursed";
     private static final String OUT_STANDING_AMOUNT = "outStandingAmount";
+    private static final String GENDER_CATEGORY_PARAM = "genderCategory";
+    private static final String PARTNER_NAME_PARAM = "partnerName";
+    private static final String VALUE_PARAM = "value";
+    private static final String TOTAL_PARAM_PARAM = "%s Totals";
 
     @Value("${jgp.dashboard.default.view.period.in.months}")
     private Integer jgpDashboardDefaultViewPeriodInMonths;
@@ -566,9 +570,9 @@ public class DashboardServiceImpl implements DashboardService {
         }
         if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
             parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
-            whereClause = String.format("%s%s  and l.data_is_approved = true", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+            whereClause = String.format("%s%s  and l.data_is_approved = true and lt.is_approved = true", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
         }
-        whereClause = String.format("%s  and l.data_is_approved = true", whereClause);
+        whereClause = String.format("%s  and l.data_is_approved = true and lt.is_approved = true", whereClause);
         var sqlQuery = String.format(SeriesDataPointMapper.ACCESSED_AMOUNT_BY_PARTNER_BY_YEAR_SCHEMA, whereClause);
 
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
@@ -734,8 +738,8 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<CountySummaryDto> getCountySummary(LocalDate fromDate, LocalDate toDate, Long partnerId) {
-        final var countySummaryMapper = new CountySummaryDataMapper();
+    public List<DataSummaryDto> getDataSummary(LocalDate fromDate, LocalDate toDate, Long partnerId) {
+        final var countySummaryMapper = new DataSummaryDataMapper();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
             fromDate = getDefaultQueryDates().getLeft();
             toDate = getDefaultQueryDates().getRight();
@@ -750,13 +754,13 @@ public class DashboardServiceImpl implements DashboardService {
             bpdWhereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, bpdWhereClause);
             loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
         }
-        var sqlQuery = String.format(CountySummaryDataMapper.COUNTY_SUMMARY_SCHEMA, bpdWhereClause, loanWhereClause);
+        var sqlQuery = String.format(DataSummaryDataMapper.COUNTY_SUMMARY_SCHEMA, bpdWhereClause, loanWhereClause);
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, countySummaryMapper);
     }
 
     @Override
-    public Map<String, CountySummaryDto> getCountySummaryMap(LocalDate fromDate, LocalDate toDate, Long partnerId) {
-        return getCountySummary(fromDate, toDate, partnerId).stream().collect(Collectors.toMap(CountySummaryDto::countyCode, s -> s));
+    public Map<String, DataSummaryDto> getDataSummaryMap(LocalDate fromDate, LocalDate toDate, Long partnerId) {
+        return getDataSummary(fromDate, toDate, partnerId).stream().collect(Collectors.toMap(DataSummaryDto::genderCategory, s -> s));
     }
 
     @Override
@@ -764,14 +768,14 @@ public class DashboardServiceImpl implements DashboardService {
         final var performanceSummaryMapper = new PerformanceSummaryMapper();
         final var today = LocalDate.now(ZoneId.systemDefault());
         final var thisYear = Objects.nonNull(year) ? Integer.parseInt(year) : today.getYear();
-        var whereClause = Objects.nonNull(year) ? "where data_year = :fromYear " : "where data_year between :fromYear and :toYear ";
+        var whereClause = Objects.nonNull(year) ? "where ds.data_year = :fromYear " : "where ds.data_year between :fromYear and :toYear ";
         var parameters = new MapSqlParameterSource();
         parameters.addValue("fromYear", (thisYear - 3));
         parameters.addValue("toYear", thisYear);
 
         if (Objects.nonNull(partnerId)) {
             parameters.addValue(PARTNER_ID_PARAM, partnerId);
-            whereClause = "and partner_id = :partnerId ";
+            whereClause = "and ds.partner_id = :partnerId ";
         }
         var sqlQuery = String.format(PerformanceSummaryMapper.PERFORMANCE_SUMMARY_SCHEMA, whereClause);
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, performanceSummaryMapper);
@@ -779,21 +783,21 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public void updateAnalyticsData(AnalyticsUpdateRequestDto analyticsUpdateRequestDto) {
-        var partners = Objects.nonNull(analyticsUpdateRequestDto.partnerId()) ? List.of(analyticsUpdateRequestDto.partnerId()) : this.partnerRepository.findAll().stream().map(Partner::getId).toList();
+        var partnerIds = Objects.nonNull(analyticsUpdateRequestDto.partnerId()) ? Set.of(analyticsUpdateRequestDto.partnerId()) : this.partnerRepository.findAll().stream().map(Partner::getId).collect(Collectors.toSet());
         final var dataDates = Set.of(analyticsUpdateRequestDto.fromDate(), analyticsUpdateRequestDto.toDate());
-        partners.forEach(id -> this.applicationContext.publishEvent(new DataApprovedEvent(id, dataDates)));
+        this.applicationContext.publishEvent(new DataApprovedEvent(partnerIds, dataDates));
     }
 
     private static final class PerformanceSummaryMapper implements ResultSetExtractor<List<PerformanceSummaryDto>> {
 
         public static final String PERFORMANCE_SUMMARY_SCHEMA = """
-                 SELECT p.partner_name as partnerName, data_year as dataYear,\s
-                 data_month as dataMonth, sum(businesses_trained) as businessesTrained,\s
-                 sum(businesses_loaned) as businessesLoaned, sum(amount_disbursed) as amountDisbursed,\s
-                 sum(out_standing_amount) as outStandingAmount\s
-                 FROM county_summary cs \s
-                 inner join partners p on cs.partner_id = p.id\s
-                 %s group by 1, 2, 3 order by 2, 3;
+                 SELECT p.partner_name as partnerName, ds.data_year as dataYear, ds.data_month as dataMonth,\s
+                 ds.gender_category as genderCategory, sum(ds.businesses_trained) as businessesTrained,\s
+                 sum(ds.businesses_loaned) as businessesLoaned, sum(ds.amount_disbursed) as amountDisbursed,\s
+                 sum(ds.out_standing_amount) as outStandingAmount\s
+                 FROM data_summary ds \s
+                 inner join partners p on ds.partner_id = p.id\s
+                 %s group by 1, 2, 3, 4 order by 2, 3;
                 """;
 
         @Override
@@ -802,13 +806,14 @@ public class DashboardServiceImpl implements DashboardService {
             while (rs.next()){
                 final var businessesTrained = rs.getInt(BUSINESSES_TRAINED);
                 final var businessesLoaned = rs.getInt(BUSINESSES_LOANED);
+                final var genderCategory = rs.getString(GENDER_CATEGORY_PARAM);
                 final var amountDisbursed = rs.getBigDecimal(AMOUNT_DISBURSED);
                 final var outStandingAmount = rs.getBigDecimal(OUT_STANDING_AMOUNT);
                 final var year = rs.getInt("dataYear");
                 final var month = rs.getInt("dataMonth");
-                final var partner = rs.getString("partnerName");
+                final var partner = rs.getString(PARTNER_NAME_PARAM);
                 final var quarter = getQuarterFromMonth(month);
-                dataPoints.add(new PerformanceSummaryDto(year, month, partner, quarter, StringUtils.capitalize((Month.of(month).name()).toLowerCase(Locale.ROOT))+" Totals", businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount, new ArrayList<>()));
+                dataPoints.add(new PerformanceSummaryDto(year, month, genderCategory, partner, quarter, StringUtils.capitalize(genderCategory)+" Totals", businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount, new ArrayList<>()));
             }
             return groupAndSummarizeByPartner(dataPoints);
         }
@@ -823,9 +828,9 @@ public class DashboardServiceImpl implements DashboardService {
             };
         }
 
-        public List<PerformanceSummaryDto> groupAndSummarizeByPartner(List<PerformanceSummaryDto> data) {
+        public List<PerformanceSummaryDto> groupAndSummarizeByPartner(List<PerformanceSummaryDto> dataSummary) {
             // Group the data by year
-            Map<String, List<PerformanceSummaryDto>> groupedByPartner = data.stream()
+            Map<String, List<PerformanceSummaryDto>> groupedByPartner = dataSummary.stream()
                     .collect(Collectors.groupingBy(PerformanceSummaryDto::partner));
 
             // Process each group
@@ -856,8 +861,9 @@ public class DashboardServiceImpl implements DashboardService {
                                 null,
                                 null,
                                 null,
+                                null,
                                 partner,
-                                String.format("%s Totals", partner),
+                                String.format(TOTAL_PARAM_PARAM, partner),
                                 totalBusinessesTrained,
                                 totalBusinessesLoaned,
                                 totalAmountDisbursed,
@@ -875,9 +881,9 @@ public class DashboardServiceImpl implements DashboardService {
             return perPartnerSummary;
         }
 
-        public List<PerformanceSummaryDto> groupAndSummarizeByYear(List<PerformanceSummaryDto> data) {
+        public List<PerformanceSummaryDto> groupAndSummarizeByYear(List<PerformanceSummaryDto> partnerDataSummary) {
             // Group the data by year
-            Map<Integer, List<PerformanceSummaryDto>> groupedByYear = data.stream()
+            Map<Integer, List<PerformanceSummaryDto>> groupedByYear = partnerDataSummary.stream()
                     .collect(Collectors.groupingBy(PerformanceSummaryDto::year));
 
             // Process each group
@@ -909,6 +915,7 @@ public class DashboardServiceImpl implements DashboardService {
                                 null,
                                 null,
                                 null,
+                                null,
                                 String.format("Year %d Totals", year),
                                 totalBusinessesTrained,
                                 totalBusinessesLoaned,
@@ -927,13 +934,13 @@ public class DashboardServiceImpl implements DashboardService {
             return yearlySummary;
         }
 
-        public List<PerformanceSummaryDto> groupAndSummarizeYearDataPerQuarter(List<PerformanceSummaryDto> singleYearlyData) {
+        public List<PerformanceSummaryDto> groupAndSummarizeYearDataPerQuarter(List<PerformanceSummaryDto> singleYearlyDataSummary) {
             // Group the data by year
-                Map<String, List<PerformanceSummaryDto>> groupedByQuarter = singleYearlyData.stream()
+                Map<String, List<PerformanceSummaryDto>> groupedByQuarter = singleYearlyDataSummary.stream()
                         .collect(Collectors.groupingBy(PerformanceSummaryDto::quarter));
 
             // Process each group
-            return groupedByQuarter.entrySet().stream()
+            var quarterlySummary = groupedByQuarter.entrySet().stream()
                     .map(entry -> {
                         String quarter = entry.getKey();
                         List<PerformanceSummaryDto> children = entry.getValue();
@@ -961,7 +968,63 @@ public class DashboardServiceImpl implements DashboardService {
                                 null,
                                 null,
                                 null,
-                                String.format("%s Totals", quarter),
+                                quarter,
+                                String.format(TOTAL_PARAM_PARAM, quarter),
+                                totalBusinessesTrained,
+                                totalBusinessesLoaned,
+                                totalAmountDisbursed,
+                                totalOutstandingAmount,
+                                children
+                        );
+                    }).toList();
+
+            for (PerformanceSummaryDto dto: quarterlySummary) {
+                var newChildren = groupAndSummarizeYearDataPerMonth(dto.children());
+                dto.children().clear();
+                dto.children().addAll(newChildren);
+            }
+
+            return quarterlySummary;
+        }
+
+        public List<PerformanceSummaryDto> groupAndSummarizeYearDataPerMonth(List<PerformanceSummaryDto> singleQuarterDataSummary) {
+            // Group the data by year
+            Map<Integer, List<PerformanceSummaryDto>> groupedByQuarter = singleQuarterDataSummary.stream()
+                    .collect(Collectors.groupingBy(PerformanceSummaryDto::month));
+
+            // Process each group
+            return groupedByQuarter.entrySet().stream()
+                    .map(entry -> {
+                        final var theMonth = entry.getKey();
+                        List<PerformanceSummaryDto> children = entry.getValue();
+
+                        // Calculate the totals for this year
+                        Integer totalBusinessesTrained = children.stream()
+                                .mapToInt(PerformanceSummaryDto::businessesTrained)
+                                .sum();
+
+                        Integer totalBusinessesLoaned = children.stream()
+                                .mapToInt(PerformanceSummaryDto::businessesLoaned)
+                                .sum();
+
+                        BigDecimal totalAmountDisbursed = children.stream()
+                                .map(PerformanceSummaryDto::amountDisbursed)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                        BigDecimal totalOutstandingAmount = children.stream()
+                                .map(PerformanceSummaryDto::outStandingAmount)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                        // Create a parent PerformanceSummaryDto for this year
+                        var monthEnum = Month.of(theMonth);
+                        var monthName = Objects.nonNull(monthEnum) ? StringUtils.capitalize(monthEnum.name().toLowerCase(Locale.getDefault())) : "";
+                        return new PerformanceSummaryDto(
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                String.format(TOTAL_PARAM_PARAM, monthName),
                                 totalBusinessesTrained,
                                 totalBusinessesLoaned,
                                 totalAmountDisbursed,
@@ -977,14 +1040,13 @@ public class DashboardServiceImpl implements DashboardService {
 
         public static final String SCHEMA = """
                     with highLevelSummary as (\s
-                    select count(*) as businessesTrained,\s
+                    select count(bpd.*) as businessesTrained,\s
                     0 as businessesLoaned, 0 as amountDisbursed,\s
-                    0 as outStandingAmount from bmo_participants_data bpd\s
-                    inner join participants cl on bpd.participant_id = cl.id %s \s
+                    0 as outStandingAmount from bmo_participants_data bpd %s \s
                     union
-                    select 0 as businessesTrained, count(*) as businessesLoaned,\s
-                    sum(loan_amount_accessed) as amountDisbursed, sum(loan_outstanding_amount) as outStandingAmount from loans l\s
-                    inner join participants cl on l.participant_id = cl.id %s\s
+                    select 0 as businessesTrained, count(distinct l.*) as businessesLoaned,\s
+                    sum(lt.amount) as amountDisbursed, sum(lt.out_standing_amount) as outStandingAmount from loan_transactions lt\s
+                    inner join loans l on lt.loan_id = l.id %s\s
                     )
                     select sum(businessesTrained) as businessesTrained, sum(businessesLoaned) as businessesLoaned,\s
                     sum(amountDisbursed) as amountDisbursed, sum(outStandingAmount) as outStandingAmount
@@ -997,7 +1059,7 @@ public class DashboardServiceImpl implements DashboardService {
             final var businessesLoaned = rs.getInt(BUSINESSES_LOANED);
             final var amountDisbursed = rs.getBigDecimal(AMOUNT_DISBURSED);
             final var outStandingAmount = rs.getBigDecimal(OUT_STANDING_AMOUNT);
-            return new HighLevelSummaryDto(businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount);
+            return new HighLevelSummaryDto(CommonUtil.NUMBER_FORMAT.format(businessesTrained), CommonUtil.NUMBER_FORMAT.format(businessesLoaned), amountDisbursed, outStandingAmount);
         }
     }
 
@@ -1031,34 +1093,38 @@ public class DashboardServiceImpl implements DashboardService {
     private static final class DataPointMapper implements ResultSetExtractor<List<DataPointDto>> {
 
         public static final String LOANS_DISBURSED_BY_GENDER_SCHEMA = """
-                select cl.gender_category as dataKey, sum(l.loan_amount_accessed) as dataValue,\s
-                SUM(l.loan_amount_accessed) * 100.0 / SUM(SUM(l.loan_amount_accessed)) OVER () AS percentage\s
-                from loans l left join participants cl on l.participant_id = cl.id %s  group by 1;\s
+                select cl.gender_category as dataKey, sum(lt.amount) as dataValue,\s
+                SUM(lt.amount) * 100.0 / SUM(SUM(lt.amount)) OVER () AS percentage\s
+                from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
+                inner join participants cl on l.participant_id = cl.id %s  group by 1;\s
                 """;
 
         public static final String LOANS_DISBURSED_BY_SECTOR_SCHEMA = """
-                select cl.industry_sector as dataKey, sum(l.loan_amount_accessed) as dataValue,\s
-                SUM(l.loan_amount_accessed) * 100.0 / SUM(SUM(l.loan_amount_accessed)) OVER () AS percentage\s
-                from loans l left join participants cl on l.participant_id = cl.id %s  group by 1;\s
+                select cl.industry_sector as dataKey, sum(lt.amount) as dataValue,\s
+                SUM(lt.amount) * 100.0 / SUM(SUM(lt.amount)) OVER () AS percentage\s
+                from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
+                inner join participants cl on l.participant_id = cl.id %s  group by 1;\s
                 """;
 
         public static final String LOANS_DISBURSED_BY_SEGMENT_SCHEMA = """
-                select cl.business_segment as dataKey, sum(l.loan_amount_accessed) as dataValue,\s
-                SUM(l.loan_amount_accessed) * 100.0 / SUM(SUM(l.loan_amount_accessed)) OVER () AS percentage\s
-                from loans l left join participants cl on l.participant_id = cl.id %s  group by 1;\s
+                select cl.business_segment as dataKey, sum(lt.amount) as dataValue,\s
+                SUM(lt.amount) * 100.0 / SUM(SUM(lt.amount)) OVER () AS percentage\s
+                from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
+                inner join participants cl on l.participant_id = cl.id %s  group by 1;\s
                 """;
 
         public static final String LOANS_DISBURSED_TOP_FOUR_PARTNERS_SCHEMA = """
-                select p.partner_name as dataKey, sum(l.loan_amount_accessed) as dataValue,
-                sum(l.loan_amount_accessed) * 100.0 / sum(sum(l.loan_amount_accessed)) OVER () AS percentage
-                from loans l inner join partners p on l.partner_id = p.id\s
-                inner join participants cl on l.participant_id = cl.id %s group by 1 order by 2 DESC limit 4;
+                select p.partner_name as dataKey, sum(lt.amount) as dataValue,
+                sum(lt.amount) * 100.0 / sum(sum(lt.amount)) OVER () AS percentage\s
+                from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
+                inner join partners p on l.partner_id = p.id %s group by 1 order by 2 DESC limit 4;
                \s""";
 
         public static final String LOANS_DISBURSED_TOP_FOUR_LOCATIONS_SCHEMA = """
-                select p.business_location as dataKey, sum(l.loan_amount_accessed) as dataValue,
-                sum(l.loan_amount_accessed) * 100.0 / sum(sum(l.loan_amount_accessed)) OVER () AS percentage
-                from loans l inner join participants p on l.participant_id = p.id %s group by 1 order by 2 DESC limit 4;
+                select p.business_location as dataKey, sum(lt.amount) as dataValue,
+                sum(lt.amount) * 100.0 / sum(sum(lt.amount)) OVER () AS percentage
+                from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
+                inner join participants p on l.participant_id = p.id %s group by 1 order by 2 DESC limit 4;
                 """;
 
         public static final String BUSINESSES_TRAINED_TOP_FOUR_LOCATIONS_SCHEMA = """
@@ -1071,33 +1137,33 @@ public class DashboardServiceImpl implements DashboardService {
                 select cl.gender_category as dataKey, count(cl.id) as dataValue,\s
                 count(cl.id) * 100.0 / sum(count(cl.id)) OVER () AS percentage\s
                 from participants cl inner join bmo_participants_data bpd on bpd.participant_id = cl.id\s
-                inner join partners p on p.id = bpd.partner_id %s  group by 1;\s
+                %s  group by 1;\s
                 """;
 
         public static final String LOANS_DISBURSED_BY_PIPELINE_SCHEMA = """
-                select l.pipeline_source as dataKey, sum(l.loan_amount_accessed) as dataValue,\s
-                SUM(l.loan_amount_accessed) * 100.0 / SUM(SUM(l.loan_amount_accessed)) OVER () AS percentage\s
-                from loans l inner join participants cl on l.participant_id = cl.id %s group by 1;\s
+                select l.pipeline_source as dataKey, sum(lt.amount) as dataValue,\s
+                SUM(lt.amount) * 100.0 / SUM(SUM(lt.amount)) OVER () AS percentage\s
+                from loan_transactions lt inner join loans l on lt.loan_id = l.id %s group by 1;\s
                 """;
 
         public static final String LOANS_DISBURSED_BY_QUALITY_SCHEMA = """
-                select l.loan_quality as dataKey, sum(l.loan_amount_accessed) as dataValue,\s
-                SUM(l.loan_amount_accessed) * 100.0 / SUM(SUM(l.loan_amount_accessed)) OVER () AS percentage\s
-                from loans l inner join participants cl on l.participant_id = cl.id %s group by 1;\s
+                select l.loan_quality as dataKey, sum(lt.amount) as dataValue,\s
+                SUM(lt.amount) * 100.0 / SUM(SUM(lt.amount)) OVER () AS percentage\s
+                from loan_transactions lt inner join loans l on lt.loan_id = l.id %s group by 1;\s
                 """;
 
         public static final String BUSINESSES_TRAINED_BY_SECTOR_SCHEMA = """
                 select cl.industry_sector as dataKey, count(cl.id) as dataValue,\s
                 count(cl.id) * 100.0 / sum(count(cl.id)) OVER () AS percentage\s
                 from participants cl inner join bmo_participants_data bpd on bpd.participant_id = cl.id\s
-                inner join partners p on p.id = bpd.partner_id %s group by 1;\s
+                %s group by 1;\s
                 """;
 
         public static final String BUSINESSES_TRAINED_BY_SEGMENT_SCHEMA = """
                 select cl.business_segment as dataKey, count(cl.id) as dataValue,\s
                 count(cl.id) * 100.0 / sum(count(cl.id)) OVER () AS percentage\s
                 from participants cl inner join bmo_participants_data bpd on bpd.participant_id = cl.id\s
-                inner join partners p on p.id = bpd.partner_id %s group by 1;\s
+                %s group by 1;\s
                 """;
 
         private final String valueDataType;
@@ -1135,18 +1201,18 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
                \s""";
 
     public static final String TRAINING_BY_PARTNER_BY_GENDER_SCHEMA = """
-                SELECT p.partner_name AS name, cl.gender_category as seriesName, COUNT(*) AS value
+                SELECT p.partner_name AS name, cl.gender_category as seriesName, COUNT(cl.*) AS value
                 FROM participants cl inner join bmo_participants_data bpd on bpd.participant_id = cl.id\s
                 inner join partners p on p.id  = bpd.partner_id %s group by 1, 2;\s
                \s""";
 
     public static final String ACCESSED_AMOUNT_BY_PARTNER_BY_YEAR_SCHEMA = """
              SELECT p.partner_name as name,\s
-             EXTRACT(YEAR FROM l.date_disbursed) AS seriesName,\s
-             SUM(l.loan_amount_accessed) AS value\s
-             FROM loans l inner join partners p on p.id = l.partner_id\s
-             inner join participants cl on l.participant_id = cl.id\s
-             WHERE EXTRACT(YEAR FROM l.date_disbursed) >= EXTRACT(YEAR FROM current_date) - 2 %s\s
+             EXTRACT(YEAR FROM lt.transaction_date) AS seriesName,\s
+             SUM(lt.amount) AS value\s
+             from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
+             inner join partners p on p.id = l.partner_id\s
+             WHERE EXTRACT(YEAR FROM lt.transaction_date) >= EXTRACT(YEAR FROM current_date) - 2 %s\s
              GROUP BY 1, 2\s
              ORDER BY 2 ASC;
            \s""";
@@ -1154,30 +1220,28 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
 
     public static final String LOAN_AMOUNT_ACCESSED_VS_OUTSTANDING_PER_PARTNER_BY_YEAR_SCHEMA = """
              SELECT p.partner_name AS name,\s
-             'ACCESSED' as seriesName, SUM(l.loan_amount_accessed) AS value
-              FROM loans l\s
-              inner join partners p on p.id  = l.partner_id \s
-              inner join participants cl on l.participant_id = cl.id %s
+             'ACCESSED' as seriesName, SUM(lt.amount) AS value
+              from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
+              inner join partners p on p.id  = l.partner_id %s\s
               group by 1, 2
               union\s
               SELECT p.partner_name AS name,\s
-             'OUT-STANDING' as seriesName, SUM(l.loan_outstanding_amount) AS value
-              FROM loans l\s
-              inner join partners p on p.id  = l.partner_id\s
-              inner join participants cl on l.participant_id = cl.id %s
+             'OUT-STANDING' as seriesName, SUM(lt.out_standing_amount) AS value
+              from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
+              inner join partners p on p.id  = l.partner_id %s\s
               group by 1, 2;
            \s""";
 
     public static final String LOAN_AMOUNT_ACCESSED_VS_OUTSTANDING_PER_GENDER_SCHEMA = """
              SELECT cl.owner_gender AS name,
-              'ACCESSED' as seriesName, SUM(l.loan_amount_accessed) AS value
-               FROM loans l
+              'ACCESSED' as seriesName, SUM(lt.amount) AS value
+               from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
                inner join participants cl on cl.id  = l.participant_id %s\s
                group by 1, 2
                union
                SELECT cl.owner_gender AS name,
-              'OUT-STANDING' as seriesName, SUM(l.loan_outstanding_amount) AS value
-               FROM loans l
+              'OUT-STANDING' as seriesName, SUM(lt.out_standing_amount) AS value
+               from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
                inner join participants cl on cl.id  = l.participant_id %s\s
                group by 1, 2;
            \s""";
@@ -1192,7 +1256,7 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
             final var nullableTaName = CommonUtil.defaultToOtherIfStringIsNull(taName);
             final var nullableSeriesName = CommonUtil.defaultToOtherIfStringIsNull(seriesName);
 
-            final var value = rs.getInt("value");
+            final var value = rs.getInt(VALUE_PARAM);
 
             if (dataPointsMap.containsKey(nullableTaName)){
                 var genderMap = dataPointsMap.get(nullableTaName);
@@ -1223,10 +1287,12 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
 
         public static final String ACCESSED_AMOUNT_BY_PARTNER_BY_YEAR_SCHEMA = """
              SELECT p.partner_name as partnerName,\s
-             EXTRACT(YEAR FROM l.date_disbursed) AS year,\s
+             EXTRACT(YEAR FROM lt.transaction_date) AS year,\s
              cl.gender_category as genderName,\s
-             SUM(l.loan_amount_accessed) as value\s
-             FROM loans l inner join partners p on p.id = l.partner_id\s
+             SUM(lt.amount) as value\s
+             from loan_transactions lt\s
+             inner join loans l on lt.loan_id = l.id\s
+             inner join partners p on p.id = l.partner_id\s
              inner join participants cl on l.participant_id = cl.id %s\s
              GROUP BY 1, 2, 3\s
              ORDER BY 2 ASC;
@@ -1234,10 +1300,12 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
 
         public static final String ACCESSED_LOAN_COUNT_BY_PARTNER_BY_YEAR_SCHEMA = """
              SELECT p.partner_name as partnerName,\s
-             EXTRACT(YEAR FROM l.date_disbursed) AS year,\s
+             EXTRACT(YEAR FROM lt.transaction_date) AS year,\s
              cl.gender_category as genderName,\s
-             COUNT(*) AS value\s
-             FROM loans l inner join partners p on p.id = l.partner_id\s
+             COUNT(distinct l.*) AS value\s
+             from loan_transactions lt\s
+             inner join loans l on lt.loan_id = l.id\s
+             inner join partners p on p.id = l.partner_id\s
              inner join participants cl on l.participant_id = cl.id %s\s
              GROUP BY 1, 2, 3\s
              ORDER BY 2 ASC;
@@ -1247,7 +1315,7 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
              SELECT p.partner_name as partnerName,\s
              EXTRACT(YEAR FROM bpd.date_partner_recorded) AS year,\s
              cl.gender_category as genderName,\s
-             COUNT(*) AS value\s
+             COUNT(distinct cl.*) AS value\s
              FROM bmo_participants_data bpd inner join partners p on p.id = bpd.partner_id\s
              inner join participants cl on bpd.participant_id = cl.id %s\s
              GROUP BY 1, 2, 3\s
@@ -1265,10 +1333,10 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
         public List<PartnerYearlyDataDto> extractData(ResultSet rs) throws SQLException, DataAccessException {
             var dataPoints = new ArrayList<PartnerYearlyDataDto>();
             while (rs.next()){
-                final var partnerName = rs.getString("partnerName");
+                final var partnerName = rs.getString(PARTNER_NAME_PARAM);
                 final var genderName = rs.getString("genderName");
                 final var year = rs.getInt("year");
-                final var value = INTEGER_DATA_POINT_TYPE.equals(valueDataType) ? rs.getInt("value") : rs.getBigDecimal("value");
+                final var value = INTEGER_DATA_POINT_TYPE.equals(valueDataType) ? rs.getInt(VALUE_PARAM) : rs.getBigDecimal(VALUE_PARAM);
                 dataPoints.add(new PartnerYearlyDataDto(StringUtils.capitalize(CommonUtil.defaultToOtherIfStringIsNull(partnerName)), StringUtils.capitalize(CommonUtil.defaultToOtherIfStringIsNull(genderName)), year, CommonUtil.NUMBER_FORMAT.format(value)));
 
             }
@@ -1291,9 +1359,9 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
         public List<TaTypeTrainedBusinessDto> extractData(ResultSet rs) throws SQLException, DataAccessException {
             var dataPoints = new ArrayList<TaTypeTrainedBusinessDto>();
             while (rs.next()){
-                final var partnerName = rs.getString("partnerName");
+                final var partnerName = rs.getString(PARTNER_NAME_PARAM);
                 final var taType = rs.getString("taType");
-                final var genderCategory = rs.getString("genderCategory");
+                final var genderCategory = rs.getString(GENDER_CATEGORY_PARAM);
                 final var businessesTrained = rs.getInt(BUSINESSES_TRAINED);
                 dataPoints.add(new TaTypeTrainedBusinessDto(StringUtils.capitalize(CommonUtil.defaultToOtherIfStringIsNull(partnerName)), taType, genderCategory, CommonUtil.NUMBER_FORMAT.format(businessesTrained)));
             }
@@ -1301,40 +1369,39 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
         }
     }
 
-    private static final class CountySummaryDataMapper implements ResultSetExtractor<List<CountySummaryDto>> {
+    private static final class DataSummaryDataMapper implements ResultSetExtractor<List<DataSummaryDto>> {
 
         public static final String COUNTY_SUMMARY_SCHEMA = """
                 with highLevelSummary as (
-                                     select p.location_county_code as county, count(*) as businessesTrained,
+                                     select p.gender_category as genderCategory, count(bpd.*) as businessesTrained,
                                      0 as businessesLoaned, 0 as amountDisbursed,
                                      0 as outStandingAmount from bmo_participants_data bpd\s
                                      inner join participants p on p.id = bpd.participant_id %s
                                      group by 1
                                      union
-                                     select p.location_county_code as county, 0 as businessesTrained, count(*) as businessesLoaned,
-                                     sum(loan_amount_accessed) as amountDisbursed, sum(loan_outstanding_amount) as outStandingAmount from loans l\s
+                                     select p.gender_category as genderCategory, 0 as businessesTrained, count(distinct l.*) as businessesLoaned,
+                                     sum(lt.amount) as amountDisbursed, sum(lt.out_standing_amount) as outStandingAmount\s
+                                     from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
                                      inner join participants p on p.id = l.participant_id %s\s
                                      group by 1
                                      )
-                                     select county, sum(businessesTrained) as businessesTrained, sum(businessesLoaned) as businessesLoaned,
+                                     select genderCategory, sum(businessesTrained) as businessesTrained, sum(businessesLoaned) as businessesLoaned,
                                      sum(amountDisbursed) as amountDisbursed, sum(outStandingAmount) as outStandingAmount
                                      from highLevelSummary group by 1;
                \s""";
 
 
         @Override
-        public List<CountySummaryDto> extractData(ResultSet rs) throws SQLException, DataAccessException {
-            var dataPoints = new ArrayList<CountySummaryDto>();
+        public List<DataSummaryDto> extractData(ResultSet rs) throws SQLException, DataAccessException {
+            var dataPoints = new ArrayList<DataSummaryDto>();
             while (rs.next()){
-                final var countyCode = rs.getString("county");
+                final var genderCategory = rs.getString(GENDER_CATEGORY_PARAM);
                 final var businessesTrained = rs.getInt(BUSINESSES_TRAINED);
                 final var businessesLoaned = rs.getInt(BUSINESSES_LOANED);
                 final var amountDisbursed = rs.getBigDecimal(AMOUNT_DISBURSED);
                 final var outStandingAmount = rs.getBigDecimal(OUT_STANDING_AMOUNT);
 
-                final var county = CommonUtil.KenyanCounty.getKenyanCountyFromCode(countyCode);
-                final var kenyaCounty = county.orElse(CommonUtil.KenyanCounty.UNKNOWN);
-                dataPoints.add(new CountySummaryDto(CommonUtil.defaultToOtherIfStringIsNull(countyCode), kenyaCounty.getCountyName(), businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount, 2025, 2));
+                dataPoints.add(new DataSummaryDto(genderCategory, businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount, 2025, 2));
             }
             return dataPoints;
         }

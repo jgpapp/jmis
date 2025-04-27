@@ -23,6 +23,7 @@ public abstract class CommonUtil {
     public static final String NO_RESOURCE_FOUND_WITH_ID = "No resource found with Id";
     public static final String RESOURCE_CREATED = "Resource Created";
     public static final String RESOURCE_UPDATED = "Resource Updated";
+    public static final String RESOURCE_DELETED = "Resource Deleted";
 
     public static final String NO_FILE_TO_UPLOAD = "No File To Upload Was Found!";
 
