@@ -54,7 +54,7 @@
               <mat-hint>Please <strong>DO NOT</strong> change the names of the data template as they were downloaded.</mat-hint>
         
               <div fxFlex="13%">
-                <button mat-raised-button color="primary" [disabled]="!template" (click)="uploadTemplate()">
+                <button mat-raised-button color="primary" [disabled]="buttonIsDisabled" (click)="uploadTemplate()">
                   <mat-icon>cloud_upload</mat-icon>&nbsp;&nbsp;Upload
                 </button>
               </div>

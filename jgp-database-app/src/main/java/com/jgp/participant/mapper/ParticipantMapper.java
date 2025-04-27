@@ -2,9 +2,13 @@ package com.jgp.participant.mapper;
 
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.dto.ParticipantResponseDto;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import com.jgp.util.CommonUtil;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -40,17 +44,8 @@ public class ParticipantMapper {
             if ( participant.getBusinessSegment() != null ) {
                 participantResponseDto.setBusinessSegment( participant.getBusinessSegment() );
             }
-            if ( participant.getIsBusinessRegistered() != null ) {
-                participantResponseDto.setIsBusinessRegistered( participant.getIsBusinessRegistered() );
-            }
             if ( participant.getRegistrationNumber() != null ) {
                 participantResponseDto.setRegistrationNumber( participant.getRegistrationNumber() );
-            }
-            if ( participant.getHasBMOMembership() != null ) {
-                participantResponseDto.setHasBMOMembership( participant.getHasBMOMembership() );
-            }
-            if ( participant.getBmoMembership() != null ) {
-                participantResponseDto.setBmoMembership( participant.getBmoMembership() );
             }
             if ( participant.getBestMonthlyRevenue() != null ) {
                 participantResponseDto.setBestMonthlyRevenue( participant.getBestMonthlyRevenue() );
@@ -79,6 +74,7 @@ public class ParticipantMapper {
             if ( participant.getRefugeeStatus() != null ) {
                 participantResponseDto.setRefugeeStatus( participant.getRefugeeStatus() );
             }
+            participantResponseDto.setSavings( null != participant.getPrePayment() ? CommonUtil.NUMBER_FORMAT.format(participant.getPrePayment()) : "0.00");
             participantResponseDto.setOwnerGender( null != participant.getOwnerGender() ? participant.getOwnerGender().getName() : null );
             participantResponseDto.setPassport( null != participant.getPassport() ? participant.getPassport() : null );
         }

@@ -124,7 +124,7 @@ export class DashboardService {
     }
 
     getCountySummaryMap(dashBoardFilters: any = undefined): Observable<any> {
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/county-summary-map?${this.getDashBoardQueryParams(dashBoardFilters)}`);
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/data-summary-map?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
     getPerformanceSummary(year: string | undefined, partnerId: number | undefined): Observable<any> {

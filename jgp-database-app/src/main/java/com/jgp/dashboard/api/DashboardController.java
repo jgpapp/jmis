@@ -2,7 +2,7 @@ package com.jgp.dashboard.api;
 
 import com.jgp.dashboard.dto.AnalyticsUpdateRequestDto;
 import com.jgp.dashboard.dto.CountyDto;
-import com.jgp.dashboard.dto.CountySummaryDto;
+import com.jgp.dashboard.dto.DataSummaryDto;
 import com.jgp.dashboard.dto.DashboardSearchCriteria;
 import com.jgp.dashboard.dto.DataPointDto;
 import com.jgp.dashboard.dto.HighLevelSummaryDto;
@@ -251,18 +251,18 @@ public class DashboardController {
         return new ResponseEntity<>(this.dashboardService.getLoansAccessedVsOutStandingByGenderSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, null)), HttpStatus.OK);
     }
 
-    @GetMapping("county-summary")
-    public ResponseEntity<List<CountySummaryDto>> getCountySummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
-                                                                   @RequestParam(value = "from-date", required = false) LocalDate fromDate,
-                                                                   @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getCountySummary(fromDate, toDate, partnerId), HttpStatus.OK);
+    @GetMapping("data-summary")
+    public ResponseEntity<List<DataSummaryDto>> getDataSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                 @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                 @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        return new ResponseEntity<>(this.dashboardService.getDataSummary(fromDate, toDate, partnerId), HttpStatus.OK);
     }
 
-    @GetMapping("county-summary-map")
-    public ResponseEntity<Map<String, CountySummaryDto>> getCountySummaryMap(@RequestParam(value = "partner-id", required = false) Long partnerId,
-                                                                     @RequestParam(value = "from-date", required = false) LocalDate fromDate,
-                                                                     @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getCountySummaryMap(fromDate, toDate, partnerId), HttpStatus.OK);
+    @GetMapping("data-summary-map")
+    public ResponseEntity<Map<String, DataSummaryDto>> getDataSummaryMap(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                           @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                           @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        return new ResponseEntity<>(this.dashboardService.getDataSummaryMap(fromDate, toDate, partnerId), HttpStatus.OK);
     }
 
     @GetMapping("kenyan-counties")

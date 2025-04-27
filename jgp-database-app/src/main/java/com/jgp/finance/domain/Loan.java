@@ -4,6 +4,7 @@ import com.jgp.authentication.domain.AppUser;
 import com.jgp.participant.domain.Participant;
 import com.jgp.patner.domain.Partner;
 import com.jgp.shared.domain.BaseEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,6 +12,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -23,6 +25,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Getter
 @Entity
@@ -45,39 +50,20 @@ public class Loan extends BaseEntity {
     @Column(name = "pipeline_source")
     private String pipeLineSource;
 
-    @Column(name = "loan_amount_applied")
-    private BigDecimal loanAmountApplied;
-
-    @Column(name = "loan_amount_approved")
-    private BigDecimal loanAmountApproved;
-
     @NotNull(message = "Loan Amount is required !!")
     @Min(value = 0, message = "Loan Amount is required !!")
-    @Column(name = "loan_amount_accessed")
-    private BigDecimal loanAmountAccessed;
+    @Column(name = "loan_amount")
+    private BigDecimal loanAmount;
 
     @NotNull(message = "Outstanding Loan Amount is required !!")
-    @Min(value = 0, message = "Outstanding Loan Amount is required !!")
     @Column(name = "loan_outstanding_amount")
     private BigDecimal loanOutStandingAmount;
-
-    @Column(name = "loan_amount_usd")
-    private BigDecimal loanAmountUSD;
 
     @Column(name = "loan_amount_repaid")
     private BigDecimal loanAmountRepaid;
 
     @Column(name = "loaner_type")
     private String loanerType;
-
-    @Column(name = "loan_type")
-    private String loanType;
-
-    @Column(name = "tranch_amount_allocated")
-    private BigDecimal tranchAmountAllocated;
-
-    @Column(name = "tranch_amount_disbursed")
-    private BigDecimal tranchAmountDisbursed;
 
     @Column(name = "loan_product")
     private String loanProduct;
@@ -89,9 +75,6 @@ public class Loan extends BaseEntity {
     @NotNull(message = "Application Date is required !!")
     @Column(name = "date_applied")
     private LocalDate dateApplied;
-
-    @Column(name = "is_repeat_customer")
-    private boolean isRepeatCustomer;
 
     @Column(name = "date_recorded_by_partner")
     private LocalDate dateRecordedByPartner;
@@ -126,6 +109,9 @@ public class Loan extends BaseEntity {
     @Column(name = "date_approved")
     private LocalDate dateApproved;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "loan", orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<LoanTransaction> loanTransactions = new HashSet<>();
+
     private transient Integer rowIndex;
 
     public Loan() {
@@ -134,12 +120,11 @@ public class Loan extends BaseEntity {
     public Loan(Partner partner, Participant participant, String loanNumber,
                 String pipeLineSource, LoanQuality loanQuality,
                 LoanStatus loanStatus, LocalDate dateApplied,
-                LocalDate dateDisbursed, BigDecimal loanAmountAccessed,
+                LocalDate dateDisbursed, BigDecimal loanAmount,
                 Integer loanDuration, BigDecimal loanOutStandingAmount,
                 LocalDate dateRecordedByPartner, String uniqueValues,
                 LocalDate dateAddedToDB, BigDecimal loanAmountRepaid,
-                String loanerType, BigDecimal tranchAmountAllocated,
-                BigDecimal tranchAmountDisbursed, String loanProduct, AppUser createdBy, Integer rowIndex) {
+                String loanerType, String loanProduct, AppUser createdBy, Integer rowIndex) {
         this.partner = partner;
         this.participant = participant;
         this.loanNumber = loanNumber;
@@ -148,22 +133,25 @@ public class Loan extends BaseEntity {
         this.loanStatus = loanStatus;
         this.dateApplied = dateApplied;
         this.dateDisbursed = dateDisbursed;
-        this.loanAmountAccessed = loanAmountAccessed;
+        this.loanAmount = loanAmount;
         this.loanDuration = loanDuration;
         this.loanOutStandingAmount = loanOutStandingAmount;
         this.dateRecordedByPartner = dateRecordedByPartner;
         this.uniqueValues = uniqueValues;
         this.dateAddedToDB = dateAddedToDB;
         this.rowIndex = rowIndex;
-        this.loanAmountUSD = BigDecimal.ZERO;
         this.loanAmountRepaid = loanAmountRepaid;
         this.loanerType = loanerType;
-        this.loanType = "loan Type";
-        this.tranchAmountAllocated = tranchAmountAllocated;
-        this.tranchAmountDisbursed = tranchAmountDisbursed;
         this.loanProduct = loanProduct;
         this.isDataApprovedByPartner = false;
         this.setCreatedBy(createdBy);
+    }
+
+    public void addLoanTransaction(LoanTransaction loanTransaction){
+        if (Objects.nonNull(loanTransaction)) {
+            loanTransaction.setLoan(this);
+            this.loanTransactions.add(loanTransaction);
+        }
     }
 
     public void approveData(Boolean approval, AppUser user){

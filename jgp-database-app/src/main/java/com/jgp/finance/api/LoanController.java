@@ -3,7 +3,9 @@ package com.jgp.finance.api;
 import com.jgp.finance.domain.Loan;
 import com.jgp.finance.dto.LoanDto;
 import com.jgp.finance.dto.LoanSearchCriteria;
+import com.jgp.finance.dto.LoanTransactionResponseDto;
 import com.jgp.finance.service.LoanService;
+import com.jgp.finance.service.LoanTransactionService;
 import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
 import com.jgp.infrastructure.bulkimport.service.BulkImportWorkbookService;
@@ -35,6 +37,7 @@ import java.util.List;
 public class LoanController {
 
     private final LoanService loanService;
+    private final LoanTransactionService loanTransactionService;
     private final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService;
     private final BulkImportWorkbookService bulkImportWorkbookService;
 
@@ -50,6 +53,18 @@ public class LoanController {
                 PageRequest.of(pageNumber, pageSize, Sort.by("dateCreated").descending());
         return new ResponseEntity<>(this.loanService.getLoans(new LoanSearchCriteria(partnerId, participantId, status, quality, approvedByPartner, null, null), sortedByDateCreated), HttpStatus.OK);
     }
+
+    @GetMapping("transactions")
+    public ResponseEntity<Page<LoanTransactionResponseDto>> getAvailableLoanTransactions(@RequestParam(name = "partnerId", required = false) Long partnerId,
+                                                                                         @RequestParam(name = "loanId", required = false) Long loanId,
+                                                                                         @RequestParam(name = "isApproved") Boolean isApproved,
+                                                                                         @RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
+                                                                                         @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
+        final var sortedByDateCreated =
+                PageRequest.of(pageNumber, pageSize, Sort.by("dateCreated").ascending());
+        return new ResponseEntity<>(this.loanService.getAvailableLoanTransactions(partnerId, loanId, isApproved , sortedByDateCreated), HttpStatus.OK);
+    }
+
 
     @PostMapping("upload-template/{documentProgressId}")
     public ResponseEntity<ApiResponseDto> uploadLoansData(@RequestParam("excelFile") MultipartFile excelFile, @PathVariable("documentProgressId") String documentProgressId) {
@@ -72,6 +87,12 @@ public class LoanController {
     @PostMapping("approve-or-reject")
     public ResponseEntity<ApiResponseDto> approveLoansData(@RequestBody List<Long> loanIds, @RequestParam(name = "approved") Boolean approved) {
         this.loanService.approvedParticipantsLoansData(loanIds, approved);
+        return new ResponseEntity<>(new ApiResponseDto(true, CommonUtil.RESOURCE_UPDATED), HttpStatus.OK);
+    }
+
+    @PostMapping("approve-or-reject-transactions")
+    public ResponseEntity<ApiResponseDto> approvedTransactionsLoans(@RequestBody List<Long> transactionsIds, @RequestParam(name = "approved") Boolean approved) {
+        this.loanService.approvedTransactionsLoans(transactionsIds, approved);
         return new ResponseEntity<>(new ApiResponseDto(true, CommonUtil.RESOURCE_UPDATED), HttpStatus.OK);
     }
 }

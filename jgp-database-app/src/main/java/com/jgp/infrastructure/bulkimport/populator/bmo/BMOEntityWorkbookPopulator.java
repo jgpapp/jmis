@@ -42,7 +42,7 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         worksheet.setColumnWidth(BMOConstants.INDUSTRY_SECTOR_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.BUSINESS_SEGMENT_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.TA_DELIVERY_MODE, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(BMOConstants.BUSINESS_IS_REGISTERED, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(BMOConstants.BUSINESS_REGISTRATION_NUMBER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.BEST_MONTH_MONTHLY_REVENUE_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.WORST_MONTH_MONTHLY_REVENUE_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.TOTAL_REGULAR_EMPLOYEES_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
@@ -72,7 +72,7 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(BMOConstants.INDUSTRY_SECTOR_COL, rowHeader, "Industry sector(Agriculture, Artists/artisans, Manufacturing, Trading & Retail, Other)");
         writeString(BMOConstants.BUSINESS_SEGMENT_COL, rowHeader, "Business segment*(Micro/SME)");
         writeString(BMOConstants.TA_DELIVERY_MODE, rowHeader, "TA delivery mode*(In person/Virtual/Mixed)");
-        writeString(BMOConstants.BUSINESS_IS_REGISTERED, rowHeader, "Is your business registered?* (Yes/No)");
+        writeString(BMOConstants.BUSINESS_REGISTRATION_NUMBER_COL, rowHeader, "Business Registration Number");
         writeString(BMOConstants.BEST_MONTH_MONTHLY_REVENUE_COL, rowHeader, "Monthly revenues in best month (KES)");
         writeString(BMOConstants.WORST_MONTH_MONTHLY_REVENUE_COL, rowHeader, "Monthly revenues in worst month (KES)");
         writeString(BMOConstants.TOTAL_REGULAR_EMPLOYEES_COL, rowHeader, "Total number of regular employees including owner*");
@@ -109,8 +109,6 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
                     BMOConstants.BUSINESS_SEGMENT_COL, BMOConstants.BUSINESS_SEGMENT_COL);
             CellRangeAddressList taDeliveryModeRange = new CellRangeAddressList(1, SpreadsheetVersion.EXCEL97.getLastRowIndex(),
                     BMOConstants.TA_DELIVERY_MODE, BMOConstants.TA_DELIVERY_MODE);
-            CellRangeAddressList isBusinessRegisteredRange = new CellRangeAddressList(1, SpreadsheetVersion.EXCEL97.getLastRowIndex(),
-                    BMOConstants.BUSINESS_IS_REGISTERED, BMOConstants.BUSINESS_IS_REGISTERED);
             CellRangeAddressList taTypeRange = new CellRangeAddressList(1, SpreadsheetVersion.EXCEL97.getLastRowIndex(),
                     BMOConstants.TYPE_OF_TA_COL, BMOConstants.TYPE_OF_TA_COL);
             CellRangeAddressList personWithDisabilityRange = new CellRangeAddressList(1, SpreadsheetVersion.EXCEL97.getLastRowIndex(),
@@ -139,7 +137,6 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
             DataValidation industrySectorValidation = validationHelper.createValidation(industrySectorConstraint, industrySectorRange);
             DataValidation businessSegmentValidation = validationHelper.createValidation(businessSegmentsConstraint, businessSegmentRange);
             DataValidation taDeliveryModeValidation = validationHelper.createValidation(taDeliveryModeConstraint, taDeliveryModeRange);
-            DataValidation isBusinessRegisteredValidation = validationHelper.createValidation(yesNoConstraint, isBusinessRegisteredRange);
             DataValidation taTypeValidation = validationHelper.createValidation(taTypeConstraint, taTypeRange);
             DataValidation personWithDisabilityValidation = validationHelper.createValidation(yesNoConstraint, personWithDisabilityRange);
             DataValidation applicantEligibleValidation = validationHelper.createValidation(yesNoConstraint, applicantEligibleRange);
@@ -151,7 +148,6 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
             worksheet.addValidationData(industrySectorValidation);
             worksheet.addValidationData(businessSegmentValidation);
             worksheet.addValidationData(taDeliveryModeValidation);
-            worksheet.addValidationData(isBusinessRegisteredValidation);
             worksheet.addValidationData(taTypeValidation);
             worksheet.addValidationData(personWithDisabilityValidation);
             worksheet.addValidationData(applicantEligibleValidation);

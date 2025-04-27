@@ -1,0 +1,191 @@
+@if (selectedLoan | async; as selectedLoan){
+    <app-content-header 
+        [icon]="'supervisor_account'" 
+        [title]="'Loan Identifier: '+selectedLoan.loanNumber" 
+        [desc]="'View information about the Selected Loan.'"
+        [hideBreadcrumb]="false"
+        [hasBgImage]="true" 
+        [class]="'pb-5'"></app-content-header>
+    
+       
+    <div fxLayout="column" class="p-2">
+        <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="end center" class="px-2 user-toolbar">
+            <div class="action-button" fxLayoutGap="25px">
+                <button mat-raised-button color="primary" *jgpHasPermission="'PARTICIPANTS_UPDATE'" [routerLink]="['/participants', selectedLoan.id, 'edit']">
+                  <mat-icon>edit</mat-icon>&nbsp;&nbsp;Edit
+                </button>
+                <button mat-raised-button color="warn" >
+                    <mat-icon>lock</mat-icon>&nbsp;&nbsp;Ban Participant
+                  </button>
+              </div>
+        </mat-toolbar>
+       
+        <div fxLayout="column" class="p-2">
+          <h2 class="mat-h2" fxFlexFill fxLayoutAlign="center">Loan {{ selectedLoan.loanNumber }} Details</h2>
+          <div fxLayout="row wrap" fxLayout.lt-md="column" fxLayoutGap="2%" class="m-b-20">
+            <div fxFlex="49" class="p-2">
+              <mat-card class="custom-card">
+                  <mat-card-header class="bg-accent" fxLayoutAlign="space-between center">
+                      <mat-card-title class="m-0"><h3>Participant information</h3></mat-card-title>
+                  </mat-card-header>
+                  <mat-card-content class="py-3">
+                      <div fxLayout="column">
+                        <div fxFlexFill>
+                          <span fxFlex="40%">Participant ID:</span>
+                          <span fxFlex="60%">{{ selectedLoan.participantJGPID }}</span>
+                        </div>
+                
+                        <div fxFlexFill>
+                          <span fxFlex="40%">Participant Name:</span>
+                          <span fxFlex="60%">{{ selectedLoan.participantName }}</span>
+                        </div>
+
+                        <div fxFlexFill>
+                          <span fxFlex="40%">Business Name:</span>
+                          <span fxFlex="60%">{{ selectedLoan.businessName }}</span>
+                        </div>
+
+                        <div fxFlexFill>
+                          <span fxFlex="40%">Lending Partner Name:</span>
+                          <span fxFlex="60%">{{ selectedLoan.partnerName }} </span>
+                        </div>
+                      </div>
+                  </mat-card-content>
+                  <mat-divider></mat-divider>
+                  <mat-card-actions fxLayoutAlign="end center" class="secondary-text-color">
+                  </mat-card-actions>
+              </mat-card>
+          </div>
+          <div fxFlex="49" class="p-2">
+            <mat-card class="custom-card">
+                <mat-card-header class="bg-accent" fxLayoutAlign="space-between center">
+                    <mat-card-title class="m-0"><h3>Loan Information</h3></mat-card-title>
+                </mat-card-header>
+                <mat-card-content class="py-3">
+                  <div fxLayout="column">
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Loan Identifier:</span>
+                      <span fxFlex="60%">{{ selectedLoan.loanNumber }}</span>
+                    </div>
+            
+                    <div fxFlexFill>
+                      <span fxFlex="40%">PipeLine Source:</span>
+                      <span fxFlex="60%">{{ selectedLoan.pipeLineSource }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Loan Amount:</span>
+                      <span fxFlex="60%">{{ selectedLoan.loanAmountAccessed }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Loan Duration:</span>
+                      <span fxFlex="60%">{{ selectedLoan.loanDuration }} Months</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Date Applied:</span>
+                      <span fxFlex="60%">{{ selectedLoan.dateApplied }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Date Recorded By Partner:</span>
+                      <span fxFlex="60%">{{ selectedLoan.dateRecordedByPartner }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Date Initially Disbursed:</span>
+                      <span fxFlex="60%">{{ selectedLoan.dateDisbursed }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Loan Quality:</span>
+                      <span fxFlex="60%">{{ selectedLoan.loanQuality }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Date Initially Uploaded:</span>
+                      <span fxFlex="60%">{{ selectedLoan.dateUploaded }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Initially Uploaded By:</span>
+                      <span fxFlex="60%">{{ selectedLoan.uploadedBy }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Date Initially Approved:</span>
+                      <span fxFlex="60%">{{ selectedLoan.dateApproved }}</span>
+                    </div>
+
+                    <div fxFlexFill>
+                      <span fxFlex="40%">Initially Approved By:</span>
+                      <span fxFlex="60%">{{ selectedLoan.approvedBy }}</span>
+                    </div>
+                  </div>
+                </mat-card-content>
+                <mat-divider></mat-divider>
+                <mat-card-actions fxLayoutAlign="end center" class="secondary-text-color">
+                </mat-card-actions>
+            </mat-card>
+        </div>
+          </div>
+          <div fxLayout="column" fxLayoutGap="2%" class="m-b-20">
+          <div fxFlex="100" class="p-2">
+            <mat-card class="custom-card">
+                <mat-card-header class="bg-accent" fxLayoutAlign="space-between center">
+                    <mat-card-title class="m-0"><h3>Loan Transactions</h3></mat-card-title>
+                </mat-card-header>
+                <mat-card-content class="py-3">
+                  <div fxLayout="column" class="p-2">
+                    <div class="p-2">
+                        <mat-table #table [dataSource]="dataSource" class="mat-elevation-z8">
+                            <ng-container matColumnDef="tranch">
+                                <mat-header-cell *matHeaderCellDef> Tranch Name </mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.tranch}} </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="transactionType">
+                                <mat-header-cell *matHeaderCellDef> Transaction Type </mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.transactionType}} </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="transactionDate">
+                                <mat-header-cell *matHeaderCellDef> Transaction Date </mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.transactionDate}} </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="amount">
+                                <mat-header-cell *matHeaderCellDef> Amount</mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.amount}} </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="dateUploaded">
+                                <mat-header-cell *matHeaderCellDef> Date Uploaded </mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.dateUploaded}} </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="uploadedBy">
+                                <mat-header-cell *matHeaderCellDef> Uploaded By </mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.uploadedBy}} </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="dateApproved">
+                              <mat-header-cell *matHeaderCellDef> Date Approved </mat-header-cell>
+                              <mat-cell *matCellDef="let element"> {{element.dateApproved}} </mat-cell>
+                          </ng-container>
+                          <ng-container matColumnDef="approvedBy">
+                            <mat-header-cell *matHeaderCellDef> Approved By </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{element.approvedBy}} </mat-cell>
+                        </ng-container>
+                        
+                      <mat-header-row *matHeaderRowDef="loansTransactionsDisplayedColumns"></mat-header-row>
+                      <mat-row *matRowDef="let row; columns: loansTransactionsDisplayedColumns;"></mat-row>
+                        </mat-table>
+                        <mat-paginator #paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"></mat-paginator>
+                    </div>
+                </div>
+                </mat-card-content>
+                <mat-divider></mat-divider>
+                <mat-card-actions fxLayoutAlign="end center" class="secondary-text-color">
+                </mat-card-actions>
+            </mat-card>
+        </div>
+          </div>
+        </div>
+    </div>
+    }

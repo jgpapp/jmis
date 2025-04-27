@@ -44,9 +44,8 @@ export class LendingDataComponent implements OnDestroy, OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   public displayedColumns = [
-    'select', 'participantName', 'businessName', 'participantJGPID', 'pipeLineSource', 
-    'loanAmountAccessed', 'loanOutStandingAmount', 
-    'loanDuration', 'dateApplied', 'dateUploaded', 'uploadedBy'
+    'select', 'participantName','tranch', 'businessName', 'participantJGPID', 'pipeLineSource', 
+    'amount', 'loanDuration', 'dateUploaded', 'uploadedBy'
   ];
   public dataSource: any;
 
@@ -61,7 +60,9 @@ export class LendingDataComponent implements OnDestroy, OnInit {
   constructor(private loanService: LoanService, public authService: AuthService, private gs: GlobalService, private dialog: MatDialog) { }
 
   getAvailableNewLendingData() {
-    this.loanService.getAvailableLendingData(this.pageIndex, this.pageSize, false, this.authService.currentUser()?.partnerId)
+    const partnerId = this.authService.currentUser()?.partnerId;
+    if (partnerId) {
+    this.loanService.getLoanTransactions(this.pageIndex, this.pageSize, false, partnerId)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -71,6 +72,7 @@ export class LendingDataComponent implements OnDestroy, OnInit {
         },
         error: (error) => { }
       });
+    }
   }
 
   
@@ -98,7 +100,7 @@ export class LendingDataComponent implements OnDestroy, OnInit {
   }
 
 
-  approveLoansData(loanIds: number[]): void {
+  approveLoansData(transactionsIds: number[]): void {
     const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to approve loans data?`);
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       maxWidth: "400px",
@@ -107,7 +109,7 @@ export class LendingDataComponent implements OnDestroy, OnInit {
 
     dialogRef.afterClosed().subscribe(dialogResult => {
       if(dialogResult){
-        this.loanService.approveLoansData(loanIds)
+        this.loanService.approveLoanTransactions(transactionsIds)
         .pipe(takeUntil(this.unsubscribe$))
           .subscribe({
             next: (response) => {
@@ -129,7 +131,6 @@ export class LendingDataComponent implements OnDestroy, OnInit {
   }
 
   onPageChange(event: PageEvent) {
-    console.log(event);
       this.pageIndex = event.pageIndex;
       this.pageSize = event.pageSize;
       this.getAvailableNewLendingData();

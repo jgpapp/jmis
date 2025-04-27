@@ -28,9 +28,6 @@ public class Participant extends BaseEntity {
     @Column(name = "business_name")
     private String businessName;
 
-    @Column(name = "corp_pin_number")
-    private String corpPinNumber;
-
     @Column(name = "jgp_id")
     private String jgpId;
 
@@ -62,17 +59,8 @@ public class Participant extends BaseEntity {
     @Column(name = "business_segment")
     private String businessSegment;
 
-    @Column(name = "is_business_registered")
-    private Boolean isBusinessRegistered;
-
     @Column(name = "registration_number")
     private String registrationNumber;
-
-    @Column(name = "has_bmo_membership")
-    private Boolean hasBMOMembership;
-
-    @Column(name = "bmo_membership")
-    private String bmoMembership;
 
     @Column(name = "best_monthly_revenue")
     private BigDecimal bestMonthlyRevenue;
@@ -107,17 +95,20 @@ public class Participant extends BaseEntity {
     @Column(name = "is_eligible")
     private Boolean isEligible;
 
+    @Column(name = "pre_payment", scale = 4, precision = 19, nullable = false)
+    private BigDecimal prePayment;
+
     public Participant() {
     }
 
     private Participant(
             String businessName, String jgpId, String phoneNumber, Gender ownerGender,
             Integer ownerAge, String businessLocation, String industrySector,
-            String businessSegment, Boolean isBusinessRegistered, String registrationNumber,
-            Boolean hasBMOMembership, String bmoMembership, BigDecimal bestMonthlyRevenue, BigDecimal worstMonthlyRevenue,
+            String businessSegment, String businessRegNumber, BigDecimal bestMonthlyRevenue, BigDecimal worstMonthlyRevenue,
             Integer totalRegularEmployees, Integer youthRegularEmployees, Integer totalCasualEmployees,
             Integer youthCasualEmployees, String sampleRecords, String personWithDisability,
-            String refugeeStatus, String locationCountyCode, String passport, String corpPinNumber, String participantName) {
+            String refugeeStatus, String locationCountyCode, String passport,
+            String participantName, Boolean isEligible) {
         this.businessName = businessName;
         this.jgpId = jgpId;
         this.phoneNumber = phoneNumber;
@@ -126,10 +117,7 @@ public class Participant extends BaseEntity {
         this.businessLocation = businessLocation;
         this.industrySector = industrySector;
         this.businessSegment = businessSegment;
-        this.isBusinessRegistered = isBusinessRegistered;
-        this.registrationNumber = registrationNumber;
-        this.hasBMOMembership = hasBMOMembership;
-        this.bmoMembership = bmoMembership;
+        this.registrationNumber = businessRegNumber;
         this.bestMonthlyRevenue = bestMonthlyRevenue;
         this.worstMonthlyRevenue = worstMonthlyRevenue;
         this.totalRegularEmployees = totalRegularEmployees;
@@ -143,18 +131,18 @@ public class Participant extends BaseEntity {
         this.genderCategory = GenderCategory.getGenderCategory(this.ownerGender, ownerAge).getName();
         this.locationCountyCode = locationCountyCode;
         this.passport = passport;
-        this.corpPinNumber = corpPinNumber;
+        this.isEligible = isEligible;
         this.participantName = participantName;
     }
 
     public static Participant createClient(ParticipantDto dto){
         return new Participant(dto.businessName(), dto.jgpId(), dto.phoneNumber(), translateGender(dto.ownerGender()),
                 dto.ownerAge(), dto.businessLocation(), dto.industrySector(), dto.businessSegment(),
-                dto.isBusinessRegistered(), dto.registrationNumber(), dto.hasBMOMembership(),
-                dto.bmoMembership(), dto.bestMonthlyRevenue(), dto.worstMonthlyRevenue(),
+                dto.businessRegNumber(), dto.bestMonthlyRevenue(), dto.worstMonthlyRevenue(),
                 dto.totalRegularEmployees(), dto.youthRegularEmployees(), dto.totalCasualEmployees(),
                 dto.youthCasualEmployees(), null == dto.sampleRecords() ? null : String.join(",", dto.sampleRecords()),
-                dto.personWithDisability(), dto.refugeeStatus(), dto.locationCountyCode(), dto.passport(), dto.corpPinNumber(), dto.participantName());
+                dto.personWithDisability(), dto.refugeeStatus(), dto.locationCountyCode(), dto.passport(),
+                dto.participantName(), dto.isEligible());
     }
 
     public void updateParticipant(ParticipantDto dto){
@@ -178,13 +166,6 @@ public class Participant extends BaseEntity {
         }
         if (StringUtils.isNotBlank(dto.businessSegment())){
             this.businessSegment = dto.businessSegment();
-        }
-        if (Objects.nonNull(dto.isBusinessRegistered())){
-            this.isBusinessRegistered = dto.isBusinessRegistered();
-            this.hasBMOMembership = Boolean.TRUE;
-        }
-        if (StringUtils.isNotBlank(dto.bmoMembership())){
-            this.bmoMembership = dto.bmoMembership();
         }
         if (Objects.nonNull(dto.bestMonthlyRevenue())){
             this.bestMonthlyRevenue = dto.bestMonthlyRevenue();
@@ -237,12 +218,23 @@ public class Participant extends BaseEntity {
         this.isActive = Boolean.TRUE;
     }
 
+    public void updatePrePaidAmount(BigDecimal newAmount){
+        this.prePayment = newAmount;
+    }
+
+    public void incrementPrePaidAmount(BigDecimal additionalAmount){
+        this.prePayment = Objects.nonNull(this.prePayment) ? this.prePayment.add(additionalAmount) : additionalAmount;
+    }
+
     private static Gender translateGender(String genderString){
         if ("M".equalsIgnoreCase(genderString.trim()) || "MALE".equalsIgnoreCase(genderString.trim())){
             genderString = "MALE";
         }
         if ("F".equalsIgnoreCase(genderString.trim()) || "FEMALE".equalsIgnoreCase(genderString.trim())){
             genderString = "FEMALE";
+        }
+        if ("INTERSEX".equalsIgnoreCase(genderString.trim())){
+            genderString = "INTERSEX";
         }
         Participant.Gender genderEnum = null;
         try {
@@ -259,6 +251,7 @@ public class Participant extends BaseEntity {
 
         MALE("Male"),
         FEMALE("Female"),
+        INTERSEX("Intersex"),
         OTHER("Other");
 
         private final String name;

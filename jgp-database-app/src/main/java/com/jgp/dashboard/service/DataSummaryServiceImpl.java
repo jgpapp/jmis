@@ -1,8 +1,9 @@
 package com.jgp.dashboard.service;
 
-import com.jgp.dashboard.domain.CountySummaryRepository;
-import com.jgp.dashboard.dto.CountySummaryDto;
-import com.jgp.util.CommonUtil;
+import com.jgp.dashboard.domain.DataSummary;
+import com.jgp.dashboard.domain.DataSummaryRepository;
+import com.jgp.dashboard.dto.DataSummaryDto;
+import com.jgp.patner.domain.PartnerRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +28,12 @@ import java.util.Objects;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class CountySummaryServiceImpl implements CountySummaryService {
+public class DataSummaryServiceImpl implements DataSummaryService {
 
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-    private final CountySummaryRepository countySummaryRepository;
+    private final DataSummaryRepository countySummaryRepository;
+    private final PartnerRepository partnerRepository;
     private static final String PARTNER_ID_PARAM = "partnerId";
     private static final String FROM_DATE_PARAM = "fromDate";
     private static final String TO_DATE_PARAM = "toDate";
@@ -46,12 +48,12 @@ public class CountySummaryServiceImpl implements CountySummaryService {
 
     @Transactional
     @Override
-    public void updateCountySummary(LocalDate fromDate, LocalDate toDate, Long partnerId) {
+    public void updateDataSummary(LocalDate fromDate, LocalDate toDate, Long partnerId) {
         LocalDate startDate = fromDate.with(TemporalAdjusters.firstDayOfMonth());
         LocalDate endDate = toDate.with(TemporalAdjusters.lastDayOfMonth());
         log.info("Updating summary between  {} and {}", startDate, endDate);
 
-        var countySummaries = new ArrayList<CountySummaryDto>();
+        var countySummaries = new ArrayList<DataSummaryDto>();
         // Iterate while the current month is before or equal to the end date's month
         while (!startDate.isAfter(endDate)) {
             // Get the start date of the month
@@ -59,7 +61,7 @@ public class CountySummaryServiceImpl implements CountySummaryService {
             // Get the last day of the month
             LocalDate monthEndDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
 
-            final var summaryMapper = new CountySummaryDataMapper(monthStartDate.getYear(), monthStartDate.getMonthValue());
+            final var summaryMapper = new DataSummaryDataMapper(monthStartDate.getYear(), monthStartDate.getMonthValue());
             var bpdWhereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
             var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
             MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, monthStartDate);
@@ -70,64 +72,65 @@ public class CountySummaryServiceImpl implements CountySummaryService {
                 bpdWhereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, bpdWhereClause);
                 loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
             }
-            var sqlQuery = String.format(CountySummaryDataMapper.COUNTY_SUMMARY_SCHEMA, bpdWhereClause, loanWhereClause);
+            var sqlQuery = String.format(DataSummaryDataMapper.COUNTY_SUMMARY_SCHEMA, bpdWhereClause, loanWhereClause);
             countySummaries.addAll(this.namedParameterJdbcTemplate.query(sqlQuery, parameters, summaryMapper));
 
             // Move to the next month
             startDate = startDate.plusMonths(1);
         }
 
-        for (CountySummaryDto dto: countySummaries){
-            this.countySummaryRepository.deleteCountySummary(partnerId, dto.dataYear(), dto.dataMonth());
-            if (0 < dto.businessesTrained() || 0 < dto.businessesLoaned() || ZERO.compareTo(dto.amountDisbursed()) < 0 || ZERO.compareTo(dto.outStandingAmount()) < 0) {
-                this.countySummaryRepository.insertOrUpdateCountySummary(partnerId, dto.countyCode(), dto.dataYear(), dto.dataMonth(),
-                        dto.businessesTrained(), dto.businessesLoaned(), dto.amountDisbursed(), dto.outStandingAmount(), LocalDate.now(ZoneId.systemDefault()));
+        List<DataSummary> dataSummaries = new ArrayList<>();
+        var partner = this.partnerRepository.findById(partnerId).orElse(null);
+        for (DataSummaryDto dto: countySummaries){
+            this.countySummaryRepository.deleteDataSummary(partnerId, dto.dataYear(), dto.dataMonth());
+            if (Objects.nonNull(partner) && (0 < dto.businessesTrained() || 0 < dto.businessesLoaned() || ZERO.compareTo(dto.amountDisbursed()) < 0 || ZERO.compareTo(dto.outStandingAmount()) < 0)) {
+                dataSummaries.add(DataSummary.createDataSummary(dto, partner));
             }
         }
+        this.countySummaryRepository.saveAll(dataSummaries);
     }
 
-    private static final class CountySummaryDataMapper implements ResultSetExtractor<List<CountySummaryDto>> {
+    private static final class DataSummaryDataMapper implements ResultSetExtractor<List<DataSummaryDto>> {
 
         private final Integer dataYear;
         private final Integer dataMonth;
 
         public static final String COUNTY_SUMMARY_SCHEMA = """
                 with highLevelSummary as (
-                                     select p.location_county_code as county, count(*) as businessesTrained,
+                                     select p.gender_category as genderCategory, count(*) as businessesTrained,
                                      0 as businessesLoaned, 0 as amountDisbursed,
                                      0 as outStandingAmount from bmo_participants_data bpd\s
                                      inner join participants p on p.id = bpd.participant_id %s
                                      group by 1
                                      union
-                                     select p.location_county_code as county, 0 as businessesTrained, count(*) as businessesLoaned,
-                                     sum(loan_amount_accessed) as amountDisbursed, sum(loan_outstanding_amount) as outStandingAmount from loans l\s
+                                     select p.gender_category as genderCategory, 0 as businessesTrained, count(l.*) as businessesLoaned,
+                                     sum(lt.amount) as amountDisbursed, sum(lt.out_standing_amount) as outStandingAmount from loan_transactions lt\s
+                                     inner join loans l on lt.loan_id = l.id\s
                                      inner join participants p on p.id = l.participant_id %s\s
                                      group by 1
                                      )
-                                     select county, sum(businessesTrained) as businessesTrained, sum(businessesLoaned) as businessesLoaned,
+                                     select genderCategory, sum(businessesTrained) as businessesTrained, sum(businessesLoaned) as businessesLoaned,
                                      sum(amountDisbursed) as amountDisbursed, sum(outStandingAmount) as outStandingAmount
                                      from highLevelSummary group by 1;
                \s""";
 
-        private CountySummaryDataMapper(Integer dataYear, Integer dataMonth) {
+        private DataSummaryDataMapper(Integer dataYear, Integer dataMonth) {
             this.dataYear = dataYear;
             this.dataMonth = dataMonth;
         }
 
 
         @Override
-        public List<CountySummaryDto> extractData(ResultSet rs) throws SQLException, DataAccessException {
-            var dataPoints = new ArrayList<CountySummaryDto>();
+        public List<DataSummaryDto> extractData(ResultSet rs) throws SQLException, DataAccessException {
+            var dataPoints = new ArrayList<DataSummaryDto>();
             while (rs.next()){
-                final var countyCode = rs.getString("county");
+                final var genderCategory = rs.getString("genderCategory");
                 final var businessesTrained = rs.getInt("businessesTrained");
                 final var businessesLoaned = rs.getInt("businessesLoaned");
                 final var amountDisbursed = rs.getBigDecimal("amountDisbursed");
                 final var outStandingAmount = rs.getBigDecimal("outStandingAmount");
 
-                final var county = CommonUtil.KenyanCounty.getKenyanCountyFromCode(countyCode);
-                final var kenyaCounty = county.orElse(CommonUtil.KenyanCounty.UNKNOWN);
-                dataPoints.add(new CountySummaryDto(CommonUtil.defaultToOtherIfStringIsNull(countyCode), kenyaCounty.getCountyName(), businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount, this.dataYear, this.dataMonth));
+                dataPoints.add(new DataSummaryDto(genderCategory, businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount, this.dataYear, this.dataMonth));
             }
             return dataPoints;
         }

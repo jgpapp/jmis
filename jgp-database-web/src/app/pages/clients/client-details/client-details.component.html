@@ -84,6 +84,11 @@
                     </div>
 
                     <div fxFlexFill>
+                      <span fxFlex="40%">Savings (Excess In Loan payments):</span>
+                      <span fxFlex="60%">{{ selectedParticipant.savings }}</span>
+                    </div>
+
+                    <div fxFlexFill>
                       <span fxFlex="40%">BMO Membership:</span>
                       <span fxFlex="60%">{{ selectedParticipant.bmoMembership }}</span>
                     </div>
@@ -269,7 +274,7 @@
                         <mat-cell *matCellDef="let element"> {{element.approvedBy}} </mat-cell>
                     </ng-container>
                       <mat-header-row *matHeaderRowDef="loansDisplayedColumns"></mat-header-row>
-                      <mat-row *matRowDef="let row; columns: loansDisplayedColumns;"></mat-row>
+                      <mat-row *matRowDef="let row; columns: loansDisplayedColumns;" [routerLink]="['/loans', row.id, 'details']"></mat-row>
                         </mat-table>
                         <mat-paginator #paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"></mat-paginator>
                     </div>

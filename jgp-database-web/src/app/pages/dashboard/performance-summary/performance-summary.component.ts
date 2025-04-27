@@ -56,7 +56,7 @@ export class PerformanceSummaryComponent implements OnInit {
 
   @Input({alias: 'selectedDashboardView', required: true}) selectedDashboardView: string
 
-  fiDisplayedColumns: string[] = ['category',  'businessesLoaned', 'amountDisbursed', 'outStandingAmount' ];
+  fiDisplayedColumns: string[] = ['category',  'businessesLoaned', 'amountDisbursed'];
   taDisplayedColumns: string[] = ['category', 'businessesTrained'];
   private transformer = (node: PerformanceSummaryDto, level: number) => {
     return {

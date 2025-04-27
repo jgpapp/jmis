@@ -7,7 +7,7 @@ public final class LoanConstants {
 
     public static final int PARTICIPANT_NAME_COL = 0; // A
     public static final int BUSINESS_NAME_COL = 1; // B
-    public static final int CORP_PIN_NUMBER = 2;// C
+    public static final int BUSINESS_REGISTRATION_NUMBER_COL = 2;// C
     public static final int PIPELINE_SOURCE = 3;// D
     public static final int JGP_ID_COL = 4; // E
     public static final int BUSINESS_PHONE_NUMBER_COL = 5;// F
@@ -32,9 +32,10 @@ public final class LoanConstants {
     public static final int LOANER_TYPE_COL = 22;// W
     public static final int DATE_RECORDED_TO_JGP_DB_COL = 23;// X
     public static final int LOAN_PRODUCT_COL = 24;// Y
-    public static final int TRANCH_AMOUNT_ALLOCATED_COL = 25;// Z
-    public static final int TRANCH_AMOUNT_DISBURSED_COL = 26;// AA
+    public static final int TRANCH_ALLOCATED_COL = 25;// Z
+    public static final int TRANCH_AMOUNT_COL = 26;// AA
+    public static final int LOAN_IDENTIFIER_COL = 27;// AB
 
-    public static final int FAILURE_COL = 27;// AB
-    public static final int STATUS_COL = 28;// AC
+    public static final int FAILURE_COL = 28;// AC
+    public static final int STATUS_COL = 29;// AD
 }
