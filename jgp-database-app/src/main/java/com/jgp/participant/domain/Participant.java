@@ -227,15 +227,6 @@ public class Participant extends BaseEntity {
     }
 
     private static Gender translateGender(String genderString){
-        if ("M".equalsIgnoreCase(genderString.trim()) || "MALE".equalsIgnoreCase(genderString.trim())){
-            genderString = "MALE";
-        }
-        if ("F".equalsIgnoreCase(genderString.trim()) || "FEMALE".equalsIgnoreCase(genderString.trim())){
-            genderString = "FEMALE";
-        }
-        if ("INTERSEX".equalsIgnoreCase(genderString.trim())){
-            genderString = "INTERSEX";
-        }
         Participant.Gender genderEnum = null;
         try {
             genderEnum = StringUtils.isBlank(genderString) ? Participant.Gender.OTHER : Participant.Gender.valueOf(genderString.toUpperCase());
