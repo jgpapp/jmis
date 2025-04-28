@@ -368,12 +368,13 @@ public class LoanImportHandler implements ImportHandler {
 
     private String validateLoanerType(String value, Row row) {
         final var loanProducts = Set.of("NEW", "REPEAT");
-        var modifiedValue = null == value ? null : value.replaceAll("[^a-zA-Z]+", "").replaceAll("\\s+", " ").toUpperCase().trim();
+        var modifiedValue = null == value ? null : value.replaceAll("[^a-zA-Z]+", "").replaceAll("\\s+", "").toUpperCase().trim();
+        if (null == rowErrorMap.get(row) && null == modifiedValue){
+            rowErrorMap.put(row, "Invalid Value for Loaner Type (Must be New/Repeat) !!");
+        }
         if (null == rowErrorMap.get(row) && null != modifiedValue && !loanProducts.contains(modifiedValue)){
             rowErrorMap.put(row, "Invalid Value for Loaner Type (Must be New/Repeat) !!");
-        }else {
-            return null != modifiedValue ? StringUtils.capitalize(modifiedValue.toLowerCase(Locale.ROOT)) : null;
         }
-        return null;
+        return null != modifiedValue ? StringUtils.capitalize(modifiedValue.toLowerCase(Locale.ROOT)) : null;
     }
 }
