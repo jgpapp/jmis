@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -154,7 +155,8 @@ public class BMOImportHandler implements ImportHandler {
         final var participantName = ImportHandlerUtils.readAsString(BMOConstants.PARTICIPANT_NAME_COL, row);
         final var jgpId = ImportHandlerUtils.readAsString(BMOConstants.JGP_ID_COL, row);
         final var phoneNumber = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_PHONE_NUMBER_COL, row);
-        final var gender = ImportHandlerUtils.readAsString(BMOConstants.GENDER_COL, row);
+        var gender = ImportHandlerUtils.readAsString(BMOConstants.GENDER_COL, row);
+        gender = validateGender(gender, row);
         final var passport = ImportHandlerUtils.readAsString(BMOConstants.PASS_PORT_COL, row);
         final var age = ImportHandlerUtils.readAsInt(BMOConstants.AGE_COL, row);
         final var businessLocation = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_LOCATION_COL, row);
@@ -369,6 +371,22 @@ public class BMOImportHandler implements ImportHandler {
                 return  null;
             }
             return value.equalsIgnoreCase("SME") ? "SME" : "Micro";
+        }
+
+    }
+
+    private String validateGender(String value, Row row){
+        if (null == value){
+            rowErrorMap.put(row, "Gender is required !!");
+            return null;
+        }else {
+            final var genders = Set.of("MALE", "FEMALE", "INTERSEX");
+            var modifiedValue = value.replaceAll("[^a-zA-Z]+", "").replaceAll("\\s+", "").toUpperCase(Locale.ROOT).trim();
+            if (null == rowErrorMap.get(row) && !genders.contains(modifiedValue)){
+                rowErrorMap.put(row, "Invalid Value for Gender (Must be Male/Female/Intersex) !!");
+                return  null;
+            }
+            return StringUtils.capitalize(modifiedValue.toLowerCase(Locale.ROOT));
         }
 
     }

@@ -65,7 +65,7 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(BMOConstants.TRAINING_PARTNER, rowHeader, "Training Partner*");
         writeString(BMOConstants.JGP_ID_COL, rowHeader, "Unique JGP ID (National ID)*");
         writeString(BMOConstants.BUSINESS_PHONE_NUMBER_COL, rowHeader, "Business phone number");
-        writeString(BMOConstants.GENDER_COL, rowHeader, "Gender of owner*");
+        writeString(BMOConstants.GENDER_COL, rowHeader, "Gender of owner* (Male/Female/Intersex)");
         writeString(BMOConstants.AGE_COL, rowHeader, "Age of owner (full years)*");
         writeString(BMOConstants.PASS_PORT_COL, rowHeader, "Passport");
         writeString(BMOConstants.BUSINESS_LOCATION_COL, rowHeader, "Business Location (County)*");
