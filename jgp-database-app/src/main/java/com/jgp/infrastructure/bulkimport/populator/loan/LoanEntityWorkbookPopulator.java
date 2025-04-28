@@ -55,7 +55,7 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(LoanConstants.BUSINESS_REGISTRATION_NUMBER_COL, rowHeader, "Business Registration Number");
         writeString(LoanConstants.JGP_ID_COL, rowHeader, "Unique JGP ID (National ID)*");
         writeString(LoanConstants.BUSINESS_PHONE_NUMBER_COL, rowHeader, "Business phone number*");
-        writeString(LoanConstants.GENDER_COL, rowHeader, "Gender of owner*");
+        writeString(LoanConstants.GENDER_COL, rowHeader, "Gender of owner* (Male/Female/Intersex)");
         writeString(LoanConstants.AGE_COL, rowHeader, "Age of owner (full years)*");
         writeString(LoanConstants.PASS_PORT_COL, rowHeader, "Passport");
         writeString(LoanConstants.BUSINESS_LOCATION_COL, rowHeader, "Business Location(County)*");
@@ -72,7 +72,7 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(LoanConstants.YOUTH_REGULAR_EMPLOYEES_COL, rowHeader, "Regular, of which are youth (18-35)*");
         writeString(LoanConstants.TOTAL_CASUAL_EMPLOYEES_COL, rowHeader, "Total number of casual employees excluding owner*");
         writeString(LoanConstants.YOUTH_CASUAL_EMPLOYEES_COL, rowHeader, "Casual, of which are youth (18-35)*");
-        writeString(LoanConstants.LOANER_TYPE_COL, rowHeader, "Loaner Type (New/Repeat)");
+        writeString(LoanConstants.LOANER_TYPE_COL, rowHeader, "Loaner Type* (New/Repeat)");
         writeString(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, rowHeader, "Date added to JGP database(yyyy-MM-dd)*");
         writeString(LoanConstants.LOAN_PRODUCT_COL, rowHeader, "Loan product* (Working Capital/Asset Finance/Stahimili/Purchase Order/Consignment Finance/Shariah Compliant)");
         writeString(LoanConstants.TRANCH_ALLOCATED_COL, rowHeader, "Tranch Allocated (Tranch 1/Tranch 2/Tranch 3/Tranch 4/Tranch 5/Not Applicable)");

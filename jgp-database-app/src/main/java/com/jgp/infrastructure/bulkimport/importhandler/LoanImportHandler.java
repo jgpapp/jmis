@@ -183,7 +183,8 @@ public class LoanImportHandler implements ImportHandler {
         String businessRegNumber = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_REGISTRATION_NUMBER_COL, row);
         String jgpId = ImportHandlerUtils.readAsString(LoanConstants.JGP_ID_COL, row);
         final var phoneNumber = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_PHONE_NUMBER_COL, row);
-        final var gender = ImportHandlerUtils.readAsString(LoanConstants.GENDER_COL, row);
+        var gender = ImportHandlerUtils.readAsString(LoanConstants.GENDER_COL, row);
+        gender = validateGender(gender, row);
         final var age = ImportHandlerUtils.readAsInt(LoanConstants.AGE_COL, row);
         final var passport = ImportHandlerUtils.readAsString(LoanConstants.PASS_PORT_COL, row);
         final var businessLocation = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_LOCATION_COL, row);
@@ -376,5 +377,21 @@ public class LoanImportHandler implements ImportHandler {
             rowErrorMap.put(row, "Invalid Value for Loaner Type (Must be New/Repeat) !!");
         }
         return null != modifiedValue ? StringUtils.capitalize(modifiedValue.toLowerCase(Locale.ROOT)) : null;
+    }
+
+    private String validateGender(String value, Row row){
+        if (null == value){
+            rowErrorMap.put(row, "Gender is required !!");
+            return null;
+        }else {
+            final var genders = Set.of("MALE", "FEMALE", "INTERSEX");
+            var modifiedValue = value.replaceAll("[^a-zA-Z]+", "").replaceAll("\\s+", "").toUpperCase(Locale.ROOT).trim();
+            if (null == rowErrorMap.get(row) && !genders.contains(modifiedValue)){
+                rowErrorMap.put(row, "Invalid Value for Gender (Must be Male/Female/Intersex) !!");
+                return  null;
+            }
+            return StringUtils.capitalize(modifiedValue.toLowerCase(Locale.ROOT));
+        }
+
     }
 }
