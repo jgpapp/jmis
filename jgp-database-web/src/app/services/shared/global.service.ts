@@ -9,7 +9,7 @@ import * as XLSX from 'xlsx';
 
 @Injectable({ providedIn: 'root' })
 export class GlobalService {
-  //API_HOST = '68.183.21.53';
+  //API_HOST = '159.89.55.54';
   //API_HOST = '20.242.125.65';
   API_HOST = 'jmis.dt-global.com';
   HTTP_SCHEMA = 'https';

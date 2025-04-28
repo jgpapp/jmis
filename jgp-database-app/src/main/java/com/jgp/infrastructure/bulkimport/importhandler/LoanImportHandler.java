@@ -336,7 +336,7 @@ public class LoanImportHandler implements ImportHandler {
     private String validateTranchAllocated(String allocatedTranch, BigDecimal tranchAmount, Row row) {
         final var deliveryModes = Set.of("TRANCH 1", "TRANCH 2", "TRANCH 3", "TRANCH 4", "TRANCH 5", "NOT APPLICABLE");
         var modifiedValue = null == allocatedTranch ? null : allocatedTranch.replaceAll("[^a-zA-Z1-9 ]+", "").replaceAll("\\s+", " ").toUpperCase().trim();
-        if (null == rowErrorMap.get(row) && ((null == modifiedValue && Objects.nonNull(tranchAmount) && tranchAmount.compareTo(BigDecimal.ZERO) > 0) || !deliveryModes.contains(modifiedValue))){
+        if (null == rowErrorMap.get(row) && ((null == modifiedValue && Objects.nonNull(tranchAmount) && tranchAmount.compareTo(BigDecimal.ZERO) > 0) || (null != modifiedValue && !deliveryModes.contains(modifiedValue)))){
             rowErrorMap.put(row, "Invalid Value for Allocated Tranch (Must be Tranch 1/Tranch 2/Tranch 3/Tranch 4/Tranch 5/Not Applicable) !!");
         }else {
             return null != modifiedValue ? StringUtils.capitalize(modifiedValue.toLowerCase(Locale.ROOT)) : null;
