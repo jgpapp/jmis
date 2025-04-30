@@ -12,6 +12,7 @@ import com.jgp.finance.domain.LoanRepository;
 import com.jgp.finance.dto.LoanDto;
 import com.jgp.finance.mapper.LoanTransactionMapper;
 import com.jgp.infrastructure.bulkimport.event.DataApprovedEvent;
+import com.jgp.shared.exception.DataRulesViolationException;
 import com.jgp.shared.exception.ResourceNotFound;
 import com.jgp.util.CommonUtil;
 import jakarta.transaction.Transactional;
@@ -22,9 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -54,6 +53,10 @@ public class LoanServiceImpl implements LoanService {
         final var existingLoanOptional = null != loan.getLoanNumber() ? this.loanRepository.findByParticipantAndLoanNumber(loan.getParticipant(), loan.getLoanNumber()) : Optional.<Loan>empty();
         if (existingLoanOptional.isPresent()){
             var existingLoan = existingLoanOptional.get();
+            var loanTransaction = loan.getLoanTransactions().stream().findFirst().orElse(null);
+            if (Objects.nonNull(loanTransaction)){
+                checkSingleDisbursementPerDayValidation(existingLoan, loanTransaction);
+            }
             existingLoan.addLoanTransaction(loan.getLoanTransactions().stream().findFirst().orElse(null));
             this.loanRepository.save(existingLoan);
         }else {
@@ -101,8 +104,7 @@ public class LoanServiceImpl implements LoanService {
         var currentUser = this.platformSecurityContext.getAuthenticatedUserIfPresent();
         var currentUserPartner = Objects.nonNull(currentUser) ? currentUser.getPartner() : null;
         if (transactionsIds.isEmpty() && Objects.nonNull(currentUserPartner)) {
-            loanTransactions = this.loanRepository.findAll(this.loanPredicateBuilder.buildPredicateForSearchLoans(new LoanSearchCriteria(currentUserPartner.getId(), null, null, null,  false, null, null)), Pageable.unpaged()).getContent()
-                    .stream().flatMap(loan -> loan.getLoanTransactions().stream()).toList();
+            loanTransactions =  this.loanTransactionRepository.getLoanTransactions(currentUserPartner.getId(), false, Pageable.unpaged()).getContent();
         }
 
         int count = 0;
@@ -166,5 +168,16 @@ public class LoanServiceImpl implements LoanService {
         return new PageImpl<>(this.loanTransactionMapper.toDto(transactions.stream().toList()), pageable, transactions.getTotalElements());
     }
 
+    private void checkSingleDisbursementPerDayValidation(Loan loan, LoanTransaction loanTransaction){
+        if (!LoanTransaction.TransactionType.DISBURSEMENT.equals(loanTransaction.getTransactionType())){
+            return;
+        }
+        var duplicateDisbursementExist = loan.getLoanTransactions().stream()
+                .filter(lt -> lt.getTransactionDate().equals(loanTransaction.getTransactionDate()))
+                .anyMatch(lt -> lt.getTransactionType().equals(loanTransaction.getTransactionType()));
+        if (duplicateDisbursementExist){
+            throw new DataRulesViolationException("Duplicate Disbursement On Same Day!!!");
+        }
+    }
 
 }

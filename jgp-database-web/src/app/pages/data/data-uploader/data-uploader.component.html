@@ -52,6 +52,14 @@
               <jgp-file-upload flex="75%" (change)="onFileSelect($event)"></jgp-file-upload>
         
               <mat-hint>Please <strong>DO NOT</strong> change the names of the data template as they were downloaded.</mat-hint>
+
+              <div fxFlex="48%" fxLayoutGap="2%">
+                <mat-label>Update Existing Participants Information (Default is NO): </mat-label>
+                <mat-radio-group [(ngModel)]="updateParticipantInfo">
+                  <mat-radio-button value="NO" labelPosition="before">No</mat-radio-button>
+                  <mat-radio-button value="YES" labelPosition="before">Yes</mat-radio-button>
+              </mat-radio-group>
+            </div>
         
               <div fxFlex="13%">
                 <button mat-raised-button color="primary" [disabled]="buttonIsDisabled" (click)="uploadTemplate()">

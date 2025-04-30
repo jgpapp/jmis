@@ -6,7 +6,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { MatCardModule } from '@angular/material/card';
 import { DataUploadService } from '@services/shared/data-upload.service';
-import { FormBuilder, FormGroup, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -20,6 +20,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { v4 as uuidv4 } from 'uuid';
+import { MatRadioModule } from '@angular/material/radio';
 
 @Component({
   selector: 'app-data-uploader',
@@ -41,7 +42,9 @@ import { v4 as uuidv4 } from 'uuid';
     MatTableModule,
     MatPaginatorModule,
     MatTooltipModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatRadioModule,
+    FormsModule
 ],
   templateUrl: './data-uploader.component.html',
   styleUrl: './data-uploader.component.scss'
@@ -56,6 +59,7 @@ export class DataUploaderComponent implements OnDestroy {
   public docsFilterForm: FormGroup;
   progress: { processed: number; total: number; finished: number } | null = null;
   private subscription: Subscription | null = null;
+  updateParticipantInfo: string;
 
   public displayedColumns = ['name', 'importTime', 'endTime', 'completed', 'totalRecords', 'successCount', 'failureCount', 'actions'];
   public dataSource: any;
@@ -170,7 +174,7 @@ export class DataUploaderComponent implements OnDestroy {
     if(this.legalFormType){
       let uploadProgressID = uuidv4();
       this.subscribeToUploadProgress(uploadProgressID);
-    this.dataUploadService.uploadDataTemplate(this.template, this.legalFormType, uploadProgressID)
+    this.dataUploadService.uploadDataTemplate(this.template, this.legalFormType, uploadProgressID, this.updateParticipantInfo)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {

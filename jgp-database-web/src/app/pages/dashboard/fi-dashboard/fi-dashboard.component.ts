@@ -15,6 +15,7 @@ import { PerformanceSummaryComponent } from "../performance-summary/performance-
 import { GlobalService } from '@services/shared/global.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatDialog } from '@angular/material/dialog';
 @Component({
   selector: 'app-fi-dashboard',
   standalone: true,
@@ -45,6 +46,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   public gradient = false;
   public autoScale = true;
   @ViewChild('resizedDiv') resizedDiv: ElementRef;
+  @ViewChild('loansDisbursedByProductContentDiv', { static: false }) loansDisbursedByProductContentDiv!: ElementRef;
   public previousWidthOfResizedDiv: number = 0;
 
   resetDashBoardFilters: boolean = false;
@@ -82,7 +84,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   public loansDisbursedByStatusShowYAxisLabel: boolean = true;
   public loansDisbursedByStatusXAxisLabel: string = 'Status';
   public loansDisbursedByStatusYAxisLabel: string = 'Amount Disbursed';
-  public loansDisbursedByStatusChartTitle: string = 'Loan Disbursed by Pipeline Source';
+  public loansDisbursedByStatusChartTitle: string = 'Loan Disbursed by Status';
 
   public loansDisbursedBySector: any[];
   public loansDisbursedBySectorShowLegend: boolean = false;
@@ -101,6 +103,16 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   public accessedVSOutStandingAmountByGenderYAxisLabel = 'Amount';
   public accessedVSOutStandingAmountByGenderChartTitle: string = 'Accessed Vs OutStanding By Gender';
 
+  public loansDisbursedByProduct: any[];
+  public loansDisbursedByProductShowXAxis: boolean = true;
+  public loansDisbursedByProductShowYAxis: boolean = true;
+  public loansDisbursedByProductShowLegend: boolean = false;
+  public loansDisbursedByProductShowXAxisLabel: boolean = true;
+  public loansDisbursedByProductShowYAxisLabel: boolean = true;
+  public loansDisbursedByProductXAxisLabel: string = 'Loan Products';
+  public loansDisbursedByProductYAxisLabel: string = 'Loans Disbursed';
+  public loansDisbursedByProductChartTitle: string = 'Loan Disbursed By Loan Product';
+
   public loansDisbursedBySegment: any[];
   public loansDisbursedBySegmentShowLegend: boolean = false;
   public loansDisbursedBySegmentShowLabels: boolean = true;
@@ -111,10 +123,10 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   public topFourCountiesloansDisbursed: any[];
   public topFourCountiesloansDisbursedChartTitle: string = 'Loan Disbursed Top Four Counties';
 
-  highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', outStandingAmount: '0'}
+  highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', amountDisbursedByTranches: '0'}
 
   private unsubscribe$ = new Subject<void>();
-  constructor(private authService: AuthService, private dashBoardService: DashboardService, public gs: GlobalService){
+  constructor(private authService: AuthService, private dashBoardService: DashboardService, public gs: GlobalService, public dialog: MatDialog){
 
   }
 
@@ -175,6 +187,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
     this.getLoanDisbursedTopFourCountiesSummary();
     this.getLastThreeYearsAccessedLoanPerPartnerYearly();
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
+    this.getLoansDisbursedByLoanProductSummary();
   }
 
   getHighLevelSummary() {
@@ -265,6 +278,42 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
         error: (error) => { }
       });
   }
+
+  getLoansDisbursedByLoanProductSummary() {
+    this.dashBoardService.getLoansDisbursedByLoanProductSummary(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.loansDisbursedByProduct = response;
+        },
+        error: (error) => { }
+      });
+  }
+
+  expandLoansDisbursedByProductBarChart(){
+    const data = { 
+      content: this.loansDisbursedByProductContentDiv.nativeElement.cloneNode(true),
+      mapContainerElement: this.loansDisbursedByProductContentDiv,
+      chartType: 'ngx-charts-bar-horizontal',
+      chartData: this.loansDisbursedByProduct,
+      chartGradient: this.gradient,
+      chartShowXAxis: this.loansDisbursedByProductShowXAxis,
+      chartShowYAxis: this.loansDisbursedByProductShowYAxis,
+      chartSColorScheme: this.chartSColorScheme,
+      chartShowLegend: true,
+      chartShowXAxisLabel: this.loansDisbursedByProductShowXAxisLabel,
+      chartShowYAxisLabel: this.loansDisbursedByProductShowYAxisLabel,
+      chartYAxisLabel: this.loansDisbursedByProductXAxisLabel,
+      chartXAxisLabel: this.loansDisbursedByProductYAxisLabel,
+      chartFormatLabel: this.valueFormatting,
+      chartTitle: this.loansDisbursedByProductChartTitle,
+    };
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
+  }
+
+  valueFormatting = (value: number) => {
+    return this.dashBoardService.formatNumberToShortForm(Number(value)); // Outputs as "8.94M"
+  };
 
   shouldDisplayAccessedLoanDataPartnerName(index: number): boolean {
     const data = this.accessedLoanDataDataSource.data; // Access the current data

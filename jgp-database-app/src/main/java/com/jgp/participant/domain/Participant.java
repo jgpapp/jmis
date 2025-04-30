@@ -149,6 +149,9 @@ public class Participant extends BaseEntity {
         if (StringUtils.isNotBlank(dto.businessName())){
             this.businessName = dto.businessName().trim();
         }
+        if (StringUtils.isNotBlank(dto.participantName())){
+            this.participantName = dto.participantName().trim();
+        }
         if (StringUtils.isNotBlank(dto.jgpId())){
             this.jgpId = dto.jgpId().trim();
         }

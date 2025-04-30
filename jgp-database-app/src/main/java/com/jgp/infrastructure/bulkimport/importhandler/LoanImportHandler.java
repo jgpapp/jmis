@@ -59,6 +59,7 @@ public class LoanImportHandler implements ImportHandler {
     private List<String> statuses;
     private Map<Row, String> rowErrorMap;
     private String documentImportProgressUUId;
+    private Boolean updateParticipantInfo;
 
     @Override
     public Count process(BulkImportEvent bulkImportEvent) {
@@ -67,6 +68,7 @@ public class LoanImportHandler implements ImportHandler {
         statuses = new ArrayList<>();
         this.rowErrorMap = new HashMap<>();
         this.documentImportProgressUUId = bulkImportEvent.importProgressUUID();
+        this.updateParticipantInfo = bulkImportEvent.updateParticipantInfo();
         readExcelFile();
         return importEntity();
     }
@@ -160,9 +162,11 @@ public class LoanImportHandler implements ImportHandler {
         if (null == rowErrorMap.get(row)){
             validateLoan(loanData, row);
         }
-
+        final var participantDto = getParticipantDto(row);
+        if (Boolean.TRUE.equals(this.updateParticipantInfo)) {
+            existingParticipant.ifPresent(participant -> this.participantService.updateParticipant(participant.getId(), participantDto));
+        }
         if (existingParticipant.isEmpty() && null == rowErrorMap.get(row)){
-            final var participantDto = getParticipantDto(row);
             validateParticipant(participantDto, row);
             if (null == rowErrorMap.get(row)){
                 existingParticipant = Optional.of(this.participantService.createParticipant(participantDto));
@@ -243,7 +247,7 @@ public class LoanImportHandler implements ImportHandler {
                 errorCount++;
                 log.error("Problem occurred When Uploading Lending Data: {}", ex.getMessage());
                 errorMessage = ImportHandlerUtils.getErrorMessage(ex);
-                if (errorMessage.contains("unique_loan")){
+                if (errorMessage.contains("unique_loan") || errorMessage.contains("Duplicate Disbursement On Same Day")){
                     errorMessage = "Row with same partner/participant/disburse date already exist !!";
                 }
                 writeGroupErrorMessage(errorMessage, progressLevel, statusCell, errorReportCell);

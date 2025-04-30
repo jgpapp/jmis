@@ -66,12 +66,12 @@ public class LoanController {
     }
 
 
-    @PostMapping("upload-template/{documentProgressId}")
-    public ResponseEntity<ApiResponseDto> uploadLoansData(@RequestParam("excelFile") MultipartFile excelFile, @PathVariable("documentProgressId") String documentProgressId) {
+    @PostMapping("upload-template/{documentProgressId}/{updateParticipantInfo}")
+    public ResponseEntity<ApiResponseDto> uploadLoansData(@RequestParam("excelFile") MultipartFile excelFile, @PathVariable("documentProgressId") String documentProgressId, @PathVariable("updateParticipantInfo") String updateParticipantInfo) {
         if (excelFile.isEmpty()) {
             return new ResponseEntity<>(new ApiResponseDto(false, CommonUtil.NO_FILE_TO_UPLOAD), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(new ApiResponseDto(true, this.bulkImportWorkbookService.importWorkbook(GlobalEntityType.LOAN_IMPORT_TEMPLATE.name(), excelFile, documentProgressId)+""), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponseDto(true, this.bulkImportWorkbookService.importWorkbook(GlobalEntityType.LOAN_IMPORT_TEMPLATE.name(), excelFile, documentProgressId, updateParticipantInfo)+""), HttpStatus.CREATED);
     }
 
     @GetMapping("template/download")

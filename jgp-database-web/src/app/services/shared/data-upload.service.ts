@@ -16,13 +16,13 @@ export class DataUploadService {
     }
 
 
-    uploadDataTemplate(file: File, templateName: string, uploadProgressID: string): Observable<any> {
+    uploadDataTemplate(file: File, templateName: string, uploadProgressID: string, updateParticipantInfo: string = 'NO'): Observable<any> {
         const formData = new FormData();
         formData.append('excelFile', file, file.name);
         if(templateName.toUpperCase().includes('TA_IMPORT_TEMPLATE')){
-            return this.httpClient.post(`${this.gs.BASE_API_URL}/bmos/upload-template/${uploadProgressID}`, formData);
+            return this.httpClient.post(`${this.gs.BASE_API_URL}/bmos/upload-template/${uploadProgressID}/${updateParticipantInfo}`, formData);
         }else if(templateName.toUpperCase().includes('LOAN_IMPORT_TEMPLATE')){
-            return this.httpClient.post(`${this.gs.BASE_API_URL}/loans/upload-template/${uploadProgressID}`, formData);
+            return this.httpClient.post(`${this.gs.BASE_API_URL}/loans/upload-template/${uploadProgressID}/${updateParticipantInfo}`, formData);
         }
         return of(null);
       }
