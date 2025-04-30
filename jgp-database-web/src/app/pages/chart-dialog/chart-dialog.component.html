@@ -60,6 +60,24 @@
       (select)="onSelect($event)"
   />   
   }
+
+  @if (data.chartType === 'ngx-charts-bar-horizontal-2d') {
+    <ngx-charts-bar-horizontal-2d
+      [scheme]="data.chartSColorScheme"
+      [results]="data.chartData"
+      [gradient]="data.chartGradient"
+      [xAxis]="data.chartShowXAxis"
+      [yAxis]="data.chartShowYAxis"
+      [legend]="data.chartShowLegend"
+      [showXAxisLabel]="data.chartShowXAxisLabel"
+      [showYAxisLabel]="data.chartShowYAxisLabel"
+      [xAxisLabel]="data.chartXAxisLabel"
+      [yAxisLabel]="data.chartYAxisLabel"
+      [dataLabelFormatting]="data.chartFormatLabel"
+      [showDataLabel]="true"
+      (select)="onSelect($event)"
+  />   
+  }
   @if (data.chartType === 'ngx-charts-bar-horizontal') {
     <ngx-charts-bar-horizontal
     [scheme]="data.chartSColorScheme"
