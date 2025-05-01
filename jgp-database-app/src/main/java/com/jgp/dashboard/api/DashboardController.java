@@ -170,6 +170,14 @@ public class DashboardController {
         return new ResponseEntity<>(this.dashboardService.getTaTrainingBySectorSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, trainingPartner)), HttpStatus.OK);
     }
 
+    @GetMapping("loans-disbursed-by-product")
+    public ResponseEntity<List<DataPointDto>> getLoansDisbursedByLoanProductSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                           @RequestParam(value = "county-code", required = false) String countyCode,
+                                                                           @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                           @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        return new ResponseEntity<>(this.dashboardService.getLoansDisbursedByLoanProductSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, null)), HttpStatus.OK);
+    }
+
     @GetMapping("employees-summary")
     public ResponseEntity<List<DataPointDto>> getParticipantsEmployeesSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
                                                                            @RequestParam(value = "from-date", required = false) LocalDate fromDate,

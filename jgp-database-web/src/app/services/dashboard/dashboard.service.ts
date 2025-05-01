@@ -82,6 +82,10 @@ export class DashboardService {
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/ta-training-by-sector?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
+    getLoansDisbursedByLoanProductSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/loans-disbursed-by-product?${this.getDashBoardQueryParams(dashBoardFilters)}`);
+    }
+
     getParticipantsEmployeesSummary(dashBoardFilters: any = undefined): Observable<any> {
       return this.httpClient.get(`${this.globalService.BASE_API_URL}/reports/employees-summary?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
@@ -189,6 +193,14 @@ export class DashboardService {
       }) : '0';
     }
 
+    formatNumberWithThousandSeparatorForm(number: any): string {
+      // Use the toLocaleString method to add suffixes to the number
+      return number && null !== number ? number.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) : '0.00';
+    }
+
 
     openExpandedChartDialog(dialog: MatDialog, chartData: any): void {
       // Dynamically calculate dialog size
@@ -211,7 +223,7 @@ export class DashboardService {
         businessesTrained: this.formatNumberToShortForm(highLevelSummary.businessesTrained), 
         businessesLoaned: this.formatNumberToShortForm(highLevelSummary.businessesLoaned), 
         amountDisbursed: this.formatNumberToShortForm(highLevelSummary.amountDisbursed), 
-        outStandingAmount: this.formatNumberToShortForm(highLevelSummary.outStandingAmount)
+        amountDisbursedByTranches: this.formatNumberToShortForm(highLevelSummary.amountDisbursedByTranches)
       }
     }
 

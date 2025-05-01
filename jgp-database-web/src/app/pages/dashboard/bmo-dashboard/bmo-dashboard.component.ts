@@ -123,7 +123,7 @@ export class BmoDashboardComponent implements OnInit {
   refugeesAndPlwdtrainedBusinessesCountDataPerGenderSource: any;
   public refugeesAndPlwdDisplayedColumnsTrainedPerGender = ['name', 'value'];
 
-  highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', outStandingAmount: '0'}
+  highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', amountDisbursedByTranches: '0'}
 
   private unsubscribe$ = new Subject<void>();
 

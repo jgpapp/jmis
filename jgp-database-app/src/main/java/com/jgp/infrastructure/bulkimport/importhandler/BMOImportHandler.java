@@ -59,6 +59,7 @@ public class BMOImportHandler implements ImportHandler {
     private Map<Row, String> rowErrorMap;
     private String documentImportProgressUUId;
     private static final String VALUE_REGEX = "[^a-zA-Z ]+";
+    private Boolean updateParticipantInfo;
 
     @Override
     public Count process(BulkImportEvent bulkImportEvent) {
@@ -67,6 +68,7 @@ public class BMOImportHandler implements ImportHandler {
         this.statuses = new ArrayList<>();
         this.rowErrorMap = new HashMap<>();
         this.documentImportProgressUUId = bulkImportEvent.importProgressUUID();
+        this.updateParticipantInfo = bulkImportEvent.updateParticipantInfo();
         readExcelFile();
         return importEntity();
     }
@@ -136,9 +138,11 @@ public class BMOImportHandler implements ImportHandler {
         if (null == rowErrorMap.get(row)){
             validateTAData(taData, row);
         }
-
+        final var participantDto = getParticipantDto(row);
+        if (Boolean.TRUE.equals(this.updateParticipantInfo)) {
+            existingParticipant.ifPresent(participant -> this.participantService.updateParticipant(participant.getId(), participantDto));
+        }
         if (existingParticipant.isEmpty() && null == rowErrorMap.get(row)){
-            final var participantDto = getParticipantDto(row);
             validateParticipant(participantDto, row);
             if (null == rowErrorMap.get(row)){
                 existingParticipant = Optional.of(this.participantService.createParticipant(participantDto));

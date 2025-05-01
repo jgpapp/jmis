@@ -46,6 +46,8 @@ public interface DashboardService {
 
     List<DataPointDto> getTaTrainingBySectorSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
+    List<DataPointDto> getLoansDisbursedByLoanProductSummary(DashboardSearchCriteria dashboardSearchCriteria);
+
     List<DataPointDto> getParticipantsEmployeesSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
     List<DataPointDto> getTaTrainingBySegmentSummary(DashboardSearchCriteria dashboardSearchCriteria);

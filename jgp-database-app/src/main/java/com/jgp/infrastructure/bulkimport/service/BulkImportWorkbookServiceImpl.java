@@ -69,7 +69,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
 
 
     @Override
-    public Long importWorkbook(String entity, MultipartFile fileDetail, String importProgressUUID) {
+    public Long importWorkbook(String entity, MultipartFile fileDetail, String importProgressUUID, String updateParticipantInfo) {
         try {
             if (entity != null && fileDetail != null) {
 
@@ -89,12 +89,12 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                     throw new InvalidEntityTypeForDocumentManagementException("Unable to find requested resource");
 
                 }
-                return publishEvent(primaryColumn, fileDetail, bis, entityType, workbook, importProgressUUID);
+                return publishEvent(primaryColumn, fileDetail, bis, entityType, workbook, importProgressUUID, updateParticipantInfo);
             }
             throw new InvalidEntityTypeForDocumentManagementException("One or more of the given parameters not found");
         } catch (IOException e) {
             log.error("Problem occurred in importWorkbook function", e);
-            throw new InvalidEntityTypeForDocumentManagementException("IO exception occured with " + fileDetail.getOriginalFilename() + " " + e.getMessage());
+            throw new InvalidEntityTypeForDocumentManagementException("IO exception occurred with " + fileDetail.getOriginalFilename() + " " + e.getMessage());
 
         }
     }
@@ -126,7 +126,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
 
 
     private Long publishEvent(final Integer primaryColumn, final MultipartFile fileDetail,
-            final InputStream clonedInputStreamWorkbook, final GlobalEntityType entityType, final Workbook workbook, String importProgressUUID) {
+            final InputStream clonedInputStreamWorkbook, final GlobalEntityType entityType, final Workbook workbook, String importProgressUUID, String updateParticipantInfo) {
 
         final String fileName = fileDetail.getOriginalFilename();
 
@@ -140,7 +140,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                 ImportHandlerUtils.getNumberOfRows(workbook.getSheetAt(0), primaryColumn), this.securityContext.getAuthenticatedUserIfPresent().getPartner());
         this.importDocumentRepository.saveAndFlush(importDocument);
 
-        BulkImportEvent event = new BulkImportEvent(workbook, entityType.name(), importDocument.getId(), importProgressUUID);
+        BulkImportEvent event = new BulkImportEvent(workbook, entityType.name(), importDocument.getId(), importProgressUUID, "YES".equalsIgnoreCase(updateParticipantInfo));
         applicationContext.publishEvent(event);
         return importDocument.getId();
     }

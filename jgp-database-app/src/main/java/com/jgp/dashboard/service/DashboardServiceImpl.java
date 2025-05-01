@@ -109,7 +109,7 @@ public class DashboardServiceImpl implements DashboardService {
             parameters.addValue(TRAINING_PARTNER_PARAM, dashboardSearchCriteria.trainingPartner().toLowerCase(Locale.getDefault()));
             bpdWhereClause = String.format("%s%s", bpdWhereClause, WHERE_CLAUSE_BY_TRAINING_PARTNER_PARAM);
         }
-        var sqlQuery = String.format(HighLevelSummaryMapper.SCHEMA, bpdWhereClause, loanWhereClause);
+        var sqlQuery = String.format(HighLevelSummaryMapper.SCHEMA, bpdWhereClause, loanWhereClause, loanWhereClause.concat(" and lt.is_given_in_tranches = true"));
         return this.namedParameterJdbcTemplate.queryForObject(sqlQuery, parameters, highLevelSummaryMapper);
     }
 
@@ -446,7 +446,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<DataPointDto> getTaTrainingBySectorSummary(DashboardSearchCriteria dashboardSearchCriteria) {
-        final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
+        final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -469,6 +469,31 @@ public class DashboardServiceImpl implements DashboardService {
             whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_TRAINING_PARTNER_PARAM);
         }
         var sqlQuery = String.format(DataPointMapper.BUSINESSES_TRAINED_BY_SECTOR_SCHEMA, whereClause);
+
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
+    public List<DataPointDto> getLoansDisbursedByLoanProductSummary(DashboardSearchCriteria dashboardSearchCriteria) {
+        final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
+        LocalDate fromDate = dashboardSearchCriteria.fromDate();
+        LocalDate toDate = dashboardSearchCriteria.toDate();
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = getDefaultQueryDates().getLeft();
+            toDate = getDefaultQueryDates().getRight();
+        }
+        var whereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
+            parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
+            whereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
+            parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
+            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        var sqlQuery = String.format(DataPointMapper.LOANS_DISBURSED_BY_LOAN_PRODUCT_SCHEMA, whereClause);
 
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
     }
@@ -1039,17 +1064,21 @@ public class DashboardServiceImpl implements DashboardService {
     private static final class HighLevelSummaryMapper implements RowMapper<HighLevelSummaryDto> {
 
         public static final String SCHEMA = """
-                    with highLevelSummary as (\s
-                    select count(bpd.*) as businessesTrained,\s
-                    0 as businessesLoaned, 0 as amountDisbursed,\s
-                    0 as outStandingAmount from bmo_participants_data bpd %s \s
-                    union
-                    select 0 as businessesTrained, count(distinct l.*) as businessesLoaned,\s
-                    sum(lt.amount) as amountDisbursed, sum(lt.out_standing_amount) as outStandingAmount from loan_transactions lt\s
-                    inner join loans l on lt.loan_id = l.id %s\s
+                with highLevelSummary as (\s
+                select count(bpd.*) as businessesTrained,\s
+                0 as businessesLoaned, 0 as amountDisbursed,\s
+                0 as amountDisbursedByTranches from bmo_participants_data bpd %s \s
+                union
+                select 0 as businessesTrained, count(distinct l.*) as businessesLoaned,\s
+                sum(lt.amount) as amountDisbursed, 0 as amountDisbursedByTranches from loan_transactions lt\s
+                inner join loans l on lt.loan_id = l.id %s\s
+                union
+                 select 0 as businessesTrained, 0 as businessesLoaned,\s
+                 0 as amountDisbursed, sum(lt.amount) as amountDisbursedByTranches from loan_transactions lt\s
+                 inner join loans l on lt.loan_id = l.id %s\s
                     )
                     select sum(businessesTrained) as businessesTrained, sum(businessesLoaned) as businessesLoaned,\s
-                    sum(amountDisbursed) as amountDisbursed, sum(outStandingAmount) as outStandingAmount
+                    sum(amountDisbursed) as amountDisbursed, sum(amountDisbursedByTranches) as amountDisbursedByTranches
                     from highLevelSummary;
                    \s""";
 
@@ -1058,8 +1087,8 @@ public class DashboardServiceImpl implements DashboardService {
             final var businessesTrained = rs.getInt(BUSINESSES_TRAINED);
             final var businessesLoaned = rs.getInt(BUSINESSES_LOANED);
             final var amountDisbursed = rs.getBigDecimal(AMOUNT_DISBURSED);
-            final var outStandingAmount = rs.getBigDecimal(OUT_STANDING_AMOUNT);
-            return new HighLevelSummaryDto(CommonUtil.NUMBER_FORMAT.format(businessesTrained), CommonUtil.NUMBER_FORMAT.format(businessesLoaned), amountDisbursed, outStandingAmount);
+            final var amountDisbursedByTranches = rs.getBigDecimal("amountDisbursedByTranches");
+            return new HighLevelSummaryDto(CommonUtil.NUMBER_FORMAT.format(businessesTrained), CommonUtil.NUMBER_FORMAT.format(businessesLoaned), amountDisbursed, amountDisbursedByTranches);
         }
     }
 
@@ -1148,6 +1177,12 @@ public class DashboardServiceImpl implements DashboardService {
 
         public static final String LOANS_DISBURSED_BY_QUALITY_SCHEMA = """
                 select l.loan_quality as dataKey, sum(lt.amount) as dataValue,\s
+                SUM(lt.amount) * 100.0 / SUM(SUM(lt.amount)) OVER () AS percentage\s
+                from loan_transactions lt inner join loans l on lt.loan_id = l.id %s group by 1;\s
+                """;
+
+        public static final String LOANS_DISBURSED_BY_LOAN_PRODUCT_SCHEMA = """
+                select l.loan_product as dataKey, sum(lt.amount) as dataValue,\s
                 SUM(lt.amount) * 100.0 / SUM(SUM(lt.amount)) OVER () AS percentage\s
                 from loan_transactions lt inner join loans l on lt.loan_id = l.id %s group by 1;\s
                 """;
