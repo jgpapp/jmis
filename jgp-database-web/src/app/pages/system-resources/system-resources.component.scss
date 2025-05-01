@@ -1,3 +1,31 @@
-.mat-icon-button {
+.view-btn {
     color: rgb(34, 119, 73);
+    
+}
+
+.delete-btn {
+    color: rgb(233, 7, 19) !important;
+}
+
+.mat-action-cell {
+    display: flex;
+    justify-content: center;
+}
+.mat-action-cell .mat-icon-button {
+    margin: 0 4px;
+}
+.mat-action-cell .mat-icon-button:hover {
+    color: rgb(34, 119, 73);
+}
+.mat-action-cell .mat-icon-button:focus {
+    outline: none;
+}
+.mat-action-cell .mat-icon-button:focus-visible {
+    outline: none;
+}
+.mat-action-cell .mat-icon-button:focus-visible {
+    outline: none;
+}
+.mat-action-cell .mat-icon-button:focus-visible {
+    outline: none;
 }

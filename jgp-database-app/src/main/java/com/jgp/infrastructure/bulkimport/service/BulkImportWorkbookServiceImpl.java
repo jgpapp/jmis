@@ -10,6 +10,7 @@ import com.jgp.infrastructure.bulkimport.domain.ImportDocumentRepository;
 import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
 import com.jgp.infrastructure.bulkimport.importhandler.ImportHandlerUtils;
 import com.jgp.infrastructure.core.domain.JdbcSupport;
+import com.jgp.infrastructure.documentmanagement.contentrepository.ContentRepository;
 import com.jgp.infrastructure.documentmanagement.data.DocumentData;
 import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.infrastructure.documentmanagement.domain.DocumentRepository;
@@ -64,6 +65,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     private final ImportDocumentRepository importDocumentRepository;
     private final JdbcTemplate jdbcTemplate;
     private final ImportDocumentMapper importDocumentMapper;
+    private final ContentRepository contentRepository;
     private static final String SELECT_LITERAL = "select ";
 
 
@@ -123,6 +125,20 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
         this.importDocumentRepository.saveAndFlush(importDocument);
     }
 
+    @Override
+    public void deleteFileFromDbAndDirectory(Long importDocumentId) {
+        final var importDoc = this.importDocumentRepository.findById(importDocumentId).orElse(null);
+        final var doc = Objects.nonNull(importDoc) ? importDoc.getDocument() : null;
+        if (Objects.nonNull(importDoc)){
+            this.importDocumentRepository.deleteById(importDoc.getId());
+        }
+        if (Objects.nonNull(doc) && null != doc.getLocation()) {
+            this.contentRepository.deleteFile(doc.getLocation());
+            this.documentRepository.deleteById(doc.getId());
+        }
+
+
+    }
 
 
     private Long publishEvent(final Integer primaryColumn, final MultipartFile fileDetail,

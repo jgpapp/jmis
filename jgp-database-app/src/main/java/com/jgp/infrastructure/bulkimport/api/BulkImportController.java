@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -76,5 +77,11 @@ public class BulkImportController {
         bulkImportWorkbookService.importFileToDirectory(GlobalEntityType.RESOURCES_IMPORT.name(), resourceType, fileDetail);
 
         return new ResponseEntity<>(new ApiResponseDto(true, "Document successfully uploaded !!"), HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("delete-resource-file/{import-id}")
+    public ResponseEntity<ApiResponseDto> deleteResourceFile( @PathVariable("import-id") Long importId) {
+        bulkImportWorkbookService.deleteFileFromDbAndDirectory(importId);
+        return new ResponseEntity<>(new ApiResponseDto(true, "Document successfully deleted !!"), HttpStatus.NO_CONTENT);
     }
 }

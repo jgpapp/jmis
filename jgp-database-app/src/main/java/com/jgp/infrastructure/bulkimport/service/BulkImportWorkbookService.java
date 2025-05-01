@@ -10,7 +10,6 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
@@ -20,6 +19,8 @@ public interface BulkImportWorkbookService {
     Long importWorkbook(String entityType, MultipartFile fileDetail, String importProgressUUID, String updateParticipantInfo);
 
     void importFileToDirectory(String entityType, ResourceType resourceType, MultipartFile fileDetail);
+
+    void deleteFileFromDbAndDirectory(@NotNull Long importDocumentId);
 
     Collection<ImportData> getImports(GlobalEntityType type);
 

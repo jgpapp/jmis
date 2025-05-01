@@ -21,6 +21,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { v4 as uuidv4 } from 'uuid';
 import { MatRadioModule } from '@angular/material/radio';
+import { ConfirmDialogModel } from '../../../dto/confirm-dialog-model';
+import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+import { HasPermissionDirective } from '../../../directives/has-permission.directive';
 
 @Component({
   selector: 'app-data-uploader',
@@ -44,7 +48,8 @@ import { MatRadioModule } from '@angular/material/radio';
     MatTooltipModule,
     MatProgressBarModule,
     MatRadioModule,
-    FormsModule
+    FormsModule,
+    HasPermissionDirective
 ],
   templateUrl: './data-uploader.component.html',
   styleUrl: './data-uploader.component.scss'
@@ -76,7 +81,8 @@ export class DataUploaderComponent implements OnDestroy {
     private dataUploadService: DataUploadService, 
     private gs: GlobalService,
     private formBuilder: UntypedFormBuilder,
-    public authService: AuthService){
+    public authService: AuthService, 
+    private dialog: MatDialog){
 
       this.docsFilterForm = this.fb.group({
         selectedEntityType: [null]
@@ -212,6 +218,31 @@ export class DataUploaderComponent implements OnDestroy {
           }
         });
   }
+
+  deleteImportedTemplateFile(importId: number): void {
+        const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to delete Imported Template?`);
+        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+          maxWidth: "400px",
+          data: dialogData
+        });
+    
+        dialogRef.afterClosed().subscribe(dialogResult => {
+          if(dialogResult){
+            this.dataUploadService.deleteResourceFile(importId)
+          .pipe(takeUntil(this.unsubscribe$))
+          .subscribe({
+            next: (response) => {
+              console.log(response);
+                this.gs.openSnackBar('Imported Template successfully deleted!!', 'X');
+                this.getAvailableDocuments();
+            },
+            error: (error) => {
+                console.error(error);
+            }
+          });
+          }
+        });
+      }
 
   get buttonIsDisabled(): boolean {
     return !this.template || !this.isExcelFile(this.template) || !this.authService.currentUser()?.partnerId || !this.legalFormType;

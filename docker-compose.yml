@@ -41,7 +41,7 @@ services:
       - "8082:8082"
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt:ro  # Mount Let's Encrypt certificates from host
-      - .jgp_documents:/home/.jgp_documents  # Persist JGP documents on the host
+      - /home/jmis/.jgp_documents:/root/.jgp_documents  # Persist JGP documents on the host
   jgp_app_ui:
     container_name: jgp_app_ui
     build:

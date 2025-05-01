@@ -11,6 +11,7 @@ import com.jgp.infrastructure.documentmanagement.data.ImageData;
 import com.jgp.infrastructure.documentmanagement.exception.ContentManagementException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -20,6 +21,7 @@ import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.Base64;
 
+@Service
 @Slf4j
 public class FileSystemContentRepository implements ContentRepository {
 

@@ -16,6 +16,10 @@ import { FileUploadComponent } from "../file-upload/file-upload.component";
 import { Subject, Subscription, takeUntil } from 'rxjs';
 import { DataUploadService } from '@services/shared/data-upload.service';
 import { GlobalService } from '@services/shared/global.service';
+import { ConfirmDialogModel } from '../../dto/confirm-dialog-model';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+import { HasPermissionDirective } from '../../directives/has-permission.directive';
 
 @Component({
   selector: 'app-system-resources',
@@ -33,7 +37,8 @@ import { GlobalService } from '@services/shared/global.service';
     MatSelectModule,
     MatCardModule,
     ReactiveFormsModule,
-    FileUploadComponent
+    FileUploadComponent,
+    HasPermissionDirective
 ],
   templateUrl: './system-resources.component.html',
   styleUrl: './system-resources.component.scss'
@@ -59,7 +64,8 @@ export class SystemResourcesComponent {
     public fb: FormBuilder,
     private gs: GlobalService,
     private formBuilder: UntypedFormBuilder,
-    private dataUploadService: DataUploadService) { 
+    private dataUploadService: DataUploadService, 
+    private dialog: MatDialog) { 
       this.createBulkImportForm();
     }
 
@@ -131,6 +137,33 @@ export class SystemResourcesComponent {
           }
         });
   }
+
+
+
+  deleteResourceFile(importId: number): void {
+      const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to delete resource?`);
+      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        maxWidth: "400px",
+        data: dialogData
+      });
+  
+      dialogRef.afterClosed().subscribe(dialogResult => {
+        if(dialogResult){
+          this.dataUploadService.deleteResourceFile(importId)
+        .pipe(takeUntil(this.unsubscribe$))
+        .subscribe({
+          next: (response) => {
+            console.log(response);
+              this.gs.openSnackBar('Document successfully deleted!!', 'X');
+              this.getAvailableDocuments();
+          },
+          error: (error) => {
+              console.error(error);
+          }
+        });
+        }
+      });
+    }
 
 
   get buttonIsDisabled(): boolean {
