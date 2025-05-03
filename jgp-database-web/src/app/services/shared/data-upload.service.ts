@@ -56,6 +56,10 @@ export class DataUploadService {
             });
       }
 
+      deleteResourceFile(importId: number): Observable<any> {
+        return this.httpClient.delete(`${this.gs.BASE_API_URL}/imports/delete-resource-file/${importId}`);
+  }
+
 
       /**
    * Download file from API response
