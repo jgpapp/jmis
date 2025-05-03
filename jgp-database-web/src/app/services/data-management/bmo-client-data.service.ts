@@ -1,7 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { GlobalService } from '../shared/global.service';
-import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -9,13 +7,13 @@ import { Observable } from 'rxjs';
 })
 export class BMOClientDataService {
 
-    constructor(private httpClient: HttpClient, private gs: GlobalService, private router: Router) { }
+    constructor(private httpClient: HttpClient) { }
 
 
     uploadBMOClientsData(file: File): Observable<any> {
         const formData = new FormData();
         formData.append('excelFile', file, file.name);
-        return this.httpClient.post(`${this.gs.BASE_API_URL}/bmos/upload-template`, formData);
+        return this.httpClient.post(`/bmos/upload-template`, formData);
       }
 
       getAvailableBMOClientData(page: number, size: number, approvedByPartner: Boolean, partnerId: number | undefined): Observable<any> {
@@ -23,16 +21,16 @@ export class BMOClientDataService {
               .set('pageNumber', page.toString())
               .set('pageSize', size.toString());
         if(partnerId){
-          return this.httpClient.get(`${this.gs.BASE_API_URL}/bmos?partnerId=${partnerId}&approvedByPartner=${approvedByPartner}`, { params });
+          return this.httpClient.get(`/bmos?partnerId=${partnerId}&approvedByPartner=${approvedByPartner}`, { params });
         }
-        return this.httpClient.get(`${this.gs.BASE_API_URL}/bmos?approvedByPartner=${approvedByPartner}`, { params });
+        return this.httpClient.get(`/bmos?approvedByPartner=${approvedByPartner}`, { params });
       }
 
       approveBMOClientData(bmoIds: number[]): Observable<any> {
-        return this.httpClient.post(`${this.gs.BASE_API_URL}/bmos/approve-or-reject?approved=true`, JSON.stringify(bmoIds));
+        return this.httpClient.post(`/bmos/approve-or-reject?approved=true`, JSON.stringify(bmoIds));
       }
 
       disapproveBMOClientData(bmoIds: number[]): Observable<any> {
-        return this.httpClient.post(`${this.gs.BASE_API_URL}/bmos/approve-or-reject?approved=false`, JSON.stringify(bmoIds));
+        return this.httpClient.post(`/bmos/approve-or-reject?approved=false`, JSON.stringify(bmoIds));
       }
 }

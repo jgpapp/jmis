@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { GlobalService } from '../shared/global.service';
 import { Observable } from 'rxjs';
 import { User } from '../../common/models/user.model';
 
@@ -9,34 +8,34 @@ import { User } from '../../common/models/user.model';
 })
 export class UserService {
 
-  constructor(private httpClient: HttpClient, private globalService: GlobalService) { }
+  constructor(private httpClient: HttpClient) { }
 
   getAvailableUsers(): Observable<any> {
-    return this.httpClient.get(`${this.globalService.BASE_API_URL}/users`);
+    return this.httpClient.get(`/users`);
   }
 
   createUser(user: User): Observable<any> {
-    return this.httpClient.post(`${this.globalService.BASE_API_URL}/users`, JSON.stringify(user));
+    return this.httpClient.post(`/users`, JSON.stringify(user));
   }
 
   updateUser(userId: number, user: User): Observable<any> {
-    return this.httpClient.put(`${this.globalService.BASE_API_URL}/users/${userId}`, JSON.stringify(user));
+    return this.httpClient.put(`/users/${userId}`, JSON.stringify(user));
   }
 
   lockOrUnlockUser(selectedUser: any): Observable<any> {
     const newUserStatus = selectedUser.isActive ? 'INACTIVE' : 'ACTIVE';
-    return this.httpClient.put(`${this.globalService.BASE_API_URL}/users/${selectedUser.id}/change-user-status/${newUserStatus}`, '');
+    return this.httpClient.put(`/users/${selectedUser.id}/change-user-status/${newUserStatus}`, '');
   }
 
   updateUserPassword(userPassDto: {password: string, newPass: string, passConfirm: string}): Observable<any> {
-    return this.httpClient.put(`${this.globalService.BASE_API_URL}/users/change-password`, JSON.stringify(userPassDto));
+    return this.httpClient.put(`/users/change-password`, JSON.stringify(userPassDto));
   }
 
   resetUserPassword(userId: number): Observable<any> {
-    return this.httpClient.put(`${this.globalService.BASE_API_URL}/users/reset-user-password/${userId}`, JSON.stringify({}));
+    return this.httpClient.put(`/users/reset-user-password/${userId}`, JSON.stringify({}));
   }
 
   getUserById(userId: number | string | null): Observable<any> {
-    return this.httpClient.get(`${this.globalService.BASE_API_URL}/users/${userId}`);
+    return this.httpClient.get(`/users/${userId}`);
   }
 }

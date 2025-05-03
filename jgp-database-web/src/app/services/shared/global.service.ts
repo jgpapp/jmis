@@ -9,22 +9,40 @@ import * as XLSX from 'xlsx';
 
 @Injectable({ providedIn: 'root' })
 export class GlobalService {
-  //API_HOST = '159.89.55.54';
-  //API_HOST = '20.242.125.65';
-  API_HOST = 'jmis.dt-global.com';
-  HTTP_SCHEMA = 'https';
-  WS_SCHEMA = 'wss';
-  //API_HOST = 'localhost';
-  API_PORT = '8082';
-  BASE_API_URL: string = `${this.HTTP_SCHEMA}://${this.API_HOST}:${this.API_PORT}/jgp-app/api/v1`;  
-  BASE_WS_URL: string = `${this.WS_SCHEMA}://${this.API_HOST}:${this.API_PORT}/jgp-app/ws`;
  
   HTTP_OPTIONS = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   };
+
+
+  // Define the structure of your expected environment variables
+  public config: {
+    baseApiUrl?: string;
+    baseWebSocketUrl?: string;
+  } = {};
   
   
-  constructor(public _snackBar: MatSnackBar) { }
+  constructor(public _snackBar: MatSnackBar) {
+
+     // Attempt to load config from the global window object
+    // The 'env' property will be populated by assets/env.js
+    const browserWindow = window || {};
+    const browserWindowEnv = (browserWindow as any)['__env'] || {};
+
+    // Assign default values or values from window.__env
+    this.config = {
+      baseApiUrl: browserWindowEnv.baseApiUrl || 'http://localhost:8082/jgp-app/api/v1',
+      baseWebSocketUrl: browserWindowEnv.baseWebSocketUrl || 'http://localhost:8082/jgp-app/ws',
+    };
+   }
+
+   get baseApiUrl(): string | undefined {
+    return this.config.baseApiUrl;
+  }
+
+  get baseWebSocketUrl(): string | undefined {
+    return this.config.baseWebSocketUrl;
+  }
 
   openSnackBar(message: string, action: string) {
     this._snackBar.open(message, 'X', {

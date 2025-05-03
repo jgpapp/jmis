@@ -9,6 +9,7 @@ import { CustomOverlayContainer } from './theme/utils/custom-overlay-container';
 import { CalendarModule, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns'; 
 import { httpInterceptor } from './util/http.interceptor';
+import { apiPrefixInterceptor } from './util/api-prefix.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,7 +19,7 @@ export const appConfig: ApplicationConfig = {
       //withPreloading(PreloadAllModules),  // comment this line for enable lazy-loading
     ), 
     provideAnimationsAsync(),
-    provideHttpClient(withInterceptors([httpInterceptor])),
+    provideHttpClient(withInterceptors([apiPrefixInterceptor, httpInterceptor])),
    // importProvidersFrom(InMemoryWebApiModule.forRoot(UsersData, { delay: 1000 })),
     importProvidersFrom(CalendarModule.forRoot({
       provide: DateAdapter,
