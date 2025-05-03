@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { GlobalService } from '@services/shared/global.service';
 import { CurrentUserCredentials } from '../../dto/CurrentUserCredentials';
 
 @Injectable({
@@ -25,9 +24,9 @@ export class AuthService {
   FORCE_PASS_CHANGE: string = 'force_change_password';
   jwtService: JwtHelperService = new JwtHelperService();
 
-  constructor(private httpClient: HttpClient, private globalService: GlobalService, private router: Router) { }
+  constructor(private httpClient: HttpClient, private router: Router) { }
 
-  login = (authRequest: {username: string, password: string}): Observable<any> => this.httpClient.post(`${this.globalService.BASE_API_URL}/users/authenticate`, JSON.stringify(authRequest))
+  login = (authRequest: {username: string, password: string}): Observable<any> => this.httpClient.post(`/users/authenticate`, JSON.stringify(authRequest))
 
   public setLocalStorageValue = (key : string, value: any): void => localStorage.setItem(key, value)
 

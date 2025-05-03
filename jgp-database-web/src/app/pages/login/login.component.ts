@@ -39,7 +39,7 @@ export class LoginComponent implements OnDestroy {
   authResponse: any
   authResponse2?: { success: boolean, message: string, authToken: string }
   private unsubscribe$ = new Subject<void>();
-  constructor(public settingsService: SettingsService, public fb: FormBuilder, public router: Router, private us: UserService, private gs: GlobalService, private authService: AuthService) {
+  constructor(public settingsService: SettingsService, public fb: FormBuilder, public router: Router, private us: UserService, private authService: AuthService) {
     this.settings = this.settingsService.settings;
     this.userloginForm = this.fb.group({
       'username': [null, Validators.compose([Validators.required, emailValidator])],

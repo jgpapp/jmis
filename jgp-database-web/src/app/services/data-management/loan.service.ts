@@ -1,7 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { GlobalService } from '../shared/global.service';
-import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -9,13 +7,13 @@ import { Observable } from 'rxjs';
 })
 export class LoanService {
 
-    constructor(private httpClient: HttpClient, private gs: GlobalService, private router: Router) { }
+    constructor(private httpClient: HttpClient) { }
 
 
     uploadLendingData(file: File): Observable<any> {
         const formData = new FormData();
         formData.append('excelFile', file, file.name);
-        return this.httpClient.post(`${this.gs.BASE_API_URL}/loans/upload-template`, formData);
+        return this.httpClient.post(`/loans/upload-template`, formData);
       }
 
       getAvailableLendingData(page: number, size: number, approvedByPartner: Boolean, partnerId: number | undefined): Observable<any> {
@@ -23,9 +21,9 @@ export class LoanService {
               .set('pageNumber', page.toString())
               .set('pageSize', size.toString());
         if(partnerId){
-          return this.httpClient.get(`${this.gs.BASE_API_URL}/loans?partnerId=${partnerId}&approvedByPartner=${approvedByPartner}`, { params });
+          return this.httpClient.get(`/loans?partnerId=${partnerId}&approvedByPartner=${approvedByPartner}`, { params });
         }
-        return this.httpClient.get(`${this.gs.BASE_API_URL}/loans?approvedByPartner=${approvedByPartner}`, { params });
+        return this.httpClient.get(`/loans?approvedByPartner=${approvedByPartner}`, { params });
       }
 
       getLoanTransactions(page: number, size: number, isApproved: Boolean, partnerId: number | undefined, loanId: number | undefined = undefined): Observable<any> {
@@ -39,22 +37,22 @@ export class LoanService {
               if(partnerId){
                 params = params.set('partnerId', partnerId.toString());
               }
-        return this.httpClient.get(`${this.gs.BASE_API_URL}/loans/transactions`, { params });
+        return this.httpClient.get(`/loans/transactions`, { params });
       }
 
       getLoanById(loanId: number | string | null): Observable<any> {
-        return this.httpClient.get(`${this.gs.BASE_API_URL}/loans/${loanId}`);
+        return this.httpClient.get(`/loans/${loanId}`);
       }
 
       approveLoansData(loanIds: number[]): Observable<any> {
-        return this.httpClient.post(`${this.gs.BASE_API_URL}/loans/approve-or-reject?approved=true`, JSON.stringify(loanIds));
+        return this.httpClient.post(`/loans/approve-or-reject?approved=true`, JSON.stringify(loanIds));
       }
 
       disapproveLoansData(loanIds: number[]): Observable<any> {
-        return this.httpClient.post(`${this.gs.BASE_API_URL}/loans/approve-or-reject?approved=false`, JSON.stringify(loanIds));
+        return this.httpClient.post(`/loans/approve-or-reject?approved=false`, JSON.stringify(loanIds));
       }
 
       approveLoanTransactions(transactionsIds: number[]): Observable<any> {
-        return this.httpClient.post(`${this.gs.BASE_API_URL}/loans/approve-or-reject-transactions?approved=true`, JSON.stringify(transactionsIds));
+        return this.httpClient.post(`/loans/approve-or-reject-transactions?approved=true`, JSON.stringify(transactionsIds));
       }
 }

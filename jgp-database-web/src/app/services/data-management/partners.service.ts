@@ -14,21 +14,21 @@ export class PartnerService {
 
 
     createPartner(partner: PartnerDto): Observable<any> {
-        return this.httpClient.post(`${this.globalService.BASE_API_URL}/partners`, JSON.stringify(partner));
+        return this.httpClient.post(`/partners`, JSON.stringify(partner));
     }
 
     updatePartner(partnerId: number, partner: PartnerDto): Observable<any> {
-      return this.httpClient.put(`${this.globalService.BASE_API_URL}/partners/${partnerId}`, JSON.stringify(partner));
+      return this.httpClient.put(`/partners/${partnerId}`, JSON.stringify(partner));
     }
 
     getAvailablePartners(page: number, size: number): Observable<any> {
       const params = new HttpParams()
       .set('pageNumber', page.toString())
       .set('pageSize', size.toString());
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/partners`, { params });
+      return this.httpClient.get(`/partners`, { params });
     }
 
     getPartnerById(partnerId: number | string | null): Observable<any> {
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/partners/${partnerId}`);
+      return this.httpClient.get(`/partners/${partnerId}`);
     }
 }

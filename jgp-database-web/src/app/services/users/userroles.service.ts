@@ -1,8 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { GlobalService } from '../shared/global.service';
 import { Observable } from 'rxjs';
-import { UserDto } from '../../dto/UserDto';
 import { UserRoleDto } from '../../dto/UserRoleDto';
 
 @Injectable({
@@ -10,29 +8,29 @@ import { UserRoleDto } from '../../dto/UserRoleDto';
 })
 export class UserRoleService {
 
-  constructor(private httpClient: HttpClient, private globalService: GlobalService) { }
+  constructor(private httpClient: HttpClient) { }
 
   getAvailableUserRoles(): Observable<any> {
-    return this.httpClient.get(`${this.globalService.BASE_API_URL}/roles`);
+    return this.httpClient.get(`/roles`);
   }
 
   createUserRole(userRole: UserRoleDto): Observable<any> {
-    return this.httpClient.post(`${this.globalService.BASE_API_URL}/roles`, JSON.stringify(userRole));
+    return this.httpClient.post(`/roles`, JSON.stringify(userRole));
   }
 
   updateUserRole(roleId: number, userRole: UserRoleDto): Observable<any> {
-    return this.httpClient.put(`${this.globalService.BASE_API_URL}/roles/${roleId}`, JSON.stringify(userRole));
+    return this.httpClient.put(`/roles/${roleId}`, JSON.stringify(userRole));
   }
 
   updateRolePermissions(roleId: number, permissions: string[]): Observable<any> {
-    return this.httpClient.put(`${this.globalService.BASE_API_URL}/roles/${roleId}/update-permissions`, JSON.stringify(permissions));
+    return this.httpClient.put(`/roles/${roleId}/update-permissions`, JSON.stringify(permissions));
   }
 
   getUserRoleById(roleId: number | string | null): Observable<any> {
-    return this.httpClient.get(`${this.globalService.BASE_API_URL}/roles/${roleId}`);
+    return this.httpClient.get(`/roles/${roleId}`);
   }
 
   deleteUserRoleById(roleId: number): Observable<any> {
-    return this.httpClient.delete(`${this.globalService.BASE_API_URL}/roles/${roleId}`);
+    return this.httpClient.delete(`/roles/${roleId}`);
   }
 }

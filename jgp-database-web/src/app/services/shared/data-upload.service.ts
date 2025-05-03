@@ -20,9 +20,9 @@ export class DataUploadService {
         const formData = new FormData();
         formData.append('excelFile', file, file.name);
         if(templateName.toUpperCase().includes('TA_IMPORT_TEMPLATE')){
-            return this.httpClient.post(`${this.gs.BASE_API_URL}/bmos/upload-template/${uploadProgressID}/${updateParticipantInfo}`, formData);
+            return this.httpClient.post(`/bmos/upload-template/${uploadProgressID}/${updateParticipantInfo}`, formData);
         }else if(templateName.toUpperCase().includes('LOAN_IMPORT_TEMPLATE')){
-            return this.httpClient.post(`${this.gs.BASE_API_URL}/loans/upload-template/${uploadProgressID}/${updateParticipantInfo}`, formData);
+            return this.httpClient.post(`/loans/upload-template/${uploadProgressID}/${updateParticipantInfo}`, formData);
         }
         return of(null);
       }
@@ -30,17 +30,17 @@ export class DataUploadService {
       uploadResourceFile(file: File, legalFormType: string): Observable<any> {
         const formData = new FormData();
         formData.append('fileDetail', file, file.name);
-        return this.httpClient.post(`${this.gs.BASE_API_URL}/imports/upload-resource-file/${legalFormType}`, formData);
+        return this.httpClient.post(`/imports/upload-resource-file/${legalFormType}`, formData);
       }
 
       downloadDataTemplate(templateName: string): Observable<any> {
         if(templateName.toUpperCase().includes('TA_IMPORT_TEMPLATE')){
-            return this.httpClient.get(`${this.gs.BASE_API_URL}/bmos/template/download`, {
+            return this.httpClient.get(`/bmos/template/download`, {
               responseType: 'arraybuffer',
               observe: 'response',
             });
         }else if(templateName.toUpperCase().includes('LOAN_IMPORT_TEMPLATE')){
-            return this.httpClient.get(`${this.gs.BASE_API_URL}/loans/template/download`, {
+            return this.httpClient.get(`/loans/template/download`, {
               responseType: 'arraybuffer',
               observe: 'response',
             });
@@ -50,14 +50,14 @@ export class DataUploadService {
 
 
       downloadDataImportedFile(row: any, fileType: string): Observable<any> {
-            return this.httpClient.get(`${this.gs.BASE_API_URL}/imports/downloadOutputTemplate/${fileType}?importDocumentId=${row.documentId}`, {
+            return this.httpClient.get(`/imports/downloadOutputTemplate/${fileType}?importDocumentId=${row.documentId}`, {
               responseType: 'arraybuffer',
               observe: 'response',
             });
       }
 
       deleteResourceFile(importId: number): Observable<any> {
-        return this.httpClient.delete(`${this.gs.BASE_API_URL}/imports/delete-resource-file/${importId}`);
+        return this.httpClient.delete(`/imports/delete-resource-file/${importId}`);
   }
 
 
@@ -128,20 +128,20 @@ export class DataUploadService {
     if(undefined !== partnerId){
       params = params.set('partnerId', partnerId);
     }
-    return this.httpClient.get(`${this.gs.BASE_API_URL}/imports`, { params });
+    return this.httpClient.get(`/imports`, { params });
   }
 
   getDocumentsById(importDocumentId: number, entityType: string): Observable<any> {
     let params = new HttpParams()
     .set('entityType', entityType)
     .set('importDocumentId', importDocumentId);
-    return this.httpClient.get(`${this.gs.BASE_API_URL}/imports`, { params });
+    return this.httpClient.get(`/imports`, { params });
   }
 
   initializeStompClient(): void {
     // Initialize the STOMP client
     this.webSocketClient = new Client({
-      brokerURL: this.gs.BASE_WS_URL, // WebSocket URL for the backend
+      brokerURL: this.gs.baseWebSocketUrl, // WebSocket URL for the backend
       connectHeaders: {},
       debug: (str) => {
         //console.log(str); // Debugging logs for STOMP. Enable in case of issues

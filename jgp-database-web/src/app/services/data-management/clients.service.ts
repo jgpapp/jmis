@@ -1,7 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { GlobalService } from '../shared/global.service';
-import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -9,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class ClientService {
 
-    constructor(private httpClient: HttpClient, private globalService: GlobalService, private router: Router) { }
+    constructor(private httpClient: HttpClient) { }
 
 
     getAvailableClients(searchText: string | null, page: number, size: number): Observable<any> {
@@ -22,14 +20,14 @@ export class ClientService {
         .set('pageSize', size.toString())
         .set('searchText', searchText);
       }
-        return this.httpClient.get(`${this.globalService.BASE_API_URL}/participants`, { params });
+        return this.httpClient.get(`/participants`, { params });
     }
 
     getParticipantById(participantId: number | string | null): Observable<any> {
-      return this.httpClient.get(`${this.globalService.BASE_API_URL}/participants/${participantId}?includeAccounts=true`);
+      return this.httpClient.get(`/participants/${participantId}?includeAccounts=true`);
     }
 
     updateParticipant(participantId: number, participantDto: any): Observable<any> {
-        return this.httpClient.put(`${this.globalService.BASE_API_URL}/participants/${participantId}`, JSON.stringify(participantDto));
+        return this.httpClient.put(`/participants/${participantId}`, JSON.stringify(participantDto));
       }
 }

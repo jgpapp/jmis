@@ -52,6 +52,12 @@ services:
     restart: on-failure
     networks:
       - jgp-app-network
+    environment:
+      - JGP_APP_BASE_URL=http://localhost:8082/jgp-app/api/v1
+      - JGP_APP_BASE_WEBSOCKET_URL=http://localhost:8082/jgp-app/ws
+      - SERVER_NAME=localhost
+      - SSL_CERT_PATH=/etc/ssl/certs/nginx-default.crt
+      - SSL_KEY_PATH=/etc/ssl/private/nginx-default.key
     depends_on:
       - jgp_app
     ports:
