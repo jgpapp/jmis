@@ -114,25 +114,42 @@ export class DataListComponent implements OnDestroy{
     });
   }
 
-
-  approveTAData22222(bmoIds: number[]){
-    this.bmoClientDataService.approveBMOClientData(bmoIds)
-    .pipe(takeUntil(this.unsubscribe$))
-      .subscribe({
-        next: (response) => {
-          this.gs.openSnackBar(response.message, "Dismiss");
-          this.getAvailableBMOClientData();
-        },
-        error: (error) => { }
-      });
-  }
-
   approveSelectedRows(){
     this.approveTAData(this.selection.selected.map(row => row.id));
   }
 
   approveAllPartnerTAData(){
     this.approveTAData([]);
+  }
+
+  rejectTAData(bmoIds: number[]): void {
+    const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to reject & delete TA data?`);
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      maxWidth: "400px",
+      data: dialogData
+    });
+
+    dialogRef.afterClosed().subscribe(dialogResult => {
+      if(dialogResult){
+        this.bmoClientDataService.rejectBMOClientData(bmoIds)
+        .pipe(takeUntil(this.unsubscribe$))
+          .subscribe({
+            next: (response) => {
+              this.gs.openSnackBar(response.message, "Dismiss");
+              this.getAvailableBMOClientData();
+            },
+            error: (error) => { }
+        });
+      }
+    });
+  }
+
+  rejectSelectedRows(){
+    this.rejectTAData(this.selection.selected.map(row => row.id));
+  }
+
+  rejectAllPartnerTAData(){
+    this.rejectTAData([]);
   }
 
   onPageChange(event: PageEvent) {

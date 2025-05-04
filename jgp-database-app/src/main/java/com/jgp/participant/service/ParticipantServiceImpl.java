@@ -33,12 +33,6 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final BMOClientDataService bmoClientDataService;
     private final ParticipantsPredicateBuilder participantsPredicateBuilder;
 
-    @Transactional
-    @Override
-    public void saveParticipant(Participant participant) {
-        this.participantRepository.save(participant);
-    }
-
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Participant createParticipant(ParticipantDto participantDto) {
@@ -75,14 +69,15 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     @Override
     public Page<Participant> availableParticipants(String searchText, Pageable pageable) {
+        final var qParticipant = QParticipant.participant;
+        var isActive = qParticipant.isActive.eq(true);
         if (null != searchText) {
-            final var qParticipant = QParticipant.participant;
             var partnerNamePredicate = qParticipant.participantName.containsIgnoreCase(searchText);
             var businessNamePredicate = qParticipant.businessName.containsIgnoreCase(searchText);
             var jgpPredicate = qParticipant.jgpId.containsIgnoreCase(searchText);
             var phoneNumberPredicate = qParticipant.phoneNumber.containsIgnoreCase(searchText);
-            return this.participantRepository.findAll(businessNamePredicate.or(jgpPredicate).or(phoneNumberPredicate).or(partnerNamePredicate), pageable);
+            return this.participantRepository.findAll(isActive.and(businessNamePredicate.or(jgpPredicate).or(phoneNumberPredicate).or(partnerNamePredicate)), pageable);
         }
-        return this.participantRepository.findAll(pageable);
+        return this.participantRepository.findAll(isActive, pageable);
     }
 }

@@ -44,15 +44,11 @@ export class LoanService {
         return this.httpClient.get(`/loans/${loanId}`);
       }
 
-      approveLoansData(loanIds: number[]): Observable<any> {
-        return this.httpClient.post(`/loans/approve-or-reject?approved=true`, JSON.stringify(loanIds));
-      }
-
-      disapproveLoansData(loanIds: number[]): Observable<any> {
-        return this.httpClient.post(`/loans/approve-or-reject?approved=false`, JSON.stringify(loanIds));
-      }
-
       approveLoanTransactions(transactionsIds: number[]): Observable<any> {
         return this.httpClient.post(`/loans/approve-or-reject-transactions?approved=true`, JSON.stringify(transactionsIds));
+      }
+
+      rejectLoanTransactions(transactionsIds: number[]): Observable<any> {
+        return this.httpClient.post(`/loans/approve-or-reject-transactions?approved=false`, JSON.stringify(transactionsIds));
       }
 }

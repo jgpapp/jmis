@@ -1,0 +1,2 @@
+DELETE FROM permission where code = 'SPECIFIC_PARTNER_DATA_ON_OVERVIEW_VIEW';
+

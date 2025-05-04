@@ -154,6 +154,12 @@ public class Loan extends BaseEntity {
         }
     }
 
+    public void removeLoanTransaction(final LoanTransaction loanTransaction){
+        if (Objects.nonNull(loanTransaction)) {
+            this.loanTransactions.removeIf(lt -> lt.getId().equals(loanTransaction.getId()));
+        }
+    }
+
     public void approveData(Boolean approval, AppUser user){
         this.isDataApprovedByPartner = approval;
         this.approvalBy = user;
