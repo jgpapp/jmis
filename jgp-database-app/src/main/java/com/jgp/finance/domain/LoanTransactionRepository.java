@@ -4,10 +4,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Repository
 public interface LoanTransactionRepository extends JpaRepository<LoanTransaction, Long>, JpaSpecificationExecutor<LoanTransaction>, QuerydslPredicateExecutor<LoanTransaction> {
@@ -20,6 +24,11 @@ public interface LoanTransactionRepository extends JpaRepository<LoanTransaction
 
     @Query("select l from LoanTransaction l where l.loan.partner.id = ?1 and l.isApproved = ?2")
     Page<LoanTransaction> getLoanTransactions(@NonNull Long id, @NonNull boolean isApproved, Pageable pageable);
+
+    @Transactional
+    @Modifying
+    @Query("delete from LoanTransaction l where l.id in ?1")
+    void deleteLoanTransactionsByIds(@NonNull List<Long> ids);
 
 
 }

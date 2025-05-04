@@ -22,6 +22,12 @@
                             <button mat-raised-button color="primary" *jgpHasPermission="'BMO_PARTICIPANTS_DATA_APPROVE'" routerLink="new" [disabled]="bmoClientsData && bmoClientsData.length == 0" (click)="approveAllPartnerTAData()">
                                 <mat-icon>verified</mat-icon>&nbsp;&nbsp;Approve All
                             </button>
+                            <button mat-raised-button color="warn" *jgpHasPermission="'BMO_PARTICIPANTS_DATA_APPROVE'" routerLink="new" [disabled]="selection.selected.length == 0" (click)="rejectSelectedRows()">
+                                <mat-icon>verified</mat-icon>&nbsp;&nbsp;Reject Selected
+                              </button>
+                              <button mat-raised-button color="warn" *jgpHasPermission="'BMO_PARTICIPANTS_DATA_APPROVE'" routerLink="new" [disabled]="bmoClientsData && bmoClientsData.length == 0" (click)="rejectAllPartnerTAData()">
+                                  <mat-icon>verified</mat-icon>&nbsp;&nbsp;Reject All
+                              </button>
                           </div>
                     </mat-toolbar>
                     <div class="p-2">

@@ -130,6 +130,36 @@ export class LendingDataComponent implements OnDestroy, OnInit {
     this.approveLoansData([]);
   }
 
+  rejectLoansData(transactionsIds: number[]): void {
+    const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to reject & remove loans data?`);
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      maxWidth: "400px",
+      data: dialogData
+    });
+
+    dialogRef.afterClosed().subscribe(dialogResult => {
+      if(dialogResult){
+        this.loanService.rejectLoanTransactions(transactionsIds)
+        .pipe(takeUntil(this.unsubscribe$))
+          .subscribe({
+            next: (response) => {
+              this.gs.openSnackBar(response.message, "Dismiss");
+              this.getAvailableNewLendingData();
+            },
+            error: (error) => { }
+          });
+      }
+    });
+  }
+
+  rejectSelectedRows(){
+    this.rejectLoansData(this.selection.selected.map(row => row.id));
+  }
+
+  rejectAllPartnerLoansData(){
+    this.rejectLoansData([]);
+  }
+
   onPageChange(event: PageEvent) {
       this.pageIndex = event.pageIndex;
       this.pageSize = event.pageSize;

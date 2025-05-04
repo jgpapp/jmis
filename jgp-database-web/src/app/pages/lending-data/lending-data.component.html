@@ -22,6 +22,12 @@
                             <button mat-raised-button color="primary" *jgpHasPermission="'LOAN_APPROVE'" routerLink="new" [disabled]="newLoansData && newLoansData.length == 0" (click)="approveAllPartnerLoansData()">
                                 <mat-icon>verified</mat-icon>&nbsp;&nbsp;Approve All
                             </button>
+                            <button mat-raised-button color="warn" *jgpHasPermission="'LOAN_APPROVE'" routerLink="new" [disabled]="selection.selected.length == 0" (click)="rejectSelectedRows()">
+                                <mat-icon>verified</mat-icon>&nbsp;&nbsp;Reject Selected
+                              </button>
+                              <button mat-raised-button color="warn" *jgpHasPermission="'LOAN_APPROVE'" routerLink="new" [disabled]="newLoansData && newLoansData.length == 0" (click)="rejectAllPartnerLoansData()">
+                                  <mat-icon>verified</mat-icon>&nbsp;&nbsp;Reject All
+                              </button>
                           </div>
                     </mat-toolbar>
                     <div class="p-2">

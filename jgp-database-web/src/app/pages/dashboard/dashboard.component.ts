@@ -243,13 +243,13 @@ export class DashboardComponent {
 
   get filterFieldFlex(): number {
     if(this.isFinancialDashboard()){
-      if(this.authService.hasPermission('SPECIFIC_PARTNER_DATA_ON_OVERVIEW_VIEW')){
+      if(this.authService.hasPermission('DASHBOARD_VIEW_WITH_PARTNER_FILTER')){
         return 25;
       } else {
         return 33.3;
       }
     } else if(this.isTADashboard()){
-      if(this.authService.hasPermission('SPECIFIC_PARTNER_DATA_ON_OVERVIEW_VIEW')){
+      if(this.authService.hasPermission('DASHBOARD_VIEW_WITH_PARTNER_FILTER')){
         return 20;
       } else {
         return 25;

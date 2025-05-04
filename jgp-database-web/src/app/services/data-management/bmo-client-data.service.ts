@@ -30,7 +30,7 @@ export class BMOClientDataService {
         return this.httpClient.post(`/bmos/approve-or-reject?approved=true`, JSON.stringify(bmoIds));
       }
 
-      disapproveBMOClientData(bmoIds: number[]): Observable<any> {
+      rejectBMOClientData(bmoIds: number[]): Observable<any> {
         return this.httpClient.post(`/bmos/approve-or-reject?approved=false`, JSON.stringify(bmoIds));
       }
 }

@@ -95,7 +95,7 @@ public class AppUser extends BaseEntity implements PlatformUser {
     }
 
     public String getUserFullName(){
-        return String.format("%s, %s", this.firstName, this.lastName);
+        return String.format("%s %s", this.firstName, this.lastName);
     }
 
     public static AppUser createUser(Partner partner, UserDtoV2 userDto, PasswordEncoder encoder){

@@ -10,8 +10,6 @@ import java.util.Optional;
 
 public interface ParticipantService {
 
-    void saveParticipant(Participant participant);
-
     Participant createParticipant(ParticipantDto participantDto);
 
     void updateParticipant(Long participantId, ParticipantDto participantDto);
@@ -21,4 +19,5 @@ public interface ParticipantService {
     ParticipantResponseDto findParticipantById(Long participantId, boolean includeAccounts);
 
     Page<Participant> availableParticipants(String searchText, Pageable pageable);
+
 }

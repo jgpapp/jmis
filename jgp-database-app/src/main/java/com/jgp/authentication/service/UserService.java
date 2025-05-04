@@ -31,4 +31,6 @@ public interface UserService {
     void updateUserRoles(Long userId, List<String> roleNames);
 
     void changeUserStatus(Long userId, boolean status);
+
+    List<AppUser> findUsersByPartnerId(Long partnerId);
 }

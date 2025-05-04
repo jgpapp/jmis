@@ -12,10 +12,10 @@ import com.jgp.finance.domain.LoanRepository;
 import com.jgp.finance.dto.LoanDto;
 import com.jgp.finance.mapper.LoanTransactionMapper;
 import com.jgp.infrastructure.bulkimport.event.DataApprovedEvent;
+import com.jgp.participant.domain.ParticipantRepository;
 import com.jgp.shared.exception.DataRulesViolationException;
 import com.jgp.shared.exception.ResourceNotFound;
 import com.jgp.util.CommonUtil;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
@@ -24,6 +24,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -46,6 +47,7 @@ public class LoanServiceImpl implements LoanService {
     private final LoanPredicateBuilder loanPredicateBuilder;
     private final PlatformSecurityContext platformSecurityContext;
     private final ApplicationContext applicationContext;
+    private final ParticipantRepository participantRepository;
 
     @Transactional
     @Override
@@ -98,6 +100,7 @@ public class LoanServiceImpl implements LoanService {
         }
     }
 
+    @Transactional
     @Override
     public void approvedTransactionsLoans(List<Long> transactionsIds, Boolean approval) {
         var loanTransactions = this.loanTransactionRepository.findAllById(transactionsIds);
@@ -107,40 +110,52 @@ public class LoanServiceImpl implements LoanService {
             loanTransactions =  this.loanTransactionRepository.getLoanTransactions(currentUserPartner.getId(), false, Pageable.unpaged()).getContent();
         }
 
-        int count = 0;
-        var loansToSave = new ArrayList<Loan>();
-        Set<LocalDate> dataDates = new HashSet<>();
-        for(var loanTransaction : loanTransactions) {
-            var loan = loanTransaction.getLoan();
-            if (!loan.isDataApprovedByPartner()) {
-                loan.approveData(approval, currentUser);
-            }
-            var participant = loan.getParticipant();
-            if (Boolean.TRUE.equals(approval)){
+        if (Boolean.TRUE.equals(approval)) {
+            int count = 0;
+            var loansToSave = new ArrayList<Loan>();
+            Set<LocalDate> dataDates = new HashSet<>();
+            for (var loanTransaction : loanTransactions) {
+                var loan = loanTransaction.getLoan();
+                if (!loan.isDataApprovedByPartner()) {
+                    loan.approveData(true, currentUser);
+                }
+                var participant = loan.getParticipant();
                 if (Boolean.FALSE.equals(participant.getIsActive())) {
                     participant.activateParticipant();
                 }
                 participant.incrementPrePaidAmount(loanTransaction.getOutStandingAmount().compareTo(BigDecimal.ZERO) < 0 ? loanTransaction.getOutStandingAmount().negate() : BigDecimal.ZERO);
-            }
 
-            var transaction = loan.getLoanTransactions().stream()
-                    .filter(txn -> loanTransaction.getId().equals(txn.getId())).findFirst().orElse(null);
-            if (Objects.nonNull(transaction) && !transaction.isApproved()) {
-                transaction.approveData(approval, currentUser);
+
+                var transaction = loan.getLoanTransactions().stream()
+                        .filter(txn -> loanTransaction.getId().equals(txn.getId())).findFirst().orElse(null);
+                if (Objects.nonNull(transaction) && !transaction.isApproved()) {
+                    transaction.approveData(approval, currentUser);
+                }
+                loansToSave.add(loan);
+                count++;
+                if (count % 20 == 0) { // Flush and clear the session every 20 entities
+                    this.loanRepository.saveAllAndFlush(loansToSave);
+                    count = 0;
+                    loansToSave = new ArrayList<>();
+                }
+                dataDates.add(loan.getDateDisbursed());
             }
-            loansToSave.add(loan);
-            count++;
-            if (count % 20 == 0) { // Flush and clear the session every 20 entities
-                this.loanRepository.saveAllAndFlush(loansToSave);
-                count = 0;
-                loansToSave = new ArrayList<>();
+            this.loanRepository.saveAllAndFlush(loansToSave);
+            if (Objects.nonNull(currentUserPartner)) {
+                this.applicationContext.publishEvent(new DataApprovedEvent(Set.of(currentUserPartner.getId()), dataDates));
             }
-            dataDates.add(loan.getDateDisbursed());
+        }else {
+            rejectAndDeleteTransactions(loanTransactions);
         }
-        this.loanRepository.saveAllAndFlush(loansToSave);
-        if (Objects.nonNull(currentUserPartner)) {
-            this.applicationContext.publishEvent(new DataApprovedEvent(Set.of(currentUserPartner.getId()), dataDates));
-        }
+    }
+
+    private void rejectAndDeleteTransactions(List<LoanTransaction> transactions){
+        final var loanTransactionsIds = transactions.stream().map(LoanTransaction::getId).toList();
+        final var loansIds = transactions.stream().map(lt -> lt.getLoan().getId()).toList();
+        final var participantsIds = transactions.stream().map(lt -> lt.getLoan().getParticipant().getId()).toList();
+        this.loanTransactionRepository.deleteLoanTransactionsByIds(loanTransactionsIds);
+        this.loanRepository.deleteLoansByIds(loansIds);
+        this.participantRepository.deleteParticipantsByIds(participantsIds);
     }
 
     @Override
