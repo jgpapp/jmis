@@ -1,20 +1,23 @@
 package com.jgp.infrastructure.bulkimport.data;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Getter
+@RequiredArgsConstructor
 public enum GlobalEntityType {
 
-    INVALID(0, "invalid"),
-    LOAN_IMPORT_TEMPLATE(1, "Loans Template"),
-    TA_IMPORT_TEMPLATE(2, "TA Template"),
-    RESOURCES_IMPORT(3, "Resources Import");
+    INVALID(0, "invalid", "invalid"),
+    LOAN_IMPORT_TEMPLATE(1, "Loans Template", "Lending Data"),
+    TA_IMPORT_TEMPLATE(2, "TA Template", "Technical Assistance Data"),
+    RESOURCES_IMPORT(3, "Resources Import", "Resources Import");
 
     private final Integer value;
     private final String code;
+    private final String dataType;
 
     private static final Map<Integer, GlobalEntityType> intToEnumMap = new HashMap<>();
     private static final Map<String, GlobalEntityType> stringToEnumMap = new HashMap<>();
@@ -39,10 +42,6 @@ public enum GlobalEntityType {
         }
     }
 
-    GlobalEntityType(final Integer value, final String code) {
-        this.value = value;
-        this.code = code;
-    }
 
     public static GlobalEntityType fromInt(final int i) {
         return intToEnumMap.get(i);

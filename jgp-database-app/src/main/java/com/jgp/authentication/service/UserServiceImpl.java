@@ -190,5 +190,10 @@ public class UserServiceImpl implements UserService{
         this.userRepository.save(user);
     }
 
+    @Override
+    public List<AppUser> findUsersByPartnerId(Long partnerId) {
+        return this.userRepository.findUsersByPartnerId(partnerId);
+    }
+
 
 }
