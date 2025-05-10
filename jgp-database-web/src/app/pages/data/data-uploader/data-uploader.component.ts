@@ -14,7 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { GlobalService } from '@services/shared/global.service';
 import { NoPermissionComponent } from '../../errors/no-permission/no-permission.component';
 import { AuthService } from '@services/users/auth.service';
-import { Subject, Subscription, takeUntil } from 'rxjs';
+import { interval, Subject, Subscription, takeUntil } from 'rxjs';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -65,6 +65,10 @@ export class DataUploaderComponent implements OnDestroy {
   progress: { processed: number; total: number; finished: number } | null = null;
   private subscription: Subscription | null = null;
   updateParticipantInfo: string;
+  dotCount: number = 0;
+  preparingText: string = 'Preparing the template';
+  private readonly animationInterval = 500; // milliseconds
+  uploadProgressID: string | null = null;
 
   public displayedColumns = ['name', 'importTime', 'endTime', 'completed', 'totalRecords', 'successCount', 'failureCount', 'actions'];
   public dataSource: any;
@@ -164,6 +168,8 @@ export class DataUploaderComponent implements OnDestroy {
   onFileSelect($event: any) {
     if ($event.target.files.length > 0) {
       this.template = $event.target.files[0];
+      this.uploadProgressID = null; // to reset progress bar
+      this.progress = null; // to reset progress bar
       if (this.template.name.toUpperCase().includes('LOAN_IMPORT_TEMPLATE')) {
         this.legalFormType = 'LOAN_IMPORT_TEMPLATE';
       } else if (this.template.name.toUpperCase().includes('TA_IMPORT_TEMPLATE')) {
@@ -175,12 +181,11 @@ export class DataUploaderComponent implements OnDestroy {
   uploadTemplate() {
     if(!this.authService.currentUser()?.partnerId){
       this.gs.openSnackBar('User must be assigned to a patner!!', "Dismiss");
-    }
-
+    }else {
     if(this.legalFormType){
-      let uploadProgressID = uuidv4();
-      this.subscribeToUploadProgress(uploadProgressID);
-    this.dataUploadService.uploadDataTemplate(this.template, this.legalFormType, uploadProgressID, this.updateParticipantInfo)
+      this.uploadProgressID = uuidv4();
+      this.subscribeToUploadProgress(this.uploadProgressID);
+    this.dataUploadService.uploadDataTemplate(this.template, this.legalFormType, this.uploadProgressID, this.updateParticipantInfo)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -190,6 +195,7 @@ export class DataUploaderComponent implements OnDestroy {
         }
       });
     }
+  }
   }
 
   
@@ -232,7 +238,6 @@ export class DataUploaderComponent implements OnDestroy {
           .pipe(takeUntil(this.unsubscribe$))
           .subscribe({
             next: (response) => {
-              console.log(response);
                 this.gs.openSnackBar('Imported Template successfully deleted!!', 'X');
                 this.getAvailableDocuments();
             },
@@ -245,8 +250,32 @@ export class DataUploaderComponent implements OnDestroy {
       }
 
   get buttonIsDisabled(): boolean {
-    return !this.template || !this.isExcelFile(this.template) || !this.authService.currentUser()?.partnerId || !this.legalFormType;
+    return !this.template || !this.isExcelFile(this.template) || !this.authService.currentUser()?.partnerId || !this.legalFormType || this.uploadProgressID !== null;
   }
+
+  get progressText(): string {
+    if (this.progress) {
+      this.progressDots();
+      if (this.progress.processed > 0 && this.progress.total !== this.progress.processed) {
+        return `Processed ${this.progress.processed} of ${this.progress.total} rows`;
+      } else if (this.progress.processed > 0 && this.progress.total === this.progress.processed) {
+        return `Completed Processing All ${this.progress.total} rows`;
+      } else {
+        return this.preparingText;
+      }
+    }
+    return '';
+  }
+
+  progressDots(){
+    interval(this.animationInterval)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(() => {
+        this.dotCount = (this.dotCount + 1) % 4; // Cycle through 0, 1, 2, 3
+        this.preparingText = 'Preparing the template' + '.'.repeat(this.dotCount);
+      });
+  }
+ 
 
   isExcelFile(file: File): boolean {
     if (!file || !file.name) {

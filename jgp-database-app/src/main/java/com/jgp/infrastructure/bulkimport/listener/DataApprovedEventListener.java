@@ -21,7 +21,7 @@ public class DataApprovedEventListener {
 
     @EventListener
     @Async
-    public void handleBulkImportEvent(DataApprovedEvent dataApprovedEvent){
+    public void handleDataApprovedEvent(DataApprovedEvent dataApprovedEvent){
         if (Objects.isNull(dataApprovedEvent.dates()) || dataApprovedEvent.dates().isEmpty()){
             return;
         }
