@@ -7,6 +7,7 @@ import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.bulkimport.domain.ImportDocument;
 import com.jgp.infrastructure.bulkimport.domain.ImportDocumentRepository;
 import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
+import com.jgp.infrastructure.bulkimport.event.DataUploadedEvent;
 import com.jgp.infrastructure.bulkimport.importhandler.ImportHandler;
 import com.jgp.infrastructure.bulkimport.importhandler.LoanImportHandler;
 import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
@@ -44,7 +45,6 @@ public class BulkImportEventListener {
     private final DocumentWritePlatformService documentService;
     private final ImportProgressService importProgressService;
     private final UserService userService;
-    private final EmailService emailService;
 
     @Value("${jgp.notification.enabled}")
     private boolean notificationEnabled;
@@ -115,22 +115,6 @@ public class BulkImportEventListener {
         if (null == entityType){
             return;
         }
-        List<AppUser> dataReviewUsers = new ArrayList<>();
-        if (GlobalEntityType.LOAN_IMPORT_TEMPLATE.equals(entityType)){
-            dataReviewUsers = this.userService.findUsersByPartnerId(currentUserPartner.getId()).stream()
-                    .filter(user -> user.hasAnyPermission("LOAN_APPROVE"))
-                    .toList();
-        } else if (GlobalEntityType.TA_IMPORT_TEMPLATE.equals(entityType)) {
-            dataReviewUsers = this.userService.findUsersByPartnerId(currentUserPartner.getId()).stream()
-                    .filter(user -> user.hasAnyPermission("BMO_PARTICIPANTS_DATA_APPROVE"))
-                    .toList();
-        }
-        if(dataReviewUsers.isEmpty()){
-            return;
-        }
-
-        for (var appUser: dataReviewUsers){
-            this.emailService.sendEmailNotificationForDataReview(appUser.getUsername(), appUser.getUserFullName(), entityType.getDataType());
-        }
+        this.applicationContext.publishEvent(new DataUploadedEvent(currentUserPartner.getId(), entityType));
     }
 }
