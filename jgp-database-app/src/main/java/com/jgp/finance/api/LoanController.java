@@ -6,12 +6,10 @@ import com.jgp.finance.dto.LoanSearchCriteria;
 import com.jgp.finance.dto.LoanTransactionResponseDto;
 import com.jgp.finance.service.LoanService;
 import com.jgp.finance.service.LoanTransactionService;
-import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
 import com.jgp.infrastructure.bulkimport.service.BulkImportWorkbookService;
 import com.jgp.shared.dto.ApiResponseDto;
 import com.jgp.util.CommonUtil;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -63,20 +60,6 @@ public class LoanController {
         final var sortedByDateCreated =
                 PageRequest.of(pageNumber, pageSize, Sort.by("dateCreated").ascending());
         return new ResponseEntity<>(this.loanService.getAvailableLoanTransactions(partnerId, loanId, isApproved , sortedByDateCreated), HttpStatus.OK);
-    }
-
-
-    @PostMapping("upload-template/{documentProgressId}/{updateParticipantInfo}")
-    public ResponseEntity<ApiResponseDto> uploadLoansData(@RequestParam("excelFile") MultipartFile excelFile, @PathVariable("documentProgressId") String documentProgressId, @PathVariable("updateParticipantInfo") String updateParticipantInfo) {
-        if (excelFile.isEmpty()) {
-            return new ResponseEntity<>(new ApiResponseDto(false, CommonUtil.NO_FILE_TO_UPLOAD), HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(new ApiResponseDto(true, this.bulkImportWorkbookService.importWorkbook(GlobalEntityType.LOAN_IMPORT_TEMPLATE.name(), excelFile, documentProgressId, updateParticipantInfo)+""), HttpStatus.CREATED);
-    }
-
-    @GetMapping("template/download")
-    public ResponseEntity<?> downloadDataTemplate(HttpServletResponse response) {
-        return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.LOAN_IMPORT_TEMPLATE.toString(), response);
     }
 
     @GetMapping("{loanId}")

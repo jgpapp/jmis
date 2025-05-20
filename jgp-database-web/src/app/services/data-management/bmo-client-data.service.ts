@@ -9,13 +9,6 @@ export class BMOClientDataService {
 
     constructor(private httpClient: HttpClient) { }
 
-
-    uploadBMOClientsData(file: File): Observable<any> {
-        const formData = new FormData();
-        formData.append('excelFile', file, file.name);
-        return this.httpClient.post(`/bmos/upload-template`, formData);
-      }
-
       getAvailableBMOClientData(page: number, size: number, approvedByPartner: Boolean, partnerId: number | undefined): Observable<any> {
         const params = new HttpParams()
               .set('pageNumber', page.toString())

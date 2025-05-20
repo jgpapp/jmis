@@ -65,8 +65,10 @@ public class DashboardServiceImpl implements DashboardService {
     private static final String DATA_PERCENTAGE_VALUE_PARAM = "percentage";
     private static final String LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM = "WHERE lt.transaction_date between :fromDate and :toDate  and l.data_is_approved = true and lt.is_approved = true ";
     private static final String BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM = "WHERE bpd.date_partner_recorded between :fromDate and :toDate and bpd.data_is_approved = true ";
+    private static final String MENTORSHIP_WHERE_CLAUSE_BY_MENTORSHIP_DATE_PARAM = "WHERE m.mentor_ship_date between :fromDate and :toDate and m.is_approved = true ";
     private static final String LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and l.partner_id = :partnerId ";
     private static final String BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and bpd.partner_id = :partnerId ";
+    private static final String MENTORSHIP_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and m.partner_id = :partnerId ";
     private static final String WHERE_CLAUSE_BY_COUNTY_CODE_PARAM = "and cl.location_county_code = :countyCode ";
     private static final String WHERE_CLAUSE_BY_TRAINING_PARTNER_PARAM = "and LOWER(bpd.training_partner) = :trainingPartner";
     private static final String BUSINESSES_TRAINED = "businessesTrained";
@@ -92,6 +94,7 @@ public class DashboardServiceImpl implements DashboardService {
         }
         var bpdWhereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
+        var mentorShipWhereClause = MENTORSHIP_WHERE_CLAUSE_BY_MENTORSHIP_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
 
@@ -99,17 +102,19 @@ public class DashboardServiceImpl implements DashboardService {
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             bpdWhereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, bpdWhereClause);
             loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
+            mentorShipWhereClause = String.format(MENTORSHIP_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, mentorShipWhereClause);
         }
         if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
             parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
             bpdWhereClause = String.format("%s%s", bpdWhereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
             loanWhereClause = String.format("%s%s", loanWhereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+            mentorShipWhereClause = String.format("%s%s", mentorShipWhereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
         }
         if (Objects.nonNull(dashboardSearchCriteria.trainingPartner())) {
             parameters.addValue(TRAINING_PARTNER_PARAM, dashboardSearchCriteria.trainingPartner().toLowerCase(Locale.getDefault()));
             bpdWhereClause = String.format("%s%s", bpdWhereClause, WHERE_CLAUSE_BY_TRAINING_PARTNER_PARAM);
         }
-        var sqlQuery = String.format(HighLevelSummaryMapper.SCHEMA, bpdWhereClause, loanWhereClause, loanWhereClause.concat(" and lt.is_given_in_tranches = true"));
+        var sqlQuery = String.format(HighLevelSummaryMapper.SCHEMA, bpdWhereClause, loanWhereClause, loanWhereClause.concat(" and lt.is_given_in_tranches = true"), mentorShipWhereClause);
         return this.namedParameterJdbcTemplate.queryForObject(sqlQuery, parameters, highLevelSummaryMapper);
     }
 
@@ -1067,18 +1072,23 @@ public class DashboardServiceImpl implements DashboardService {
                 with highLevelSummary as (\s
                 select count(bpd.*) as businessesTrained,\s
                 0 as businessesLoaned, 0 as amountDisbursed,\s
-                0 as amountDisbursedByTranches from bmo_participants_data bpd %s \s
+                0 as amountDisbursedByTranches, 0 as businessesMentored from bmo_participants_data bpd %s \s
                 union
                 select 0 as businessesTrained, count(distinct l.*) as businessesLoaned,\s
-                sum(lt.amount) as amountDisbursed, 0 as amountDisbursedByTranches from loan_transactions lt\s
+                sum(lt.amount) as amountDisbursed, 0 as amountDisbursedByTranches, 0 as businessesMentored from loan_transactions lt\s
                 inner join loans l on lt.loan_id = l.id %s\s
                 union
                  select 0 as businessesTrained, 0 as businessesLoaned,\s
-                 0 as amountDisbursed, sum(lt.amount) as amountDisbursedByTranches from loan_transactions lt\s
+                 0 as amountDisbursed, sum(lt.amount) as amountDisbursedByTranches, 0 as businessesMentored from loan_transactions lt\s
                  inner join loans l on lt.loan_id = l.id %s\s
+                 union
+                 select 0 as businessesTrained, 0 as businessesLoaned,\s
+                 0 as amountDisbursed, 0 as amountDisbursedByTranches, count(distinct m.*) as businessesMentored from mentor_ships m\s
+                 inner join participants cl on m.participant_id = cl.id %s\s
                     )
                     select sum(businessesTrained) as businessesTrained, sum(businessesLoaned) as businessesLoaned,\s
-                    sum(amountDisbursed) as amountDisbursed, sum(amountDisbursedByTranches) as amountDisbursedByTranches
+                    sum(amountDisbursed) as amountDisbursed, sum(amountDisbursedByTranches) as amountDisbursedByTranches,\s
+                    sum(businessesMentored) as businessesMentored
                     from highLevelSummary;
                    \s""";
 
@@ -1088,7 +1098,8 @@ public class DashboardServiceImpl implements DashboardService {
             final var businessesLoaned = rs.getInt(BUSINESSES_LOANED);
             final var amountDisbursed = rs.getBigDecimal(AMOUNT_DISBURSED);
             final var amountDisbursedByTranches = rs.getBigDecimal("amountDisbursedByTranches");
-            return new HighLevelSummaryDto(CommonUtil.NUMBER_FORMAT.format(businessesTrained), CommonUtil.NUMBER_FORMAT.format(businessesLoaned), amountDisbursed, amountDisbursedByTranches);
+            final var businessesMentored = rs.getBigDecimal("businessesMentored");
+            return new HighLevelSummaryDto(CommonUtil.NUMBER_FORMAT.format(businessesTrained), CommonUtil.NUMBER_FORMAT.format(businessesLoaned), amountDisbursed, amountDisbursedByTranches, CommonUtil.NUMBER_FORMAT.format(businessesMentored));
         }
     }
 

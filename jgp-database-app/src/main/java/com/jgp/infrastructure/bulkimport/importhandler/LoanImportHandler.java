@@ -14,14 +14,11 @@ import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.dto.ParticipantDto;
 import com.jgp.participant.service.ParticipantService;
+import com.jgp.shared.validator.LoanValidator;
+import com.jgp.shared.validator.ParticipantValidator;
 import com.jgp.util.CommonUtil;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
@@ -37,11 +34,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 
@@ -112,7 +107,7 @@ public class LoanImportHandler implements ImportHandler {
         final var outStandingAmountDouble = ImportHandlerUtils.readAsDouble(LoanConstants.OUT_STANDING_AMOUNT, row);
         final var outStandingAmount = BigDecimal.valueOf(outStandingAmountDouble);
         var loanQuality = ImportHandlerUtils.readAsString(LoanConstants.LOAN_QUALITY, row);
-        loanQuality = validateLoanQuality(loanQuality, row);
+        loanQuality = LoanValidator.validateLoanQuality(loanQuality, row, rowErrorMap);
         var loanQualityEnum = Loan.LoanQuality.NORMAL;
         if (null == rowErrorMap.get(row)){
             loanQualityEnum = (null != loanQuality) ? Loan.LoanQuality.valueOf(loanQuality.toUpperCase()) : Loan.LoanQuality.NORMAL;
@@ -123,11 +118,11 @@ public class LoanImportHandler implements ImportHandler {
         final var tranchAmountDouble = ImportHandlerUtils.readAsDouble(LoanConstants.TRANCH_AMOUNT_COL, row);
         final var tranchAmount = BigDecimal.valueOf(tranchAmountDouble);
         var tranchAllocated = ImportHandlerUtils.readAsString(LoanConstants.TRANCH_ALLOCATED_COL, row);
-        tranchAllocated = validateTranchAllocated(tranchAllocated, tranchAmount, row);
+        tranchAllocated = LoanValidator.validateTranchAllocated(tranchAllocated, tranchAmount, row, rowErrorMap);
         var loanerType = ImportHandlerUtils.readAsString(LoanConstants.LOANER_TYPE_COL, row);
-        loanerType = validateLoanerType(loanerType, row);
+        loanerType = LoanValidator.validateLoanerType(loanerType, row, rowErrorMap);
         var loanProduct = ImportHandlerUtils.readAsString(LoanConstants.LOAN_PRODUCT_COL, row);
-        loanProduct = validateLoanProduct(loanProduct, row);
+        loanProduct = LoanValidator.validateLoanProduct(loanProduct, row, rowErrorMap);
         var loanNumber = ImportHandlerUtils.readAsString(LoanConstants.LOAN_IDENTIFIER_COL, row);
         if (null == rowErrorMap.get(row) && null == loanNumber && tranchAmount.compareTo(BigDecimal.ZERO) > 0){
             rowErrorMap.put(row, "Loan Identifier is required If Tranch Amount Is Provided!!");
@@ -160,14 +155,14 @@ public class LoanImportHandler implements ImportHandler {
                 outStandingAmount, userService.currentUser(), null != tranchAllocated));
 
         if (null == rowErrorMap.get(row)){
-            validateLoan(loanData, row);
+            LoanValidator.validateLoan(loanData, row, rowErrorMap);
         }
         final var participantDto = getParticipantDto(row);
         if (Boolean.TRUE.equals(this.updateParticipantInfo)) {
             existingParticipant.ifPresent(participant -> this.participantService.updateParticipant(participant.getId(), participantDto));
         }
         if (existingParticipant.isEmpty() && null == rowErrorMap.get(row)){
-            validateParticipant(participantDto, row);
+            ParticipantValidator.validateParticipant(participantDto, row, rowErrorMap);
             if (null == rowErrorMap.get(row)){
                 existingParticipant = Optional.of(this.participantService.createParticipant(participantDto));
             }
@@ -188,8 +183,9 @@ public class LoanImportHandler implements ImportHandler {
         String jgpId = ImportHandlerUtils.readAsString(LoanConstants.JGP_ID_COL, row);
         final var phoneNumber = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_PHONE_NUMBER_COL, row);
         var gender = ImportHandlerUtils.readAsString(LoanConstants.GENDER_COL, row);
-        gender = validateGender(gender, row);
-        final var age = ImportHandlerUtils.readAsInt(LoanConstants.AGE_COL, row);
+        gender = ParticipantValidator.validateGender(gender, row, rowErrorMap);
+        var age = ImportHandlerUtils.readAsInt(LoanConstants.AGE_COL, row);
+        age = ParticipantValidator.validateParticipantAge(age, row, rowErrorMap);
         final var passport = ImportHandlerUtils.readAsString(LoanConstants.PASS_PORT_COL, row);
         final var businessLocation = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_LOCATION_COL, row);
         final var locationCountyCode = CommonUtil.KenyanCounty.getKenyanCountyFromName(businessLocation);
@@ -214,7 +210,7 @@ public class LoanImportHandler implements ImportHandler {
     }
 
     public Count importEntity() {
-        Sheet groupSheet = workbook.getSheet(TemplatePopulateImportConstants.LOAN_SHEET_NAME);
+        Sheet loansSheet = workbook.getSheet(TemplatePopulateImportConstants.LOAN_SHEET_NAME);
         int successCount = 0;
         int errorCount = 0;
         int progressLevel = 0;
@@ -222,7 +218,7 @@ public class LoanImportHandler implements ImportHandler {
         var loanDataSize = loanDataList.size();
         for (int i = 0; i < loanDataSize; i++) {
             final var loanData = loanDataList.get(i);
-            Row row = groupSheet.getRow(loanData.getRowIndex());
+            Row row = loansSheet.getRow(loanData.getRowIndex());
             Cell errorReportCell = row.createCell(LoanConstants.FAILURE_COL);
             Cell statusCell = row.createCell(LoanConstants.STATUS_COL);
             if (null == rowErrorMap.get(row) && Objects.isNull(loanData.getParticipant())){
@@ -260,7 +256,7 @@ public class LoanImportHandler implements ImportHandler {
                 }
             }
         }
-        setReportHeaders(groupSheet);
+        setReportHeaders(loansSheet);
         log.info("Finished Import Finished := {}", LocalDateTime.now(ZoneId.systemDefault()));
         return Count.instance(loanDataSize, successCount, errorCount);
     }
@@ -292,110 +288,5 @@ public class LoanImportHandler implements ImportHandler {
             return 1;
         }
         return 0;
-    }
-
-    private void validateParticipant(ParticipantDto participantDto, Row row) {
-        // Create a Validator instance
-        Validator validator;
-        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
-            validator = factory.getValidator();
-        }
-
-        // Validate the object
-        Set<ConstraintViolation<ParticipantDto>> violations = validator.validate(participantDto);
-
-        // Get the first error, if any
-        if (null == rowErrorMap.get(row) && !violations.isEmpty()) {
-            ConstraintViolation<ParticipantDto> firstViolation = violations.iterator().next();
-            rowErrorMap.put(row, firstViolation.getMessage());
-        }
-
-        if (null == rowErrorMap.get(row) && CommonUtil.isStringValueLengthNotValid(participantDto.jgpId(), 5, 10)){
-            rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
-        }
-        if (null == rowErrorMap.get(row) && CommonUtil.stringDoesNotContainOnlyDigits(participantDto.jgpId())){
-            rowErrorMap.put(row, "Provided JGP ID is invalid (must contain only numbers) !!");
-        }
-        if (null == rowErrorMap.get(row) && CommonUtil.isStringValueLengthNotValid(participantDto.phoneNumber(), 9, 12)){
-            rowErrorMap.put(row, "Phone number must be 9-12 digits !!");
-        }
-    }
-
-    private void validateLoan(Loan loan, Row row) {
-        // Create a Validator instance
-        Validator validator;
-        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
-            validator = factory.getValidator();
-        }
-
-        // Validate the object
-        Set<ConstraintViolation<Loan>> violations = validator.validate(loan);
-
-        // Get the first error, if any
-        if (null == rowErrorMap.get(row) && !violations.isEmpty()) {
-            ConstraintViolation<Loan> firstViolation = violations.iterator().next();
-            rowErrorMap.put(row, firstViolation.getMessage());
-        }
-    }
-
-    private String validateTranchAllocated(String allocatedTranch, BigDecimal tranchAmount, Row row) {
-        final var deliveryModes = Set.of("TRANCH 1", "TRANCH 2", "TRANCH 3", "TRANCH 4", "TRANCH 5", "NOT APPLICABLE");
-        var modifiedValue = null == allocatedTranch ? null : allocatedTranch.replaceAll("[^a-zA-Z1-9 ]+", "").replaceAll("\\s+", " ").toUpperCase().trim();
-        if (null == rowErrorMap.get(row) && ((null == modifiedValue && Objects.nonNull(tranchAmount) && tranchAmount.compareTo(BigDecimal.ZERO) > 0) || (null != modifiedValue && !deliveryModes.contains(modifiedValue)))){
-            rowErrorMap.put(row, "Invalid Value for Allocated Tranch (Must be Tranch 1/Tranch 2/Tranch 3/Tranch 4/Tranch 5/Not Applicable) !!");
-        }else {
-            return null != modifiedValue ? StringUtils.capitalize(modifiedValue.toLowerCase(Locale.ROOT)) : null;
-        }
-        return null;
-    }
-
-    private String validateLoanQuality(String value, Row row) {
-        final var loanQualities = Set.of("NORMAL", "WATCH", "SUBSTANDARD", "DOUBTFUL", "LOSS");
-        var modifiedValue = null == value ? null : value.replaceAll("[^a-zA-Z]+", "").toUpperCase().trim();
-        if (null == rowErrorMap.get(row) && null != modifiedValue && !loanQualities.contains(modifiedValue)){
-            rowErrorMap.put(row, "Invalid Value for Loan quality (Must be Normal/Watch/Substandard/Doubtful/Loss) !!");
-        }else {
-            return null != modifiedValue ? StringUtils.capitalize(modifiedValue.toLowerCase(Locale.ROOT)) : null;
-        }
-        return null;
-    }
-
-    private String validateLoanProduct(String value, Row row) {
-        final var loanProducts = Set.of("WORKING CAPITAL", "ASSET FINANCE", "STAHIMILI", "PURCHASE ORDER", "CONSIGNMENT FINANCE", "SHARIAH COMPLIANT");
-        var modifiedValue = null == value ? null : value.replaceAll("[^a-zA-Z ]+", "").replaceAll("\\s+", " ").toUpperCase().trim();
-        if (null == rowErrorMap.get(row) && null != modifiedValue && !loanProducts.contains(modifiedValue)){
-            rowErrorMap.put(row, "Invalid Value for Loan quality (Must be Working Capital/Asset Finance/Stahimili/Purchase Order/Consignment Finance/Shariah Compliant) !!");
-        }else {
-            return null != modifiedValue ? StringUtils.capitalize(modifiedValue.toLowerCase(Locale.ROOT)) : null;
-        }
-        return null;
-    }
-
-    private String validateLoanerType(String value, Row row) {
-        final var loanProducts = Set.of("NEW", "REPEAT");
-        var modifiedValue = null == value ? null : value.replaceAll("[^a-zA-Z]+", "").replaceAll("\\s+", "").toUpperCase().trim();
-        if (null == rowErrorMap.get(row) && null == modifiedValue){
-            rowErrorMap.put(row, "Invalid Value for Loaner Type (Must be New/Repeat) !!");
-        }
-        if (null == rowErrorMap.get(row) && null != modifiedValue && !loanProducts.contains(modifiedValue)){
-            rowErrorMap.put(row, "Invalid Value for Loaner Type (Must be New/Repeat) !!");
-        }
-        return null != modifiedValue ? StringUtils.capitalize(modifiedValue.toLowerCase(Locale.ROOT)) : null;
-    }
-
-    private String validateGender(String value, Row row){
-        if (null == value){
-            rowErrorMap.put(row, "Gender is required !!");
-            return null;
-        }else {
-            final var genders = Set.of("MALE", "FEMALE", "INTERSEX");
-            var modifiedValue = value.replaceAll("[^a-zA-Z]+", "").replaceAll("\\s+", "").toUpperCase(Locale.ROOT).trim();
-            if (null == rowErrorMap.get(row) && !genders.contains(modifiedValue)){
-                rowErrorMap.put(row, "Invalid Value for Gender (Must be Male/Female/Intersex) !!");
-                return  null;
-            }
-            return StringUtils.capitalize(modifiedValue.toLowerCase(Locale.ROOT));
-        }
-
     }
 }

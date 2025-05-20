@@ -4,6 +4,7 @@ import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.bulkimport.populator.WorkbookPopulator;
 import com.jgp.infrastructure.bulkimport.populator.bmo.BMOEntityWorkbookPopulator;
 import com.jgp.infrastructure.bulkimport.populator.loan.LoanEntityWorkbookPopulator;
+import com.jgp.infrastructure.bulkimport.populator.mentorship.MentorshipWorkbookPopulator;
 import com.jgp.shared.exception.ResourceNotFound;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,8 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
                 populator = new LoanEntityWorkbookPopulator();
             } else if (entityType.trim().equalsIgnoreCase(GlobalEntityType.TA_IMPORT_TEMPLATE.toString())) {
                 populator = new BMOEntityWorkbookPopulator();
+            }else if (entityType.trim().equalsIgnoreCase(GlobalEntityType.MENTORSHIP_IMPORT_TEMPLATE.toString())) {
+                populator = new MentorshipWorkbookPopulator();
             }  else {
                 throw new ResourceNotFound(HttpStatus.NOT_FOUND);
             }

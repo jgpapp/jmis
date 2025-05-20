@@ -285,6 +285,67 @@
                 </mat-card-actions>
             </mat-card>
         </div>
+          <div fxFlex="100" class="p-2">
+            <mat-card class="custom-card">
+                <mat-card-header class="bg-accent" fxLayoutAlign="space-between center">
+                    <mat-card-title class="m-0"><h3>Mentorship Data</h3></mat-card-title>
+                </mat-card-header>
+                <mat-card-content class="py-3">
+                  <div fxLayout="column" class="p-2">
+                    <div class="p-2">
+                        <mat-table #table [dataSource]="selectedParticipant.mentorshipResponseDtos" class="mat-elevation-z8">
+                            <ng-container matColumnDef="partnerName">
+                                <mat-header-cell *matHeaderCellDef> Partner Name </mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.partnerName}} </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="mentorShipDate">
+                                <mat-header-cell *matHeaderCellDef> Mentorship Date </mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.mentorShipDate}} </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="mentorShipOrganization">
+                                <mat-header-cell *matHeaderCellDef> Mentorship Organization </mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.mentorShipOrganization}} </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="bmoMemberShip">
+                                <mat-header-cell *matHeaderCellDef> BMO Membership</mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.bmoMemberShip}} </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="msmeSessionsCovered">
+                                <mat-header-cell *matHeaderCellDef> MSME Sessions Covered </mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.msmeSessionsCovered}} </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="smeSessionsCovered">
+                                <mat-header-cell *matHeaderCellDef> SME Sessions Covered </mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.smeSessionsCovered}} </mat-cell>
+                            </ng-container>
+                        <ng-container matColumnDef="dateUploaded">
+                          <mat-header-cell *matHeaderCellDef> Date Uploaded </mat-header-cell>
+                          <mat-cell *matCellDef="let element"> {{element.dateUploaded}} </mat-cell>
+                      </ng-container>
+                      <ng-container matColumnDef="uploadedBy">
+                        <mat-header-cell *matHeaderCellDef> Uploaded By </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{element.uploadedBy}} </mat-cell>
+                    </ng-container>
+                        <ng-container matColumnDef="dateApproved">
+                          <mat-header-cell *matHeaderCellDef> Date Approved </mat-header-cell>
+                          <mat-cell *matCellDef="let element"> {{element.dateApproved}} </mat-cell>
+                      </ng-container>
+                      <ng-container matColumnDef="approvedBy">
+                        <mat-header-cell *matHeaderCellDef> Approved By </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{element.approvedBy}} </mat-cell>
+                    </ng-container>
+                      <mat-header-row *matHeaderRowDef="mentorshipDisplayedColumns"></mat-header-row>
+                      <mat-row *matRowDef="let row; columns: mentorshipDisplayedColumns;" [routerLink]="['/mentor-ship', row.id, 'details']"></mat-row>
+                        </mat-table>
+                        <mat-paginator #paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"></mat-paginator>
+                    </div>
+                </div>
+                </mat-card-content>
+                <mat-divider></mat-divider>
+                <mat-card-actions fxLayoutAlign="end center" class="secondary-text-color">
+                </mat-card-actions>
+            </mat-card>
+        </div>
           </div>
         </div>
     </div>

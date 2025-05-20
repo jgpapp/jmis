@@ -3,7 +3,6 @@ package com.jgp.infrastructure.bulkimport.listener;
 import com.jgp.authentication.domain.AppUser;
 import com.jgp.authentication.service.UserService;
 import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
-import com.jgp.infrastructure.bulkimport.event.DataApprovedEvent;
 import com.jgp.infrastructure.bulkimport.event.DataUploadedEvent;
 import com.jgp.notification.service.EmailService;
 import lombok.RequiredArgsConstructor;

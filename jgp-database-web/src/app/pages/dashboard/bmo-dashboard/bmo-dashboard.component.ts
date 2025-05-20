@@ -15,6 +15,8 @@ import { PerformanceSummaryComponent } from "../performance-summary/performance-
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { GlobalService } from '@services/shared/global.service';
 import { MatDialog } from '@angular/material/dialog';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-bmo-dashboard',
@@ -29,7 +31,9 @@ import { MatDialog } from '@angular/material/dialog';
     PieChartComponent,
     DashboardFiltersComponent,
     PerformanceSummaryComponent,
-    MatTableModule
+    MatTableModule,
+    MatButtonToggleModule,
+    FormsModule
 ],
   templateUrl: './bmo-dashboard.component.html',
   styleUrl: './bmo-dashboard.component.scss'
@@ -123,7 +127,7 @@ export class BmoDashboardComponent implements OnInit {
   refugeesAndPlwdtrainedBusinessesCountDataPerGenderSource: any;
   public refugeesAndPlwdDisplayedColumnsTrainedPerGender = ['name', 'value'];
 
-  highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', amountDisbursedByTranches: '0'}
+  highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', amountDisbursedByTranches: '0', businessesMentored: '0'}
 
   private unsubscribe$ = new Subject<void>();
 
@@ -373,7 +377,13 @@ export class BmoDashboardComponent implements OnInit {
     return 'TA' === this.selectedDashboardView;
   }
 
+  isMentorShipDashboard(): boolean {
+    return 'MENTOR' === this.selectedDashboardView;
+  }
 
+  get filterFieldFlex(): number {
+    return this.isMentorShipDashboard() ? 33.3 : 25;
+  }
 
   public onSelect(event: any) {
     console.log(event);

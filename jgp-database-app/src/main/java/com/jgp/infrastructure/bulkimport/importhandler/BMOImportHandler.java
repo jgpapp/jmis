@@ -13,14 +13,11 @@ import com.jgp.infrastructure.bulkimport.constants.BMOConstants;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import com.jgp.infrastructure.bulkimport.data.Count;
 import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
+import com.jgp.shared.validator.ParticipantValidator;
+import com.jgp.shared.validator.TAValidator;
 import com.jgp.util.CommonUtil;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
@@ -36,11 +33,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -58,7 +53,6 @@ public class BMOImportHandler implements ImportHandler {
     private List<String> statuses;
     private Map<Row, String> rowErrorMap;
     private String documentImportProgressUUId;
-    private static final String VALUE_REGEX = "[^a-zA-Z ]+";
     private Boolean updateParticipantInfo;
 
     @Override
@@ -110,13 +104,13 @@ public class BMOImportHandler implements ImportHandler {
         String referredFIBusiness = ImportHandlerUtils.readAsString(BMOConstants.REFERRED_FI_BUSINESS_COL, row);
         LocalDate dateRecordedByPartner = ImportHandlerUtils.readAsDate(BMOConstants.DATE_RECORD_ENTERED_BY_PARTNER_COL, row);
         var taNeeds = ImportHandlerUtils.readAsString(BMOConstants.TA_NEEDS_COL, row);
-        taNeeds = taNeeds == null ? null : validateTANeeds(taNeeds, row);
+        taNeeds = taNeeds == null ? null : TAValidator.validateTANeeds(taNeeds, row, rowErrorMap);
         final var trainingPartner = ImportHandlerUtils.readAsString(BMOConstants.TRAINING_PARTNER, row);
         var taDeliveryMode = ImportHandlerUtils.readAsString(BMOConstants.TA_DELIVERY_MODE, row);
-        taDeliveryMode = validateTADeliveryMode(taDeliveryMode, row);
+        taDeliveryMode = TAValidator.validateTADeliveryMode(taDeliveryMode, row, rowErrorMap);
         final var otherTaNeeds = ImportHandlerUtils.readAsString(BMOConstants.OTHER_TA_NEEDS_COL, row);
         var taType = ImportHandlerUtils.readAsString(BMOConstants.TYPE_OF_TA_COL, row);
-        taType = validateTATypes(taType, row);
+        taType = TAValidator.validateTATypes(taType, row, rowErrorMap);
 
         statuses.add(status);
         String jgpId = ImportHandlerUtils.readAsString(BMOConstants.JGP_ID_COL, row);
@@ -136,14 +130,14 @@ public class BMOImportHandler implements ImportHandler {
                 row.getRowNum(), trainingPartner, taDeliveryMode, otherTaNeeds, taType, userService.currentUser(), rowErrorMap.get(row));
 
         if (null == rowErrorMap.get(row)){
-            validateTAData(taData, row);
+            TAValidator.validateTAData(taData, row, rowErrorMap);
         }
         final var participantDto = getParticipantDto(row);
         if (Boolean.TRUE.equals(this.updateParticipantInfo)) {
             existingParticipant.ifPresent(participant -> this.participantService.updateParticipant(participant.getId(), participantDto));
         }
         if (existingParticipant.isEmpty() && null == rowErrorMap.get(row)){
-            validateParticipant(participantDto, row);
+            ParticipantValidator.validateParticipant(participantDto, row, rowErrorMap);
             if (null == rowErrorMap.get(row)){
                 existingParticipant = Optional.of(this.participantService.createParticipant(participantDto));
             }
@@ -160,14 +154,15 @@ public class BMOImportHandler implements ImportHandler {
         final var jgpId = ImportHandlerUtils.readAsString(BMOConstants.JGP_ID_COL, row);
         final var phoneNumber = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_PHONE_NUMBER_COL, row);
         var gender = ImportHandlerUtils.readAsString(BMOConstants.GENDER_COL, row);
-        gender = validateGender(gender, row);
+        gender = ParticipantValidator.validateGender(gender, row, rowErrorMap);
         final var passport = ImportHandlerUtils.readAsString(BMOConstants.PASS_PORT_COL, row);
-        final var age = ImportHandlerUtils.readAsInt(BMOConstants.AGE_COL, row);
+        var age = ImportHandlerUtils.readAsInt(BMOConstants.AGE_COL, row);
+        age = ParticipantValidator.validateParticipantAge(age, row, rowErrorMap);
         final var businessLocation = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_LOCATION_COL, row);
         final var locationCountyCode = CommonUtil.KenyanCounty.getKenyanCountyFromName(businessLocation);
         final var industrySector = ImportHandlerUtils.readAsString(BMOConstants.INDUSTRY_SECTOR_COL, row);
         var businessSegment = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_SEGMENT_COL, row);
-        businessSegment = validateBusinessSegment(businessSegment, row);
+        businessSegment = TAValidator.validateBusinessSegment(businessSegment, row, rowErrorMap);
         final var registrationNumber = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_REGISTRATION_NUMBER_COL, row);
         final var bestMonthlyRevenueD = ImportHandlerUtils.readAsDouble(BMOConstants.BEST_MONTH_MONTHLY_REVENUE_COL, row);
         final var bestMonthlyRevenue = Objects.nonNull(bestMonthlyRevenueD) ? BigDecimal.valueOf(bestMonthlyRevenueD) : null;
@@ -181,11 +176,11 @@ public class BMOImportHandler implements ImportHandler {
         final var totalCasualEmployees = ImportHandlerUtils.readAsInt(BMOConstants.TOTAL_CASUAL_EMPLOYEES_COL, row);
         final var youthCasualEmployees = ImportHandlerUtils.readAsInt(BMOConstants.YOUTH_CASUAL_EMPLOYEES_COL, row);
         var sampleRecordsKept = ImportHandlerUtils.readAsString(BMOConstants.SAMPLE_RECORDS_KEPT_COL, row);
-        sampleRecordsKept = null == sampleRecordsKept ? null : validateSampleRecords(sampleRecordsKept, row);
+        sampleRecordsKept = null == sampleRecordsKept ? null : TAValidator.validateSampleRecords(sampleRecordsKept, row, rowErrorMap);
         final var personWithDisability = ImportHandlerUtils.readAsString(BMOConstants.PERSON_WITH_DISABILITY_COL, row);
-        validatePersonWithDisability(personWithDisability, row);
+        ParticipantValidator.validatePersonWithDisability(personWithDisability, row, rowErrorMap);
         final var refugeeStatus = ImportHandlerUtils.readAsString(BMOConstants.REFUGEE_STATUS_COL, row);
-        validateRefugeeStatus(refugeeStatus, row);
+        ParticipantValidator.validateRefugeeStatus(refugeeStatus, row, rowErrorMap);
 
         return ParticipantDto.builder()
                 .phoneNumber(phoneNumber).bestMonthlyRevenue(bestMonthlyRevenue)
@@ -201,7 +196,7 @@ public class BMOImportHandler implements ImportHandler {
     }
 
     public Count importEntity() {
-        Sheet groupSheet = workbook.getSheet(TemplatePopulateImportConstants.BMO_SHEET_NAME);
+        Sheet bmoSheet = workbook.getSheet(TemplatePopulateImportConstants.BMO_SHEET_NAME);
         int successCount = 0;
         int errorCount = 0;
         int progressLevel = 0;
@@ -209,7 +204,7 @@ public class BMOImportHandler implements ImportHandler {
         var bmoDataSize = bmoDataList.size();
         for (int i = 0; i < bmoDataSize; i++) {
             final var bmoData = bmoDataList.get(i);
-            Row row = groupSheet.getRow(bmoData.getRowIndex());
+            Row row = bmoSheet.getRow(bmoData.getRowIndex());
             Cell errorReportCell = row.createCell(BMOConstants.FAILURE_COL);
             Cell statusCell = row.createCell(BMOConstants.STATUS_COL);
             if (null == rowErrorMap.get(row) && Objects.isNull(bmoData.getParticipant())){
@@ -247,7 +242,7 @@ public class BMOImportHandler implements ImportHandler {
 
             }
         }
-        setReportHeaders(groupSheet);
+        setReportHeaders(bmoSheet);
         log.info("Finished Import Finished := {}", LocalDateTime.now(ZoneId.systemDefault()));
         return Count.instance(bmoDataSize, successCount, errorCount);
     }
@@ -279,144 +274,6 @@ public class BMOImportHandler implements ImportHandler {
             return 1;
         }
         return 0;
-    }
-
-
-    private void validateParticipant(ParticipantDto participantDto, Row row) {
-        // Create a Validator instance
-        Validator validator;
-        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
-            validator = factory.getValidator();
-        }
-
-        // Validate the object
-        Set<ConstraintViolation<ParticipantDto>> violations = validator.validate(participantDto);
-
-        // Get the first error, if any
-        if (!violations.isEmpty()) {
-            ConstraintViolation<ParticipantDto> firstViolation = violations.iterator().next();
-            rowErrorMap.put(row, firstViolation.getMessage());
-        }
-
-        if (null == rowErrorMap.get(row)){
-            if (CommonUtil.isStringValueLengthNotValid(participantDto.jgpId(), 5, 10)){
-                rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
-            }
-            if (null == rowErrorMap.get(row) && CommonUtil.stringDoesNotContainOnlyDigits(participantDto.jgpId())){
-                rowErrorMap.put(row, "Provided JGP ID is invalid (must contain only numbers) !!");
-            }
-            if (null == rowErrorMap.get(row) && CommonUtil.isStringValueLengthNotValid(participantDto.phoneNumber(), 9, 12)){
-                rowErrorMap.put(row, "Phone number must be 9-12 digits !!");
-            }
-        }
-    }
-
-    private void validateTAData(BMOParticipantData bmoParticipantData, Row row) {
-        // Create a Validator instance
-        Validator validator;
-        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
-            validator = factory.getValidator();
-        }
-
-        // Validate the object
-        Set<ConstraintViolation<BMOParticipantData>> violations = validator.validate(bmoParticipantData);
-
-        // Get the first error, if any
-        if (!violations.isEmpty()) {
-            ConstraintViolation<BMOParticipantData> firstViolation = violations.iterator().next();
-            rowErrorMap.put(row, firstViolation.getMessage());
-        }
-    }
-
-    private String validateTADeliveryMode(String value, Row row){
-        final var deliveryModes = Set.of("in person", "virtual", "mixed");
-        var modifiedValue = null == value ? null : value.replaceAll(VALUE_REGEX, "").replaceAll("\\s+", " ").toLowerCase().trim();
-        if (null == rowErrorMap.get(row) && (null == modifiedValue || !deliveryModes.contains(modifiedValue))){
-            rowErrorMap.put(row, "Invalid Delivery Mode (Must be In person/Virtual/Mixed) !!");
-        }else {
-            return StringUtils.capitalize(modifiedValue);
-        }
-        return null;
-    }
-
-    private String validateTATypes(String value, Row row){
-        final var deliveryModes = Set.of("post-lending", "pre-lending", "non-lending", "mentorship", "voucher scheme");
-        var modifiedValue = null == value ? null : value.replaceAll("[^a-zA-Z\\s-]+", "").replaceAll("\\s+", " ").toLowerCase().trim();
-        if (null == rowErrorMap.get(row) && (null == modifiedValue || !deliveryModes.contains(modifiedValue))){
-            rowErrorMap.put(row, "Invalid TA Type (Must be Post-lending/Pre-lending/Non-lending/Mentorship/Voucher scheme) !!");
-        }else {
-            return StringUtils.capitalize(modifiedValue);
-        }
-        return null;
-    }
-
-    private void validatePersonWithDisability(String value, Row row){
-        final var deliveryModes = Set.of("YES", "NO");
-        if (null == rowErrorMap.get(row) && (null == value || !deliveryModes.contains(value.toUpperCase()))){
-            rowErrorMap.put(row, "Invalid Value for Person With Disability (Must be Yes/No) !!");
-        }
-    }
-
-    private void validateRefugeeStatus(String value, Row row){
-        final var deliveryModes = Set.of("YES", "NO");
-        if (null == rowErrorMap.get(row) && (null == value || !deliveryModes.contains(value.toUpperCase()))){
-            rowErrorMap.put(row, "Invalid Value for Refugee Status (Must be Yes/No) !!");
-        }
-    }
-
-    private String validateBusinessSegment(String value, Row row){
-        if (null == value){
-            rowErrorMap.put(row, "Business segment is required !!");
-            return null;
-        }else {
-            final var businessSegments = Set.of("MICRO", "SME");
-            if (null == rowErrorMap.get(row) && !businessSegments.contains(value.toUpperCase())){
-                rowErrorMap.put(row, "Invalid Value for Business segment (Must be Micro/SME) !!");
-                return  null;
-            }
-            return value.equalsIgnoreCase("SME") ? "SME" : "Micro";
-        }
-
-    }
-
-    private String validateGender(String value, Row row){
-        if (null == value){
-            rowErrorMap.put(row, "Gender is required !!");
-            return null;
-        }else {
-            final var genders = Set.of("MALE", "FEMALE", "INTERSEX");
-            var modifiedValue = value.replaceAll("[^a-zA-Z]+", "").replaceAll("\\s+", "").toUpperCase(Locale.ROOT).trim();
-            if (null == rowErrorMap.get(row) && !genders.contains(modifiedValue)){
-                rowErrorMap.put(row, "Invalid Value for Gender (Must be Male/Female/Intersex) !!");
-                return  null;
-            }
-            return StringUtils.capitalize(modifiedValue.toLowerCase(Locale.ROOT));
-        }
-
-    }
-
-    private String validateTANeeds(String value, Row row){
-        var taNeeds = new java.util.HashSet<>(Set.of("FINANCIAL LITERACY", "RECORD KEEPING", "DIGITIZATION", "MARKET ACCESS", "OTHER"));
-        var valueArray = Arrays.stream(value.split(",")).map(str -> str.replaceAll(VALUE_REGEX, "").replaceAll("\\s+", " ").trim()).map(String::toUpperCase).collect(Collectors.toSet());
-        if (null == rowErrorMap.get(row) && (valueArray.isEmpty() || !taNeeds.containsAll(valueArray))){
-            rowErrorMap.put(row, "Invalid Value for TA needs (Must be Financial Literacy/Record Keeping/Digitization/Market Access/Other) !!");
-        }else {
-            taNeeds.retainAll(valueArray);
-            return taNeeds.stream().map(String::toLowerCase).map(StringUtils::capitalize).collect(Collectors.joining(","));
-        }
-        return null;
-    }
-
-    private String validateSampleRecords(String value, Row row){
-        var sampleRecords = new java.util.HashSet<>(Set.of("PURCHASE RECORD", "RECORD OF SALES", "DELIVERY RECORDS", "RECORD OF EXPENSES", "RECEIPTS", "OTHER"));
-        var valueArray = Arrays.stream(value.split(",")).map(str -> str.replaceAll(VALUE_REGEX, "").replaceAll("\\s+", " ").trim()).map(String::toUpperCase).collect(Collectors.toSet());
-        if (null == rowErrorMap.get(row) && (valueArray.isEmpty() || !sampleRecords.containsAll(valueArray))){
-            rowErrorMap.put(row, "Invalid Value for Sample Records (Must be Purchase record/Record of sales/Delivery records/Record of expenses/Receipts/Other) !!");
-        }else {
-            sampleRecords.retainAll(valueArray);
-            return sampleRecords.stream().map(String::toLowerCase).map(StringUtils::capitalize).collect(Collectors.joining(","));
-        }
-        return null;
     }
 
 }
