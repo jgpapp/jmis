@@ -96,6 +96,7 @@ public class Mentorship extends BaseEntity {
         this.participant = participant;
         this.rowIndex = rowIndex;
         this.setCreatedBy(createdBy);
+        this.isDataApproved = Boolean.FALSE;
         this.mentorShipDate = dto.mentorShipDate();
         this.mentorShipOrganization = dto.mentorShipOrganization();
         this.bmoMemberShip = dto.bmoMemberShip();

@@ -1,10 +1,7 @@
 package com.jgp.bmo.api;
 
-import com.jgp.bmo.dto.BMOClientDto;
-import com.jgp.bmo.dto.BMOParticipantSearchCriteria;
 import com.jgp.bmo.dto.MentorshipResponseDto;
 import com.jgp.bmo.dto.MentorshipSearchCriteria;
-import com.jgp.bmo.service.BMOClientDataService;
 import com.jgp.bmo.service.MentorshipService;
 import com.jgp.shared.dto.ApiResponseDto;
 import com.jgp.util.CommonUtil;
