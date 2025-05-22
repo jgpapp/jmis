@@ -18,6 +18,7 @@ jobs:
         # Determine the environment based on the branch name
         # If branch is 'main', use PROD secrets. If 'uat', use UAT secrets.
         # You can add more 'elif' conditions for other environments if needed.
+        echo "Checking secrets ${{ secrets.PROD_REMOTE_HOST }}"
         if [ "${{ github.ref_name }}" == "main" ]; then
           echo "SSH_HOST=${{ secrets.PROD_REMOTE_HOST }}" >> $GITHUB_OUTPUT
           echo "SSH_USERNAME=${{ secrets.PROD_REMOTE_USER }}" >> $GITHUB_OUTPUT
