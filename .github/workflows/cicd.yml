@@ -22,14 +22,14 @@ jobs:
           echo "SSH_HOST=${{ secrets.PROD_REMOTE_HOST }}" >> $GITHUB_OUTPUT
           echo "SSH_USERNAME=${{ secrets.PROD_REMOTE_USER }}" >> $GITHUB_OUTPUT
           echo "SSH_PRIVATE_KEY<<$EOF_DELIMITER" >> $GITHUB_OUTPUT
-          echo "${{ secrets.PROD_SSH_PRIVATE_KEY }}" >> $GITHUB_OUTPUT
+          printf "%s" "${{ secrets.PROD_SSH_PRIVATE_KEY }}" >> $GITHUB_OUTPUT # Use printf for robust multi-line output
           echo "$EOF_DELIMITER" >> $GITHUB_OUTPUT
           echo "SSH_PORT=${{ 22 }}" >> $GITHUB_OUTPUT # Use default 22 if secret not set
         elif [ "${{ github.ref_name }}" == "uat" ]; then
           echo "SSH_HOST=${{ secrets.TEST_REMOTE_HOST }}" >> $GITHUB_OUTPUT
           echo "SSH_USERNAME=${{ secrets.TEST_REMOTE_USER }}" >> $GITHUB_OUTPUT
           echo "SSH_PRIVATE_KEY<<$EOF_DELIMITER" >> $GITHUB_OUTPUT
-          echo "${{ secrets.TEST_SSH_PRIVATE_KEY }}" >> $GITHUB_OUTPUT
+          printf "%s" "${{ secrets.TEST_SSH_PRIVATE_KEY }}" >> $GITHUB_OUTPUT # Use printf for robust multi-line output
           echo "$EOF_DELIMITER" >> $GITHUB_OUTPUT
           echo "SSH_PORT=${{ 22 }}" >> $GITHUB_OUTPUT # Use default 22 if secret not set
         else
