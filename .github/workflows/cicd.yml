@@ -1,0 +1,61 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - uat
+
+jobs:
+  deploy:
+    name: Deploy to Remote Server
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set environment-specific SSH credentials
+      id: set-ssh-creds # Assign an ID to this step to reference its outputs
+      run: |
+        # Determine the environment based on the branch name
+        # If branch is 'main', use PROD secrets. If 'uat', use UAT secrets.
+        # You can add more 'elif' conditions for other environments if needed.
+        if [ "${{ github.ref_name }}" == "main" ]; then
+          echo "SSH_HOST=${{ secrets.PROD_REMOTE_HOST }}" >> $GITHUB_OUTPUT
+          echo "SSH_USERNAME=${{ secrets.PROD_REMOTE_USER }}" >> $GITHUB_OUTPUT
+          echo "SSH_PRIVATE_KEY=${{ secrets.PROD_SSH_PRIVATE_KEY }}" >> $GITHUB_OUTPUT
+          echo "SSH_PORT=${{ secrets.PROD_SSH_PORT || 22 }}" >> $GITHUB_OUTPUT # Use default 22 if secret not set
+        elif [ "${{ github.ref_name }}" == "uat" ]; then
+          echo "SSH_HOST=${{ secrets.TEST_REMOTE_HOST }}" >> $GITHUB_OUTPUT
+          echo "SSH_USERNAME=${{ secrets.TEST_REMOTE_USER }}" >> $GITHUB_OUTPUT
+          echo "SSH_PRIVATE_KEY=${{ secrets.TEST_SSH_PRIVATE_KEY }}" >> $GITHUB_OUTPUT
+          echo "SSH_PORT=${{ secrets.UAT_SSH_PORT || 22 }}" >> $GITHUB_OUTPUT # Use default 22 if secret not set
+        else
+          echo "No deployment configured for branch ${{ github.ref_name }}"
+          exit 1 # Fail the workflow if no deployment environment is matched
+        fi
+        
+    - name: Deploy via SSH
+      uses: appleboy/ssh-action@v1.0.0 # Action to connect to a remote server via SSH
+      with:
+        host: ${{ steps.set-ssh-creds.outputs.SSH_HOST }} # Use output from the previous step
+        username: ${{ steps.set-ssh-creds.outputs.SSH_USERNAME }} # Use output from the previous step
+        key: ${{ steps.set-ssh-creds.outputs.SSH_PRIVATE_KEY }} # Use output from the previous step
+        port: ${{ steps.set-ssh-creds.outputs.SSH_PORT }} # Use output from the previous step
+        script: |
+          # Navigate to the directory where your docker-compose.yml is located on the remote server
+          # IMPORTANT: Replace '/path/to/your/app' with the actual path on your remote server
+          # You might need different paths for different environments, e.g., /prod/app or /uat/app
+          # For simplicity, this example assumes the same path structure, but you can
+          # make this conditional as well if paths differ per environment.
+          cd /home/jmis/
+
+          # Stop and remove existing containers, then start new ones in detached mode
+          # This ensures a clean deployment with the new images
+          docker-compose down
+          docker rmi jmis-jgp_app_ui
+          docker rmi jmis-jgp_app
+          docker-compose up --build -d
+
+          # Optional: Clean up old Docker images to save space
+          docker image prune -f
+
+          echo "Deployment completed successfully for ${{ github.ref_name }} branch!"
