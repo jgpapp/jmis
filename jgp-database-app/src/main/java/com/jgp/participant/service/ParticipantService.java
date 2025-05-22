@@ -10,6 +10,8 @@ import java.util.Optional;
 
 public interface ParticipantService {
 
+    void saveParticipant(Participant participant);
+
     Participant createParticipant(ParticipantDto participantDto);
 
     void updateParticipant(Long participantId, ParticipantDto participantDto);

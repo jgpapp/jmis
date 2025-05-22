@@ -51,6 +51,12 @@ export const routes: Routes = [
         data: { breadcrumb: 'Analytics Update' }
       },
       {
+        path: 'mentorship',
+        loadComponent: () => import('./mentor-ship/mentor-ship.component').then(c => c.MentorShipComponent),
+        canActivate: [AuthGuard],
+        data: { breadcrumb: 'Mentorship Data Approval' }
+      },
+      {
         path: 'users',
         loadChildren: () => import('./users/user.routes').then(p => p.routes),
         canActivate: [AuthGuard],

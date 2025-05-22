@@ -1,13 +1,14 @@
 package com.jgp.participant.service;
 
 import com.jgp.bmo.dto.BMOParticipantSearchCriteria;
+import com.jgp.bmo.dto.MentorshipSearchCriteria;
 import com.jgp.bmo.service.BMOClientDataService;
+import com.jgp.bmo.service.MentorshipService;
 import com.jgp.finance.dto.LoanSearchCriteria;
 import com.jgp.finance.service.LoanService;
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.domain.ParticipantRepository;
 import com.jgp.participant.domain.QParticipant;
-import com.jgp.participant.domain.predicate.ParticipantsPredicateBuilder;
 import com.jgp.participant.dto.ParticipantDto;
 import com.jgp.participant.dto.ParticipantResponseDto;
 import com.jgp.participant.exception.ParticipantNotFoundException;
@@ -31,7 +32,13 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final ParticipantMapper participantMapper;
     private final LoanService loanService;
     private final BMOClientDataService bmoClientDataService;
-    private final ParticipantsPredicateBuilder participantsPredicateBuilder;
+    private final MentorshipService mentorshipService;
+
+    @Transactional
+    @Override
+    public void saveParticipant(Participant participant) {
+        this.participantRepository.save(participant);
+    }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -62,6 +69,7 @@ public class ParticipantServiceImpl implements ParticipantService {
         if (includeAccounts){
             participant.setLoanDtos(this.loanService.getLoans(LoanSearchCriteria.builder().participantId(participantId).approvedByPartner(true).build(), Pageable.unpaged()).stream().toList());
             participant.setBmoClientDtos(this.bmoClientDataService.getBMODataRecords(BMOParticipantSearchCriteria.builder().approvedByPartner(true).participantId(participantId).build(), Pageable.unpaged()).stream().toList());
+            participant.setMentorshipResponseDtos(this.mentorshipService.getMentorshipDataRecords(MentorshipSearchCriteria.builder().approvedByPartner(true).participantId(participantId).build(), Pageable.unpaged()).stream().toList());
         }
 
         return participant;

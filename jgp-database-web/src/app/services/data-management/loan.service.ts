@@ -9,13 +9,6 @@ export class LoanService {
 
     constructor(private httpClient: HttpClient) { }
 
-
-    uploadLendingData(file: File): Observable<any> {
-        const formData = new FormData();
-        formData.append('excelFile', file, file.name);
-        return this.httpClient.post(`/loans/upload-template`, formData);
-      }
-
       getAvailableLendingData(page: number, size: number, approvedByPartner: Boolean, partnerId: number | undefined): Observable<any> {
         const params = new HttpParams()
               .set('pageNumber', page.toString())

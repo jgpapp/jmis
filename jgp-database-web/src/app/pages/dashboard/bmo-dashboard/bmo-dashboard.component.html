@@ -7,9 +7,25 @@
 
     <div class="p-2">
         <div fxLayout="row" fxLayoutAlign="center center">
+            <mat-button-toggle-group [(ngModel)]="selectedDashboardView" name="fontStyle" aria-label="Font Style">
+                <mat-button-toggle value="TA">Technical Assistance Summary</mat-button-toggle>
+                <mat-button-toggle value="MENTOR">Mentorship Summary</mat-button-toggle>
+              </mat-button-toggle-group>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="center center">
             <a class="dash-board-reset-link" mat-menu-item (click)="doResetDashBoardFilters()">Reset Filters</a>
         </div>
     <div fxLayout="row wrap">
+        @if(isMentorShipDashboard()){
+            <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2">
+                <mat-card class="gradient-orange tile p-2">
+                    <mat-icon>group</mat-icon>
+                    <h2>{{highLevelSummary!.businessesMentored}}</h2>
+                    <p>Businesses Mentored</p>
+                </mat-card>
+            </div>
+        }
+        @if(isTADashboard()){
         <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2">
             <mat-card class="gradient-orange tile p-2">
                 <mat-icon>group</mat-icon>
@@ -17,13 +33,14 @@
                 <p>Businesses Trained</p>
             </mat-card>
         </div>
+    }
         <div fxFlex="100" fxFlex.xl="75" fxFlex.lg="75" fxFlex.md="67.7" fxFlex.sm="50" class="p-2">
             <app-dashboard-filters 
             (dashBoardFilters)="setDashBoardFilters($event)" 
             [isPartnerDashBoard]="true" 
-            [showTADashboard]="true"
+            [showTADashboard]="!isMentorShipDashboard()"
             [partnerId]="partnerId"
-            [fieldFlex]="25"
+            [fieldFlex]="filterFieldFlex"
             [resetDashBoardFilters]="resetDashBoardFilters"
             />
         </div>
@@ -31,7 +48,7 @@
     </div>
     <div fxLayout="row wrap" #resizedDiv>
     
-      
+        @if(isTADashboard()){
         <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
             <mat-card>
                 <mat-card-header fxLayoutAlign="center center">                
@@ -58,8 +75,10 @@
                 }          
                 </div>
             </mat-card>
-        </div>  
+        </div> 
+    } 
 
+    @if(isTADashboard()){
         <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
             <mat-card>
                 <mat-card-header fxLayoutAlign="center center">                
@@ -81,7 +100,9 @@
                 </div>
             </mat-card>
         </div> 
+    }
 
+    @if(isTADashboard()){
         <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
             <mat-card>
                 <mat-card-header fxLayoutAlign="center center">                
@@ -103,6 +124,7 @@
                 </div>
             </mat-card>
         </div> 
+    }
 
         @if (displayChart) {
         <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
@@ -125,6 +147,7 @@
         </div> 
     }
 
+    @if(isTADashboard()){
     <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button"> 
           
         <mat-card>
@@ -152,7 +175,8 @@
             }          
             </div>
         </mat-card>
-    </div>  
+    </div> 
+} 
 
     @if(isTADashboard()){
         <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button"> 
@@ -202,6 +226,7 @@
         </div> 
     }
 
+    @if(isTADashboard()){
     <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #bmoTaNeedsByGenderContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandTANeedsByGenderBarChart()">
             <mat-icon>open_in_full</mat-icon>
@@ -232,7 +257,8 @@
                 }        
             </div>
         </mat-card>
-    </div>   
+    </div> 
+}  
          
     </div>
 
@@ -342,9 +368,11 @@
         </div>
     }
 
+    @if(!isMentorShipDashboard()){
     <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
         <app-performance-summary [selectedDashboardView]="selectedDashboardView"/>
     </div>
+    }
     </div>
     
 

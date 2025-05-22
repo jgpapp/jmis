@@ -38,6 +38,8 @@ export class ClientDetailsComponent {
 
   public bmoDisplayedColumns = ['partnerName', 'dateFormSubmitted', 'isApplicantEligible', 'taSessionsAttended', 'isRecommendedForFinance', 'decisionDate', 'fiBusinessReferred', 'dateUploaded', 'uploadedBy', 'dateApproved', 'approvedBy'];
   public loansDisplayedColumns = ['partnerName', 'loanNumber', 'pipeLineSource', 'loanAmountAccessed', 'loanOutStandingAmount', 'loanDuration', 'dateApplied', 'dateDisbursed', 'dateUploaded', 'uploadedBy', 'dateApproved', 'approvedBy'];
+  public mentorshipDisplayedColumns = ['partnerName', 'mentorShipDate', 'mentorShipOrganization', 'bmoMemberShip','msmeSessionsCovered', 'smeSessionsCovered', 'dateUploaded', 'uploadedBy', 'dateApproved', 'approvedBy'];
+
   selectedParticipant: Observable<any>;
   constructor(private activatedRoute: ActivatedRoute, private dashBoardService: DashboardService){}
 

@@ -241,6 +241,10 @@ export class DashboardComponent {
     return 'TA' === this.selectedDashboardView;
   }
 
+  isMentorShipDashboard(): boolean {
+    return 'MENTOR' === this.selectedDashboardView;
+  }
+
   get filterFieldFlex(): number {
     if(this.isFinancialDashboard()){
       if(this.authService.hasPermission('DASHBOARD_VIEW_WITH_PARTNER_FILTER')){

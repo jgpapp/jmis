@@ -86,6 +86,8 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                     entityType = GlobalEntityType.TA_IMPORT_TEMPLATE;
                 } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.LOAN_IMPORT_TEMPLATE.toString())) {
                     entityType = GlobalEntityType.LOAN_IMPORT_TEMPLATE;
+                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.MENTORSHIP_IMPORT_TEMPLATE.toString())) {
+                    entityType = GlobalEntityType.MENTORSHIP_IMPORT_TEMPLATE;
                 }  else {
                     workbook.close();
                     throw new InvalidEntityTypeForDocumentManagementException("Unable to find requested resource");

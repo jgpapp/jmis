@@ -68,5 +68,11 @@ public record ParticipantDto(
 
         String locationCountyCode,
 
+        String locationSubCounty,
+
+        BigDecimal locationLatitude,
+
+        BigDecimal locationLongitude,
+
         Boolean isEligible) {
 }

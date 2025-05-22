@@ -11,6 +11,7 @@
             <mat-button-toggle-group [(ngModel)]="selectedDashboardView" name="fontStyle" aria-label="Font Style">
                 <mat-button-toggle value="FI">Financial Summary</mat-button-toggle>
                 <mat-button-toggle value="TA">Technical Assistance Summary</mat-button-toggle>
+                <mat-button-toggle value="MENTOR">Mentorship Summary</mat-button-toggle>
               </mat-button-toggle-group>
         </div>
         <div fxLayout="row" fxLayoutAlign="center center">
@@ -213,9 +214,11 @@
                 </mat-card>
             </div>
         }
+        @if(!isMentorShipDashboard()){
         <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
             <app-performance-summary [selectedDashboardView]="selectedDashboardView"/>
         </div>
+        }
         </div>
     
     </div>

@@ -1,5 +1,6 @@
 package com.jgp.finance.dto;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -47,5 +48,5 @@ public record LoanDto(
          String approvedBy,
 
          LocalDate dateApproved
-) {
+) implements Serializable {
 }

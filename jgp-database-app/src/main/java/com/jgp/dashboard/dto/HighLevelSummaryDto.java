@@ -6,5 +6,6 @@ public record HighLevelSummaryDto(
         String businessesTrained,
         String businessesLoaned,
         BigDecimal amountDisbursed,
-        BigDecimal amountDisbursedByTranches
+        BigDecimal amountDisbursedByTranches,
+        String businessesMentored
 ) {}

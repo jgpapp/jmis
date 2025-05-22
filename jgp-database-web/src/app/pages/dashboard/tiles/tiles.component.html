@@ -8,6 +8,15 @@
         </mat-card>
     </div>
 }
+@if(isMentorShipDashboard()){
+    <div fxFlex="100" fxFlex.xl="100" fxFlex.lg="100" fxFlex.md="100" fxFlex.sm="100" class="p-2">
+        <mat-card class="gradient-orange tile p-2">
+            <mat-icon>group</mat-icon>
+            <h2>{{highLevelSummary!.businessesMentored}}</h2>
+            <p>Businesses Mentored</p>
+        </mat-card>
+    </div>
+}
 @if(isFinancialDashboard()){
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2">
         <mat-card class="gradient-pink tile p-2">

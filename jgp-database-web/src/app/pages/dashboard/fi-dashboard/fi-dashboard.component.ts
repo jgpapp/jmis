@@ -16,6 +16,8 @@ import { GlobalService } from '@services/shared/global.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-fi-dashboard',
   standalone: true,
@@ -32,7 +34,9 @@ import { MatDialog } from '@angular/material/dialog';
     DashboardFiltersComponent,
     PerformanceSummaryComponent,
     MatButtonModule,
-    MatTableModule
+    MatTableModule,
+    MatButtonToggleModule,
+    FormsModule
 ],
   templateUrl: './fi-dashboard.component.html',
   styleUrl: './fi-dashboard.component.scss'
@@ -123,7 +127,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   public topFourCountiesloansDisbursed: any[];
   public topFourCountiesloansDisbursedChartTitle: string = 'Loan Disbursed Top Four Counties';
 
-  highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', amountDisbursedByTranches: '0'}
+  highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', amountDisbursedByTranches: '0', businessesMentored: '0'}
 
   private unsubscribe$ = new Subject<void>();
   constructor(private authService: AuthService, private dashBoardService: DashboardService, public gs: GlobalService, public dialog: MatDialog){
@@ -351,6 +355,9 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
     return 'FI' === this.selectedDashboardView;
   }
 
+  isMentorShipDashboard(): boolean {
+    return 'MENTOR' === this.selectedDashboardView;
+  }
 
 
   public onSelect(event: any) {

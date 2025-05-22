@@ -174,6 +174,8 @@ export class DataUploaderComponent implements OnDestroy {
         this.legalFormType = 'LOAN_IMPORT_TEMPLATE';
       } else if (this.template.name.toUpperCase().includes('TA_IMPORT_TEMPLATE')) {
         this.legalFormType = 'TA_IMPORT_TEMPLATE';
+      }else if (this.template.name.toUpperCase().includes('MENTORSHIP_IMPORT_TEMPLATE')) {
+        this.legalFormType = 'MENTORSHIP_IMPORT_TEMPLATE';
       }
     }
   }
@@ -249,7 +251,7 @@ export class DataUploaderComponent implements OnDestroy {
         });
       }
 
-  get buttonIsDisabled(): boolean {
+  get uploadButtonIsDisabled(): boolean {
     return !this.template || !this.isExcelFile(this.template) || !this.authService.currentUser()?.partnerId || !this.legalFormType || this.uploadProgressID !== null;
   }
 

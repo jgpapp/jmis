@@ -7,80 +7,57 @@ on:
       - uat
 
 jobs:
-  build:
-    name: Build Docker Images
-    runs-on: ubuntu-latest
-    outputs:
-      angular-tag: ${{ steps.set-tag.outputs.angular }}
-      spring-tag: ${{ steps.set-tag.outputs.spring }}
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-
-    - name: Set tags based on branch
-      id: set-tag
-      run: |
-        echo "angular=${{ secrets.DOCKER_USERNAME }}/my-angular-app:${{ github.ref_name }}" >> $GITHUB_OUTPUT
-        echo "spring=${{ secrets.DOCKER_USERNAME }}/my-spring-app:${{ github.ref_name }}" >> $GITHUB_OUTPUT
-
-    - name: Build and push Angular image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./jgp-database-web
-        push: true
-        tags: ${{ steps.set-tag.outputs.angular }}
-
-    - name: Build and push Spring Boot image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./jgp-database-app
-        push: true
-        tags: ${{ steps.set-tag.outputs.spring }}
-
-  deploy-to-uat:
-    name: Deploy to UAT
-    needs: build
-    if: github.ref_name == 'uat'
+  deploy:
+    name: Deploy to Remote Server
     runs-on: ubuntu-latest
 
     steps:
-    - name: Deploy to UAT via SSH
-      run: |
-        echo "${{ secrets.TEST_SSH_PRIVATE_KEY }}" > key.pem
-        chmod 600 key.pem
+    # Deploy to Production if merged to 'main'
+    - name: Deploy to Production Server
+      if: github.ref_name == 'main' # This step only runs if the branch is 'main'
+      uses: appleboy/ssh-action@v1.0.0 # Action to connect to a remote server via SSH
+      with:
+        host: ${{ secrets.PROD_REMOTE_HOST }} # Directly use production secrets
+        username: ${{ secrets.PROD_REMOTE_USER }} # Directly use production secrets
+        key: ${{ secrets.PROD_SSH_PRIVATE_KEY }} # Directly use production secrets
+        port: ${{ secrets.PROD_SSH_PORT || 22 }} # Directly use production secrets, with default
+        script: |
+          # Navigate to the directory where your docker-compose.yml is located on the remote server
+          cd /home/jmis/
 
-        ssh -i key.pem -o StrictHostKeyChecking=no ${{ secrets.TEST_REMOTE_USER }}@${{ secrets.TEST_REMOTE_HOST }} << EOF
-          docker pull ${{ secrets.DOCKER_USERNAME }}/jgp-app-web:uat
-          docker pull ${{ secrets.DOCKER_USERNAME }}/jgp-app-api:uat
+          # Stop and remove existing containers, then start new ones in detached mode
+          # This ensures a clean deployment with the new images
           docker-compose down
-          docker-compose up -d
-        EOF
+          docker rmi jmis-jgp_app_ui
+          docker rmi jmis-jgp_app
+          docker-compose up --build -d
 
-  deploy-to-prod:
-    name: Deploy to Production
-    needs: build
-    if: github.ref_name == 'main'
-    runs-on: ubuntu-latest
+          # Optional: Clean up old Docker images to save space
+          docker image prune -f
 
-    steps:
-    - name: Deploy to Production via SSH
-      run: |
-        echo "${{ secrets.PROD_SSH_PRIVATE_KEY }}" > key.pem
-        chmod 600 key.pem
+          echo "Deployment completed successfully for main branch (Production)!"
 
-        ssh -i key.pem -o StrictHostKeyChecking=no ${{ secrets.PROD_REMOTE_USER }}@${{ secrets.PROD_REMOTE_HOST }} << EOF
-          docker pull ${{ secrets.DOCKER_USERNAME }}/my-angular-app:main
-          docker pull ${{ secrets.DOCKER_USERNAME }}/my-spring-app:main
+    # Deploy to UAT/Test if merged to 'uat'
+    - name: Deploy to UAT/Test Server
+      if: github.ref_name == 'uat' # This step only runs if the branch is 'uat'
+      uses: appleboy/ssh-action@v1.0.0 # Action to connect to a remote server via SSH
+      with:
+        host: ${{ secrets.TEST_REMOTE_HOST }} # Directly use UAT secrets
+        username: ${{ secrets.TEST_REMOTE_USER }} # Directly use UAT secrets
+        key: ${{ secrets.TEST_SSH_PRIVATE_KEY }} # Directly use UAT secrets
+        port: ${{ secrets.TEST_SSH_PORT || 22 }} # Directly use UAT secrets, with default
+        script: |
+          # Navigate to the directory where your docker-compose.yml is located on the remote server
+          cd /home/jmis/
+
+          # Stop and remove existing containers, then start new ones in detached mode
+          # This ensures a clean deployment with the new images
           docker-compose down
-          docker-compose up -d
-        EOF
+          docker rmi jmis-jgp_app_ui
+          docker rmi jmis-jgp_app
+          docker-compose up --build -d
+
+          # Optional: Clean up old Docker images to save space
+          docker image prune -f
+
+          echo "Deployment completed successfully for uat branch (UAT/Test)!"

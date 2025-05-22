@@ -3,4 +3,5 @@ export interface HighLevelSummaryDto {
     businessesLoaned: string | undefined;
     amountDisbursed: string | undefined;
     amountDisbursedByTranches: string | undefined;
+    businessesMentored: string | undefined;
 }
