@@ -18,16 +18,19 @@ jobs:
         # Determine the environment based on the branch name
         # If branch is 'main', use PROD secrets. If 'uat', use UAT secrets.
         # You can add more 'elif' conditions for other environments if needed.
-        echo "Checking secrets ${{ secrets.PROD_REMOTE_HOST }}"
         if [ "${{ github.ref_name }}" == "main" ]; then
           echo "SSH_HOST=${{ secrets.PROD_REMOTE_HOST }}" >> $GITHUB_OUTPUT
           echo "SSH_USERNAME=${{ secrets.PROD_REMOTE_USER }}" >> $GITHUB_OUTPUT
-          echo "SSH_PRIVATE_KEY=${{ secrets.PROD_SSH_PRIVATE_KEY }}" >> $GITHUB_OUTPUT
+          echo "SSH_PRIVATE_KEY<<$EOF" >> $GITHUB_OUTPUT
+          echo "${{ secrets.PROD_SSH_PRIVATE_KEY }}" >> $GITHUB_OUTPUT
+          echo "$EOF" >> $GITHUB_OUTPUT
           echo "SSH_PORT=${{ 22 }}" >> $GITHUB_OUTPUT # Use default 22 if secret not set
         elif [ "${{ github.ref_name }}" == "uat" ]; then
           echo "SSH_HOST=${{ secrets.TEST_REMOTE_HOST }}" >> $GITHUB_OUTPUT
           echo "SSH_USERNAME=${{ secrets.TEST_REMOTE_USER }}" >> $GITHUB_OUTPUT
-          echo "SSH_PRIVATE_KEY=${{ secrets.TEST_SSH_PRIVATE_KEY }}" >> $GITHUB_OUTPUT
+          echo "SSH_PRIVATE_KEY<<$EOF" >> $GITHUB_OUTPUT
+          echo "${{ secrets.TEST_SSH_PRIVATE_KEY }}" >> $GITHUB_OUTPUT
+          echo "$EOF" >> $GITHUB_OUTPUT
           echo "SSH_PORT=${{ 22 }}" >> $GITHUB_OUTPUT # Use default 22 if secret not set
         else
           echo "No deployment configured for branch ${{ github.ref_name }}"
