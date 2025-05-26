@@ -8,6 +8,12 @@
 
 <div class="p-2">
     <div fxLayout="row" fxLayoutAlign="center center">
+        <mat-button-toggle-group [(ngModel)]="selectedDashboardView" name="fontStyle" aria-label="Font Style">
+            <mat-button-toggle value="FI">Financial Summary</mat-button-toggle>
+            <mat-button-toggle value="MENTOR">Mentorship Summary</mat-button-toggle>
+          </mat-button-toggle-group>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="center center">
         <a class="dash-board-reset-link" mat-menu-item (click)="doResetDashBoardFilters()">Reset Filters</a>
     </div>
     <app-dashboard-filters 
@@ -20,6 +26,16 @@
     />
 
     <div fxLayout="row wrap">
+        @if(isMentorShipDashboard()){
+            <div fxFlex="100" fxFlex.xl="100" fxFlex.lg="100" fxFlex.md="100" fxFlex.sm="100" class="p-2">
+                <mat-card class="gradient-orange tile p-2">
+                    <mat-icon>group</mat-icon>
+                    <h2>{{highLevelSummary!.businessesMentored}}</h2>
+                    <p>Businesses Mentored</p>
+                </mat-card>
+            </div>
+        }
+        @if(isFinancialDashboard()){
         <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2">
             <mat-card class="gradient-pink tile p-2">
                 <mat-icon>pie_chart</mat-icon>
@@ -41,8 +57,10 @@
                 <p>Loan Amount Disbursed In Tranches</p>
             </mat-card>
         </div>
+    }
     </div>
     <div fxLayout="row wrap" #resizedDiv>
+        @if(isFinancialDashboard()){
         <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
             <mat-card>
                 <mat-card-header fxLayoutAlign="center center">                
@@ -64,6 +82,9 @@
                 </div>
             </mat-card>
         </div>
+    }
+
+        @if(isFinancialDashboard()){
         <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
             <mat-card>
                 <mat-card-header fxLayoutAlign="center center">                
@@ -85,6 +106,9 @@
                 </div>
             </mat-card>
         </div>
+    }
+
+        @if(isFinancialDashboard()){
         <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
             <mat-card>
                 <mat-card-header fxLayoutAlign="center center">                
@@ -112,8 +136,10 @@
                 }          
                 </div>
             </mat-card>
-        </div>  
-        
+        </div>
+    }  
+
+        @if(isFinancialDashboard()){
         <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
             <mat-card>
                 <mat-card-header fxLayoutAlign="center center">                
@@ -135,7 +161,9 @@
                 </div>
             </mat-card>
         </div> 
+    }
 
+        @if(isFinancialDashboard()){
         <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
             <mat-card>
                 <mat-card-header fxLayoutAlign="center center">                
@@ -163,7 +191,9 @@
                 </div>
             </mat-card>
         </div>
+    }
 
+        @if(isFinancialDashboard()){
         <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
             <mat-card>
                 <mat-card-header fxLayoutAlign="center center">                
@@ -185,6 +215,7 @@
                 </div>
             </mat-card>
         </div>
+    }
 
         @if (displayChart) {
         <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
@@ -322,9 +353,12 @@
             </mat-card>
         </div>
     }
+
+    @if(!isMentorShipDashboard()){
     <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
         <app-performance-summary [selectedDashboardView]="selectedDashboardView"/>
     </div>
+ }
     </div>
    
 </div>

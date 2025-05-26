@@ -21,7 +21,7 @@ export class TilesComponent implements OnInit, OnDestroy, OnChanges {
 
   @Input('dashBoardFilters') dashBoardFilters: any;
   @Input('selectedDashboardView') selectedDashboardView: any;
-  highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', amountDisbursedByTranches: '0'}
+  highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', amountDisbursedByTranches: '0', businessesMentored: '0'};
   private unsubscribe$ = new Subject<void>();
   constructor(private dashBoardService: DashboardService){
 
@@ -64,6 +64,10 @@ export class TilesComponent implements OnInit, OnDestroy, OnChanges {
 
   isTADashboard(): boolean {
     return 'TA' === this.selectedDashboardView;
+  }
+
+  isMentorShipDashboard(): boolean {
+    return 'MENTOR' === this.selectedDashboardView;
   }
 
 }

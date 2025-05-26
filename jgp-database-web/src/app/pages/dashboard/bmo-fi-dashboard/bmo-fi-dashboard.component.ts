@@ -231,6 +231,10 @@ export class BmoFiDashboardComponent implements OnInit{
     return 'TA' === this.selectedDashboardView;
   }
 
+  isMentorShipDashboard(): boolean {
+    return 'MENTOR' === this.selectedDashboardView;
+  }
+
   get filterFieldFlex(): number {
     return this.isFinancialDashboard() ? 33.3 : 25;
   }

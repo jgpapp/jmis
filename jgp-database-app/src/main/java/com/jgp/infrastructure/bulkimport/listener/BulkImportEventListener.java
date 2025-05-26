@@ -1,7 +1,6 @@
 package com.jgp.infrastructure.bulkimport.listener;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jgp.authentication.domain.AppUser;
 import com.jgp.authentication.service.UserService;
 import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.bulkimport.domain.ImportDocument;
@@ -10,11 +9,11 @@ import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
 import com.jgp.infrastructure.bulkimport.event.DataUploadedEvent;
 import com.jgp.infrastructure.bulkimport.importhandler.ImportHandler;
 import com.jgp.infrastructure.bulkimport.importhandler.LoanImportHandler;
+import com.jgp.infrastructure.bulkimport.importhandler.MentorshipImportHandler;
 import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
 import com.jgp.infrastructure.documentmanagement.command.DocumentCommand;
 import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.infrastructure.documentmanagement.service.DocumentWritePlatformService;
-import com.jgp.notification.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -29,9 +28,7 @@ import java.io.IOException;
 import java.net.URLConnection;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -61,6 +58,7 @@ public class BulkImportEventListener {
         ImportHandler importHandler = switch (entityType) {
             case GlobalEntityType.TA_IMPORT_TEMPLATE -> this.applicationContext.getBean("BMOImportHandler", ImportHandler.class);
             case GlobalEntityType.LOAN_IMPORT_TEMPLATE -> this.applicationContext.getBean("loanImportHandler", LoanImportHandler.class);
+            case GlobalEntityType.MENTORSHIP_IMPORT_TEMPLATE -> this.applicationContext.getBean("mentorshipImportHandler", MentorshipImportHandler.class);
             default -> throw new IllegalArgumentException("Unable to find requested resource");
         };
 

@@ -26,6 +26,7 @@
                       }@if (partnerType === 'FI' || partnerType === 'FI_TA') {
                         <mat-option value="LOAN_IMPORT_TEMPLATE">Loan Template</mat-option>
                       }
+                      <mat-option value="MENTORSHIP_IMPORT_TEMPLATE">Mentorship Template</mat-option>
                       </mat-select>
                     </mat-form-field>
                   </div>
@@ -62,7 +63,7 @@
             </div>
         
               <div fxFlex="13%">
-                <button mat-raised-button color="primary" [disabled]="buttonIsDisabled" (click)="uploadTemplate()">
+                <button mat-raised-button color="primary" [disabled]="uploadButtonIsDisabled" (click)="uploadTemplate()">
                   <mat-icon>cloud_upload</mat-icon>&nbsp;&nbsp;Upload
                 </button>
               </div>

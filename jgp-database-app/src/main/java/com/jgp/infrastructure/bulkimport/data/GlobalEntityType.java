@@ -13,7 +13,8 @@ public enum GlobalEntityType {
     INVALID(0, "invalid", "invalid"),
     LOAN_IMPORT_TEMPLATE(1, "Loans Template", "Lending Data"),
     TA_IMPORT_TEMPLATE(2, "TA Template", "Technical Assistance Data"),
-    RESOURCES_IMPORT(3, "Resources Import", "Resources Import");
+    RESOURCES_IMPORT(3, "Resources Import", "Resources Import"),
+    MENTORSHIP_IMPORT_TEMPLATE(4, "Mentorship Import", "Mentorship Import");
 
     private final Integer value;
     private final String code;

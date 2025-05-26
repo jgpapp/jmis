@@ -53,6 +53,15 @@ public class Participant extends BaseEntity {
     @Column(name = "location_county_code")
     private String locationCountyCode;
 
+    @Column(name = "location_sub_county")
+    private String locationSubCounty;
+
+    @Column(name = "location_latitude")
+    private BigDecimal locationLatitude;
+
+    @Column(name = "location_longitude")
+    private BigDecimal locationLongitude;
+
     @Column(name = "industry_sector")
     private String industrySector;
 
@@ -212,8 +221,44 @@ public class Participant extends BaseEntity {
             }
 
         }
+        if (StringUtils.isNotBlank(dto.locationSubCounty())){
+            this.locationSubCounty = dto.locationSubCounty();
+        }
+        if (Objects.nonNull(dto.locationLatitude())){
+            this.locationLatitude = dto.locationLatitude();
+        }
+        if (Objects.nonNull(dto.locationLongitude())){
+            this.locationLongitude = dto.locationLongitude();
+        }
         if (StringUtils.isNotBlank(dto.passport()) && !StringUtils.equals(this.passport, dto.passport())){
             this.passport = dto.passport();
+        }
+    }
+
+    public void updateBusinessLocation(ParticipantDto dto){
+        if (StringUtils.isNotBlank(dto.locationCountyCode())){
+            var countyCode = dto.locationCountyCode().trim();
+            if (countyCode.length() == 1){
+                countyCode = String.format("00%s", countyCode);
+            }
+            if (countyCode.length() == 2){
+                countyCode = String.format("0%s", countyCode);
+            }
+            final var county = CommonUtil.getCountyByCode(countyCode);
+            if (null != county){
+                this.locationCountyCode = countyCode;
+                this.businessLocation = county;
+            }
+
+        }
+        if (StringUtils.isNotBlank(dto.locationSubCounty())){
+            this.locationSubCounty = dto.locationSubCounty();
+        }
+        if (Objects.nonNull(dto.locationLatitude())){
+            this.locationLatitude = dto.locationLatitude();
+        }
+        if (Objects.nonNull(dto.locationLongitude())){
+            this.locationLongitude = dto.locationLongitude();
         }
     }
 

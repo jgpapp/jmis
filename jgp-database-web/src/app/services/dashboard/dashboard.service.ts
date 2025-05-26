@@ -221,7 +221,8 @@ export class DashboardService {
         businessesTrained: this.formatNumberToShortForm(highLevelSummary.businessesTrained), 
         businessesLoaned: this.formatNumberToShortForm(highLevelSummary.businessesLoaned), 
         amountDisbursed: this.formatNumberToShortForm(highLevelSummary.amountDisbursed), 
-        amountDisbursedByTranches: this.formatNumberToShortForm(highLevelSummary.amountDisbursedByTranches)
+        amountDisbursedByTranches: this.formatNumberToShortForm(highLevelSummary.amountDisbursedByTranches),
+        businessesMentored: this.formatNumberToShortForm(highLevelSummary.businessesMentored)
       }
     }
 

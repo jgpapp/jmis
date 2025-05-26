@@ -19,12 +19,15 @@ export class DataUploadService {
     uploadDataTemplate(file: File, templateName: string, uploadProgressID: string, updateParticipantInfo: string = 'NO'): Observable<any> {
         const formData = new FormData();
         formData.append('excelFile', file, file.name);
+        let templateEntityType = 'INVALID';
         if(templateName.toUpperCase().includes('TA_IMPORT_TEMPLATE')){
-            return this.httpClient.post(`/bmos/upload-template/${uploadProgressID}/${updateParticipantInfo}`, formData);
+            templateEntityType = 'TA_IMPORT_TEMPLATE';
         }else if(templateName.toUpperCase().includes('LOAN_IMPORT_TEMPLATE')){
-            return this.httpClient.post(`/loans/upload-template/${uploadProgressID}/${updateParticipantInfo}`, formData);
-        }
-        return of(null);
+            templateEntityType = 'LOAN_IMPORT_TEMPLATE';
+        }else if(templateName.toUpperCase().includes('MENTORSHIP_IMPORT_TEMPLATE')){
+          templateEntityType = 'MENTORSHIP_IMPORT_TEMPLATE';
+      }
+        return this.httpClient.post(`/imports/upload-template/${templateEntityType}/${uploadProgressID}/${updateParticipantInfo}`, formData);
       }
 
       uploadResourceFile(file: File, legalFormType: string): Observable<any> {
@@ -34,18 +37,21 @@ export class DataUploadService {
       }
 
       downloadDataTemplate(templateName: string): Observable<any> {
+        let templateEntityType = 'INVALID';
         if(templateName.toUpperCase().includes('TA_IMPORT_TEMPLATE')){
-            return this.httpClient.get(`/bmos/template/download`, {
-              responseType: 'arraybuffer',
-              observe: 'response',
-            });
+            templateEntityType = 'TA_IMPORT_TEMPLATE';
         }else if(templateName.toUpperCase().includes('LOAN_IMPORT_TEMPLATE')){
-            return this.httpClient.get(`/loans/template/download`, {
-              responseType: 'arraybuffer',
-              observe: 'response',
-            });
+            templateEntityType = 'LOAN_IMPORT_TEMPLATE';
+        } else if(templateName.toUpperCase().includes('MENTORSHIP_IMPORT_TEMPLATE')){
+            templateEntityType = 'MENTORSHIP_IMPORT_TEMPLATE';
+        }   else {
+          return of();
         }
-        return of();
+        
+        return this.httpClient.get(`/imports/template/download/${templateEntityType}`, {
+          responseType: 'arraybuffer',
+          observe: 'response',
+        });
       }
 
 
