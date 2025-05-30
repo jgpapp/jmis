@@ -27,8 +27,7 @@ public class MentorshipWorkbookPopulator extends AbstractWorkbookPopulator {
         worksheet.setColumnWidth(MentorShipConstants.MENTORSHIP_DELIVERY_MODE_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(MentorShipConstants.BUSINESS_NAME_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(MentorShipConstants.PARTICIPANT_NAME_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(MentorShipConstants.NATIONAL_ID_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(MentorShipConstants.PASS_PORT_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(MentorShipConstants.JGP_ID_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(MentorShipConstants.BUSINESS_PHONE_NUMBER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(MentorShipConstants.MENTEE_AGE_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(MentorShipConstants.MENTEE_GENDER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
@@ -63,8 +62,7 @@ public class MentorshipWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(MentorShipConstants.MENTORSHIP_DELIVERY_MODE_COL, rowHeader, "Mentorship delivery mode* (In person/Virtual/Mixed)");
         writeString(MentorShipConstants.BUSINESS_NAME_COL, rowHeader, "Name of Business*");
         writeString(MentorShipConstants.PARTICIPANT_NAME_COL, rowHeader, "Mentee name (Participant name)*");
-        writeString(MentorShipConstants.NATIONAL_ID_COL, rowHeader, "National ID");
-        writeString(MentorShipConstants.PASS_PORT_COL, rowHeader, "Passport/Alien Number");
+        writeString(MentorShipConstants.JGP_ID_COL, rowHeader, "JGP ID (National ID/Passport/Alien Number)*");
         writeString(MentorShipConstants.BUSINESS_PHONE_NUMBER_COL, rowHeader, "Mobile phone Number");
         writeString(MentorShipConstants.MENTEE_AGE_COL, rowHeader, "Age of Mentee (full years)*");
         writeString(MentorShipConstants.MENTEE_GENDER_COL, rowHeader, "Gender of Mentee* (Male/Female/Intersex)");

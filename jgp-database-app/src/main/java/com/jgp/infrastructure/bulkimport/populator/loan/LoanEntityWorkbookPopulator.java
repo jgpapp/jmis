@@ -27,7 +27,6 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         worksheet.setColumnWidth(LoanConstants.BUSINESS_PHONE_NUMBER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.GENDER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.AGE_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
-        worksheet.setColumnWidth(LoanConstants.PASS_PORT_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.BUSINESS_LOCATION_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.INDUSTRY_SECTOR_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(LoanConstants.PIPELINE_SOURCE, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
@@ -53,11 +52,10 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(LoanConstants.PARTICIPANT_NAME_COL, rowHeader, "Participant Name*");
         writeString(LoanConstants.BUSINESS_NAME_COL, rowHeader, "Business Name");
         writeString(LoanConstants.BUSINESS_REGISTRATION_NUMBER_COL, rowHeader, "Business Registration Number");
-        writeString(LoanConstants.JGP_ID_COL, rowHeader, "Unique JGP ID (National ID)*");
+        writeString(LoanConstants.JGP_ID_COL, rowHeader, "JGP ID (National ID/Passport/Alien Number)*");
         writeString(LoanConstants.BUSINESS_PHONE_NUMBER_COL, rowHeader, "Business phone number*");
         writeString(LoanConstants.GENDER_COL, rowHeader, "Gender of owner* (Male/Female/Intersex)");
         writeString(LoanConstants.AGE_COL, rowHeader, "Age of owner (full years)*");
-        writeString(LoanConstants.PASS_PORT_COL, rowHeader, "Passport");
         writeString(LoanConstants.BUSINESS_LOCATION_COL, rowHeader, "Business Location(County)*");
         writeString(LoanConstants.INDUSTRY_SECTOR_COL, rowHeader, "Industry sector*(Agriculture, Artists/artisans, Manufacturing, Trading & Retail, Other)");
         writeString(LoanConstants.PIPELINE_SOURCE, rowHeader, "Pipeline source*");

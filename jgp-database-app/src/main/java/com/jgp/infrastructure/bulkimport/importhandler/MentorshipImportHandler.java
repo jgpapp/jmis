@@ -108,7 +108,7 @@ public class MentorshipImportHandler implements ImportHandler {
             bmoMembership =ImportHandlerUtils.readAsString(MentorShipConstants.OTHER_BMO_MEMBERSHIP_COL, row);
         }
         final var deliveryMode = ImportHandlerUtils.readAsString(MentorShipConstants.MENTORSHIP_DELIVERY_MODE_COL, row);
-        final var jgpID = ImportHandlerUtils.readAsString(MentorShipConstants.NATIONAL_ID_COL, row);
+        final var jgpID = ImportHandlerUtils.readAsString(MentorShipConstants.JGP_ID_COL, row);
         final var participant = null == jgpID ? null : this.participantService.findOneParticipantByJGPID(jgpID).orElse(null);
         if (Objects.isNull(participant)){
             rowErrorMap.put(row, "Participant can not be found by Id");
@@ -171,13 +171,12 @@ public class MentorshipImportHandler implements ImportHandler {
             rowErrorMap.put(row, "Participant Name Is Required !!");
         }
         String businessName = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_NAME_COL, row);
-        String jgpId = ImportHandlerUtils.readAsString(MentorShipConstants.NATIONAL_ID_COL, row);
+        String jgpId = ImportHandlerUtils.readAsString(MentorShipConstants.JGP_ID_COL, row);
         final var phoneNumber = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_PHONE_NUMBER_COL, row);
         var gender = ImportHandlerUtils.readAsString(MentorShipConstants.MENTEE_GENDER_COL, row);
         gender = ParticipantValidator.validateGender(gender, row, rowErrorMap);
         var age = ImportHandlerUtils.readAsInt(MentorShipConstants.MENTEE_AGE_COL, row);
         age = ParticipantValidator.validateParticipantAge(age, row, rowErrorMap);
-        final var passport = ImportHandlerUtils.readAsString(MentorShipConstants.PASS_PORT_COL, row);
         final var personWithDisability = ImportHandlerUtils.readAsString(MentorShipConstants.IS_MENTEE_DISABLED, row);
         ParticipantValidator.validatePersonWithDisability(personWithDisability, row, rowErrorMap);
         final var businessLocation = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_COUNTY_LOCATION_COL, row);
@@ -204,7 +203,7 @@ public class MentorshipImportHandler implements ImportHandler {
                 .locationCountyCode(locationCountyCode.isPresent() ? locationCountyCode.get().getCountyCode() : "999")
                 .locationSubCounty(businessLocationSubCounty).locationLatitude(businessLocationLatitude)
                 .locationLongitude(businessLocationLongitude).businessSegment(businessSegment)
-                .passport(passport).participantName(participantName).build();
+                .participantName(participantName).build();
     }
 
 
