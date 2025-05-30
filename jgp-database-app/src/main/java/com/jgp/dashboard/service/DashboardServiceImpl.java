@@ -1072,15 +1072,15 @@ public class DashboardServiceImpl implements DashboardService {
                 with highLevelSummary as (\s
                 select count(bpd.*) as businessesTrained,\s
                 0 as businessesLoaned, 0 as amountDisbursed,\s
-                0 as amountDisbursedByTranches, 0 as businessesMentored from bmo_participants_data bpd %s \s
+                0 as amountDisbursedByTranches, 0 as businessesMentored from bmo_participants_data bpd inner join participants cl on bpd.participant_id = cl.id %s \s
                 union
                 select 0 as businessesTrained, count(distinct l.*) as businessesLoaned,\s
                 sum(lt.amount) as amountDisbursed, 0 as amountDisbursedByTranches, 0 as businessesMentored from loan_transactions lt\s
-                inner join loans l on lt.loan_id = l.id %s\s
+                inner join loans l on lt.loan_id = l.id inner join participants cl on l.participant_id = cl.id %s\s
                 union
                  select 0 as businessesTrained, 0 as businessesLoaned,\s
                  0 as amountDisbursed, sum(lt.amount) as amountDisbursedByTranches, 0 as businessesMentored from loan_transactions lt\s
-                 inner join loans l on lt.loan_id = l.id %s\s
+                 inner join loans l on lt.loan_id = l.id inner join participants cl on l.participant_id = cl.id %s\s
                  union
                  select 0 as businessesTrained, 0 as businessesLoaned,\s
                  0 as amountDisbursed, 0 as amountDisbursedByTranches, count(distinct m.*) as businessesMentored from mentor_ships m\s
@@ -1157,6 +1157,7 @@ public class DashboardServiceImpl implements DashboardService {
                 select p.partner_name as dataKey, sum(lt.amount) as dataValue,
                 sum(lt.amount) * 100.0 / sum(sum(lt.amount)) OVER () AS percentage\s
                 from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
+                inner join participants cl on l.participant_id = cl.id\s
                 inner join partners p on l.partner_id = p.id %s group by 1 order by 2 DESC limit 4;
                \s""";
 
@@ -1183,19 +1184,19 @@ public class DashboardServiceImpl implements DashboardService {
         public static final String LOANS_DISBURSED_BY_PIPELINE_SCHEMA = """
                 select l.pipeline_source as dataKey, sum(lt.amount) as dataValue,\s
                 SUM(lt.amount) * 100.0 / SUM(SUM(lt.amount)) OVER () AS percentage\s
-                from loan_transactions lt inner join loans l on lt.loan_id = l.id %s group by 1;\s
+                from loan_transactions lt inner join loans l on lt.loan_id = l.id inner join participants cl on l.participant_id = cl.id %s group by 1;\s
                 """;
 
         public static final String LOANS_DISBURSED_BY_QUALITY_SCHEMA = """
                 select l.loan_quality as dataKey, sum(lt.amount) as dataValue,\s
                 SUM(lt.amount) * 100.0 / SUM(SUM(lt.amount)) OVER () AS percentage\s
-                from loan_transactions lt inner join loans l on lt.loan_id = l.id %s group by 1;\s
+                from loan_transactions lt inner join loans l on lt.loan_id = l.id inner join participants cl on l.participant_id = cl.id %s group by 1;\s
                 """;
 
         public static final String LOANS_DISBURSED_BY_LOAN_PRODUCT_SCHEMA = """
                 select l.loan_product as dataKey, sum(lt.amount) as dataValue,\s
                 SUM(lt.amount) * 100.0 / SUM(SUM(lt.amount)) OVER () AS percentage\s
-                from loan_transactions lt inner join loans l on lt.loan_id = l.id %s group by 1;\s
+                from loan_transactions lt inner join loans l on lt.loan_id = l.id inner join participants cl on l.participant_id = cl.id %s group by 1;\s
                 """;
 
         public static final String BUSINESSES_TRAINED_BY_SECTOR_SCHEMA = """
@@ -1257,7 +1258,7 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
              EXTRACT(YEAR FROM lt.transaction_date) AS seriesName,\s
              SUM(lt.amount) AS value\s
              from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
-             inner join partners p on p.id = l.partner_id\s
+             inner join partners p on p.id = l.partner_id inner join participants cl on l.participant_id = cl.id\s
              WHERE EXTRACT(YEAR FROM lt.transaction_date) >= EXTRACT(YEAR FROM current_date) - 2 %s\s
              GROUP BY 1, 2\s
              ORDER BY 2 ASC;
@@ -1268,13 +1269,13 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
              SELECT p.partner_name AS name,\s
              'ACCESSED' as seriesName, SUM(lt.amount) AS value
               from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
-              inner join partners p on p.id  = l.partner_id %s\s
+              inner join partners p on p.id  = l.partner_id inner join participants cl on l.participant_id = cl.id %s\s
               group by 1, 2
               union\s
               SELECT p.partner_name AS name,\s
              'OUT-STANDING' as seriesName, SUM(lt.out_standing_amount) AS value
               from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
-              inner join partners p on p.id  = l.partner_id %s\s
+              inner join partners p on p.id  = l.partner_id inner join participants cl on l.participant_id = cl.id %s\s
               group by 1, 2;
            \s""";
 
