@@ -60,8 +60,6 @@ public record ParticipantDto(
 
         String refugeeStatus,
 
-        String passport,
-
         List<BMOClientDto> bmoClientDtos,
 
         List<LoanDto> loanDtos,

@@ -155,7 +155,6 @@ public class BMOImportHandler implements ImportHandler {
         final var phoneNumber = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_PHONE_NUMBER_COL, row);
         var gender = ImportHandlerUtils.readAsString(BMOConstants.GENDER_COL, row);
         gender = ParticipantValidator.validateGender(gender, row, rowErrorMap);
-        final var passport = ImportHandlerUtils.readAsString(BMOConstants.PASS_PORT_COL, row);
         var age = ImportHandlerUtils.readAsInt(BMOConstants.AGE_COL, row);
         age = ParticipantValidator.validateParticipantAge(age, row, rowErrorMap);
         final var businessLocation = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_LOCATION_COL, row);
@@ -191,7 +190,7 @@ public class BMOImportHandler implements ImportHandler {
                 .youthCasualEmployees(youthCasualEmployees).sampleRecords(sampleRecordsKept != null ? Arrays.stream(sampleRecordsKept.split(",")).map(String::trim).toList() : null)
                 .personWithDisability("YES".equalsIgnoreCase(personWithDisability) ? "Yes" : "No").refugeeStatus("YES".equalsIgnoreCase(refugeeStatus) ? "Yes" : "No").jgpId(jgpId)
                 .locationCountyCode(locationCountyCode.isPresent() ? locationCountyCode.get().getCountyCode() : "999")
-                .passport(passport).businessRegNumber(registrationNumber).build();
+                .businessRegNumber(registrationNumber).build();
 
     }
 

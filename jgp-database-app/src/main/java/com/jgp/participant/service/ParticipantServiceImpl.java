@@ -43,7 +43,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Participant createParticipant(ParticipantDto participantDto) {
-        return this.participantRepository.save(Participant.createClient(participantDto));
+        return this.participantRepository.save(new Participant(participantDto));
     }
 
     @Override

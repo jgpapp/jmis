@@ -110,48 +110,31 @@ public class Participant extends BaseEntity {
     public Participant() {
     }
 
-    private Participant(
-            String businessName, String jgpId, String phoneNumber, Gender ownerGender,
-            Integer ownerAge, String businessLocation, String industrySector,
-            String businessSegment, String businessRegNumber, BigDecimal bestMonthlyRevenue, BigDecimal worstMonthlyRevenue,
-            Integer totalRegularEmployees, Integer youthRegularEmployees, Integer totalCasualEmployees,
-            Integer youthCasualEmployees, String sampleRecords, String personWithDisability,
-            String refugeeStatus, String locationCountyCode, String passport,
-            String participantName, Boolean isEligible) {
-        this.businessName = businessName;
-        this.jgpId = jgpId;
-        this.phoneNumber = phoneNumber;
-        this.ownerGender = ownerGender;
-        this.ownerAge = ownerAge;
-        this.businessLocation = businessLocation;
-        this.industrySector = industrySector;
-        this.businessSegment = businessSegment;
-        this.registrationNumber = businessRegNumber;
-        this.bestMonthlyRevenue = bestMonthlyRevenue;
-        this.worstMonthlyRevenue = worstMonthlyRevenue;
-        this.totalRegularEmployees = totalRegularEmployees;
-        this.youthRegularEmployees = youthRegularEmployees;
-        this.totalCasualEmployees = totalCasualEmployees;
-        this.youthCasualEmployees = youthCasualEmployees;
-        this.sampleRecords = sampleRecords;
-        this.personWithDisability = personWithDisability;
-        this.refugeeStatus = refugeeStatus;
+    public Participant(ParticipantDto dto) {
+        this.businessName = dto.businessName();
+        this.jgpId = dto.jgpId();
+        this.phoneNumber = dto.phoneNumber();
+        this.ownerGender = translateGender(dto.ownerGender());
+        this.ownerAge = dto.ownerAge();
+        this.businessLocation = dto.businessLocation();
+        this.industrySector = dto.industrySector();
+        this.businessSegment = dto.businessSegment();
+        this.registrationNumber = dto.businessRegNumber();
+        this.bestMonthlyRevenue = dto.bestMonthlyRevenue();
+        this.worstMonthlyRevenue = dto.worstMonthlyRevenue();
+        this.totalRegularEmployees = dto.totalRegularEmployees();
+        this.youthRegularEmployees = dto.youthRegularEmployees();
+        this.totalCasualEmployees = dto.totalCasualEmployees();
+        this.youthCasualEmployees = dto.youthCasualEmployees();
+        this.sampleRecords = (null == dto.sampleRecords() ? null : String.join(",", dto.sampleRecords()));
+        this.personWithDisability = dto.personWithDisability();
+        this.refugeeStatus = dto.refugeeStatus();
         this.isActive = Boolean.FALSE;
         this.genderCategory = GenderCategory.getGenderCategory(this.ownerGender, ownerAge).getName();
-        this.locationCountyCode = locationCountyCode;
-        this.passport = passport;
-        this.isEligible = isEligible;
-        this.participantName = participantName;
-    }
-
-    public static Participant createClient(ParticipantDto dto){
-        return new Participant(dto.businessName(), dto.jgpId(), dto.phoneNumber(), translateGender(dto.ownerGender()),
-                dto.ownerAge(), dto.businessLocation(), dto.industrySector(), dto.businessSegment(),
-                dto.businessRegNumber(), dto.bestMonthlyRevenue(), dto.worstMonthlyRevenue(),
-                dto.totalRegularEmployees(), dto.youthRegularEmployees(), dto.totalCasualEmployees(),
-                dto.youthCasualEmployees(), null == dto.sampleRecords() ? null : String.join(",", dto.sampleRecords()),
-                dto.personWithDisability(), dto.refugeeStatus(), dto.locationCountyCode(), dto.passport(),
-                dto.participantName(), dto.isEligible());
+        this.locationCountyCode = dto.locationCountyCode();
+        this.passport = "NA";
+        this.isEligible = dto.isEligible();
+        this.participantName = dto.participantName();
     }
 
     public void updateParticipant(ParticipantDto dto){
@@ -229,9 +212,6 @@ public class Participant extends BaseEntity {
         }
         if (Objects.nonNull(dto.locationLongitude())){
             this.locationLongitude = dto.locationLongitude();
-        }
-        if (StringUtils.isNotBlank(dto.passport()) && !StringUtils.equals(this.passport, dto.passport())){
-            this.passport = dto.passport();
         }
     }
 
