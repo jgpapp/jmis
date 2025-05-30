@@ -1108,11 +1108,11 @@ public class DashboardServiceImpl implements DashboardService {
 
         public static final String EMPLOYEES_SCHEMA = """
                 with employees as (\s
-                select sum(p.total_regular_employees) as totalRegularEmployees,\s
-                sum(p.youth_regular_employees ) as youthRegularEmployees,\s
-                sum(p.total_casual_employees ) as totalCasualEmployees,\s
-                sum(p.youth_casual_employees ) as youthCasualEmployees\s
-                from participants p inner join bmo_participants_data bpd on p.id = bpd.participant_id %s\s
+                select sum(cl.total_regular_employees) as totalRegularEmployees,\s
+                sum(cl.youth_regular_employees ) as youthRegularEmployees,\s
+                sum(cl.total_casual_employees ) as totalCasualEmployees,\s
+                sum(cl.youth_casual_employees ) as youthCasualEmployees\s
+                from participants cl inner join bmo_participants_data bpd on cl.id = bpd.participant_id %s\s
                 )
                 select (totalRegularEmployees - youthRegularEmployees) as totalRegularEmployeesAbove35,
                 youthRegularEmployees,
@@ -1161,16 +1161,16 @@ public class DashboardServiceImpl implements DashboardService {
                \s""";
 
         public static final String LOANS_DISBURSED_TOP_FOUR_LOCATIONS_SCHEMA = """
-                select p.business_location as dataKey, sum(lt.amount) as dataValue,
+                select cl.business_location as dataKey, sum(lt.amount) as dataValue,
                 sum(lt.amount) * 100.0 / sum(sum(lt.amount)) OVER () AS percentage
                 from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
-                inner join participants p on l.participant_id = p.id %s group by 1 order by 2 DESC limit 4;
+                inner join participants cl on l.participant_id = cl.id %s group by 1 order by 2 DESC limit 4;
                 """;
 
         public static final String BUSINESSES_TRAINED_TOP_FOUR_LOCATIONS_SCHEMA = """
-                select p.business_location as dataKey, count(p.id) as dataValue,
-                count(p.id) * 100.0 / sum(count(p.id)) OVER () AS percentage
-                from bmo_participants_data bpd inner join participants p on bpd.participant_id = p.id %s group by 1 order by 2 DESC limit 4;
+                select cl.business_location as dataKey, count(cl.id) as dataValue,
+                count(cl.id) * 100.0 / sum(count(cl.id)) OVER () AS percentage
+                from bmo_participants_data bpd inner join participants cl on bpd.participant_id = cl.id %s group by 1 order by 2 DESC limit 4;
                 """;
 
         public static final String BUSINESSES_TRAINED_BY_GENDER_SCHEMA = """
@@ -1393,8 +1393,8 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
     private static final class TaTypeTrainedBusinessMapper implements ResultSetExtractor<List<TaTypeTrainedBusinessDto>> {
 
         public static final String BUSINESSES_TRAINED_COUNT_BY_TA_TYPE_SCHEMA = """
-             select p2.partner_name as partnerName , bpd.ta_type as taType, p.gender_category as genderCategory, count(p.id) as businessesTrained\s
-             from participants p inner join bmo_participants_data bpd on p.id = bpd.participant_id\s
+             select p2.partner_name as partnerName , bpd.ta_type as taType, cl.gender_category as genderCategory, count(cl.id) as businessesTrained\s
+             from participants cl inner join bmo_participants_data bpd on cl.id = bpd.participant_id\s
              inner join partners p2 on p2.id = bpd.partner_id %s\s
              GROUP BY 1, 2, 3\s
              ORDER BY 1 ASC, 2, 3;
@@ -1419,16 +1419,16 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
 
         public static final String COUNTY_SUMMARY_SCHEMA = """
                 with highLevelSummary as (
-                                     select p.gender_category as genderCategory, count(bpd.*) as businessesTrained,
+                                     select cl.gender_category as genderCategory, count(bpd.*) as businessesTrained,
                                      0 as businessesLoaned, 0 as amountDisbursed,
                                      0 as outStandingAmount from bmo_participants_data bpd\s
-                                     inner join participants p on p.id = bpd.participant_id %s
+                                     inner join participants cl on p.id = bpd.participant_id %s
                                      group by 1
                                      union
-                                     select p.gender_category as genderCategory, 0 as businessesTrained, count(distinct l.*) as businessesLoaned,
+                                     select cl.gender_category as genderCategory, 0 as businessesTrained, count(distinct l.*) as businessesLoaned,
                                      sum(lt.amount) as amountDisbursed, sum(lt.out_standing_amount) as outStandingAmount\s
                                      from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
-                                     inner join participants p on p.id = l.participant_id %s\s
+                                     inner join participants cl on cl.id = l.participant_id %s\s
                                      group by 1
                                      )
                                      select genderCategory, sum(businessesTrained) as businessesTrained, sum(businessesLoaned) as businessesLoaned,
