@@ -186,7 +186,6 @@ public class LoanImportHandler implements ImportHandler {
         gender = ParticipantValidator.validateGender(gender, row, rowErrorMap);
         var age = ImportHandlerUtils.readAsInt(LoanConstants.AGE_COL, row);
         age = ParticipantValidator.validateParticipantAge(age, row, rowErrorMap);
-        final var passport = ImportHandlerUtils.readAsString(LoanConstants.PASS_PORT_COL, row);
         final var businessLocation = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_LOCATION_COL, row);
         final var locationCountyCode = CommonUtil.KenyanCounty.getKenyanCountyFromName(businessLocation);
         final var industrySector = ImportHandlerUtils.readAsString(LoanConstants.INDUSTRY_SECTOR_COL, row);
@@ -206,7 +205,7 @@ public class LoanImportHandler implements ImportHandler {
                 .youthRegularEmployees(youthRegularEmployees).totalCasualEmployees(totalCasualEmployees)
                 .youthCasualEmployees(youthCasualEmployees).jgpId(jgpId)
                 .locationCountyCode(locationCountyCode.isPresent() ? locationCountyCode.get().getCountyCode() : "999")
-                .passport(passport).businessRegNumber(businessRegNumber).participantName(participantName).build();
+                .businessRegNumber(businessRegNumber).participantName(participantName).build();
     }
 
     public Count importEntity() {
