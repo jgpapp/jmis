@@ -1422,7 +1422,7 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
                                      select cl.gender_category as genderCategory, count(bpd.*) as businessesTrained,
                                      0 as businessesLoaned, 0 as amountDisbursed,
                                      0 as outStandingAmount from bmo_participants_data bpd\s
-                                     inner join participants cl on p.id = bpd.participant_id %s
+                                     inner join participants cl on cl.id = bpd.participant_id %s
                                      group by 1
                                      union
                                      select cl.gender_category as genderCategory, 0 as businessesTrained, count(distinct l.*) as businessesLoaned,
