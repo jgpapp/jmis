@@ -100,6 +100,10 @@ export class DashboardService {
       return this.httpClient.get(`/reports/training-by-partner-by-gender?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
+    getLoanDisbursedByLoanProductByGenderSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`/reports/disbursed-by-product-by-gender?${this.getDashBoardQueryParams(dashBoardFilters)}`);
+    }
+
     getLastThreeYearsAccessedLoanPerPartnerSummary(dashBoardFilters: any = undefined): Observable<any> {
       return this.httpClient.get(`/reports/loan-accessed-per-partner-for-last-three-years?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }

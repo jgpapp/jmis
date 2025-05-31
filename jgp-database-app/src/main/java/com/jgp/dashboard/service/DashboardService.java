@@ -56,6 +56,8 @@ public interface DashboardService {
 
     List<SeriesDataPointDto> getTrainingByPartnerByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
+    List<SeriesDataPointDto> getLoanDisbursedByLoanProductByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);
+
     List<SeriesDataPointDto> getLastThreeYearsAccessedLoanPerPartnerSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
     List<PartnerYearlyDataDto> getLastThreeYearsAccessedLoanAmountPerPartnerYearly(DashboardSearchCriteria dashboardSearchCriteria);

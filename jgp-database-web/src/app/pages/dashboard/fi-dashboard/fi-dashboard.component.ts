@@ -52,6 +52,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   @ViewChild('resizedDiv') resizedDiv: ElementRef;
   @ViewChild('loansDisbursedByProductContentDiv', { static: false }) loansDisbursedByProductContentDiv!: ElementRef;
   @ViewChild('loanedBusinessesByGenderContentDiv', { static: false }) loanedBusinessesByGenderContentDiv!: ElementRef;
+  @ViewChild('loanDisbursedByProductByGenderContentDiv', { static: false }) loanDisbursedByProductByGenderContentDiv!: ElementRef;
   public previousWidthOfResizedDiv: number = 0;
 
   resetDashBoardFilters: boolean = false;
@@ -124,6 +125,16 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   public loansDisbursedByProductXAxisLabel: string = 'Loan Products';
   public loansDisbursedByProductYAxisLabel: string = 'Loans Disbursed';
   public loansDisbursedByProductChartTitle: string = 'Loan Disbursed By Loan Product';
+
+  public loanDisbursedByProductByGender: any[]
+  public loanDisbursedByProductByGenderShowXAxis = true;
+  public loanDisbursedByProductByGenderShowYAxis = true;
+  public loanDisbursedByProductByGenderShowLegend = false;
+  public loanDisbursedByProductByGenderShowXAxisLabel = true;
+  public loanDisbursedByProductByGenderXAxisLabel = 'Loan Products';
+  public loanDisbursedByProductByGenderShowYAxisLabel = true;
+  public loanDisbursedByProductByGenderYAxisLabel = 'Amount Disbursed';
+  public loanDisbursedByProductByGenderChartTitle: string = 'Disbursed By Loan Product By Gender';
 
   public loansDisbursedBySegment: any[];
   public loansDisbursedBySegmentShowLegend: boolean = false;
@@ -201,6 +212,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
     this.getLoansDisbursedByLoanProductSummary();
     this.getLoanedBusinessesByGenderSummary();
+    this.getLoanDisbursedByLoanProductByGenderSummary();
   }
 
   getLoanedBusinessesByGenderSummary() {
@@ -209,6 +221,17 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           this.loanedBusinessesByGender = response;
+        },
+        error: (error) => { }
+      });
+  }
+
+  getLoanDisbursedByLoanProductByGenderSummary() {
+    this.dashBoardService.getLoanDisbursedByLoanProductByGenderSummary(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.loanDisbursedByProductByGender = response;
         },
         error: (error) => { }
       });
@@ -352,6 +375,27 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
         const item = this.loanedBusinessesByGender.find(data => data.name === label);
         return item ? `${this.valueFormatting(item.value)}` : label; // If found, return the value; otherwise return the name as fallback
       }
+    };
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
+  }
+
+  expandLoanDisbursedByProductByGenderBarChart(){
+    const data = { 
+      content: this.loanDisbursedByProductByGenderContentDiv.nativeElement.cloneNode(true),
+      mapContainerElement: this.loanDisbursedByProductByGenderContentDiv,
+      chartType: 'ngx-charts-bar-vertical-2d',
+      chartData: this.loanDisbursedByProductByGender,
+      chartGradient: this.gradient,
+      chartShowXAxis: this.loanDisbursedByProductByGenderShowXAxis,
+      chartShowYAxis: this.loanDisbursedByProductByGenderShowYAxis,
+      chartSColorScheme: this.chartSColorScheme,
+      chartShowLegend: true,
+      chartShowXAxisLabel: this.loanDisbursedByProductByGenderShowXAxisLabel,
+      chartShowYAxisLabel: this.loanDisbursedByProductByGenderShowYAxisLabel,
+      chartYAxisLabel: this.loanDisbursedByProductByGenderYAxisLabel,
+      chartXAxisLabel: this.loanDisbursedByProductByGenderXAxisLabel,
+      chartFormatLabel: this.valueFormatting,
+      chartTitle: this.loanDisbursedByProductByGenderChartTitle,
     };
     this.dashBoardService.openExpandedChartDialog(this.dialog, data);
   }

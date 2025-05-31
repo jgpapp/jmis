@@ -614,6 +614,30 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    public List<SeriesDataPointDto> getLoanDisbursedByLoanProductByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
+        final var rm = new SeriesDataPointMapper();
+        LocalDate fromDate = dashboardSearchCriteria.fromDate();
+        LocalDate toDate = dashboardSearchCriteria.toDate();
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = getDefaultQueryDates().getLeft();
+            toDate = getDefaultQueryDates().getRight();
+        }
+        var whereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
+            parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
+            whereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
+            parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
+            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        var sqlQuery = String.format(SeriesDataPointMapper.DISBURSED_BY_PRODUCT_BY_GENDER_SCHEMA, whereClause);
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
     public List<SeriesDataPointDto> getLastThreeYearsAccessedLoanPerPartnerSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new SeriesDataPointMapper();
         MapSqlParameterSource parameters = new MapSqlParameterSource();
@@ -1282,6 +1306,12 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
                 SELECT p.partner_name AS name, cl.gender_category as seriesName, COUNT(cl.*) AS value
                 FROM participants cl inner join bmo_participants_data bpd on bpd.participant_id = cl.id\s
                 inner join partners p on p.id  = bpd.partner_id %s group by 1, 2;\s
+               \s""";
+
+    public static final String DISBURSED_BY_PRODUCT_BY_GENDER_SCHEMA = """
+                SELECT l.loan_product AS name, cl.gender_category as seriesName, SUM(lt.amount) AS value
+                from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
+                inner join participants cl on l.participant_id = cl.id %s group by 1, 2;\s
                \s""";
 
     public static final String ACCESSED_AMOUNT_BY_PARTNER_BY_YEAR_SCHEMA = """
