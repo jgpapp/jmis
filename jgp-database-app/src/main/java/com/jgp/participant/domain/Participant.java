@@ -34,9 +34,6 @@ public class Participant extends BaseEntity {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "passport")
-    private String passport;
-
     @Column(name = "owner_gender")
     @Enumerated(EnumType.STRING)
     private Gender ownerGender;
@@ -132,7 +129,6 @@ public class Participant extends BaseEntity {
         this.isActive = Boolean.FALSE;
         this.genderCategory = GenderCategory.getGenderCategory(this.ownerGender, ownerAge).getName();
         this.locationCountyCode = dto.locationCountyCode();
-        this.passport = "NA";
         this.isEligible = dto.isEligible();
         this.participantName = dto.participantName();
     }

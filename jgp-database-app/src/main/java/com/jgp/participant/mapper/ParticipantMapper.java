@@ -75,7 +75,6 @@ public class ParticipantMapper {
             }
             participantResponseDto.setSavings( null != participant.getPrePayment() ? CommonUtil.NUMBER_FORMAT.format(participant.getPrePayment()) : "0.00");
             participantResponseDto.setOwnerGender( null != participant.getOwnerGender() ? participant.getOwnerGender().getName() : null );
-            participantResponseDto.setPassport( null != participant.getPassport() ? participant.getPassport() : null );
         }
 
 

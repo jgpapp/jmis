@@ -58,20 +58,20 @@ public class MentorshipWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(MentorShipConstants.MENTORSHIP_DATE_COL, rowHeader, "Mentorship Date*");
         writeString(MentorShipConstants.MENTOR_ORGANIZATION_COL, rowHeader, "Mentor Organization* (JETs/KEPSA/4G/GBF/KNCCI/PBP/GROOTS)");
         writeString(MentorShipConstants.BMO_MEMBERSHIP_COL, rowHeader, "BMO Membership* (KNCCI/KEPSA/PBP/GROOTS/Other)");
-        writeString(MentorShipConstants.OTHER_BMO_MEMBERSHIP_COL, rowHeader, "If other, specify (BMO membership)*");
+        writeString(MentorShipConstants.OTHER_BMO_MEMBERSHIP_COL, rowHeader, "If other, specify* (BMO membership)");
         writeString(MentorShipConstants.MENTORSHIP_DELIVERY_MODE_COL, rowHeader, "Mentorship delivery mode* (In person/Virtual/Mixed)");
         writeString(MentorShipConstants.BUSINESS_NAME_COL, rowHeader, "Name of Business*");
-        writeString(MentorShipConstants.PARTICIPANT_NAME_COL, rowHeader, "Mentee name (Participant name)*");
+        writeString(MentorShipConstants.PARTICIPANT_NAME_COL, rowHeader, "Mentee name* (Participant name)");
         writeString(MentorShipConstants.JGP_ID_COL, rowHeader, "JGP ID (National ID/Passport/Alien Number)*");
-        writeString(MentorShipConstants.BUSINESS_PHONE_NUMBER_COL, rowHeader, "Mobile phone Number");
-        writeString(MentorShipConstants.MENTEE_AGE_COL, rowHeader, "Age of Mentee (full years)*");
+        writeString(MentorShipConstants.BUSINESS_PHONE_NUMBER_COL, rowHeader, "Mobile phone Number*");
+        writeString(MentorShipConstants.MENTEE_AGE_COL, rowHeader, "Age of Mentee* (full years)");
         writeString(MentorShipConstants.MENTEE_GENDER_COL, rowHeader, "Gender of Mentee* (Male/Female/Intersex)");
         writeString(MentorShipConstants.IS_MENTEE_DISABLED, rowHeader, "Do you have a disability?*(Yes/No)");
-        writeString(MentorShipConstants.BUSINESS_COUNTY_LOCATION_COL, rowHeader, "Business Location(County)*");
-        writeString(MentorShipConstants.BUSINESS_SUB_COUNTY_LOCATION_COL, rowHeader, "Sub-County");
+        writeString(MentorShipConstants.BUSINESS_COUNTY_LOCATION_COL, rowHeader, "Business Location*(County)");
+        writeString(MentorShipConstants.BUSINESS_SUB_COUNTY_LOCATION_COL, rowHeader, "Sub-County*");
         writeString(MentorShipConstants.GEO_LOCATION_LATITUDE, rowHeader, "Geo Location Latitude");
         writeString(MentorShipConstants.GEO_LOCATION_LONGITUDE, rowHeader, "Geo Location Longitude");
-        writeString(MentorShipConstants.BUSINESS_CATEGORY_COL, rowHeader, "Business Category(Agriculture, Artists/artisans, Manufacturing, Trading & Retail, Other)");
+        writeString(MentorShipConstants.BUSINESS_CATEGORY_COL, rowHeader, "Business Category*(Agriculture, Artists/artisans, Manufacturing, Trading & Retail, Other)");
         writeString(MentorShipConstants.OTHER_BUSINESS_CATEGORY_COL, rowHeader, "If other specify (Business Category)");
         writeString(MentorShipConstants.BUSINESS_SITUATION_COL, rowHeader, "Business Situation* (I attended the training but did not receive a loan, I received a loan but did not attend the training, I attended both the training and received a loan)");
         writeString(MentorShipConstants.LOAN_MADE_HIRE_MORE_COL, rowHeader, "Has the loan contributed to the ability to hire new employees or expand the team?*(Yes/No)");
@@ -85,7 +85,7 @@ public class MentorshipWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(MentorShipConstants.BUSINESS_SEGMENT, rowHeader, "Business segment (SME/Micro (MSME))");
         writeString(MentorShipConstants.MSME_SESSIONS_COVERED_COL, rowHeader, "MSME Sessions Covered (Session 1/Session 2)");
         writeString(MentorShipConstants.SME_SESSIONS_COVERED_COL, rowHeader, "SME Sessions Covered (Session 1/Session 2/Session 3/Session 4/Session 5)");
-        writeString(MentorShipConstants.IDENTIFIED_BUSINESS_GAPS, rowHeader, "What are the top business gaps or needs identified by both mentees and mentors?");
+        writeString(MentorShipConstants.IDENTIFIED_BUSINESS_GAPS, rowHeader, "What are the top business gaps or needs identified by both mentees and mentors?*(Please separate multiple gaps by a comma)");
         writeString(MentorShipConstants.AGREED_ACTION_FOR_GAP_1, rowHeader, "What actions did the mentor and mentee agree upon to address and close the identified and prioritized business gaps?");
         writeString(MentorShipConstants.ADDITIONAL_SUPPORT_NEEDED, rowHeader, "What additional support or resources would be most helpful for your business at this point?");
 
