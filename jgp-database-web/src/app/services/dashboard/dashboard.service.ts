@@ -52,6 +52,10 @@ export class DashboardService {
       return this.httpClient.get(`/reports/businesses-trained-by-gender?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
+    getLoanedBusinessesByGenderSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`/reports/loaned-businesses-by-gender?${this.getDashBoardQueryParams(dashBoardFilters)}`);
+    }
+
     getDisabledBusinessOwnersTrainedByGenderSummary(dashBoardFilters: any = undefined): Observable<any> {
       return this.httpClient.get(`/reports/disabled-businesses-trained-by-gender?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }

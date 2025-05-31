@@ -51,6 +51,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   public autoScale = true;
   @ViewChild('resizedDiv') resizedDiv: ElementRef;
   @ViewChild('loansDisbursedByProductContentDiv', { static: false }) loansDisbursedByProductContentDiv!: ElementRef;
+  @ViewChild('loanedBusinessesByGenderContentDiv', { static: false }) loanedBusinessesByGenderContentDiv!: ElementRef;
   public previousWidthOfResizedDiv: number = 0;
 
   resetDashBoardFilters: boolean = false;
@@ -89,6 +90,13 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   public loansDisbursedByStatusXAxisLabel: string = 'Status';
   public loansDisbursedByStatusYAxisLabel: string = 'Amount Disbursed';
   public loansDisbursedByStatusChartTitle: string = 'Loan Disbursed by Status';
+
+  public loanedBusinessesByGender: any[];
+  public loanedBusinessesByGenderShowLegend: boolean = false;
+  public loanedBusinessesByGenderShowLabels: boolean = true;
+  public loanedBusinessesByGenderExplodeSlices: boolean = false;
+  public loanedBusinessesByGenderDoughnut: boolean = true;
+  public loanedBusinessesByGenderChartTitle: string = 'Business Loaned By Gender';
 
   public loansDisbursedBySector: any[];
   public loansDisbursedBySectorShowLegend: boolean = false;
@@ -192,6 +200,18 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
     this.getLastThreeYearsAccessedLoanPerPartnerYearly();
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
     this.getLoansDisbursedByLoanProductSummary();
+    this.getLoanedBusinessesByGenderSummary();
+  }
+
+  getLoanedBusinessesByGenderSummary() {
+    this.dashBoardService.getLoanedBusinessesByGenderSummary(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.loanedBusinessesByGender = response;
+        },
+        error: (error) => { }
+      });
   }
 
   getHighLevelSummary() {
@@ -311,6 +331,27 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
       chartXAxisLabel: this.loansDisbursedByProductYAxisLabel,
       chartFormatLabel: this.valueFormatting,
       chartTitle: this.loansDisbursedByProductChartTitle,
+    };
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
+  }
+
+  expandLoanedBusinessesByGenderDoughnut(){
+    const data = { 
+      content: this.loanedBusinessesByGenderContentDiv.nativeElement.cloneNode(true),
+      chartType: 'app-pie-chart',
+      chartData: this.loanedBusinessesByGender,
+      chartShowLegend: this.loanedBusinessesByGenderShowLegend,
+      chartSColorScheme: this.chartSColorScheme,
+      chartShowLabels: this.loanedBusinessesByGenderShowLabels,
+      chartExplodeSlices: this.loanedBusinessesByGenderExplodeSlices,
+      chartIsDoughnut: this.loanedBusinessesByGenderDoughnut,
+      labelFormatting: this.valueFormatting,
+      chartTitle: this.loanedBusinessesByGenderChartTitle,
+      chartFormatLabel: (label: string): string => {
+        // Find the data object by name and return the value instead of name
+        const item = this.loanedBusinessesByGender.find(data => data.name === label);
+        return item ? `${this.valueFormatting(item.value)}` : label; // If found, return the value; otherwise return the name as fallback
+      }
     };
     this.dashBoardService.openExpandedChartDialog(this.dialog, data);
   }
