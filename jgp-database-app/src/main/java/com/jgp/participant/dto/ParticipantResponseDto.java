@@ -59,8 +59,6 @@ public class ParticipantResponseDto implements Serializable {
 
     private String refugeeStatus;
 
-    private String passport;
-
     private String savings;
 
     private List<BMOClientDto> bmoClientDtos;

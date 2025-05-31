@@ -28,12 +28,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -107,6 +102,9 @@ public class MentorshipImportHandler implements ImportHandler {
         if (StringUtils.isNotBlank(bmoMembership) && OTHER.equals(bmoMembership.toUpperCase(Locale.ROOT))){
             bmoMembership =ImportHandlerUtils.readAsString(MentorShipConstants.OTHER_BMO_MEMBERSHIP_COL, row);
         }
+        if (Objects.isNull(bmoMembership)){
+            rowErrorMap.put(row, "BMO Membership is required !!");
+        }
         final var deliveryMode = ImportHandlerUtils.readAsString(MentorShipConstants.MENTORSHIP_DELIVERY_MODE_COL, row);
         final var jgpID = ImportHandlerUtils.readAsString(MentorShipConstants.JGP_ID_COL, row);
         final var participant = null == jgpID ? null : this.participantService.findOneParticipantByJGPID(jgpID).orElse(null);
@@ -114,6 +112,9 @@ public class MentorshipImportHandler implements ImportHandler {
             rowErrorMap.put(row, "Participant can not be found by Id");
         }
         final var businessSituation = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_SITUATION_COL, row);
+        if (null == rowErrorMap.get(row) && null == businessSituation){
+            rowErrorMap.put(row, "Business Situation is required !!");
+        }
         final var didHireMoreEmployees = ImportHandlerUtils.readAsString(MentorShipConstants.LOAN_MADE_HIRE_MORE_COL, row);
         final var numberOfMoreEmployees = ImportHandlerUtils.readAsInt(MentorShipConstants.NEW_EMPLOYEES_18_35_COL, row);
         if ((null == numberOfMoreEmployees || numberOfMoreEmployees < 1) && "YES".equalsIgnoreCase(didHireMoreEmployees) && null == rowErrorMap.get(row)){
@@ -141,6 +142,11 @@ public class MentorshipImportHandler implements ImportHandler {
         final var msmeCovered = ImportHandlerUtils.readAsString(MentorShipConstants.MSME_SESSIONS_COVERED_COL, row);
         final var smeCovered = ImportHandlerUtils.readAsString(MentorShipConstants.SME_SESSIONS_COVERED_COL, row);
         final var businessGaps = ImportHandlerUtils.readAsString(MentorShipConstants.IDENTIFIED_BUSINESS_GAPS, row);
+        if (null == businessGaps){
+            rowErrorMap.put(row, "Business Gaps must be provided!!");
+        } else if (businessGaps.split(",").length < 3) {
+            rowErrorMap.put(row, "At least 3 Business Gaps must be provided !!");
+        }
         final var businessGapsAgreedAction = ImportHandlerUtils.readAsString(MentorShipConstants.AGREED_ACTION_FOR_GAP_1, row);
         final var additionalSupport = ImportHandlerUtils.readAsString(MentorShipConstants.ADDITIONAL_SUPPORT_NEEDED, row);
 
@@ -151,7 +157,7 @@ public class MentorshipImportHandler implements ImportHandler {
                 .mentorShipDeliveryMode(deliveryMode).businessSituation(businessSituation)
                 .newHiresBecauseOfLoan(Objects.nonNull(numberOfMoreEmployees) ? numberOfMoreEmployees : 0)
                 .revenueIncreaseDueToTraining(revenueIncrease).usefulTrainingTopics(usefulTopics).supportNeededAreas(areasNeedingSupport)
-                .msmeSessionsCovered(msmeCovered).smeSessionsCovered(smeCovered).identifiedBusinessGaps(businessGaps)
+                .msmeSessionsCovered(msmeCovered).smeSessionsCovered(smeCovered).identifiedBusinessGaps(String.join(",", businessGaps))
                 .agreedActionForGapOne(businessGapsAgreedAction).additionalNeededSupport(additionalSupport)
                 .build();
 
@@ -166,13 +172,19 @@ public class MentorshipImportHandler implements ImportHandler {
     }
 
     private ParticipantDto getParticipantDto(Row row){
-        String participantName = ImportHandlerUtils.readAsString(MentorShipConstants.PARTICIPANT_NAME_COL, row);
+        final var participantName = ImportHandlerUtils.readAsString(MentorShipConstants.PARTICIPANT_NAME_COL, row);
         if (null == participantName && null == rowErrorMap.get(row)){
             rowErrorMap.put(row, "Participant Name Is Required !!");
         }
-        String businessName = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_NAME_COL, row);
-        String jgpId = ImportHandlerUtils.readAsString(MentorShipConstants.JGP_ID_COL, row);
+        final var businessName = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_NAME_COL, row);
+        if (null == businessName && null == rowErrorMap.get(row)){
+            rowErrorMap.put(row, "Business Name Is Required !!");
+        }
+        final var jgpId = ImportHandlerUtils.readAsString(MentorShipConstants.JGP_ID_COL, row);
         final var phoneNumber = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_PHONE_NUMBER_COL, row);
+        if (null == phoneNumber && null == rowErrorMap.get(row)){
+            rowErrorMap.put(row, "Phone Number Is Required !!");
+        }
         var gender = ImportHandlerUtils.readAsString(MentorShipConstants.MENTEE_GENDER_COL, row);
         gender = ParticipantValidator.validateGender(gender, row, rowErrorMap);
         var age = ImportHandlerUtils.readAsInt(MentorShipConstants.MENTEE_AGE_COL, row);
@@ -180,8 +192,14 @@ public class MentorshipImportHandler implements ImportHandler {
         final var personWithDisability = ImportHandlerUtils.readAsString(MentorShipConstants.IS_MENTEE_DISABLED, row);
         ParticipantValidator.validatePersonWithDisability(personWithDisability, row, rowErrorMap);
         final var businessLocation = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_COUNTY_LOCATION_COL, row);
+        if (null == businessLocation && null == rowErrorMap.get(row)){
+            rowErrorMap.put(row, "Business Location Is Required !!");
+        }
         final var locationCountyCode = CommonUtil.KenyanCounty.getKenyanCountyFromName(businessLocation);
         final var businessLocationSubCounty = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_SUB_COUNTY_LOCATION_COL, row);
+        if (null == businessLocationSubCounty && null == rowErrorMap.get(row)){
+            rowErrorMap.put(row, "Business Location SubCounty Is Required !!");
+        }
 
         final var businessLocationDoubleLatitude = ImportHandlerUtils.readAsDouble(MentorShipConstants.GEO_LOCATION_LATITUDE, row);
         final var businessLocationLatitude = Objects.nonNull(businessLocationDoubleLatitude) ? BigDecimal.valueOf(businessLocationDoubleLatitude) : null;
@@ -192,9 +210,14 @@ public class MentorshipImportHandler implements ImportHandler {
         if (StringUtils.isNotBlank(industrySector) && OTHER.equals(industrySector.toUpperCase(Locale.ROOT))){
             industrySector =ImportHandlerUtils.readAsString(MentorShipConstants.OTHER_BUSINESS_CATEGORY_COL, row);
         }
-
+        if (null == industrySector && null == rowErrorMap.get(row)){
+            rowErrorMap.put(row, "Business Category Is Required !!");
+        }
 
         final var businessSegment = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_SEGMENT, row);
+        if (null == businessSegment && null == rowErrorMap.get(row)){
+            rowErrorMap.put(row, "Business Segment Is Required !!");
+        }
 
 
         return ParticipantDto.builder()
