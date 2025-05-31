@@ -91,6 +91,13 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   public businessesTainedByGenderDoughnut: boolean = true;
   public businessesTainedByGenderChartTitle: string = 'Business Trained By Gender';
 
+  public loanedBusinessesByGender: any[];
+  public loanedBusinessesByGenderShowLegend: boolean = false;
+  public loanedBusinessesByGenderShowLabels: boolean = true;
+  public loanedBusinessesByGenderExplodeSlices: boolean = false;
+  public loanedBusinessesByGenderDoughnut: boolean = true;
+  public loanedBusinessesByGenderChartTitle: string = 'Business Loaned By Gender';
+
   public gradient = false;
 
   public single: any[];
@@ -231,6 +238,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
 
   @ViewChild('loansDisbursedByGenderContentDiv', { static: false }) loansDisbursedByGenderContentDiv!: ElementRef;
   @ViewChild('businessesTainedByGenderContentDiv', { static: false }) businessesTainedByGenderContentDiv!: ElementRef;
+  @ViewChild('loanedBusinessesByGenderContentDiv', { static: false }) loanedBusinessesByGenderContentDiv!: ElementRef;
   @ViewChild('loansDisbursedByPipelineContentDiv', { static: false }) loansDisbursedByPipelineContentDiv!: ElementRef;
   @ViewChild('countyTrainedBusinessesMapContentDiv', { static: false }) countyTrainedBusinessesMapContentDiv!: ElementRef;
   @ViewChild('loansDisbursedByStatusContentDiv', { static: false }) loansDisbursedByStatusContentDiv!: ElementRef;
@@ -288,6 +296,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
     this.getDisabledBusinessOwnersTrainedByGenderSummary();
     this.getRefugeeBusinessOwnersTrainedByGenderSummary();
     this.getLoansDisbursedByLoanProductSummary();
+    this.getLoanedBusinessesByGenderSummary();
   }
 
   getLoansDisbursedByGenderSummary() {
@@ -351,6 +360,17 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       .subscribe({
         next: (response) => {
           this.businessesTainedByGender = response;
+        },
+        error: (error) => { }
+      });
+  }
+
+  getLoanedBusinessesByGenderSummary() {
+    this.dashBoardService.getLoanedBusinessesByGenderSummary(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.loanedBusinessesByGender = response;
         },
         error: (error) => { }
       });
@@ -584,6 +604,27 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartFormatLabel: (label: string): string => {
         // Find the data object by name and return the value instead of name
         const item = this.businessesTainedByGender.find(data => data.name === label);
+        return item ? `${this.valueFormatting(item.value)}` : label; // If found, return the value; otherwise return the name as fallback
+      }
+    };
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
+  }
+
+  expandLoanedBusinessesByGenderDoughnut(){
+    const data = { 
+      content: this.loanedBusinessesByGenderContentDiv.nativeElement.cloneNode(true),
+      chartType: 'app-pie-chart',
+      chartData: this.loanedBusinessesByGender,
+      chartShowLegend: this.loanedBusinessesByGenderShowLegend,
+      chartSColorScheme: this.chartSColorScheme,
+      chartShowLabels: this.loanedBusinessesByGenderShowLabels,
+      chartExplodeSlices: this.loanedBusinessesByGenderExplodeSlices,
+      chartIsDoughnut: this.loanedBusinessesByGenderDoughnut,
+      labelFormatting: this.valueFormatting,
+      chartTitle: this.loanedBusinessesByGenderChartTitle,
+      chartFormatLabel: (label: string): string => {
+        // Find the data object by name and return the value instead of name
+        const item = this.loanedBusinessesByGender.find(data => data.name === label);
         return item ? `${this.valueFormatting(item.value)}` : label; // If found, return the value; otherwise return the name as fallback
       }
     };

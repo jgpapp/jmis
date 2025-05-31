@@ -143,6 +143,30 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    public List<DataPointDto> getLoanedBusinessesByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
+        final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
+        LocalDate fromDate = dashboardSearchCriteria.fromDate();
+        LocalDate toDate = dashboardSearchCriteria.toDate();
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = getDefaultQueryDates().getLeft();
+            toDate = getDefaultQueryDates().getRight();
+        }
+        var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
+            parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
+            loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
+            parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
+            loanWhereClause = String.format("%s%s", loanWhereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        var sqlQuery = String.format(DataPointMapper.LOANED_BUSINESSES_BY_GENDER_SCHEMA, loanWhereClause);
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
     public List<DataPointDto> getLoanDisbursedByIndustrySectorSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -1135,6 +1159,13 @@ public class DashboardServiceImpl implements DashboardService {
         public static final String LOANS_DISBURSED_BY_GENDER_SCHEMA = """
                 select cl.gender_category as dataKey, sum(lt.amount) as dataValue,\s
                 SUM(lt.amount) * 100.0 / SUM(SUM(lt.amount)) OVER () AS percentage\s
+                from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
+                inner join participants cl on l.participant_id = cl.id %s  group by 1;\s
+                """;
+
+        public static final String LOANED_BUSINESSES_BY_GENDER_SCHEMA = """
+                select cl.gender_category as dataKey, count(distinct l.id) as dataValue,\s
+                count(distinct l.id) * 100.0 / count(count(distinct l.id)) OVER () AS percentage\s
                 from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
                 inner join participants cl on l.participant_id = cl.id %s  group by 1;\s
                 """;
