@@ -123,6 +123,16 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   public trainingByPartnerByGenderYAxisLabel = 'Number';
   public trainingByPartnerByGenderChartTitle: string = 'Training By Partner By Gender';
 
+  public loanDisbursedByProductByGender: any[]
+  public loanDisbursedByProductByGenderShowXAxis = true;
+  public loanDisbursedByProductByGenderShowYAxis = true;
+  public loanDisbursedByProductByGenderShowLegend = false;
+  public loanDisbursedByProductByGenderShowXAxisLabel = true;
+  public loanDisbursedByProductByGenderXAxisLabel = 'Loan Products';
+  public loanDisbursedByProductByGenderShowYAxisLabel = true;
+  public loanDisbursedByProductByGenderYAxisLabel = 'Amount Disbursed';
+  public loanDisbursedByProductByGenderChartTitle: string = 'Disbursed By Loan Product By Gender';
+
 
   public taTrainedBySector: any[];
   public taTrainedBySectorShowXAxis: boolean = true;
@@ -246,6 +256,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   @ViewChild('loansDisbursedBySegmentContentDiv', { static: false }) loansDisbursedBySegmentContentDiv!: ElementRef;
   @ViewChild('loansDisbursedBySectorContentDiv', { static: false }) loansDisbursedBySectorContentDiv!: ElementRef;
   @ViewChild('trainingByPartnerByGenderContentDiv', { static: false }) trainingByPartnerByGenderContentDiv!: ElementRef;
+  @ViewChild('loanDisbursedByProductByGenderContentDiv', { static: false }) loanDisbursedByProductByGenderContentDiv!: ElementRef;
   @ViewChild('taTrainedBySectorContentDiv', { static: false }) taTrainedBySectorContentDiv!: ElementRef;
   @ViewChild('loansDisbursedByProductContentDiv', { static: false }) loansDisbursedByProductContentDiv!: ElementRef;
   @ViewChild('employeesSummaryContentDiv', { static: false }) employeesSummaryContentDiv!: ElementRef;
@@ -297,6 +308,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
     this.getRefugeeBusinessOwnersTrainedByGenderSummary();
     this.getLoansDisbursedByLoanProductSummary();
     this.getLoanedBusinessesByGenderSummary();
+    this.getLoanDisbursedByLoanProductByGenderSummary();
   }
 
   getLoansDisbursedByGenderSummary() {
@@ -461,6 +473,17 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       .subscribe({
         next: (response) => {
           this.trainingByPartnerByGender = response;
+        },
+        error: (error) => { }
+      });
+  }
+
+  getLoanDisbursedByLoanProductByGenderSummary() {
+    this.dashBoardService.getLoanDisbursedByLoanProductByGenderSummary(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.loanDisbursedByProductByGender = response;
         },
         error: (error) => { }
       });
@@ -765,6 +788,27 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartXAxisLabel: this.trainingByPartnerByGenderXAxisLabel,
       chartFormatLabel: this.valueFormatting,
       chartTitle: this.trainingByPartnerByGenderChartTitle,
+    };
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
+  }
+
+  expandLoanDisbursedByProductByGenderBarChart(){
+    const data = { 
+      content: this.loanDisbursedByProductByGenderContentDiv.nativeElement.cloneNode(true),
+      mapContainerElement: this.loanDisbursedByProductByGenderContentDiv,
+      chartType: 'ngx-charts-bar-vertical-2d',
+      chartData: this.loanDisbursedByProductByGender,
+      chartGradient: this.gradient,
+      chartShowXAxis: this.loanDisbursedByProductByGenderShowXAxis,
+      chartShowYAxis: this.loanDisbursedByProductByGenderShowYAxis,
+      chartSColorScheme: this.chartSColorScheme,
+      chartShowLegend: true,
+      chartShowXAxisLabel: this.loanDisbursedByProductByGenderShowXAxisLabel,
+      chartShowYAxisLabel: this.loanDisbursedByProductByGenderShowYAxisLabel,
+      chartYAxisLabel: this.loanDisbursedByProductByGenderYAxisLabel,
+      chartXAxisLabel: this.loanDisbursedByProductByGenderXAxisLabel,
+      chartFormatLabel: this.valueFormatting,
+      chartTitle: this.loanDisbursedByProductByGenderChartTitle,
     };
     this.dashBoardService.openExpandedChartDialog(this.dialog, data);
   }

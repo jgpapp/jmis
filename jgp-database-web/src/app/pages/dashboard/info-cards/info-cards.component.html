@@ -145,6 +145,40 @@
 }
 
 @if(isFinancialDashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loanDisbursedByProductByGenderContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandLoanDisbursedByProductByGenderBarChart()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{loanDisbursedByProductByGenderChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (loanDisbursedByProductByGender && loanDisbursedByProductByGender.length > 0) {
+                <ngx-charts-bar-vertical-2d
+                    [scheme]="chartSColorScheme"
+                    [results]="loanDisbursedByProductByGender"
+                    [gradient]="gradient"
+                    [xAxis]="loanDisbursedByProductByGenderShowXAxis"
+                    [yAxis]="loanDisbursedByProductByGenderShowYAxis"
+                    [legend]="loanDisbursedByProductByGenderShowLegend"
+                    [showXAxisLabel]="loanDisbursedByProductByGenderShowXAxisLabel"
+                    [showYAxisLabel]="loanDisbursedByProductByGenderShowYAxisLabel"
+                    [xAxisLabel]="loanDisbursedByProductByGenderXAxisLabel"
+                    [yAxisLabel]="loanDisbursedByProductByGenderYAxisLabel"
+                    [dataLabelFormatting]="valueFormatting"
+                    [showDataLabel]="true"
+                    (select)="onSelect($event)" 
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }         
+            </div>
+        </mat-card>
+    </div> 
+}
+
+@if(isFinancialDashboard()){
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loanedBusinessesByGenderContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandLoanedBusinessesByGenderDoughnut()">
             <mat-icon>open_in_full</mat-icon>
@@ -266,6 +300,7 @@
         </mat-card>
     </div>  
 }
+
 
 @if(isFinancialDashboard()){
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #accessedVSOutStandingAmountByGenderContentDiv> 
