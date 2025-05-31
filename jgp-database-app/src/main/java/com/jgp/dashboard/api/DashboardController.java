@@ -211,6 +211,14 @@ public class DashboardController {
         return new ResponseEntity<>(this.dashboardService.getTrainingByPartnerByGenderSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, trainingPartner)), HttpStatus.OK);
     }
 
+    @GetMapping("disbursed-by-product-by-gender")
+    public ResponseEntity<List<SeriesDataPointDto>> getLoanDisbursedByLoanProductByGenderSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                                        @RequestParam(value = "county-code", required = false) String countyCode,
+                                                                                        @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                                        @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        return new ResponseEntity<>(this.dashboardService.getLoanDisbursedByLoanProductByGenderSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, null)), HttpStatus.OK);
+    }
+
     @GetMapping("loan-accessed-per-partner-for-last-three-years")
     public ResponseEntity<List<SeriesDataPointDto>> getLastThreeYearsAccessedLoanPerPartnerSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
                                                                                                    @RequestParam(value = "county-code", required = false) String countyCode){
