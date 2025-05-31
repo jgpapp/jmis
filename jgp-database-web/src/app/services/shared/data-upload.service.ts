@@ -62,6 +62,13 @@ export class DataUploadService {
             });
       }
 
+      downloadFile(row: any): Observable<any> {
+            return this.httpClient.get(`/imports/downloadFile/${row.documentId}`, {
+              responseType: 'arraybuffer',
+              observe: 'response',
+            });
+      }
+
       deleteResourceFile(importId: number): Observable<any> {
         return this.httpClient.delete(`/imports/delete-resource-file/${importId}`);
   }

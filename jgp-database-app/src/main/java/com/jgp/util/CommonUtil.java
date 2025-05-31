@@ -8,6 +8,7 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -195,5 +196,17 @@ public abstract class CommonUtil {
             return BigDecimal.ZERO;
         }
         return (value.divide(total, 2, RoundingMode.HALF_UP)).multiply(BigDecimal.valueOf(100));
+    }
+
+    public static Optional<String> getFileExtension(MultipartFile file) {
+        if (file == null || file.getOriginalFilename() == null || file.getOriginalFilename().isEmpty()) {
+            return Optional.empty();
+        }
+        String originalFilename = file.getOriginalFilename();
+        int dotIndex = originalFilename.lastIndexOf('.');
+        if (dotIndex == -1 || dotIndex == originalFilename.length() - 1) {
+            return Optional.empty(); // No extension or ends with a dot
+        }
+        return Optional.of(originalFilename.substring(dotIndex + 1));
     }
 }
