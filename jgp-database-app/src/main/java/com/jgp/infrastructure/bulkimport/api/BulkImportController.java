@@ -88,6 +88,11 @@ public class BulkImportController {
         return bulkImportWorkbookService.getOutputTemplate(importDocumentId, fileType);
     }
 
+    @GetMapping("downloadFile/{file-document-id}")
+    public ResponseEntity<?> downloadFile(@PathVariable("file-document-id") String importDocumentId) {
+        return bulkImportWorkbookService.downloadFile(importDocumentId);
+    }
+
     @PostMapping("upload-resource-file/{resource-type}")
     public ResponseEntity<ApiResponseDto> uploadResourceFile(@RequestParam("fileDetail") MultipartFile fileDetail, @PathVariable("resource-type") ResourceType resourceType) {
         if (fileDetail.isEmpty()) {

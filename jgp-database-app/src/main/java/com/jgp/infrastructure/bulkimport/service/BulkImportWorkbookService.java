@@ -32,4 +32,6 @@ public interface BulkImportWorkbookService {
 
     ResponseEntity<?> getOutputTemplate(String importDocumentId, String fileType);
 
+    ResponseEntity<?> downloadFile(String importDocumentId);
+
 }

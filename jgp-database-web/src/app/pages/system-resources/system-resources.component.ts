@@ -138,6 +138,20 @@ export class SystemResourcesComponent {
         });
   }
 
+  downloadDocument(row: any) {
+    this.dataUploadService.downloadFile(row)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+            this.dataUploadService.downloadFileFromAPIResponse(response);
+        },
+        error: (error) => {
+          console.error('Error downloading template:', error);
+          this.gs.openSnackBar('Error downloading template', "Dismiss");
+        }
+      });
+  }
+
 
 
   deleteResourceFile(importId: number): void {
@@ -167,7 +181,7 @@ export class SystemResourcesComponent {
 
 
   get buttonIsDisabled(): boolean {
-    return !this.template || !this.isPDFFile(this.template) || !this.legalFormType;
+    return !this.template || !this.legalFormType;
   }
 
   isPDFFile(file: File): boolean {

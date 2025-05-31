@@ -18,6 +18,7 @@ import com.jgp.infrastructure.documentmanagement.exception.InvalidEntityTypeForD
 import com.jgp.infrastructure.documentmanagement.mapper.ImportDocumentMapper;
 import com.jgp.infrastructure.documentmanagement.service.DocumentWritePlatformService;
 import com.jgp.infrastructure.documentmanagement.service.DocumentWritePlatformServiceJpaRepositoryImpl;
+import com.jgp.shared.dto.ApiResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -28,6 +29,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -67,6 +69,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     private final ImportDocumentMapper importDocumentMapper;
     private final ContentRepository contentRepository;
     private static final String SELECT_LITERAL = "select ";
+    private static final String CONTENT_TYPE = "Content-Type";
 
 
 
@@ -105,9 +108,9 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
 
     @Override
     public void importFileToDirectory(String entityType, ResourceType resourceType, MultipartFile fileDetail) {
-        final String fileName = fileDetail.getOriginalFilename();
+        final var fileName = fileDetail.getOriginalFilename();
 
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final var baos = new ByteArrayOutputStream();
         try {
             IOUtils.copy(fileDetail.getInputStream(), baos);
         } catch (IOException e) {
@@ -119,7 +122,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
         final Long documentId = this.documentWritePlatformService.createInternalDocument(
                 DocumentWritePlatformServiceJpaRepositoryImpl.DocumentManagementEntity.IMPORT.name(),
                 this.securityContext.getAuthenticatedUserIfPresent().getId(), null, inputStream,
-                URLConnection.guessContentTypeFromName(fileName), fileName, null, resourceType.getName().concat(".pdf"));
+                URLConnection.guessContentTypeFromName(fileName), fileName, null, fileName);
         final Document document = this.documentRepository.findById(documentId).orElse(null);
 
         final ImportDocument importDocument = ImportDocument.instance(document, LocalDateTime.now(ZoneId.systemDefault()), GlobalEntityType.RESOURCES_IMPORT.getValue(),
@@ -220,7 +223,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     @Override
     public DocumentData getOutputTemplateLocation(String importDocumentId) {
         final ImportTemplateLocationMapper importTemplateLocationMapper = new ImportTemplateLocationMapper();
-        final String sql = SELECT_LITERAL + importTemplateLocationMapper.schema();
+        final String sql = SELECT_LITERAL + ImportTemplateLocationMapper.IMPORT_DOCUMENT_SCHEMA;
 
         return this.jdbcTemplate.queryForObject(sql, importTemplateLocationMapper, Integer.parseInt(importDocumentId)); // NOSONAR
     }
@@ -228,10 +231,43 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     @Override
     public ResponseEntity<?> getOutputTemplate(String importDocumentId, String fileType) {
         final ImportTemplateLocationMapper importTemplateLocationMapper = new ImportTemplateLocationMapper();
-        final String sql = SELECT_LITERAL + importTemplateLocationMapper.schema();
+        final String sql = SELECT_LITERAL + ImportTemplateLocationMapper.IMPORT_DOCUMENT_SCHEMA;
         DocumentData documentData = this.jdbcTemplate.queryForObject(sql, importTemplateLocationMapper,
                 Integer.parseInt(importDocumentId)); // NOSONAR
         return (documentData != null) ? buildResponse(documentData, fileType) : null;
+    }
+
+    @Override
+    public ResponseEntity<?> downloadFile(String importDocumentId) {
+        final ImportTemplateLocationMapper importTemplateLocationMapper = new ImportTemplateLocationMapper();
+        final String sql = SELECT_LITERAL + ImportTemplateLocationMapper.IMPORT_DOCUMENT_SCHEMA;
+        DocumentData documentData = this.jdbcTemplate.queryForObject(sql, importTemplateLocationMapper,
+                Integer.parseInt(importDocumentId)); // NOSONAR
+
+        if (Objects.isNull(documentData)){
+            return new ResponseEntity<>(new ApiResponseDto(false, "No such file exist"), HttpStatus.BAD_REQUEST);
+        }
+
+        String fileName = documentData.fileName();
+        String fileLocation = documentData.fileLocation();
+        File file = new File(fileLocation);
+        HttpHeaders headers = new HttpHeaders();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            InputStream initialStream = new FileInputStream(file);
+            byte[] targetArray = IOUtils.toByteArray(initialStream);
+            baos.write(targetArray);
+            // Set response headers
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.add("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+            headers.add(CONTENT_TYPE, documentData.contentType());
+
+        } catch (IOException e) {
+            log.error("Problem occurred in buildResponse function", e);
+        }
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(baos.toByteArray());
     }
 
     private ResponseEntity<?> buildResponse(DocumentData documentData, String fileType) {
@@ -248,9 +284,9 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
             headers.add("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
             if (fileType.equals("EXCEL")) {
-                headers.add("Content-Type", "application/vnd.ms-excel");
+                headers.add(CONTENT_TYPE, "application/vnd.ms-excel");
             } else if (fileType.equals("PDF")) {
-                headers.add("Content-Type", "application/pdf");
+                headers.add(CONTENT_TYPE, "application/pdf");
             }
 
         } catch (IOException e) {
@@ -263,15 +299,14 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
 
     private static final class ImportTemplateLocationMapper implements RowMapper<DocumentData> {
 
-        public String schema() {
-            return "d.location,d.file_name from import_document i inner join jgp_document d on i.document_id=d.id where d.id= ? ";
-        }
+        public static final String IMPORT_DOCUMENT_SCHEMA = "d.location,d.file_name,d.type from import_document i inner join jgp_document d on i.document_id=d.id where d.id= ? ";
 
         @Override
         public DocumentData mapRow(ResultSet rs, @SuppressWarnings("unused") int rowNum) throws SQLException {
             final String location = rs.getString("location");
             final String fileName = rs.getString("file_name");
-            return new DocumentData(null, null, null, null, fileName, null, null, null, location);
+            final String fileContentType = rs.getString("type");
+            return new DocumentData(null, null, null, null, fileName, null, fileContentType, null, location);
         }
     }
 }
