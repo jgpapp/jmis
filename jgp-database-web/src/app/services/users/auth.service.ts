@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, tap, throwError } from 'rxjs';
 import { CurrentUserCredentials } from '../../dto/CurrentUserCredentials';
 
 @Injectable({
@@ -11,7 +11,8 @@ import { CurrentUserCredentials } from '../../dto/CurrentUserCredentials';
 export class AuthService {
 
   CURRENT_USER_CREDENTIALS: string = 'current_user_credentials';
-  AUTH_TOKEN_KEY: string = 'auth_token';
+  ACCESS_TOKEN_KEY: string = 'auth_token';
+  REFRESH_TOKEN_KEY: string = 'refresh_token';
   USER_FULL_NAME: string = 'user_full_name';
   USER_ROLES: string = 'user_roles';
   USER_PERMISSIONS: string = 'user_permissions';
@@ -23,24 +24,73 @@ export class AuthService {
   USER_REGISTRATION: string = 'user_registration';
   FORCE_PASS_CHANGE: string = 'force_change_password';
   jwtService: JwtHelperService = new JwtHelperService();
+  private loggedIn = new BehaviorSubject<boolean>(this.hasTokens());
 
   constructor(private httpClient: HttpClient, private router: Router) { }
 
-  login = (authRequest: {username: string, password: string}): Observable<any> => this.httpClient.post(`/users/authenticate`, JSON.stringify(authRequest))
+  get isLoggedIn(): Observable<boolean> {
+    return this.loggedIn.asObservable();
+  }
 
-  public setLocalStorageValue = (key : string, value: any): void => localStorage.setItem(key, value)
+  login(authRequest: {username: string, password: string}): Observable<any> {
+    return this.httpClient.post<any>(`/users/authenticate`, JSON.stringify(authRequest)).pipe(
+      tap(response => {
+        this.storeUserDetails(response.accessToken, response.refreshToken);
+        this.loggedIn.next(true);
+        this.userRedirection();
+      }),
+      catchError(error => {
+        console.error('Login failed:', error);
+        return throwError(() => new Error('Invalid credentials or server error.'));
+      })
+    );
+  }
 
-  public getLocalStorageValue = (key: string): any => localStorage.getItem(key);
+  refreshToken(): Observable<any> {
+    const refreshToken = this.getRefreshToken();
+    if (!refreshToken) {
+      this.doLogout();
+      return throwError(() => new Error('No refresh token available. Logging out.'));
+    }
 
-  public getAuthToken = (): string | null => this.getLocalStorageValue(this.AUTH_TOKEN_KEY);
+    const refreshRequest: any = { refreshToken: refreshToken };
+    return this.httpClient.post<any>(`/users/refresh-token`, JSON.stringify(refreshRequest)).pipe(
+      tap(response => {
+        this.storeUserDetails(response.accessToken, response.refreshToken);
+        console.log('Tokens refreshed successfully.');
+      }),
+      catchError(error => {
+        console.error('Refresh token failed:', error);
+        // If refresh token itself is invalid or expired, force logout
+        this.doLogout();
+        return throwError(() => new Error('Refresh token invalid or expired. Logging out.'));
+      })
+    );
+  }
 
-  public clearLocalStorageValue = (): void => localStorage.clear();
+  private hasTokens(): boolean {
+    return !!this.getAccessToken() && !!this.getRefreshToken();
+  }
+
+  getAccessToken(): string | null {
+    return localStorage.getItem(this.ACCESS_TOKEN_KEY);
+  }
+
+  getRefreshToken(): string | null {
+    return localStorage.getItem(this.REFRESH_TOKEN_KEY);
+  }
+
+  saveTokens(accessToken: string, refreshToken: string): void {
+    localStorage.setItem(this.ACCESS_TOKEN_KEY, accessToken);
+    localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
+  }
   
-  public decodeAuthToken = (): any =>  this.getAuthToken() === null ? null : this.jwtService.decodeToken(this.getAuthToken()!);
+  public decodeAuthToken = (): any =>  this.getAccessToken() === null ? null : this.jwtService.decodeToken(this.getAccessToken()!);
 
-  public storeUserDetails = (token?: string) : void => {
-    if(token){
-      this.setLocalStorageValue(this.AUTH_TOKEN_KEY, token);
+  public storeUserDetails = (token?: string, refreshToken?: string) : void => {
+    if(token && refreshToken){
+      localStorage.setItem(this.ACCESS_TOKEN_KEY, token);
+      localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
       const userCredentials: CurrentUserCredentials = {
         accessToken: token,
         desgnation: this.decodeAuthToken()[this.USER_POSITION],
@@ -56,39 +106,43 @@ export class AuthService {
         userFullName: this.decodeAuthToken()[this.USER_FULL_NAME],
         forceChangePassword: this.decodeAuthToken()[this.FORCE_PASS_CHANGE]
       }
-      this.setLocalStorageValue(this.CURRENT_USER_CREDENTIALS, JSON.stringify(userCredentials));
+      localStorage.setItem(this.CURRENT_USER_CREDENTIALS, JSON.stringify(userCredentials));
     }
   };
 
-  public isAuthenticated = () : boolean => this.getAuthToken() !== null && !this.jwtService.isTokenExpired(this.getAuthToken());
+  public isAuthenticatedw = () : boolean => this.getAccessToken() !== null && !this.jwtService.isTokenExpired(this.getAccessToken());
 
   public isUserAdmin(): boolean {
     return (this.decodeAuthToken()['roles'] as Array<string>).includes('Admin');
   }
 
   userRedirection(): void {
-    if(this.isAuthenticated()){
-      this.router.navigateByUrl("/");
+    if(this.hasTokens()){
+      this.router.navigateByUrl('/');
     }else {
-      this.doLogout();
+      this.router.navigateByUrl('/login');
     }
   }
 
   redirectToChangePassword(): void{
-    this.router.navigateByUrl("/change-password");
+    this.router.navigateByUrl('/change-password');
   }
 
 
   doLogout(): void {
-    this.clearLocalStorageValue();
-    this.router.navigateByUrl("/login");
+    localStorage.clear();
+    this.loggedIn.next(false);
+    this.router.navigateByUrl('/login');
   }
 
   currentUser(): CurrentUserCredentials | null {
-    if(undefined == this.getLocalStorageValue(this.CURRENT_USER_CREDENTIALS) ){
+    
+    let userDetails = localStorage.getItem(this.CURRENT_USER_CREDENTIALS);
+    if(null === userDetails || undefined === userDetails){
       this.doLogout();
+      return null;
     }
-    return JSON.parse(this.getLocalStorageValue(this.CURRENT_USER_CREDENTIALS))
+    return JSON.parse(userDetails)
   }
 
   hasPermission(permission: string): boolean {

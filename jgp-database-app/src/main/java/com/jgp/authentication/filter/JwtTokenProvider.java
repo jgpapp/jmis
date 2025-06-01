@@ -2,26 +2,21 @@ package com.jgp.authentication.filter;
 
 import com.jgp.authentication.domain.AppUser;
 import com.jgp.authentication.domain.Role;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.jgp.authentication.exception.UserNotAuthenticatedException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.Key;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -29,41 +24,83 @@ import java.util.function.Function;
 @Slf4j
 public class JwtTokenProvider {
 
+    @Value("${jwt.secret}")
+    private String jwtSecret;
+
+    @Value("${jwt.expiration}")
+    private long jwtExpirationInMs;
+
+    @Value("${jwt.refresh.expiration}")
+    private long jwtRefreshExpirationInMs;
+
     private JwtTokenProvider(){}
 
-    public static  <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public  <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    private static Claims extractAllClaims(String jwtToken) {
-        SecretKey secretKey = Keys.hmacShaKeyFor(SecurityConstants.SECRET.getBytes()); // key must be at least 256 bits
-
-    return Jwts.parser().setSigningKey(secretKey)
-              .build().parseClaimsJws(jwtToken).getBody();
+    private Claims extractAllClaims(String jwtToken) {
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build() // <-- THIS IS ESSENTIAL!
+                .parseSignedClaims(jwtToken)
+                .getPayload();
     }
 
-    private static boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+    public boolean isTokenExpired(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token);
+            return false; // Token is valid and not expired
+        } catch (Exception _) {
+            return true; // Token is expired
+        }
     }
 
-    private static Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+    public boolean isValidToken(String authToken) {
+        try {
+            Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(authToken);
+            return true;
+        } catch (MalformedJwtException ex) {
+            // Invalid JWT token
+            log.error("Invalid JWT token", ex);
+            throw new UserNotAuthenticatedException("Invalid JWT token");
+        } catch (ExpiredJwtException ex) {
+            // Expired JWT token
+            log.error("Expired JWT token", ex);
+            throw new UserNotAuthenticatedException("Expired JWT token");
+        } catch (UnsupportedJwtException ex) {
+            // Unsupported JWT token
+            log.error("Unsupported JWT token", ex);
+            throw new UserNotAuthenticatedException("Unsupported JWT token");
+        } catch (IllegalArgumentException ex) {
+            // JWT claims string is empty.
+            log.error("JWT claims string is empty", ex);
+            throw new UserNotAuthenticatedException("JWT claims string is empty");
+        }
     }
 
-    public static String extractUsername(String token) {
+    public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public static boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
-    public static String createToken(AppUser user) {
-
-        SecretKey secretKey = Keys.hmacShaKeyFor(SecurityConstants.SECRET.getBytes()); // key must be at least 256 bits
-
+    public String createToken(AppUser user) {
 
         return Jwts.builder()
                 .subject(user.getUsername())
@@ -79,8 +116,20 @@ public class JwtTokenProvider {
                 .claim("user_permissions", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet()))
                 .claim("force_change_password", user.isForceChangePass())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
-                .signWith(secretKey)
+                .expiration(new Date(System.currentTimeMillis() + jwtExpirationInMs))
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    public String createRefreshToken(AppUser user) {
+
+        return Jwts.builder()
+                .subject(user.getUsername())
+                .claim("user_id", user.getId())
+                .claim("user_email", user.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + jwtRefreshExpirationInMs))
+                .signWith(getSigningKey())
                 .compact();
     }
 }
