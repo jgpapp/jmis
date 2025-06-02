@@ -39,7 +39,7 @@ export class VerticalMenuComponent implements OnInit {
     this.parentMenu = this.menuItems.filter(item => item.parentId == this.menuParentId);
     this.currentUser = this.authService.currentUser();  
     this.myDashboardMenu = this.menuItems.find(item => item.id === 2);
-    if(this.myDashboardMenu && this.currentUser.partnerName){
+    if(this.myDashboardMenu && this.currentUser){
       this.myDashboardMenu.title = `${this.currentUser.partnerName} Dashboard`;
     }else {
       this.parentMenu = this.parentMenu.filter(item => item.id !== 2);

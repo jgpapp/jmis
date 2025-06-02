@@ -39,6 +39,9 @@ services:
       - JGP_NOTIFICATION_MAIL_HOST=smtp.gmail.com
       - JGP_NOTIFICATION_USERNAME=your-email@gmail.com
       - JGP_NOTIFICATION_PASSWORD=your-app-password
+      - JGP_JWT_SECRET=MyVeryLongAndSecureSecretKeyThatIsAtLeast32BytesLongForHS256Encryption
+      - JGP_JWT_ACCESS_TOKEN_TTL=3600000
+      - JGP_JWT_REFRESH_TOKEN_TTL=604800000
     depends_on:
       - postgres_jgp_db
     ports:

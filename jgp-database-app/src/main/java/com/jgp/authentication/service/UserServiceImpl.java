@@ -3,10 +3,7 @@ package com.jgp.authentication.service;
 
 import com.jgp.authentication.domain.AppUser;
 import com.jgp.authentication.domain.AppUserRepository;
-import com.jgp.authentication.dto.AuthRequestDto;
-import com.jgp.authentication.dto.AuthResponseDto;
-import com.jgp.authentication.dto.UserDtoV2;
-import com.jgp.authentication.dto.UserPassChangeDto;
+import com.jgp.authentication.dto.*;
 import com.jgp.authentication.exception.UserNotFoundException;
 import com.jgp.authentication.filter.JwtTokenProvider;
 import com.jgp.patner.domain.Partner;
@@ -15,6 +12,7 @@ import com.jgp.patner.exception.PartnerNotFoundException;
 import com.jgp.shared.exception.DataRulesViolationException;
 import com.jgp.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,6 +31,7 @@ import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService{
 
     private final AppUserRepository userRepository;
@@ -41,6 +40,7 @@ public class UserServiceImpl implements UserService{
     private final PasswordEncoder passwordEncoder;
     private final PartnerRepository partnerRepository;
     private final RoleService roleService;
+    private final JwtTokenProvider jwtTokenProvider;
     private static final String NO_USER_FOUND_WITH_ID = "No user found with Id";
 
 
@@ -140,6 +140,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public AuthResponseDto authenticateUser(AuthRequestDto authRequestDto) {
+        log.info("Obtaining JWT Token !!!");
         final var userDetails = userDetailsService.loadUserByUsername(authRequestDto.username());
         if (Objects.isNull(userDetails)) {
             throw  new UserNotFoundException("Bad User Credentials !!");
@@ -149,8 +150,29 @@ public class UserServiceImpl implements UserService{
                 throw  new UserNotFoundException("User Locked !!");
             }
             this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDetails, authRequestDto.password(), userDetails.getAuthorities()));
-            return new AuthResponseDto(true, "User Authenticated!!", JwtTokenProvider.createToken(user));
+            final var accessToken = this.jwtTokenProvider.createToken(user);
+            final var refreshToken = this.jwtTokenProvider.createRefreshToken(user);
+            return new AuthResponseDto(true, "User Authenticated!!", accessToken, refreshToken);
         }
+    }
+
+    @Override
+    public AuthResponseDto refreshAccessToken(RefreshTokenRequest refreshTokenRequest) {
+        log.info("Refreshing JWT Token !!!");
+        String refreshToken = refreshTokenRequest.refreshToken();
+        if (jwtTokenProvider.isValidToken(refreshToken)) {
+
+            String username = jwtTokenProvider.extractUsername(refreshToken);
+            final var userDetails = userDetailsService.loadUserByUsername(username);
+            final var user = findUserByUsername(userDetails.getUsername());
+
+            // Re-generate both access and refresh token for security/simplicity
+            final var newAccessToken = this.jwtTokenProvider.createToken(user);
+            final var newRefreshToken = this.jwtTokenProvider.createRefreshToken(user);
+
+            return new AuthResponseDto(true, "Token Refreshed!!", newAccessToken, newRefreshToken);
+        }
+        return null;
     }
 
     @Override
