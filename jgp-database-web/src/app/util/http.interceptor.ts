@@ -38,7 +38,6 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      console.log('Interceptor error');
        // THIS IS THE KEY DETECTION POINT FOR 401
       if (error.status === 401 && !req.url.includes('/authenticate')) {
         // Handle 401 error: Token expired or invalid

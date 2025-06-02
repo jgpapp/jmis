@@ -57,7 +57,6 @@ export class AuthService {
     return this.httpClient.post<any>(`/users/refresh-token`, JSON.stringify(refreshRequest)).pipe(
       tap(response => {
         this.storeUserDetails(response.accessToken, response.refreshToken);
-        console.log('Tokens refreshed successfully.');
       }),
       catchError(error => {
         console.error('Refresh token failed:', error);

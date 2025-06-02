@@ -12,6 +12,7 @@ import com.jgp.patner.exception.PartnerNotFoundException;
 import com.jgp.shared.exception.DataRulesViolationException;
 import com.jgp.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,6 +31,7 @@ import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService{
 
     private final AppUserRepository userRepository;
@@ -138,6 +140,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public AuthResponseDto authenticateUser(AuthRequestDto authRequestDto) {
+        log.info("Obtaining JWT Token !!!");
         final var userDetails = userDetailsService.loadUserByUsername(authRequestDto.username());
         if (Objects.isNull(userDetails)) {
             throw  new UserNotFoundException("Bad User Credentials !!");
@@ -155,6 +158,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public AuthResponseDto refreshAccessToken(RefreshTokenRequest refreshTokenRequest) {
+        log.info("Refreshing JWT Token !!!");
         String refreshToken = refreshTokenRequest.refreshToken();
         if (jwtTokenProvider.isValidToken(refreshToken)) {
 

@@ -38,7 +38,7 @@ public class WebSecurityFilterChainConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize.
-                        requestMatchers("/api/v1/users/authenticate", "/ws/**").permitAll()
+                        requestMatchers("/api/v1/users/authenticate", "/api/v1/users/refresh-token", "/ws/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPoint))

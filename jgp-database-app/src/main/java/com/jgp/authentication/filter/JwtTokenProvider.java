@@ -75,19 +75,19 @@ public class JwtTokenProvider {
         } catch (MalformedJwtException ex) {
             // Invalid JWT token
             log.error("Invalid JWT token", ex);
-            throw new UserNotAuthenticatedException("Invalid JWT token");
+            throw new UserNotAuthenticatedException("Invalid Credentials !!");
         } catch (ExpiredJwtException ex) {
             // Expired JWT token
             log.error("Expired JWT token", ex);
-            throw new UserNotAuthenticatedException("Expired JWT token");
+            throw new UserNotAuthenticatedException("Your Session Has Expired !!");
         } catch (UnsupportedJwtException ex) {
             // Unsupported JWT token
             log.error("Unsupported JWT token", ex);
-            throw new UserNotAuthenticatedException("Unsupported JWT token");
+            throw new UserNotAuthenticatedException("Invalid Credentials !!");
         } catch (IllegalArgumentException ex) {
             // JWT claims string is empty.
             log.error("JWT claims string is empty", ex);
-            throw new UserNotAuthenticatedException("JWT claims string is empty");
+            throw new UserNotAuthenticatedException("Invalid Credentials !!");
         }
     }
 
