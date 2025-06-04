@@ -13,6 +13,7 @@ import com.jgp.infrastructure.bulkimport.constants.BMOConstants;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import com.jgp.infrastructure.bulkimport.data.Count;
 import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
+import com.jgp.shared.validator.DataValidator;
 import com.jgp.shared.validator.ParticipantValidator;
 import com.jgp.shared.validator.TAValidator;
 import com.jgp.util.CommonUtil;
@@ -155,7 +156,7 @@ public class BMOImportHandler implements ImportHandler {
         final var phoneNumber = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_PHONE_NUMBER_COL, row);
         var gender = ImportHandlerUtils.readAsString(BMOConstants.GENDER_COL, row);
         gender = ParticipantValidator.validateGender(gender, row, rowErrorMap);
-        var age = ImportHandlerUtils.readAsInt(BMOConstants.AGE_COL, row);
+        var age = DataValidator.validateTemplateIntegerValue(BMOConstants.AGE_COL, row, rowErrorMap);
         age = ParticipantValidator.validateParticipantAge(age, row, rowErrorMap);
         final var businessLocation = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_LOCATION_COL, row);
         final var locationCountyCode = CommonUtil.KenyanCounty.getKenyanCountyFromName(businessLocation);
@@ -163,17 +164,17 @@ public class BMOImportHandler implements ImportHandler {
         var businessSegment = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_SEGMENT_COL, row);
         businessSegment = TAValidator.validateBusinessSegment(businessSegment, row, rowErrorMap);
         final var registrationNumber = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_REGISTRATION_NUMBER_COL, row);
-        final var bestMonthlyRevenueD = ImportHandlerUtils.readAsDouble(BMOConstants.BEST_MONTH_MONTHLY_REVENUE_COL, row);
+        final var bestMonthlyRevenueD = DataValidator.validateTemplateDoubleValue(BMOConstants.BEST_MONTH_MONTHLY_REVENUE_COL, row, rowErrorMap);
         final var bestMonthlyRevenue = Objects.nonNull(bestMonthlyRevenueD) ? BigDecimal.valueOf(bestMonthlyRevenueD) : null;
-        final var worstMonthlyRevenueD = ImportHandlerUtils.readAsDouble(BMOConstants.WORST_MONTH_MONTHLY_REVENUE_COL, row);
+        final var worstMonthlyRevenueD = DataValidator.validateTemplateDoubleValue(BMOConstants.WORST_MONTH_MONTHLY_REVENUE_COL, row, rowErrorMap);
         final var worstMonthlyRevenue = Objects.nonNull(worstMonthlyRevenueD) ? BigDecimal.valueOf(worstMonthlyRevenueD) : null;
-        final var totalRegularEmployees = ImportHandlerUtils.readAsInt(BMOConstants.TOTAL_REGULAR_EMPLOYEES_COL, row);
+        final var totalRegularEmployees = DataValidator.validateTemplateIntegerValue(BMOConstants.TOTAL_REGULAR_EMPLOYEES_COL, row, rowErrorMap);
         if ((null == totalRegularEmployees || totalRegularEmployees < 1) && null == rowErrorMap.get(row)){
             rowErrorMap.put(row, "Regular Employees Must Be Greater Than 0 !!");
         }
-        final var youthRegularEmployees = ImportHandlerUtils.readAsInt(BMOConstants.YOUTH_REGULAR_EMPLOYEES_COL, row);
-        final var totalCasualEmployees = ImportHandlerUtils.readAsInt(BMOConstants.TOTAL_CASUAL_EMPLOYEES_COL, row);
-        final var youthCasualEmployees = ImportHandlerUtils.readAsInt(BMOConstants.YOUTH_CASUAL_EMPLOYEES_COL, row);
+        final var youthRegularEmployees = DataValidator.validateTemplateIntegerValue(BMOConstants.YOUTH_REGULAR_EMPLOYEES_COL, row, rowErrorMap);
+        final var totalCasualEmployees = DataValidator.validateTemplateIntegerValue(BMOConstants.TOTAL_CASUAL_EMPLOYEES_COL, row, rowErrorMap);
+        final var youthCasualEmployees = DataValidator.validateTemplateIntegerValue(BMOConstants.YOUTH_CASUAL_EMPLOYEES_COL, row, rowErrorMap);
         var sampleRecordsKept = ImportHandlerUtils.readAsString(BMOConstants.SAMPLE_RECORDS_KEPT_COL, row);
         sampleRecordsKept = null == sampleRecordsKept ? null : TAValidator.validateSampleRecords(sampleRecordsKept, row, rowErrorMap);
         final var personWithDisability = ImportHandlerUtils.readAsString(BMOConstants.PERSON_WITH_DISABILITY_COL, row);
