@@ -1,5 +1,6 @@
 package com.jgp.authentication.filter;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -13,7 +14,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
@@ -24,22 +24,24 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
  */
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class WebSecurityFilterChainConfig {
 
     private final AuthenticationProvider authenticationProvider;
     private final JwtTokenFilter jwtTokenFilter;
-
-    public WebSecurityFilterChainConfig(AuthenticationProvider authenticationProvider, JwtTokenFilter jwtTokenFilter) {
-        this.authenticationProvider = authenticationProvider;
-        this.jwtTokenFilter = jwtTokenFilter;
-    }
+    private final JwtAuthenticationEntryPoint authEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.cors(Customizer.withDefaults()).csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(request -> request.requestMatchers("/api/v1/users/authenticate", "/ws/**")
-                        .permitAll().anyRequest().authenticated())
+        http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(authorize -> authorize.
+                        requestMatchers("/api/v1/users/authenticate", "/api/v1/users/refresh-token", "/ws/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPoint))
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);

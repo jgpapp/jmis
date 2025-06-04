@@ -38,7 +38,7 @@ export class HorizontalMenuComponent implements OnInit {
     this.menuItems = this.menuItems.filter(item => item.parentId == this.menuParentId);
     this.currentUser = this.authService.currentUser();
     this.myDashboardMenu = this.menuItems.find(item => item.id === 2);
-    if(this.myDashboardMenu && this.currentUser.partnerName){
+    if(this.myDashboardMenu && this.currentUser){
       this.myDashboardMenu.title = `${this.currentUser.partnerName} Dashboard`;
     }else {
       this.menuItems = this.menuItems.filter(item => item.id !== 2);

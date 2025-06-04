@@ -10,7 +10,6 @@ import { ContentHeaderComponent } from '../../theme/components/content-header/co
 import { MatInputModule } from '@angular/material/input';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { UserService } from '@services/users/user.service';
 import { GlobalService } from '@services/shared/global.service';
 import { AuthService } from '@services/users/auth.service';
 import { Subject, takeUntil } from 'rxjs';
@@ -39,7 +38,13 @@ export class LoginComponent implements OnDestroy {
   authResponse: any
   authResponse2?: { success: boolean, message: string, authToken: string }
   private unsubscribe$ = new Subject<void>();
-  constructor(public settingsService: SettingsService, public fb: FormBuilder, public router: Router, private us: UserService, private authService: AuthService) {
+  constructor(
+    public settingsService: SettingsService, 
+    public fb: FormBuilder, 
+    public router: Router, 
+    private gs: GlobalService,
+    private authService: AuthService
+  ) {
     this.settings = this.settingsService.settings;
     this.userloginForm = this.fb.group({
       'username': [null, Validators.compose([Validators.required, emailValidator])],
@@ -51,11 +56,8 @@ export class LoginComponent implements OnDestroy {
     this.authService.login(this.userloginForm.value)
     .pipe(takeUntil(this.unsubscribe$))
     .subscribe({
-      next: (response) => {
-        this.authResponse = response
-        this.authService.storeUserDetails(this.authResponse?.authToken);
-        this.authService.userRedirection();
-
+      next: () => {
+        this.gs.openSnackBar("Welcome Back !!", "Dismiss");
       }
     });
   }

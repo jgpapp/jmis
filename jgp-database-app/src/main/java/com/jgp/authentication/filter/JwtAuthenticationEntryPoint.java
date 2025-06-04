@@ -18,6 +18,7 @@ public class JwtAuthenticationEntryPoint extends BasicAuthenticationEntryPoint {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.getWriter().write("{ \"message\": \"" + authException.getMessage() + "\" }");
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
     }
 
     @Override

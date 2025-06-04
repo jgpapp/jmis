@@ -5,7 +5,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,12 +24,13 @@ import java.util.Objects;
 public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final UserDetailsService currentUserDetails;
+    private final JwtTokenProvider jwtTokenProvider;
 
 
     @Override
-    protected void doFilterInternal(@NotNull HttpServletRequest request,
-                                    @NotNull HttpServletResponse response,
-                                    @NotNull FilterChain chain) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain chain) throws IOException, ServletException {
         final var header = request.getHeader(SecurityConstants.HEADER_AUTHORIZATION);
         if (header == null || !header.startsWith(SecurityConstants.TOKEN_PREFIX)) {
             chain.doFilter(request, response);
@@ -40,11 +40,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         UserDetails userDetails = null;
         try {
             userDetails = currentUserDetails
-                    .loadUserByUsername(JwtTokenProvider.extractUsername(token));
+                    .loadUserByUsername(this.jwtTokenProvider.extractUsername(token));
         }catch (JwtException e){
             log.error("Auth Error: {}", e.getMessage());
         }
-        if (Objects.isNull(userDetails) || !JwtTokenProvider.isTokenValid(token, userDetails)) {
+        if (Objects.isNull(userDetails) || !this.jwtTokenProvider.isTokenValid(token, userDetails)) {
             chain.doFilter(request, response);
             return;
         }

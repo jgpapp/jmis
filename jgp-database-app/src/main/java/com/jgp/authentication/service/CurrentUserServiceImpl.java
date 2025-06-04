@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -22,10 +21,7 @@ public class CurrentUserServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException{
         final var appUser = userRepository.findByUsername(username)
-                .orElse(null);
-        if(Objects.isNull(appUser)){
-            return null;
-        }
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
         final var grantedAuthorities = new HashSet<GrantedAuthority>(Collections.singleton(new SimpleGrantedAuthority("USER")));
         return new org.springframework.security.core.userdetails.User(appUser.getUsername(), appUser.getPassword(), grantedAuthorities);
     }

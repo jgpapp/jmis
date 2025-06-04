@@ -5,6 +5,7 @@ import com.jgp.authentication.service.UserService;
 import com.jgp.finance.domain.Loan;
 import com.jgp.finance.domain.LoanTransaction;
 import com.jgp.finance.service.LoanService;
+import com.jgp.infrastructure.bulkimport.constants.BMOConstants;
 import com.jgp.infrastructure.bulkimport.constants.LoanConstants;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import com.jgp.infrastructure.bulkimport.data.Count;
@@ -14,6 +15,7 @@ import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.dto.ParticipantDto;
 import com.jgp.participant.service.ParticipantService;
+import com.jgp.shared.validator.DataValidator;
 import com.jgp.shared.validator.LoanValidator;
 import com.jgp.shared.validator.ParticipantValidator;
 import com.jgp.util.CommonUtil;
@@ -101,11 +103,11 @@ public class LoanImportHandler implements ImportHandler {
         final var pipeLineSource = ImportHandlerUtils.readAsString(LoanConstants.PIPELINE_SOURCE, row);
         final var applicationDate = ImportHandlerUtils.readAsDate(LoanConstants.DATE_APPLIED, row);
         final var dateDisbursed = ImportHandlerUtils.readAsDate(LoanConstants.DATE_DISBURSED, row);
-        final var amountApproved = ImportHandlerUtils.readAsDouble(LoanConstants.LOAN_AMOUNT_KES, row);
-        final var loanAmount = BigDecimal.valueOf(amountApproved);
-        final var loanDuration = ImportHandlerUtils.readAsInt(LoanConstants.LOAN_DURATION, row);
-        final var outStandingAmountDouble = ImportHandlerUtils.readAsDouble(LoanConstants.OUT_STANDING_AMOUNT, row);
-        final var outStandingAmount = BigDecimal.valueOf(outStandingAmountDouble);
+        final var amountApproved = DataValidator.validateTemplateDoubleValue(LoanConstants.LOAN_AMOUNT_KES, row, rowErrorMap);
+        final var loanAmount = null == amountApproved ? BigDecimal.ZERO : BigDecimal.valueOf(amountApproved);
+        final var loanDuration = DataValidator.validateTemplateIntegerValue(LoanConstants.LOAN_DURATION, row, rowErrorMap);
+        final var outStandingAmountDouble = DataValidator.validateTemplateDoubleValue(LoanConstants.OUT_STANDING_AMOUNT, row, rowErrorMap);
+        final var outStandingAmount = null == outStandingAmountDouble ? BigDecimal.ZERO : BigDecimal.valueOf(outStandingAmountDouble);
         var loanQuality = ImportHandlerUtils.readAsString(LoanConstants.LOAN_QUALITY, row);
         loanQuality = LoanValidator.validateLoanQuality(loanQuality, row, rowErrorMap);
         var loanQualityEnum = Loan.LoanQuality.NORMAL;
@@ -113,10 +115,10 @@ public class LoanImportHandler implements ImportHandler {
             loanQualityEnum = (null != loanQuality) ? Loan.LoanQuality.valueOf(loanQuality.toUpperCase()) : Loan.LoanQuality.NORMAL;
         }
         final var recordedToJGPDBOnDate = ImportHandlerUtils.readAsDate(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, row);
-        final var loanAmountRepaidDouble = ImportHandlerUtils.readAsDouble(LoanConstants.REPAID_LOAN_AMOUNT, row);
-        final var loanAmountRepaid = BigDecimal.valueOf(loanAmountRepaidDouble);
-        final var tranchAmountDouble = ImportHandlerUtils.readAsDouble(LoanConstants.TRANCH_AMOUNT_COL, row);
-        final var tranchAmount = BigDecimal.valueOf(tranchAmountDouble);
+        final var loanAmountRepaidDouble = DataValidator.validateTemplateDoubleValue(LoanConstants.REPAID_LOAN_AMOUNT, row, rowErrorMap);
+        final var loanAmountRepaid = null == loanAmountRepaidDouble ? BigDecimal.ZERO : BigDecimal.valueOf(loanAmountRepaidDouble);
+        final var tranchAmountDouble = DataValidator.validateTemplateDoubleValue(LoanConstants.TRANCH_AMOUNT_COL, row, rowErrorMap);
+        final var tranchAmount = null == tranchAmountDouble ? BigDecimal.ZERO : BigDecimal.valueOf(tranchAmountDouble);
         var tranchAllocated = ImportHandlerUtils.readAsString(LoanConstants.TRANCH_ALLOCATED_COL, row);
         tranchAllocated = LoanValidator.validateTranchAllocated(tranchAllocated, tranchAmount, row, rowErrorMap);
         var loanerType = ImportHandlerUtils.readAsString(LoanConstants.LOANER_TYPE_COL, row);
@@ -184,19 +186,19 @@ public class LoanImportHandler implements ImportHandler {
         final var phoneNumber = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_PHONE_NUMBER_COL, row);
         var gender = ImportHandlerUtils.readAsString(LoanConstants.GENDER_COL, row);
         gender = ParticipantValidator.validateGender(gender, row, rowErrorMap);
-        var age = ImportHandlerUtils.readAsInt(LoanConstants.AGE_COL, row);
+        var age = DataValidator.validateTemplateIntegerValue(LoanConstants.AGE_COL, row, rowErrorMap);
         age = ParticipantValidator.validateParticipantAge(age, row, rowErrorMap);
         final var businessLocation = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_LOCATION_COL, row);
         final var locationCountyCode = CommonUtil.KenyanCounty.getKenyanCountyFromName(businessLocation);
         final var industrySector = ImportHandlerUtils.readAsString(LoanConstants.INDUSTRY_SECTOR_COL, row);
 
-        final var totalRegularEmployees = ImportHandlerUtils.readAsInt(LoanConstants.TOTAL_REGULAR_EMPLOYEES_COL, row);
+        final var totalRegularEmployees = DataValidator.validateTemplateIntegerValue(LoanConstants.TOTAL_REGULAR_EMPLOYEES_COL, row, rowErrorMap);
         if ((null == totalRegularEmployees || totalRegularEmployees < 1) && null == rowErrorMap.get(row)){
             rowErrorMap.put(row, "Regular Employees Must Be Greater Than 0 !!");
         }
-        final var youthRegularEmployees = ImportHandlerUtils.readAsInt(LoanConstants.YOUTH_REGULAR_EMPLOYEES_COL, row);
-        final var totalCasualEmployees = ImportHandlerUtils.readAsInt(LoanConstants.TOTAL_CASUAL_EMPLOYEES_COL, row);
-        final var youthCasualEmployees = ImportHandlerUtils.readAsInt(LoanConstants.YOUTH_CASUAL_EMPLOYEES_COL, row);
+        final var youthRegularEmployees = DataValidator.validateTemplateIntegerValue(LoanConstants.YOUTH_REGULAR_EMPLOYEES_COL, row, rowErrorMap);
+        final var totalCasualEmployees = DataValidator.validateTemplateIntegerValue(LoanConstants.TOTAL_CASUAL_EMPLOYEES_COL, row, rowErrorMap);
+        final var youthCasualEmployees = DataValidator.validateTemplateIntegerValue(LoanConstants.YOUTH_CASUAL_EMPLOYEES_COL, row, rowErrorMap);
 
         return ParticipantDto.builder()
                 .phoneNumber(phoneNumber).businessLocation(businessLocation).businessName(businessName)
