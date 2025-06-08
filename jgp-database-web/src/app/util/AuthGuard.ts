@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { AuthService } from '@services/users/auth.service';
-import { Observable } from 'rxjs';
+import { map, Observable, take } from 'rxjs';
 
 export const AuthGuard: CanActivateFn = (
     route: ActivatedRouteSnapshot,
@@ -13,13 +13,16 @@ export const AuthGuard: CanActivateFn = (
     | UrlTree=> {
     
       const router = inject(Router);
-      const userIsAuthorized: boolean = inject(AuthService).isAuthenticated()
 
-      if(userIsAuthorized){
+      return inject(AuthService).isLoggedIn.pipe(
+      take(1),
+      map((isLoggedIn: boolean) => {
+        if (!isLoggedIn) {
+          router.navigate(['/login']);
+          return false;
+        }
         return true;
-      } else {
-        router.navigateByUrl('/login');
-        return false;
-      }
+      })
+    );
   
   };

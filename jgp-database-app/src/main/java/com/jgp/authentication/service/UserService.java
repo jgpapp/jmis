@@ -1,10 +1,7 @@
 package com.jgp.authentication.service;
 
 import com.jgp.authentication.domain.AppUser;
-import com.jgp.authentication.dto.AuthRequestDto;
-import com.jgp.authentication.dto.AuthResponseDto;
-import com.jgp.authentication.dto.UserDtoV2;
-import com.jgp.authentication.dto.UserPassChangeDto;
+import com.jgp.authentication.dto.*;
 
 import java.util.List;
 
@@ -23,6 +20,8 @@ public interface UserService {
     AppUser findUserByUsername(String userName);
 
     AuthResponseDto authenticateUser(AuthRequestDto authRequestDto);
+
+    AuthResponseDto refreshAccessToken(RefreshTokenRequest refreshTokenRequest);
 
     List<UserDtoV2> getAllUsers();
 
