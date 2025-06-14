@@ -59,8 +59,8 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(LoanConstants.BUSINESS_LOCATION_COL, rowHeader, "Business Location(County)*");
         writeString(LoanConstants.INDUSTRY_SECTOR_COL, rowHeader, "Industry sector*(Agriculture, Artists/artisans, Manufacturing, Trading & Retail, Other)");
         writeString(LoanConstants.PIPELINE_SOURCE, rowHeader, "Pipeline source*");
-        writeString(LoanConstants.DATE_APPLIED, rowHeader, "Date loan application(yyyy-MM-dd)*");
-        writeString(LoanConstants.DATE_DISBURSED, rowHeader, "Date loan disbursed(yyyy-MM-dd)*");
+        writeString(LoanConstants.DATE_APPLIED, rowHeader, "Date loan application(yyyy-MM-dd example:2000-04-20)*");
+        writeString(LoanConstants.DATE_DISBURSED, rowHeader, "Date loan disbursed(yyyy-MM-dd example:2000-04-20)*");
         writeString(LoanConstants.LOAN_AMOUNT_KES, rowHeader, "Loan Amount (KES)*");
         writeString(LoanConstants.LOAN_DURATION, rowHeader, "Loan duration (months)*");
         writeString(LoanConstants.OUT_STANDING_AMOUNT, rowHeader, "Outstanding amount*");
@@ -71,7 +71,7 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(LoanConstants.TOTAL_CASUAL_EMPLOYEES_COL, rowHeader, "Total number of casual employees excluding owner*");
         writeString(LoanConstants.YOUTH_CASUAL_EMPLOYEES_COL, rowHeader, "Casual, of which are youth (18-35)*");
         writeString(LoanConstants.LOANER_TYPE_COL, rowHeader, "Loaner Type* (New/Repeat)");
-        writeString(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, rowHeader, "Date added to JGP database(yyyy-MM-dd)*");
+        writeString(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, rowHeader, "Date added to JGP database(yyyy-MM-dd example:2000-04-20)*");
         writeString(LoanConstants.LOAN_PRODUCT_COL, rowHeader, "Loan product* (Working Capital/Asset Finance/Stahimili/Purchase Order/Consignment Finance/Shariah Compliant)");
         writeString(LoanConstants.TRANCH_ALLOCATED_COL, rowHeader, "Tranch Allocated (Tranch 1/Tranch 2/Tranch 3/Tranch 4/Tranch 5/Not Applicable)");
         writeString(LoanConstants.TRANCH_AMOUNT_COL, rowHeader, "Tranch Amount (KES)");

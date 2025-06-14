@@ -179,9 +179,7 @@ public class MentorshipImportHandler implements ImportHandler {
             rowErrorMap.put(row, "Participant Name Is Required !!");
         }
         final var businessName = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_NAME_COL, row);
-        if (null == businessName && null == rowErrorMap.get(row)){
-            rowErrorMap.put(row, "Business Name Is Required !!");
-        }
+
         final var jgpId = ImportHandlerUtils.readAsString(MentorShipConstants.JGP_ID_COL, row);
         final var phoneNumber = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_PHONE_NUMBER_COL, row);
         if (null == phoneNumber && null == rowErrorMap.get(row)){
@@ -193,6 +191,13 @@ public class MentorshipImportHandler implements ImportHandler {
         age = ParticipantValidator.validateParticipantAge(age, row, rowErrorMap);
         final var personWithDisability = ImportHandlerUtils.readAsString(MentorShipConstants.IS_MENTEE_DISABLED, row);
         ParticipantValidator.validatePersonWithDisability(personWithDisability, row, rowErrorMap);
+        String personWithDisabilityType = null;
+        if ("YES".equalsIgnoreCase(personWithDisability)){
+            personWithDisabilityType = ImportHandlerUtils.readAsString(MentorShipConstants.MENTEE_DISABILITY_TYPE, row);
+            ParticipantValidator.validateDisabilityType(personWithDisabilityType, row, rowErrorMap);
+        }
+        final var financier = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_FINANCIER_COL, row);
+        ParticipantValidator.validateFinanciers(financier, row, rowErrorMap);
         final var businessLocation = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_COUNTY_LOCATION_COL, row);
         if (null == businessLocation && null == rowErrorMap.get(row)){
             rowErrorMap.put(row, "Business Location Is Required !!");
@@ -228,7 +233,8 @@ public class MentorshipImportHandler implements ImportHandler {
                 .locationCountyCode(locationCountyCode.isPresent() ? locationCountyCode.get().getCountyCode() : "999")
                 .locationSubCounty(businessLocationSubCounty).locationLatitude(businessLocationLatitude)
                 .locationLongitude(businessLocationLongitude).businessSegment(businessSegment)
-                .participantName(participantName).build();
+                .participantName(participantName).businessFinancier(financier)
+                .personWithDisability(personWithDisability).disabilityType(personWithDisabilityType).build();
     }
 
 

@@ -55,10 +55,24 @@ public class ParticipantValidator {
         }
     }
 
+    public static void validateFinanciers(String value, Row row, Map<Row, String> rowErrorMap){
+        final var financiers = Set.of("GBF", "4G", "PBP");
+        if (null == rowErrorMap.get(row) && null != value && !financiers.contains(value.toUpperCase())){
+            rowErrorMap.put(row, "Invalid Value for financier (Must be GBF/4G/PBP) !!");
+        }
+    }
+
     public static void validateRefugeeStatus(String value, Row row, Map<Row, String> rowErrorMap){
         final var deliveryModes = Set.of("YES", "NO");
         if (null == rowErrorMap.get(row) && (null == value || !deliveryModes.contains(value.toUpperCase()))){
             rowErrorMap.put(row, "Invalid Value for Refugee Status (Must be Yes/No) !!");
+        }
+    }
+
+    public static void validateDisabilityType(String value, Row row, Map<Row, String> rowErrorMap){
+        final var disabilityTypes = Set.of("visual impairment", "hearing impairment", "speech impairment", "physical impairment", "intellectual impairment", "psychosocial impairment", "multiple impairments");
+        if (null == rowErrorMap.get(row) && (null == value || !disabilityTypes.contains(value.toLowerCase(Locale.ROOT)))){
+            rowErrorMap.put(row, "Invalid Value for Refugee Status (Must be Visual impairment/Hearing impairment/Speech impairment/Physical impairment/Intellectual impairment/Psychosocial impairment/Multiple impairments) !!");
         }
     }
 
