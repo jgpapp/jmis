@@ -47,6 +47,9 @@ public class Participant extends BaseEntity {
     @Column(name = "business_location")
     private String businessLocation;
 
+    @Column(name = "business_financier")
+    private String businessFinancier;
+
     @Column(name = "location_county_code")
     private String locationCountyCode;
 
@@ -92,6 +95,9 @@ public class Participant extends BaseEntity {
     @Column(name = "person_with_disability")
     private String personWithDisability;
 
+    @Column(name = "disability_type")
+    private String disabilityType;
+
     @Column(name = "refugee_status")
     private String refugeeStatus;
 
@@ -131,6 +137,8 @@ public class Participant extends BaseEntity {
         this.locationCountyCode = dto.locationCountyCode();
         this.isEligible = dto.isEligible();
         this.participantName = dto.participantName();
+        this.businessFinancier = dto.businessFinancier();
+        this.disabilityType = dto.disabilityType();
     }
 
     public void updateParticipant(ParticipantDto dto){
@@ -184,6 +192,12 @@ public class Participant extends BaseEntity {
         }
         if (StringUtils.isNotBlank(dto.refugeeStatus())){
             this.refugeeStatus = dto.refugeeStatus();
+        }
+        if (StringUtils.isNotBlank(dto.businessFinancier())){
+            this.businessFinancier = dto.businessFinancier();
+        }
+        if (StringUtils.isNotBlank(dto.disabilityType())){
+            this.disabilityType = dto.disabilityType();
         }
         if (StringUtils.isNotBlank(dto.locationCountyCode())){
             var countyCode = dto.locationCountyCode().trim();
