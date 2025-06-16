@@ -131,7 +131,7 @@ public class AppUser extends BaseEntity implements PlatformUser {
     }
 
     public boolean forceChangePassword(final Integer passwordLifeSpan) {
-        return this.forceChangePass || this.getLastModified().plusMonths(passwordLifeSpan).isAfter(LocalDate.now(ZoneId.systemDefault()));
+        return this.forceChangePass || this.getLastModified().plusMonths(passwordLifeSpan).isBefore(LocalDate.now(ZoneId.systemDefault()));
     }
 
     public void changeUserStatus(boolean status){
