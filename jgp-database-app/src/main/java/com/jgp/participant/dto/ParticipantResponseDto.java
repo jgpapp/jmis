@@ -17,6 +17,8 @@ public class ParticipantResponseDto implements Serializable {
 
     private String businessName;
 
+    private String participantName;
+
     private String jgpId;
 
     private String phoneNumber;

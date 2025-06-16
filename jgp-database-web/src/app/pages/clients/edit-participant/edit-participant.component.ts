@@ -60,6 +60,7 @@ export class EditParticipantComponent implements OnInit {
       this.editParticipantForm = this.fb.group({
         id: null,
         businessName: [null, Validators.compose([Validators.required])],
+        participantName: [null],
         jgpId: [null, Validators.compose([Validators.required])],
         phoneNumber: [null, Validators.compose([Validators.required])],
         ownerGender: [null, Validators.compose([Validators.required])],
@@ -75,8 +76,7 @@ export class EditParticipantComponent implements OnInit {
         youthCasualEmployees: [null],
         sampleRecords: [null],
         personWithDisability: [null],
-        refugeeStatus: [null],
-        passport: [null]
+        refugeeStatus: [null]
       });
       }
 
@@ -90,6 +90,7 @@ export class EditParticipantComponent implements OnInit {
             this.selectedParticipant = response;
             this.editParticipantForm.patchValue({
               'businessName': this.selectedParticipant.businessName,
+              'participantName': this.selectedParticipant.participantName,
               'jgpId': this.selectedParticipant.jgpId,
               'phoneNumber': this.selectedParticipant.phoneNumber,
               'ownerGender': this.selectedParticipant.ownerGender,
@@ -105,8 +106,7 @@ export class EditParticipantComponent implements OnInit {
               'youthCasualEmployees': this.selectedParticipant.youthCasualEmployees,
               'sampleRecords': this.selectedParticipant.sampleRecords,
               'personWithDisability': this.selectedParticipant.personWithDisability,
-              'refugeeStatus': this.selectedParticipant.refugeeStatus,
-              'passport': this.selectedParticipant.passport
+              'refugeeStatus': this.selectedParticipant.refugeeStatus
             });
           }
         });

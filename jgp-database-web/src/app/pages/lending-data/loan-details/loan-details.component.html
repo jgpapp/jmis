@@ -40,10 +40,12 @@
                           <span fxFlex="60%">{{ selectedLoan.participantName }}</span>
                         </div>
 
+                        @if (selectedLoan.businessName) {
                         <div fxFlexFill>
                           <span fxFlex="40%">Business Name:</span>
                           <span fxFlex="60%">{{ selectedLoan.businessName }}</span>
                         </div>
+                        }
 
                         <div fxFlexFill>
                           <span fxFlex="40%">Lending Partner Name:</span>
