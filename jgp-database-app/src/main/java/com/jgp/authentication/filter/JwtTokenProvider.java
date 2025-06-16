@@ -33,6 +33,9 @@ public class JwtTokenProvider {
     @Value("${jwt.refresh.expiration}")
     private long jwtRefreshExpirationInMs;
 
+    @Value("${jgp.password.life.period.in.months}")
+    private Integer jgpPasswordLifeSpanInMonths;
+
     private JwtTokenProvider(){}
 
     private SecretKey getSigningKey() {
@@ -114,7 +117,7 @@ public class JwtTokenProvider {
                 .claim("user_registration", user.getDateCreated().format(DateTimeFormatter.ofPattern("MMM, yyyy")))
                 .claim("user_roles", user.getRoles().stream().map(Role::getRoleName).collect(Collectors.toSet()))
                 .claim("user_permissions", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet()))
-                .claim("force_change_password", user.isForceChangePass())
+                .claim("force_change_password", user.forceChangePassword(jgpPasswordLifeSpanInMonths))
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationInMs))
                 .signWith(getSigningKey())
