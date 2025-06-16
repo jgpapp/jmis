@@ -1,7 +1,7 @@
 @if (selectedParticipant | async; as selectedParticipant){
     <app-content-header 
         [icon]="'supervisor_account'" 
-        [title]="selectedParticipant.businessName" 
+        [title]="selectedParticipant.participantName" 
         [desc]="'View information about the Selected Participant.'"
         [hideBreadcrumb]="false"
         [hasBgImage]="true" 
@@ -21,7 +21,7 @@
         </mat-toolbar>
        
         <div fxLayout="column" class="p-2">
-          <h2 class="mat-h2" fxFlexFill fxLayoutAlign="center">{{ selectedParticipant.businessName }} Details</h2>
+          <h2 class="mat-h2" fxFlexFill fxLayoutAlign="center">{{ selectedParticipant.participantName }} Details</h2>
           <div fxLayout="row wrap" fxLayout.lt-md="column" fxLayoutGap="2%" class="m-b-20">
             <div fxFlex="49" class="p-2">
               <mat-card class="custom-card">
@@ -34,6 +34,13 @@
                           <span fxFlex="40%">JGP ID (National ID/Passport/Alien Number):</span>
                           <span fxFlex="60%">{{ selectedParticipant.jgpId }}</span>
                         </div>
+
+                        @if (selectedParticipant.businessName) {
+                        <div fxFlexFill>
+                          <span fxFlex="40%">Business Name:</span>
+                          <span fxFlex="60%">{{ selectedParticipant.businessName }}</span>
+                        </div>
+                        }
                 
                         <div fxFlexFill>
                           <span fxFlex="40%">Phone Number:</span>

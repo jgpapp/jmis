@@ -22,6 +22,9 @@ public class ParticipantMapper {
             if ( participant.getBusinessName() != null ) {
                 participantResponseDto.setBusinessName( participant.getBusinessName() );
             }
+            if ( participant.getParticipantName() != null ) {
+                participantResponseDto.setParticipantName( participant.getParticipantName() );
+            }
             if ( participant.getJgpId() != null ) {
                 participantResponseDto.setJgpId( participant.getJgpId() );
             }
