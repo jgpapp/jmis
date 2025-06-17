@@ -78,11 +78,11 @@ public class MentorshipWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(MentorShipConstants.OTHER_BUSINESS_CATEGORY_COL, rowHeader, "If other specify (Business Category)");
         writeString(MentorShipConstants.BUSINESS_SITUATION_COL, rowHeader, "Business Situation* (I attended the training but did not receive a loan, I received a loan but did not attend the training, I attended both the training and received a loan)");
         writeString(MentorShipConstants.BUSINESS_FINANCIER_COL, rowHeader, "Financier*(GBF/4G/PBP)");
-        writeString(MentorShipConstants.LOAN_MADE_HIRE_MORE_COL, rowHeader, "Has the loan contributed to the ability to hire new employees or expand the team?*(Yes/No)");
+        writeString(MentorShipConstants.LOAN_MADE_HIRE_MORE_COL, rowHeader, "Has the loan contributed to the ability to hire new employees or expand the team?(Yes/No)");
         writeString(MentorShipConstants.NEW_EMPLOYEES_18_35_COL, rowHeader, "If yes, please state the number of new employees hired (age between 18-35).");
-        writeString(MentorShipConstants.DID_TRAINING_CONTRIBUTE_TO_REVENUE_COL, rowHeader, "Has the technical training contributed to an increase in your business revenue?*(Yes/No)");
+        writeString(MentorShipConstants.DID_TRAINING_CONTRIBUTE_TO_REVENUE_COL, rowHeader, "Has the technical training contributed to an increase in your business revenue?(Yes/No)");
         writeString(MentorShipConstants.REVENUE_INCREASE_PERCENT_COL, rowHeader, "If yes, please estimate the percentage increase in revenue since the training.");
-        writeString(MentorShipConstants.USEFUL_TRAINING_TOPICS_COL, rowHeader, "Which training topics have been the most useful to you?* (Financial literacy/Record Keeping/Digital Skills/Market access/Artisan Development/Others)");
+        writeString(MentorShipConstants.USEFUL_TRAINING_TOPICS_COL, rowHeader, "Which training topics have been the most useful to you? (Financial literacy/Record Keeping/Digital Skills/Market access/Artisan Development/Others)");
         writeString(MentorShipConstants.OTHER_USEFUL_TRAINING_TOPICS_COL, rowHeader, "If others, specify (training topics)");
         writeString(MentorShipConstants.AREAS_NEEDING_SUPPORT, rowHeader, "Which areas require further clarification or additional support?(Financial literacy/Record Keeping/Digital Skills/Market access/Artisan Development/Others)");
         writeString(MentorShipConstants.OTHER_AREA_NEEDING_SUPPORT, rowHeader, "If other specify (areas of support)");
