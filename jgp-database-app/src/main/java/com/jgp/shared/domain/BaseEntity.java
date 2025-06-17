@@ -15,6 +15,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Objects;
 
 @Setter
@@ -40,12 +41,12 @@ public class BaseEntity implements Serializable {
 
     @PrePersist
     public void setDateCreated() {
-        this.dateCreated = LocalDate.now();
+        this.dateCreated = LocalDate.now(ZoneId.systemDefault());
     }
 
     @PreUpdate
     public void setLastModified() {
-        this.lastModified = LocalDate.now();
+        this.lastModified = LocalDate.now(ZoneId.systemDefault());
     }
 
     @Override

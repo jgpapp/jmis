@@ -19,17 +19,17 @@
 
                     <mat-form-field fxFlex="48%">
                         <mat-label>Participant Name</mat-label>
+                        <input matInput formControlName="participantName">
+                    </mat-form-field>
+
+                    <mat-form-field fxFlex="48%">
+                        <mat-label>Business Name</mat-label>
                         <input matInput formControlName="businessName">
                     </mat-form-field>
 
                     <mat-form-field fxFlex="48%">
                         <mat-label>JGP ID (National ID/Passport/Alien Number)</mat-label>
                         <input matInput formControlName="jgpId">
-                    </mat-form-field>
-
-                    <mat-form-field fxFlex="48%">
-                        <mat-label>Passport</mat-label>
-                        <input matInput formControlName="passport">
                     </mat-form-field>
 
                     <mat-form-field fxFlex="48%">
@@ -76,7 +76,7 @@
                     <mat-form-field appearance="fill" fxFlex="48%">
                         <mat-label>Business Segment</mat-label>
                         <mat-select formControlName="businessSegment">
-                            <mat-option value="MICRO">Micro (Less than 10 Employees)</mat-option>
+                            <mat-option value="Micro">Micro (Less than 10 Employees)</mat-option>
                             <mat-option value="SME">SME (10+ Employees)</mat-option>
                         </mat-select>
                       </mat-form-field>

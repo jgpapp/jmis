@@ -72,5 +72,9 @@ public record ParticipantDto(
 
         BigDecimal locationLongitude,
 
-        Boolean isEligible) {
+        Boolean isEligible,
+
+        String businessFinancier,
+
+        String disabilityType) {
 }

@@ -23,6 +23,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -107,12 +109,14 @@ public class UserServiceImpl implements UserService{
             );
         }
         final var currentUser = currentUser();
-        if (this.passwordEncoder.matches(userPassChangeDto.password(), currentUser.getPassword())){
-            currentUser.setPassword(this.passwordEncoder.encode(userPassChangeDto.newPass()));
-            currentUser.setForceChangePass(false);
-        }else {
+        if (this.passwordEncoder.matches(userPassChangeDto.newPass(), currentUser.getPassword())){
+            throw new DataRulesViolationException("New Password must not much the previous password!!");
+        }else if (!this.passwordEncoder.matches(userPassChangeDto.password(), currentUser.getPassword())){
             throw new DataRulesViolationException("Invalid current password!!");
         }
+        currentUser.setPassword(this.passwordEncoder.encode(userPassChangeDto.newPass()));
+        currentUser.setForceChangePass(false);
+        currentUser.setLastModified(LocalDate.now(ZoneId.systemDefault()));
         this.userRepository.save(currentUser);
     }
 

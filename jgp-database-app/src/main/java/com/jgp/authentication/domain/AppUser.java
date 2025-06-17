@@ -24,6 +24,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -126,6 +128,10 @@ public class AppUser extends BaseEntity implements PlatformUser {
         if(!StringUtils.equals(userDto.cellPhone(), this.cellPhone)){
             this.cellPhone = userDto.cellPhone();
         }
+    }
+
+    public boolean forceChangePassword(final Integer passwordLifeSpan) {
+        return this.forceChangePass || this.getLastModified().plusMonths(passwordLifeSpan).isBefore(LocalDate.now(ZoneId.systemDefault()));
     }
 
     public void changeUserStatus(boolean status){
