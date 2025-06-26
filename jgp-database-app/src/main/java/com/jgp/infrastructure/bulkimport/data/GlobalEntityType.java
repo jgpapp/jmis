@@ -14,7 +14,8 @@ public enum GlobalEntityType {
     LOAN_IMPORT_TEMPLATE(1, "Loans Template", "Lending Data"),
     TA_IMPORT_TEMPLATE(2, "TA Template", "Technical Assistance Data"),
     RESOURCES_IMPORT(3, "Resources Import", "Resources Import"),
-    MENTORSHIP_IMPORT_TEMPLATE(4, "Mentorship Import", "Mentorship Import");
+    MENTORSHIP_IMPORT_TEMPLATE(4, "Mentorship Import", "Mentorship Import"),
+    MONITORING_IMPORT_TEMPLATE(5, "Monitoring Import", "Monitoring Import");
 
     private final Integer value;
     private final String code;

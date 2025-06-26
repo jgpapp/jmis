@@ -1,0 +1,263 @@
+package com.jgp.monitoring.domain;
+
+import com.jgp.participant.domain.Participant;
+import com.jgp.shared.domain.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+@Setter
+@Getter
+@Entity
+@Table(name = "outcome_monitoring")
+public class OutComeMonitoring extends BaseEntity {
+
+    @Column(name = "survey_date")
+    private LocalDate surveyDate;
+
+    @Column(name = "survey_language")
+    private String surveyLanguage;
+
+    @Column(name = "consented")
+    private Boolean consented;
+
+    @Column(name = "location_latitude")
+    private BigDecimal locationLatitude;
+
+    @Column(name = "location_longitude")
+    private BigDecimal locationLongitude;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "participant_id")
+    private Participant participant;
+
+    @Column(name = "age")
+    private Integer age;
+
+    @Column(name = "gender_category")
+    private String genderCategory;
+
+    @Column(name = "segment")
+    private String segment;
+
+    @Column(name = "partner")
+    private String partner;
+
+    @Column(name = "gender")
+    private String gender;
+
+    @Column(name = "region")
+    private String region;
+
+    @Column(name = "county_code")
+    private String countyCode;
+
+    @Column(name = "county_name")
+    private String countyName;
+
+    @Column(name = "business_setting")
+    private String businessSetting;
+
+    @Column(name = "business_age_category")
+    private String businessAgeCategory;
+
+    @Column(name = "group_membership")
+    private String groupMembership;
+
+    @Column(name = "education_level")
+    private String educationLevel;
+
+    @Column(name = "business_age")
+    private Integer businessAge;
+
+    @Column(name = "regular_employees")
+    private Integer regularEmployees;
+
+    @Column(name = "casual_employees")
+    private Integer casualEmployees;
+
+    @Column(name = "household_income_change")
+    private String householdIncomeChange;
+
+    @Column(name = "financial_stability")
+    private String financialStability;
+
+    @Column(name = "quality_of_life")
+    private String qualityOfLife;
+
+    @Column(name = "empowerment")
+    private String empowerment;
+
+    @Column(name = "voice_in_community")
+    private String voiceInCommunity;
+
+    @Column(name = "respect_in_community")
+    private String respectInCommunity;
+
+    @Column(name = "reliable_income")
+    private String reliableIncome;
+
+    @Column(name = "reputable_work")
+    private String reputableWork;
+
+    @Column(name = "sense_of_purpose")
+    private String senseOfPurpose;
+
+    @Column(name = "business_sector_growth")
+    private String businessSectorGrowth;
+
+    @Column(name = "community_growth")
+    private String communityGrowth;
+
+    @Column(name = "work_opportunities")
+    private String workOpportunities;
+
+    @Column(name = "income_regularity")
+    private String incomeRegularity;
+
+    @Column(name = "income_sufficiency")
+    private String incomeSufficiency;
+
+    @Column(name = "income_predictability")
+    private String incomePredictability;
+
+    @Column(name = "financial_security")
+    private String financialSecurity;
+
+    @Column(name = "community_groups")
+    private String communityGroups;
+
+    @Column(name = "leadership_role")
+    private String leadershipRole;
+
+    @Column(name = "decision_making_confidence")
+    private String decisionMakingConfidence;
+
+    @Column(name = "community_change")
+    private String communityChange;
+
+    @Column(name = "community_issues")
+    private String communityIssues;
+
+    @Column(name = "satisfaction_education")
+    private String satisfactionEducation;
+
+    @Column(name = "satisfaction_relationships")
+    private String satisfactionRelationships;
+
+    @Column(name = "satisfaction_business_type")
+    private String satisfactionBusinessType;
+
+    @Column(name = "satisfaction_income")
+    private String satisfactionIncome;
+
+    @Column(name = "satisfaction_housing")
+    private String satisfactionHousing;
+
+    @Column(name = "satisfaction_healthcare")
+    private String satisfactionHealthcare;
+
+    @Column(name = "satisfaction_water")
+    private String satisfactionWater;
+
+    @Column(name = "satisfaction_food")
+    private String satisfactionFood;
+
+    @Column(name = "satisfaction_nutrition")
+    private String satisfactionNutrition;
+
+    @Column(name = "satisfaction_life")
+    private String satisfactionLife;
+
+    @Column(name = "satisfaction_information")
+    private String satisfactionInformation;
+
+    @Column(name = "satisfaction_leisure")
+    private String satisfactionLeisure;
+
+    @Column(name = "jgp_interventions")
+    private String jgpInterventions;
+
+    @Column(name = "technical_training")
+    private String technicalTraining;
+
+    @Column(name = "new_practices")
+    private String newPractices;
+
+    @Column(name = "improved_practices")
+    private String improvedPractices;
+
+    @Column(name = "training_improvements")
+    private String trainingImprovements;
+
+    @Column(name = "business_changes")
+    private String businessChanges;
+
+    @Column(name = "profitability_growth")
+    private String profitabilityGrowth;
+
+    @Column(name = "revenue_change")
+    private BigDecimal revenueChange;
+
+    @Column(name = "loan_application")
+    private String loanApplication;
+
+    @Column(name = "number_of_loans")
+    private Integer numberOfLoans;
+
+    @Column(name = "loan_platform")
+    private String loanPlatform;
+
+    @Column(name = "external_financing")
+    private String externalFinancing;
+
+    @Column(name = "financing_sources")
+    private String financingSources;
+
+    @Column(name = "jgp_impact")
+    private String jgpImpact;
+
+    @Column(name = "changes_without_jgp")
+    private String changesWithoutJgp;
+
+    @Column(name = "market_access")
+    private String marketAccess;
+
+    @Column(name = "business_opportunities")
+    private String businessOpportunities;
+
+    @Column(name = "market_challenges")
+    private String marketChallenges;
+
+    private transient Integer rowIndex;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        OutComeMonitoring outComeMonitoring = (OutComeMonitoring) o;
+
+        return new EqualsBuilder()
+                .appendSuper(super.equals(o)).append(getId(), outComeMonitoring.getId())
+                .append(getParticipant(), outComeMonitoring.getParticipant())
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .appendSuper(super.hashCode()).append(getId()).append(getParticipant()).toHashCode();
+    }
+}

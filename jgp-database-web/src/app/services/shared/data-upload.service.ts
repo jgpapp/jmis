@@ -26,7 +26,9 @@ export class DataUploadService {
             templateEntityType = 'LOAN_IMPORT_TEMPLATE';
         }else if(templateName.toUpperCase().includes('MENTORSHIP_IMPORT_TEMPLATE')){
           templateEntityType = 'MENTORSHIP_IMPORT_TEMPLATE';
-      }
+        }else if(templateName.toUpperCase().includes('MONITORING_IMPORT_TEMPLATE')){
+            templateEntityType = 'MONITORING_IMPORT_TEMPLATE';
+        }
         return this.httpClient.post(`/imports/upload-template/${templateEntityType}/${uploadProgressID}/${updateParticipantInfo}`, formData);
       }
 
@@ -44,7 +46,9 @@ export class DataUploadService {
             templateEntityType = 'LOAN_IMPORT_TEMPLATE';
         } else if(templateName.toUpperCase().includes('MENTORSHIP_IMPORT_TEMPLATE')){
             templateEntityType = 'MENTORSHIP_IMPORT_TEMPLATE';
-        }   else {
+        } else if(templateName.toUpperCase().includes('MONITORING_IMPORT_TEMPLATE')){
+            templateEntityType = 'MONITORING_IMPORT_TEMPLATE';
+        }  else {
           return of();
         }
         
