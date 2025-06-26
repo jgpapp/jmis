@@ -10,6 +10,7 @@ import com.jgp.infrastructure.bulkimport.event.DataUploadedEvent;
 import com.jgp.infrastructure.bulkimport.importhandler.ImportHandler;
 import com.jgp.infrastructure.bulkimport.importhandler.LoanImportHandler;
 import com.jgp.infrastructure.bulkimport.importhandler.MentorshipImportHandler;
+import com.jgp.infrastructure.bulkimport.importhandler.MonitoringImportHandler;
 import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
 import com.jgp.infrastructure.documentmanagement.command.DocumentCommand;
 import com.jgp.infrastructure.documentmanagement.domain.Document;
@@ -59,6 +60,7 @@ public class BulkImportEventListener {
             case GlobalEntityType.TA_IMPORT_TEMPLATE -> this.applicationContext.getBean("BMOImportHandler", ImportHandler.class);
             case GlobalEntityType.LOAN_IMPORT_TEMPLATE -> this.applicationContext.getBean("loanImportHandler", LoanImportHandler.class);
             case GlobalEntityType.MENTORSHIP_IMPORT_TEMPLATE -> this.applicationContext.getBean("mentorshipImportHandler", MentorshipImportHandler.class);
+            case GlobalEntityType.MONITORING_IMPORT_TEMPLATE -> this.applicationContext.getBean("monitoringImportHandler", MonitoringImportHandler.class);
             default -> throw new IllegalArgumentException("Unable to find requested resource");
         };
 

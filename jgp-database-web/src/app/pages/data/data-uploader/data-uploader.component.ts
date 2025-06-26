@@ -176,6 +176,8 @@ export class DataUploaderComponent implements OnDestroy {
         this.legalFormType = 'TA_IMPORT_TEMPLATE';
       }else if (this.template.name.toUpperCase().includes('MENTORSHIP_IMPORT_TEMPLATE')) {
         this.legalFormType = 'MENTORSHIP_IMPORT_TEMPLATE';
+      }else if (this.template.name.toUpperCase().includes('MONITORING_IMPORT_TEMPLATE')) {
+        this.legalFormType = 'MONITORING_IMPORT_TEMPLATE';
       }
     }
   }
