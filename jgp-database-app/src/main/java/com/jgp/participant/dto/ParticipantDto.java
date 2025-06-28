@@ -19,6 +19,8 @@ public record ParticipantDto(
 
         String phoneNumber,
 
+        String alternativePhoneNumber,
+
         @NotNull(message = "Gender is required !!")
         String ownerGender,
 

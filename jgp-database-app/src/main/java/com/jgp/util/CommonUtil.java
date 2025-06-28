@@ -181,6 +181,22 @@ public abstract class CommonUtil {
         return strLength < min || strLength > max;
     }
 
+    public static String sanitizeString(String input) {
+        if (input == null) {
+            return null;
+        }
+        // Step 1: Trim leading and trailing whitespace
+        var trimmedString = input.trim();
+
+        // Step 2: Replace any non-alphabet characters with a single space
+        // Using regex: [^a-zA-Z] matches any character that is NOT an alphabet (uppercase or lowercase)
+        var nonAlphabetsReplaced = trimmedString.replaceAll("[^a-zA-Z]", " ");
+
+        // Step 3: Replace all sequences of spaces with a single space
+        // Using regex: \\s+ matches one or more whitespace characters
+        return nonAlphabetsReplaced.replaceAll("\\s+", " ");
+    }
+
     public static boolean stringDoesNotContainOnlyDigits(String input) {
         return !Pattern.compile(".*\\d.*")
                 .matcher(input)
@@ -191,22 +207,4 @@ public abstract class CommonUtil {
         return null != value ? value : "Other";
     }
 
-    public static BigDecimal getPercentage(BigDecimal value, BigDecimal total){
-        if (value.compareTo(BigDecimal.ZERO) <= 0 || total.compareTo(BigDecimal.ZERO) <= 0){
-            return BigDecimal.ZERO;
-        }
-        return (value.divide(total, 2, RoundingMode.HALF_UP)).multiply(BigDecimal.valueOf(100));
-    }
-
-    public static Optional<String> getFileExtension(MultipartFile file) {
-        if (file == null || file.getOriginalFilename() == null || file.getOriginalFilename().isEmpty()) {
-            return Optional.empty();
-        }
-        String originalFilename = file.getOriginalFilename();
-        int dotIndex = originalFilename.lastIndexOf('.');
-        if (dotIndex == -1 || dotIndex == originalFilename.length() - 1) {
-            return Optional.empty(); // No extension or ends with a dot
-        }
-        return Optional.of(originalFilename.substring(dotIndex + 1));
-    }
 }

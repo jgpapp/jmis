@@ -35,6 +35,7 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         worksheet.setColumnWidth(BMOConstants.TRAINING_PARTNER, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.JGP_ID_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.BUSINESS_PHONE_NUMBER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(BMOConstants.BUSINESS_ALTERNATIVE_PHONE_NUMBER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.GENDER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.AGE_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.BUSINESS_LOCATION_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
@@ -64,6 +65,7 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(BMOConstants.TRAINING_PARTNER, rowHeader, "Training Partner*");
         writeString(BMOConstants.JGP_ID_COL, rowHeader, "JGP ID (National ID/Passport/Alien Number)*");
         writeString(BMOConstants.BUSINESS_PHONE_NUMBER_COL, rowHeader, "Business phone number");
+        writeString(BMOConstants.BUSINESS_ALTERNATIVE_PHONE_NUMBER_COL, rowHeader, "Alternative phone number");
         writeString(BMOConstants.GENDER_COL, rowHeader, "Gender of owner* (Male/Female/Intersex)");
         writeString(BMOConstants.AGE_COL, rowHeader, "Age of owner (full years)*");
         writeString(BMOConstants.BUSINESS_LOCATION_COL, rowHeader, "Business Location (County)*");
