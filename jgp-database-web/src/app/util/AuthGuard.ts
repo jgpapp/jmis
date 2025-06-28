@@ -13,11 +13,13 @@ export const AuthGuard: CanActivateFn = (
     | UrlTree=> {
     
       const router = inject(Router);
+      const authService = inject(AuthService);
 
-      return inject(AuthService).isLoggedIn.pipe(
+      return authService.isLoggedIn.pipe(
       take(1),
       map((isLoggedIn: boolean) => {
         if (!isLoggedIn) {
+          authService.redirectUrl = state.url;
           router.navigate(['/login']);
           return false;
         }
