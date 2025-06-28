@@ -25,6 +25,7 @@ export class AuthService {
   FORCE_PASS_CHANGE: string = 'force_change_password';
   jwtService: JwtHelperService = new JwtHelperService();
   private loggedIn = new BehaviorSubject<boolean>(this.hasTokens());
+  redirectUrl: string | null = null;
 
   constructor(private httpClient: HttpClient, private router: Router) { }
 
@@ -37,7 +38,8 @@ export class AuthService {
       tap(response => {
         this.storeUserDetails(response.accessToken, response.refreshToken);
         this.loggedIn.next(true);
-        this.userRedirection();
+        this.userRedirection(this.redirectUrl || '/');
+        this.redirectUrl = null; // Reset redirect URL after successful login
       }),
       catchError(error => {
         console.error('Login failed:', error);
@@ -115,9 +117,9 @@ export class AuthService {
     return (this.decodeAuthToken()['roles'] as Array<string>).includes('Admin');
   }
 
-  userRedirection(): void {
+  userRedirection(redirectUrl: string | undefined = undefined): void {
     if(this.hasTokens()){
-      this.router.navigateByUrl('/');
+      this.router.navigateByUrl(redirectUrl || '/');
     }else {
       this.router.navigateByUrl('/login');
     }

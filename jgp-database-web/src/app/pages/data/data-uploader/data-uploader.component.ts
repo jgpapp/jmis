@@ -170,13 +170,13 @@ export class DataUploaderComponent implements OnDestroy {
       this.template = $event.target.files[0];
       this.uploadProgressID = null; // to reset progress bar
       this.progress = null; // to reset progress bar
-      if (this.template.name.toUpperCase().includes('LOAN_IMPORT_TEMPLATE')) {
+      if (this.template.name.toUpperCase().includes('LOAN_IMPORT_TEMPLATE') && this.authService.hasPermission('LOAN_UPLOAD')) {
         this.legalFormType = 'LOAN_IMPORT_TEMPLATE';
-      } else if (this.template.name.toUpperCase().includes('TA_IMPORT_TEMPLATE')) {
+      } else if (this.template.name.toUpperCase().includes('TA_IMPORT_TEMPLATE') && this.authService.hasPermission('BMO_PARTICIPANTS_DATA_UPLOAD')) {
         this.legalFormType = 'TA_IMPORT_TEMPLATE';
-      }else if (this.template.name.toUpperCase().includes('MENTORSHIP_IMPORT_TEMPLATE')) {
+      }else if (this.template.name.toUpperCase().includes('MENTORSHIP_IMPORT_TEMPLATE') && this.authService.hasPermission('MENTOR_SHIP_UPLOAD')) {
         this.legalFormType = 'MENTORSHIP_IMPORT_TEMPLATE';
-      }else if (this.template.name.toUpperCase().includes('MONITORING_IMPORT_TEMPLATE')) {
+      }else if (this.template.name.toUpperCase().includes('MONITORING_IMPORT_TEMPLATE') && this.authService.hasPermission('MONITORING_OUTCOME_UPLOAD')) {
         this.legalFormType = 'MONITORING_IMPORT_TEMPLATE';
       }
     }
@@ -198,6 +198,8 @@ export class DataUploaderComponent implements OnDestroy {
           this.getAvailableDocuments();
         }
       });
+    }else {
+      this.gs.openSnackBar('Invalid Template or You have no required permissions!!', "Dismiss");
     }
   }
   }
@@ -254,7 +256,7 @@ export class DataUploaderComponent implements OnDestroy {
       }
 
   get uploadButtonIsDisabled(): boolean {
-    return !this.template || !this.isExcelFile(this.template) || !this.authService.currentUser()?.partnerId || !this.legalFormType || this.uploadProgressID !== null;
+    return !this.template || !this.isExcelFile(this.template) || !this.authService.currentUser()?.partnerId || this.uploadProgressID !== null;
   }
 
   get progressText(): string {

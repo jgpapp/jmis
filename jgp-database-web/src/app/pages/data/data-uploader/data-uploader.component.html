@@ -21,13 +21,17 @@
                     <mat-form-field fxFlex>
                       <mat-label>Legal Form</mat-label>
                       <mat-select required formControlName="legalForm">
-                        @if (partnerType === 'TA' || partnerType === 'FI_TA') {
+                        @if(authService.hasPermission('BMO_PARTICIPANTS_DATA_UPLOAD')){
                           <mat-option value="TA_IMPORT_TEMPLATE">TA Data Template</mat-option>
-                      }@if (partnerType === 'FI' || partnerType === 'FI_TA') {
+                      }@if (authService.hasPermission('LOAN_UPLOAD')) {
                         <mat-option value="LOAN_IMPORT_TEMPLATE">Loan Template</mat-option>
                       }
-                      <mat-option value="MENTORSHIP_IMPORT_TEMPLATE">Mentorship Template</mat-option>
-                      <mat-option value="MONITORING_IMPORT_TEMPLATE">Monitoring Template</mat-option>
+                      @if (authService.hasPermission('MENTOR_SHIP_UPLOAD')) {
+                        <mat-option value="MENTORSHIP_IMPORT_TEMPLATE">Mentorship Template</mat-option>
+                      }
+                      @if (authService.hasPermission('MONITORING_OUTCOME_UPLOAD')) {
+                        <mat-option value="MONITORING_IMPORT_TEMPLATE">Monitoring Template</mat-option>
+                      }
                       </mat-select>
                     </mat-form-field>
                   </div>
@@ -89,13 +93,17 @@
         <mat-form-field fxFlex>
           <mat-label>Select Import Types </mat-label>
           <mat-select formControlName="selectedEntityType" (selectionChange)="filterEntityTypeChanged()">
-            @if (partnerType === 'TA' || partnerType === 'FI_TA') {
+          @if(authService.hasPermission('BMO_PARTICIPANTS_DATA_VIEW')){
               <mat-option value="TA_IMPORT_TEMPLATE">TA Data Imports</mat-option>
-          }@if (partnerType === 'FI' || partnerType === 'FI_TA') {
+          }@if (authService.hasPermission('LOAN_READ')) {
             <mat-option value="LOAN_IMPORT_TEMPLATE">Loan Data Imports</mat-option>
           }
-          <mat-option value="MENTORSHIP_IMPORT_TEMPLATE">Mentorship Data Imports</mat-option>
-          <mat-option value="MONITORING_IMPORT_TEMPLATE">Monitoring Data Imports</mat-option>
+          @if (authService.hasPermission('MENTOR_SHIP_READ')) {
+              <mat-option value="MENTORSHIP_IMPORT_TEMPLATE">Mentorship Data Imports</mat-option>
+          }
+          @if (authService.hasPermission('MONITORING_OUTCOME_READ')) {
+            <mat-option value="MONITORING_IMPORT_TEMPLATE">Monitoring Data Imports</mat-option>
+          }
           </mat-select>
         </mat-form-field>
       </form>

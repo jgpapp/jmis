@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { PagesComponent } from './pages.component';
 import { AuthGuard } from '../util/AuthGuard';
-import { userRoleResolver } from '../resolvers/user-role.resolver';
 
 export const routes: Routes = [
   {
