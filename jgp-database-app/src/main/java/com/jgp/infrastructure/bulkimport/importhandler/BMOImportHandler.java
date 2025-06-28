@@ -154,6 +154,7 @@ public class BMOImportHandler implements ImportHandler {
         final var participantName = ImportHandlerUtils.readAsString(BMOConstants.PARTICIPANT_NAME_COL, row);
         final var jgpId = ImportHandlerUtils.readAsString(BMOConstants.JGP_ID_COL, row);
         final var phoneNumber = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_PHONE_NUMBER_COL, row);
+        final var alternativePhoneNumber = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_ALTERNATIVE_PHONE_NUMBER_COL, row);
         var gender = ImportHandlerUtils.readAsString(BMOConstants.GENDER_COL, row);
         gender = ParticipantValidator.validateGender(gender, row, rowErrorMap);
         var age = DataValidator.validateTemplateIntegerValue(BMOConstants.AGE_COL, row, rowErrorMap);
@@ -183,7 +184,7 @@ public class BMOImportHandler implements ImportHandler {
         ParticipantValidator.validateRefugeeStatus(refugeeStatus, row, rowErrorMap);
 
         return ParticipantDto.builder()
-                .phoneNumber(phoneNumber).bestMonthlyRevenue(bestMonthlyRevenue)
+                .phoneNumber(phoneNumber).alternativePhoneNumber(alternativePhoneNumber).bestMonthlyRevenue(bestMonthlyRevenue)
                 .businessLocation(businessLocation).participantName(participantName)
                 .ownerGender(gender).ownerAge(age).industrySector(industrySector).businessSegment(businessSegment)
                 .worstMonthlyRevenue(worstMonthlyRevenue).totalRegularEmployees(totalRegularEmployees)

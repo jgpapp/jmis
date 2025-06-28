@@ -23,6 +23,8 @@ public class ParticipantResponseDto implements Serializable {
 
     private String phoneNumber;
 
+    private String alternativePhoneNumber;
+
     private String ownerGender;
 
     private Integer ownerAge;

@@ -124,10 +124,10 @@ public class LoanImportHandler implements ImportHandler {
         var loanerType = ImportHandlerUtils.readAsString(LoanConstants.LOANER_TYPE_COL, row);
         loanerType = LoanValidator.validateLoanerType(loanerType, row, rowErrorMap);
         var loanProduct = ImportHandlerUtils.readAsString(LoanConstants.LOAN_PRODUCT_COL, row);
-        loanProduct = LoanValidator.validateLoanProduct(loanProduct, row, rowErrorMap);
-        var loanNumber = ImportHandlerUtils.readAsString(LoanConstants.LOAN_IDENTIFIER_COL, row);
-        if (null == rowErrorMap.get(row) && null == loanNumber && tranchAmount.compareTo(BigDecimal.ZERO) > 0){
-            rowErrorMap.put(row, "Loan Identifier is required If Tranch Amount Is Provided!!");
+        loanProduct = LoanValidator.validateAndNormalizeLoanProduct(loanProduct, row, rowErrorMap);
+        var loanIdentifier = ImportHandlerUtils.readAsString(LoanConstants.LOAN_IDENTIFIER_COL, row);
+        if (null == rowErrorMap.get(row) && null == loanIdentifier){
+            rowErrorMap.put(row, "Loan Identifier is required !!");
         }
 
         statuses.add(status);
@@ -139,8 +139,6 @@ public class LoanImportHandler implements ImportHandler {
             existingParticipant = this.participantService.findOneParticipantByJGPID(jgpId);
         }
 
-        final var now = LocalDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_DATE_TIME);
-        final  var loanIdentifier = Objects.requireNonNullElseGet(loanNumber, () -> jgpId != null ? "LOAN_".concat(jgpId).concat(now) : "LOAN_".concat(now));
         var loanData = new Loan(Objects.nonNull(userService.currentUser()) ? userService.currentUser().getPartner() : null,
                 null, loanIdentifier, pipeLineSource, loanQualityEnum, Loan.LoanStatus.APPROVED, applicationDate, dateDisbursed, loanAmount,
                 loanDuration, outStandingAmount, LocalDate.now(ZoneId.systemDefault()), null, recordedToJGPDBOnDate,
