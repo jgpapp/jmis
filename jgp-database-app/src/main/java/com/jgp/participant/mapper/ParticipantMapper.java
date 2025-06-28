@@ -76,6 +76,9 @@ public class ParticipantMapper {
             if ( participant.getRefugeeStatus() != null ) {
                 participantResponseDto.setRefugeeStatus( participant.getRefugeeStatus() );
             }
+            if ( participant.getAlternativePhoneNumber() != null ) {
+                participantResponseDto.setAlternativePhoneNumber( participant.getAlternativePhoneNumber() );
+            }
             participantResponseDto.setSavings( null != participant.getPrePayment() ? CommonUtil.NUMBER_FORMAT.format(participant.getPrePayment()) : "0.00");
             participantResponseDto.setOwnerGender( null != participant.getOwnerGender() ? participant.getOwnerGender().getName() : null );
         }

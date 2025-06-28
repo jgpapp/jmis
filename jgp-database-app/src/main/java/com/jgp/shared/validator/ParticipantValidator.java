@@ -93,11 +93,11 @@ public class ParticipantValidator {
         }
 
         if (null == rowErrorMap.get(row)){
-            if (CommonUtil.isStringValueLengthNotValid(participantDto.jgpId(), 5, 10)){
-                rowErrorMap.put(row, "JGP ID must be 5-10 characters !!");
+            if (CommonUtil.isStringValueLengthNotValid(participantDto.jgpId(), 5, 11)){
+                rowErrorMap.put(row, "JGP ID must be 5-11 characters !!");
             }
-            if (null == rowErrorMap.get(row) && CommonUtil.isStringValueLengthNotValid(participantDto.phoneNumber(), 9, 12)){
-                rowErrorMap.put(row, "Phone number must be 9-12 digits !!");
+            if (null == rowErrorMap.get(row) && CommonUtil.isStringValueLengthNotValid(participantDto.phoneNumber(), 12, 12)){
+                rowErrorMap.put(row, "Phone number must be 12 digits !!");
             }
         }
     }

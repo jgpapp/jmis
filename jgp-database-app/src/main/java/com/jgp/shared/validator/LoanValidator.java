@@ -1,11 +1,13 @@
 package com.jgp.shared.validator;
 
 import com.jgp.finance.domain.Loan;
+import com.jgp.util.CommonUtil;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.WordUtils;
 import org.apache.poi.ss.usermodel.Row;
 
 import java.math.BigDecimal;
@@ -48,36 +50,36 @@ public class LoanValidator {
     }
 
     public static String validateLoanQuality(String value, Row row, Map<Row, String> rowErrorMap) {
-        final var loanQualities = Set.of("NORMAL", "WATCH", "SUBSTANDARD", "DOUBTFUL", "LOSS");
-        var modifiedValue = null == value ? null : value.replaceAll("[^a-zA-Z]+", "").toUpperCase().trim();
+        final var loanQualities = Set.of("normal", "watch", "substandard", "doubtful", "loss");
+        var modifiedValue = null == value ? null : CommonUtil.sanitizeString(value).toLowerCase();
         if (null == rowErrorMap.get(row) && null != modifiedValue && !loanQualities.contains(modifiedValue)){
             rowErrorMap.put(row, "Invalid Value for Loan quality (Must be Normal/Watch/Substandard/Doubtful/Loss) !!");
         }else {
-            return null != modifiedValue ? StringUtils.capitalize(modifiedValue.toLowerCase(Locale.ROOT)) : null;
+            return null != modifiedValue ? StringUtils.capitalize(modifiedValue) : null;
         }
         return null;
     }
 
-    public static String validateLoanProduct(String value, Row row, Map<Row, String> rowErrorMap) {
-        final var loanProducts = Set.of("WORKING CAPITAL", "ASSET FINANCE", "STAHIMILI", "PURCHASE ORDER", "CONSIGNMENT FINANCE", "SHARIAH COMPLIANT");
-        var modifiedValue = null == value ? null : value.replaceAll("[^a-zA-Z ]+", "").replaceAll("\\s+", " ").toUpperCase().trim();
+    public static String validateAndNormalizeLoanProduct(String value, Row row, Map<Row, String> rowErrorMap) {
+        final var loanProducts = Set.of("working capital", "asset finance", "stahimili", "purchase order", "consignment finance", "shariah compliant");
+        var modifiedValue = (null == value) ? null : CommonUtil.sanitizeString(value).toLowerCase();
         if (null == rowErrorMap.get(row) && null != modifiedValue && !loanProducts.contains(modifiedValue)){
-            rowErrorMap.put(row, "Invalid Value for Loan quality (Must be Working Capital/Asset Finance/Stahimili/Purchase Order/Consignment Finance/Shariah Compliant) !!");
+            rowErrorMap.put(row, "Invalid Value for Loan Product (Must be Working Capital/Asset Finance/Stahimili/Purchase Order/Consignment Finance/Shariah Compliant) !!");
         }else {
-            return null != modifiedValue ? StringUtils.capitalize(modifiedValue.toLowerCase(Locale.ROOT)) : null;
+            return null != modifiedValue ? WordUtils.capitalizeFully(modifiedValue) : null;
         }
         return null;
     }
 
     public static String validateLoanerType(String value, Row row, Map<Row, String> rowErrorMap) {
-        final var loanProducts = Set.of("NEW", "REPEAT");
-        var modifiedValue = null == value ? null : value.replaceAll("[^a-zA-Z]+", "").replaceAll("\\s+", "").toUpperCase().trim();
+        final var loanProducts = Set.of("new", "repeat");
+        var modifiedValue = null == value ? null : CommonUtil.sanitizeString(value).toLowerCase();
         if (null == rowErrorMap.get(row) && null == modifiedValue){
             rowErrorMap.put(row, "Invalid Value for Loaner Type (Must be New/Repeat) !!");
         }
         if (null == rowErrorMap.get(row) && null != modifiedValue && !loanProducts.contains(modifiedValue)){
             rowErrorMap.put(row, "Invalid Value for Loaner Type (Must be New/Repeat) !!");
         }
-        return null != modifiedValue ? StringUtils.capitalize(modifiedValue.toLowerCase(Locale.ROOT)) : null;
+        return null != modifiedValue ? StringUtils.capitalize(modifiedValue) : null;
     }
 }

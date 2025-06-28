@@ -34,6 +34,9 @@ public class Participant extends BaseEntity {
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @Column(name = "alternative_phone_number")
+    private String alternativePhoneNumber;
+
     @Column(name = "owner_gender")
     @Enumerated(EnumType.STRING)
     private Gender ownerGender;
@@ -117,6 +120,7 @@ public class Participant extends BaseEntity {
         this.businessName = dto.businessName();
         this.jgpId = dto.jgpId();
         this.phoneNumber = dto.phoneNumber();
+        this.alternativePhoneNumber = dto.alternativePhoneNumber();
         this.ownerGender = translateGender(dto.ownerGender());
         this.ownerAge = dto.ownerAge();
         this.businessLocation = dto.businessLocation();
@@ -153,6 +157,9 @@ public class Participant extends BaseEntity {
         }
         if (StringUtils.isNotBlank(dto.phoneNumber())){
             this.phoneNumber = dto.phoneNumber().trim();
+        }
+        if (StringUtils.isNotBlank(dto.alternativePhoneNumber())){
+            this.alternativePhoneNumber = dto.alternativePhoneNumber().trim();
         }
         if (StringUtils.isNotBlank(dto.ownerGender())){
             this.ownerGender = translateGender(dto.ownerGender().trim());
