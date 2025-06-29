@@ -3,8 +3,6 @@ package com.jgp.bmo.api;
 import com.jgp.bmo.dto.BMOClientDto;
 import com.jgp.bmo.dto.BMOParticipantSearchCriteria;
 import com.jgp.bmo.service.BMOClientDataService;
-import com.jgp.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
-import com.jgp.infrastructure.bulkimport.service.BulkImportWorkbookService;
 import com.jgp.shared.dto.ApiResponseDto;
 import com.jgp.util.CommonUtil;
 import lombok.RequiredArgsConstructor;

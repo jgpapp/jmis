@@ -1,1 +1,0 @@
-ALTER TABLE participants ADD COLUMN alternative_phone_number VARCHAR(50) DEFAULT NULL;

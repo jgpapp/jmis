@@ -39,6 +39,7 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit, OnChanges{
   @Input('partnerId') partnerId: number;
   @Input({required: true, alias: 'fieldFlex'}) fieldFlex: number;
   @Input({required: true, alias: 'resetDashBoardFilters'}) resetDashBoardFilters: boolean;
+  @Input({required: true, alias: 'isMonitoringDashBoard'}) isMonitoringDashBoard: boolean;
   public disableToDate: boolean = true;
   maxDate: Date = new Date();
   toDateMinValue = new Date();
@@ -59,7 +60,12 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit, OnChanges{
       selectedTrainingPartner: [null],
       selectedCountyCode: [null],
       selectedDateFrom: [null],
-      selectedDateTo: [null]
+      selectedDateTo: [null],
+      partnerName: [null],
+      ageGroup: [null],
+      gender: [null],
+      jgpIntervention: [null],
+      region: [null]
       });
   }
 
@@ -70,7 +76,12 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit, OnChanges{
         selectedTrainingPartner: [null],
         selectedCountyCode: [null],
         selectedDateFrom: [null],
-        selectedDateTo: [null]
+        selectedDateTo: [null],
+        partnerName: [null],
+        ageGroup: [null],
+        gender: [null],
+        jgpIntervention: [null],
+        region: [null]
         });
     }
   }

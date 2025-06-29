@@ -141,6 +141,10 @@ export class DashboardService {
       return this.httpClient.get(`/reports/performance-summary${this.getPerformanceSummaryQueryParams(year, partnerId)}`);
     }
 
+    getOutcomeMonitoringSummary(dashBoardFilters: any = undefined, summarizingColumn: any = undefined): Observable<any> {
+      return this.httpClient.get(`/reports/outcome-monitoring-summary?${this.getDashBoardQueryParams(dashBoardFilters, summarizingColumn)}`);
+    }
+
     getKenyanCounties(): Observable<any> {
       return this.httpClient.get(`/reports/kenyan-counties`);
     }
@@ -163,7 +167,7 @@ export class DashboardService {
     }
 
 
-    getDashBoardQueryParams(dashBoardFilters: any): string {
+    getDashBoardQueryParams(dashBoardFilters: any, summarizingColumn: any = undefined): string {
       let queryParam = ``
       if(!dashBoardFilters){
         return queryParam;
@@ -181,6 +185,25 @@ export class DashboardService {
       }
       if(dashBoardFilters.selectedTrainingPartner){
         queryParam = `${queryParam}&training-partner=${dashBoardFilters.selectedTrainingPartner}`
+      }
+
+      if(dashBoardFilters.partnerName){
+        queryParam = `${queryParam}&partner=${dashBoardFilters.partnerName}`
+      }
+      if(dashBoardFilters.ageGroup){
+        queryParam = `${queryParam}&age-group=${dashBoardFilters.ageGroup}`
+      }
+      if(dashBoardFilters.gender){
+        queryParam = `${queryParam}&gender=${dashBoardFilters.gender}`
+      }
+      if(dashBoardFilters.jgpIntervention){
+        queryParam = `${queryParam}&jgp-intervention=${dashBoardFilters.jgpIntervention}`
+      }
+      if(dashBoardFilters.region){
+        queryParam = `${queryParam}&region=${dashBoardFilters.region}`
+      }
+      if(summarizingColumn){
+        queryParam = `${queryParam}&summarizing-column=${summarizingColumn}`
       }
       return queryParam;
     }

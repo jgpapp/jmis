@@ -13,8 +13,6 @@ public interface LoanService {
 
     void createOrUpdateLoan(Loan loan);
 
-    void approvedParticipantsLoansData(List<Long> dataIds, Boolean approval);
-
     void approvedTransactionsLoans(List<Long> transactionsIds, Boolean approval);
 
     Page<LoanDto> getLoans(LoanSearchCriteria searchCriteria, Pageable pageable);

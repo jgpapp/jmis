@@ -1,14 +1,12 @@
 package com.jgp.util;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.multipart.MultipartFile;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -205,6 +203,20 @@ public abstract class CommonUtil {
 
     public static String defaultToOtherIfStringIsNull(String value){
         return null != value ? value : "Other";
+    }
+
+    public static Pair<Integer, Integer> getAgeRangeFromAgeGroup(String ageGroup) {
+        if (null == ageGroup) {
+            return Pair.of(0, 0);
+        } else if ("18-24".equalsIgnoreCase(ageGroup)) {
+            return Pair.of(18, 24);
+        } else if ("25-34".equalsIgnoreCase(ageGroup)) {
+            return Pair.of(25, 34);
+        } else if ("35+".equalsIgnoreCase(ageGroup)) {
+            return Pair.of(35, 150);
+        } else {
+            return Pair.of(0, 0); // Default case
+        }
     }
 
 }
