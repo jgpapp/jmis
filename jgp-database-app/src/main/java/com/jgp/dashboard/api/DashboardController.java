@@ -11,6 +11,7 @@ import com.jgp.dashboard.dto.PerformanceSummaryDto;
 import com.jgp.dashboard.dto.SeriesDataPointDto;
 import com.jgp.dashboard.dto.TaTypeTrainedBusinessDto;
 import com.jgp.dashboard.service.DashboardService;
+import com.jgp.monitoring.domain.predicate.OutComeMonitoringSearchCriteria;
 import com.jgp.shared.dto.ApiResponseDto;
 import com.jgp.util.CommonUtil;
 import jakarta.validation.Valid;
@@ -52,7 +53,14 @@ public class DashboardController {
                                                                    @RequestParam(value = "training-partner", required = false) String trainingPartner,
                                                                    @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                    @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getHighLevelSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, trainingPartner)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .trainingPartner(trainingPartner)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getHighLevelSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("loans-disbursed-by-gender")
@@ -60,7 +68,13 @@ public class DashboardController {
                                                                                @RequestParam(value = "county-code", required = false) String countyCode,
                                                                                @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                                @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getLoanDisbursedByGenderSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, null)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getLoanDisbursedByGenderSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("loaned-businesses-by-gender")
@@ -68,7 +82,13 @@ public class DashboardController {
                                                                                @RequestParam(value = "county-code", required = false) String countyCode,
                                                                                @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                                @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getLoanedBusinessesByGenderSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, null)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getLoanedBusinessesByGenderSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("loans-disbursed-by-sector")
@@ -76,7 +96,13 @@ public class DashboardController {
                                                                                       @RequestParam(value = "county-code", required = false) String countyCode,
                                                                                       @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                                       @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getLoanDisbursedByIndustrySectorSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, null)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getLoanDisbursedByIndustrySectorSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("loans-disbursed-by-segment")
@@ -84,28 +110,49 @@ public class DashboardController {
                                                                                        @RequestParam(value = "county-code", required = false) String countyCode,
                                                                                       @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                                       @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getLoanDisbursedByIndustrySegmentSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, null)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getLoanDisbursedByIndustrySegmentSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("loans-disbursed-top-four-partners")
     public ResponseEntity<List<DataPointDto>> getLoanDisbursedTopFourPartnersSummary(@RequestParam(value = "county-code", required = false) String countyCode,
                                                                              @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                              @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getLoanDisbursedTopFourPartnersSummary(new DashboardSearchCriteria(fromDate, toDate, null, countyCode, null)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .countyCode(countyCode)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getLoanDisbursedTopFourPartnersSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("loans-disbursed-top-four-counties")
     public ResponseEntity<List<DataPointDto>> getLoanDisbursedTopFourCountiesSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
                                                                                      @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                                      @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getLoanDisbursedTopFourCountiesSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, null, null)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getLoanDisbursedTopFourCountiesSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("businesses-trained-top-four-counties")
     public ResponseEntity<List<DataPointDto>> getBusinessTrainedTopFourCountiesSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
                                                                                      @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                                      @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getBusinessTrainedTopFourCountiesSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, null, null)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getBusinessTrainedTopFourCountiesSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("businesses-trained-by-gender")
@@ -114,7 +161,14 @@ public class DashboardController {
                                                                            @RequestParam(value = "training-partner", required = false) String trainingPartner,
                                                                            @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                            @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getBusinessOwnersTrainedByGenderSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, trainingPartner)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .trainingPartner(trainingPartner)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getBusinessOwnersTrainedByGenderSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("disabled-businesses-trained-by-gender")
@@ -123,7 +177,14 @@ public class DashboardController {
                                                                                               @RequestParam(value = "training-partner", required = false) String trainingPartner,
                                                                                               @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                                               @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getDisabledBusinessOwnersTrainedByGenderSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, trainingPartner)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .trainingPartner(trainingPartner)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getDisabledBusinessOwnersTrainedByGenderSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("refugee-businesses-trained-by-gender")
@@ -132,7 +193,14 @@ public class DashboardController {
                                                                                              @RequestParam(value = "training-partner", required = false) String trainingPartner,
                                                                                              @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                                              @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getRefugeeBusinessOwnersTrainedByGenderSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, trainingPartner)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .trainingPartner(trainingPartner)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getRefugeeBusinessOwnersTrainedByGenderSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("refugee-and-plwd-businesses-trained-by-gender")
@@ -141,7 +209,14 @@ public class DashboardController {
                                                                                              @RequestParam(value = "training-partner", required = false) String trainingPartner,
                                                                                              @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                                              @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, trainingPartner)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .trainingPartner(trainingPartner)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("loans-disbursed-by-pipeline")
@@ -149,7 +224,13 @@ public class DashboardController {
                                                                                  @RequestParam(value = "county-code", required = false) String countyCode,
                                                                                  @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                                  @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getLoanDisbursedByPipelineSourceSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, null)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getLoanDisbursedByPipelineSourceSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("loans-disbursed-by-quality")
@@ -157,7 +238,13 @@ public class DashboardController {
                                                                                 @RequestParam(value = "county-code", required = false) String countyCode,
                                                                                 @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                                 @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getLoansDisbursedByQualitySummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, null)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getLoansDisbursedByQualitySummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("ta-needs-by-gender")
@@ -166,7 +253,14 @@ public class DashboardController {
                                                                               @RequestParam(value = "training-partner", required = false) String trainingPartner,
                                                                               @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                               @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getTaNeedsByGenderSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, trainingPartner)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .trainingPartner(trainingPartner)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getTaNeedsByGenderSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("ta-training-by-sector")
@@ -175,7 +269,14 @@ public class DashboardController {
                                                                            @RequestParam(value = "training-partner", required = false) String trainingPartner,
                                                                            @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                            @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getTaTrainingBySectorSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, trainingPartner)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .trainingPartner(trainingPartner)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getTaTrainingBySectorSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("loans-disbursed-by-product")
@@ -183,14 +284,51 @@ public class DashboardController {
                                                                            @RequestParam(value = "county-code", required = false) String countyCode,
                                                                            @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                            @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getLoansDisbursedByLoanProductSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, null)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getLoansDisbursedByLoanProductSummary(searchCriteria), HttpStatus.OK);
+    }
+
+    @GetMapping("outcome-monitoring-summary")
+    public ResponseEntity<List<DataPointDto>> getOutcomeMonitoringSummary(@RequestParam(value = "partner", required = false) String partner,
+                                                                          @RequestParam(value = "county-code", required = false) String countyCode,
+                                                                          @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                          @RequestParam(value = "to-date", required = false) LocalDate toDate,
+                                                                          @RequestParam(value = "age-group", required = false) String ageGroup,
+                                                                          @RequestParam(value = "gender", required = false) String gender,
+                                                                          @RequestParam(value = "gender-category", required = false) String genderCategory,
+                                                                          @RequestParam(value = "jgp-intervention", required = false) String jgpIntervention,
+                                                                          @RequestParam(value = "region", required = false) String region,
+                                                                          @RequestParam(value = "summarizing-column", required = false) String summarizingColumn){
+        final var searchCriteria = OutComeMonitoringSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .participantAgeGroup(ageGroup)
+                .partner(partner)
+                .countyCode(countyCode)
+                .gender(gender)
+                .genderCategory(genderCategory)
+                .jgpIntervention(jgpIntervention)
+                .region(region)
+                .summarizingColumn(summarizingColumn)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getOutcomeMonitoringSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("employees-summary")
     public ResponseEntity<List<DataPointDto>> getParticipantsEmployeesSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
                                                                            @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                            @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getParticipantsEmployeesSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, null, null)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getParticipantsEmployeesSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("ta-training-by-segment")
@@ -199,7 +337,14 @@ public class DashboardController {
                                                                             @RequestParam(value = "training-partner", required = false) String trainingPartner,
                                                                            @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                            @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getTaTrainingBySegmentSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, trainingPartner)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .trainingPartner(trainingPartner)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getTaTrainingBySegmentSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("training-by-partner-by-gender")
@@ -208,7 +353,14 @@ public class DashboardController {
                                                                                         @RequestParam(value = "training-partner", required = false) String trainingPartner,
                                                                                         @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                                         @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getTrainingByPartnerByGenderSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, trainingPartner)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .trainingPartner(trainingPartner)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getTrainingByPartnerByGenderSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("disbursed-by-product-by-gender")
@@ -216,13 +368,23 @@ public class DashboardController {
                                                                                         @RequestParam(value = "county-code", required = false) String countyCode,
                                                                                         @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                                         @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getLoanDisbursedByLoanProductByGenderSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, null)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getLoanDisbursedByLoanProductByGenderSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("loan-accessed-per-partner-for-last-three-years")
     public ResponseEntity<List<SeriesDataPointDto>> getLastThreeYearsAccessedLoanPerPartnerSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
                                                                                                    @RequestParam(value = "county-code", required = false) String countyCode){
-        return new ResponseEntity<>(this.dashboardService.getLastThreeYearsAccessedLoanPerPartnerSummary(new DashboardSearchCriteria(null, null, partnerId, countyCode, null)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getLastThreeYearsAccessedLoanPerPartnerSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("loan-accessed-per-partner-yearly")
@@ -230,7 +392,13 @@ public class DashboardController {
                                                                                                     @RequestParam(value = "county-code", required = false) String countyCode,
                                                                                                     @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                                                     @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getLastThreeYearsAccessedLoanAmountPerPartnerYearly(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, null)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getLastThreeYearsAccessedLoanAmountPerPartnerYearly(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("accessed-loans-count-per-partner-yearly")
@@ -238,7 +406,13 @@ public class DashboardController {
                                                                                                           @RequestParam(value = "county-code", required = false) String countyCode,
                                                                                                           @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                                                           @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getLastThreeYearsAccessedLoansCountPerPartnerYearly(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, null)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getLastThreeYearsAccessedLoansCountPerPartnerYearly(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("trained_businesses-per-partner-yearly")
@@ -247,7 +421,14 @@ public class DashboardController {
                                                                                                          @RequestParam(value = "training-partner", required = false) String trainingPartner,
                                                                                                          @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                                                          @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getLastThreeYearsTrainedBusinessesPerPartnerYearly(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, trainingPartner)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .trainingPartner(trainingPartner)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getLastThreeYearsTrainedBusinessesPerPartnerYearly(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("trained_businesses-per-ta-type")
@@ -256,7 +437,14 @@ public class DashboardController {
                                                                                                              @RequestParam(value = "training-partner", required = false) String trainingPartner,
                                                                                                              @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                                                              @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getTaTypeTrainedBusinesses(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, trainingPartner)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .trainingPartner(trainingPartner)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getTaTypeTrainedBusinesses(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("loans-accessed-vs-out-standing-per-partner")
@@ -264,7 +452,13 @@ public class DashboardController {
                                                                                                   @RequestParam(value = "county-code", required = false) String countyCode,
                                                                                                   @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                                                   @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getLoansAccessedVsOutStandingByPartnerSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, null)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getLoansAccessedVsOutStandingByPartnerSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("loans-accessed-vs-out-standing-per-gender")
@@ -272,7 +466,13 @@ public class DashboardController {
                                                                                                  @RequestParam(value = "county-code", required = false) String countyCode,
                                                                                                   @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                                                   @RequestParam(value = "to-date", required = false) LocalDate toDate){
-        return new ResponseEntity<>(this.dashboardService.getLoansAccessedVsOutStandingByGenderSummary(new DashboardSearchCriteria(fromDate, toDate, partnerId, countyCode, null)), HttpStatus.OK);
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getLoansAccessedVsOutStandingByGenderSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("data-summary")

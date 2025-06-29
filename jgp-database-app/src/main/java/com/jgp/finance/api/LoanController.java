@@ -67,12 +67,6 @@ public class LoanController {
         return new ResponseEntity<>(this.loanService.findLoanById(loanId), HttpStatus.OK);
     }
 
-    @PostMapping("approve-or-reject")
-    public ResponseEntity<ApiResponseDto> approveLoansData(@RequestBody List<Long> loanIds, @RequestParam(name = "approved") Boolean approved) {
-        this.loanService.approvedParticipantsLoansData(loanIds, approved);
-        return new ResponseEntity<>(new ApiResponseDto(true, CommonUtil.RESOURCE_UPDATED), HttpStatus.OK);
-    }
-
     @PostMapping("approve-or-reject-transactions")
     public ResponseEntity<ApiResponseDto> approvedTransactionsLoans(@RequestBody List<Long> transactionsIds, @RequestParam(name = "approved") Boolean approved) {
         this.loanService.approvedTransactionsLoans(transactionsIds, approved);

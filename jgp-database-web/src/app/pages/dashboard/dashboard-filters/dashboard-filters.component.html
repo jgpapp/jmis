@@ -1,6 +1,63 @@
 
     <form [formGroup]="dashFilterForm" fxLayout="row wrap" fxLayoutAlign="center center"> 
-        @if(!isPartnerDashBoard && authService.hasPermission('DASHBOARD_VIEW_WITH_PARTNER_FILTER')){
+        
+
+        <mat-form-field appearance="outline" fxFlex="100" [fxFlex.xl]="fieldFlex" [fxFlex.lg]="fieldFlex" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
+            <mat-label>Select County</mat-label>
+            <mat-select formControlName="selectedCountyCode" (selectionChange)="filterFormChanged()">
+                <mat-option value="0">All</mat-option>
+                @for (county of counties; track county) {
+                    <mat-option [value]="county.countyCode">{{county.countyName}}</mat-option>
+                  }
+            </mat-select>
+        </mat-form-field>
+
+        @if(isMonitoringDashBoard){
+            <mat-form-field appearance="outline" fxFlex="100" [fxFlex.xl]="fieldFlex" [fxFlex.lg]="fieldFlex" fxFlex.md="20" fxFlex.sm="50" class="px-2">
+                <mat-label>Age Group</mat-label>
+                <mat-select formControlName="ageGroup" (selectionChange)="filterFormChanged()">
+                    <mat-option value="18-24">18-24</mat-option>
+                    <mat-option value="25-34">25-34</mat-option>
+                    <mat-option value="35+">35+</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" fxFlex="100" [fxFlex.xl]="fieldFlex" [fxFlex.lg]="fieldFlex" fxFlex.md="20" fxFlex.sm="50" class="px-2">
+                <mat-label>Gender</mat-label>
+                <mat-select formControlName="gender" (selectionChange)="filterFormChanged()">
+                    <mat-option value="Male">Male</mat-option>
+                    <mat-option value="Female">Female</mat-option>
+                    <mat-option value="Intersex">Intersex</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" fxFlex="100" [fxFlex.xl]="fieldFlex" [fxFlex.lg]="fieldFlex" fxFlex.md="20" fxFlex.sm="50" class="px-2">
+                <mat-label>Intervention</mat-label>
+                <mat-select formControlName="jgpIntervention" (selectionChange)="filterFormChanged()">
+                    <mat-option value="Technical Assistance Training">Technical Assistance Training</mat-option>
+                    <mat-option value="Financial Access">Financial Access</mat-option>
+                    <mat-option value="Market Access">Market Access</mat-option>
+                    <mat-option value="Other">Other</mat-option>
+                    <mat-option value="DONT KNOW">DONT KNOW</mat-option>
+                    <mat-option value="REFUSED">REFUSED</mat-option>
+                </mat-select>
+            </mat-form-field>
+           
+            <mat-form-field appearance="outline" fxFlex="100" [fxFlex.xl]="fieldFlex" [fxFlex.lg]="fieldFlex" fxFlex.md="20" fxFlex.sm="50" class="px-2">
+                <mat-label>Region</mat-label>
+                <mat-select formControlName="region" (selectionChange)="filterFormChanged()">
+                    <mat-option value="Central">Central</mat-option>
+                    <mat-option value="Coast">Coast</mat-option>
+                    <mat-option value="Lower Eastern">Lower Eastern</mat-option>
+                    <mat-option value="Nairobi">Nairobi</mat-option>
+                    <mat-option value="North Eastern">North Eastern</mat-option>
+                    <mat-option value="North Rift">North Rift</mat-option>
+                    <mat-option value="South Rift">South Rift</mat-option>
+                    <mat-option value="Nyanza">Nyanza</mat-option>
+                    <mat-option value="Upper Eastern">Upper Eastern</mat-option>
+                    <mat-option value="Western">Western</mat-option>
+                </mat-select>
+            </mat-form-field>
+        }@else{
+            @if(!isPartnerDashBoard && authService.hasPermission('DASHBOARD_VIEW_WITH_PARTNER_FILTER')){
             <mat-form-field appearance="outline" fxFlex="100" [fxFlex.xl]="fieldFlex" [fxFlex.lg]="fieldFlex" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
                 <mat-label>Select Partner</mat-label>
                 <mat-select formControlName="selectedPartnerId" (selectionChange)="filterFormChanged()">
@@ -27,17 +84,6 @@
                 </mat-select>
             </mat-form-field>
         }
-
-        
-        <mat-form-field appearance="outline" fxFlex="100" [fxFlex.xl]="fieldFlex" [fxFlex.lg]="fieldFlex" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
-            <mat-label>Select County</mat-label>
-            <mat-select formControlName="selectedCountyCode" (selectionChange)="filterFormChanged()">
-                <mat-option value="0">All</mat-option>
-                @for (county of counties; track county) {
-                    <mat-option [value]="county.countyCode">{{county.countyName}}</mat-option>
-                  }
-            </mat-select>
-        </mat-form-field>
         <mat-form-field fxFlex="100" [fxFlex.xl]="fieldFlex" [fxFlex.lg]="fieldFlex" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
             <input matInput [matDatepicker]="dateFrom" placeholder="Date From" formControlName="selectedDateFrom" 
             (dateInput)="filterFromDateChanged()" (dateChange)="filterFromDateChanged()" [max]="maxDate">
@@ -51,4 +97,5 @@
             <mat-datepicker-toggle matSuffix [for]="dateTo"></mat-datepicker-toggle>
             <mat-datepicker #dateTo  [disabled]="disableToDate"></mat-datepicker>
         </mat-form-field>
+        }
     </form>

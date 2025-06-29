@@ -10,6 +10,7 @@ import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
 import com.jgp.infrastructure.bulkimport.exception.InvalidDataException;
 import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
 import com.jgp.monitoring.domain.OutComeMonitoring;
+import com.jgp.monitoring.dto.OutComeMonitoringDto;
 import com.jgp.monitoring.service.OutComeMonitoringService;
 import com.jgp.participant.service.ParticipantService;
 import com.jgp.shared.validator.DataValidator;
@@ -81,83 +82,84 @@ public class MonitoringImportHandler implements ImportHandler {
     private OutComeMonitoring readMonitoringData(Row row) {
         final var status = ImportHandlerUtils.readAsString(MentorShipConstants.STATUS_COL, row);
         final var jgpID = ImportHandlerUtils.readAsString(MonitoringConstants.JGP_ID_COL, row);
-        OutComeMonitoring monitoring = new OutComeMonitoring();
-        monitoring.setParticipant(null == jgpID ? null : this.participantService.findOneParticipantByJGPID(jgpID).orElse(null));
-        monitoring.setSurveyDate(ImportHandlerUtils.readAsDate(MonitoringConstants.SURVEY_DATE_COL, row));
-        monitoring.setSurveyLanguage(ImportHandlerUtils.readAsString(MonitoringConstants.SURVEY_LANGUAGE_COL, row));
-        monitoring.setConsented("YES".equalsIgnoreCase(ImportHandlerUtils.readAsString(MonitoringConstants.CONSENTED_COL, row)));
+        final var participant = (null == jgpID ? null : this.participantService.findOneParticipantByJGPID(jgpID).orElse(null));
         final var locationLatDouble = DataValidator.validateTemplateDoubleValue(MonitoringConstants.LOCATION_LATITUDE_COL, row, rowErrorMap);
-        monitoring.setLocationLatitude(null == locationLatDouble ? BigDecimal.ZERO : BigDecimal.valueOf(locationLatDouble));
         final var locationLangDouble = DataValidator.validateTemplateDoubleValue(MonitoringConstants.LOCATION_LONGITUDE_COL, row, rowErrorMap);
-        monitoring.setLocationLongitude(null == locationLangDouble ? null : BigDecimal.valueOf(locationLangDouble));
-        monitoring.setAge(ImportHandlerUtils.readAsInt(MonitoringConstants.AGE_COL, row));
-        monitoring.setGenderCategory(ImportHandlerUtils.readAsString(MonitoringConstants.GENDER_CATEGORY_COL, row));
-        monitoring.setSegment(ImportHandlerUtils.readAsString(MonitoringConstants.SEGMENT_COL, row));
-        monitoring.setPartner(ImportHandlerUtils.readAsString(MonitoringConstants.PARTNER_COL, row));
-        monitoring.setGender(ImportHandlerUtils.readAsString(MonitoringConstants.GENDER_COL, row));
-        monitoring.setRegion(ImportHandlerUtils.readAsString(MonitoringConstants.REGION_COL, row));
-        monitoring.setCountyCode(ImportHandlerUtils.readAsString(MonitoringConstants.COUNTY_CODE_COL, row));
-        monitoring.setCountyName(ImportHandlerUtils.readAsString(MonitoringConstants.COUNTY_NAME_COL, row));
-        monitoring.setBusinessSetting(ImportHandlerUtils.readAsString(MonitoringConstants.BUSINESS_SETTING_COL, row));
-        monitoring.setBusinessAgeCategory(ImportHandlerUtils.readAsString(MonitoringConstants.BUSINESS_AGE_CATEGORY_COL, row));
-        monitoring.setGroupMembership(ImportHandlerUtils.readAsString(MonitoringConstants.GROUP_MEMBERSHIP_COL, row));
-        monitoring.setEducationLevel(ImportHandlerUtils.readAsString(MonitoringConstants.EDUCATION_LEVEL_COL, row));
-        monitoring.setBusinessAge(ImportHandlerUtils.readAsInt(MonitoringConstants.BUSINESS_AGE_COL, row));
-        monitoring.setRegularEmployees(ImportHandlerUtils.readAsInt(MonitoringConstants.REGULAR_EMPLOYEES_COL, row));
-        monitoring.setCasualEmployees(ImportHandlerUtils.readAsInt(MonitoringConstants.CASUAL_EMPLOYEES_COL, row));
-        monitoring.setHouseholdIncomeChange(ImportHandlerUtils.readAsString(MonitoringConstants.HOUSEHOLD_INCOME_CHANGE_COL, row));
-        monitoring.setFinancialStability(ImportHandlerUtils.readAsString(MonitoringConstants.FINANCIAL_STABILITY_COL, row));
-        monitoring.setQualityOfLife(ImportHandlerUtils.readAsString(MonitoringConstants.QUALITY_OF_LIFE_COL, row));
-        monitoring.setEmpowerment(ImportHandlerUtils.readAsString(MonitoringConstants.EMPOWERMENT_COL, row));
-        monitoring.setVoiceInCommunity(ImportHandlerUtils.readAsString(MonitoringConstants.VOICE_IN_COMMUNITY_COL, row));
-        monitoring.setRespectInCommunity(ImportHandlerUtils.readAsString(MonitoringConstants.RESPECT_IN_COMMUNITY_COL, row));
-        monitoring.setReliableIncome(ImportHandlerUtils.readAsString(MonitoringConstants.RELIABLE_INCOME_COL, row));
-        monitoring.setReputableWork(ImportHandlerUtils.readAsString(MonitoringConstants.REPUTABLE_WORK_COL, row));
-        monitoring.setSenseOfPurpose(ImportHandlerUtils.readAsString(MonitoringConstants.SENSE_OF_PURPOSE_COL, row));
-        monitoring.setBusinessSectorGrowth(ImportHandlerUtils.readAsString(MonitoringConstants.BUSINESS_SECTOR_GROWTH_COL, row));
-        monitoring.setCommunityGrowth(ImportHandlerUtils.readAsString(MonitoringConstants.COMMUNITY_GROWTH_COL, row));
-        monitoring.setWorkOpportunities(ImportHandlerUtils.readAsString(MonitoringConstants.WORK_OPPORTUNITIES_COL, row));
-        monitoring.setIncomeRegularity(ImportHandlerUtils.readAsString(MonitoringConstants.INCOME_REGULARITY_COL, row));
-        monitoring.setIncomeSufficiency(ImportHandlerUtils.readAsString(MonitoringConstants.INCOME_SUFFICIENCY_COL, row));
-        monitoring.setIncomePredictability(ImportHandlerUtils.readAsString(MonitoringConstants.INCOME_PREDICTABILITY_COL, row));
-        monitoring.setFinancialSecurity(ImportHandlerUtils.readAsString(MonitoringConstants.FINANCIAL_SECURITY_COL, row));
-        monitoring.setCommunityGroups(ImportHandlerUtils.readAsString(MonitoringConstants.COMMUNITY_GROUPS_COL, row));
-        monitoring.setLeadershipRole(ImportHandlerUtils.readAsString(MonitoringConstants.LEADERSHIP_ROLE_COL, row));
-        monitoring.setDecisionMakingConfidence(ImportHandlerUtils.readAsString(MonitoringConstants.DECISION_MAKING_CONFIDENCE_COL, row));
-        monitoring.setCommunityChange(ImportHandlerUtils.readAsString(MonitoringConstants.COMMUNITY_CHANGE_COL, row));
-        monitoring.setCommunityIssues(ImportHandlerUtils.readAsString(MonitoringConstants.COMMUNITY_ISSUES_COL, row));
-        monitoring.setSatisfactionEducation(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_EDUCATION_COL, row));
-        monitoring.setSatisfactionRelationships(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_RELATIONSHIPS_COL, row));
-        monitoring.setSatisfactionBusinessType(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_BUSINESS_TYPE_COL, row));
-        monitoring.setSatisfactionIncome(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_INCOME_COL, row));
-        monitoring.setSatisfactionHousing(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_HOUSING_COL, row));
-        monitoring.setSatisfactionHealthcare(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_HEALTHCARE_COL, row));
-        monitoring.setSatisfactionWater(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_WATER_COL, row));
-        monitoring.setSatisfactionFood(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_FOOD_COL, row));
-        monitoring.setSatisfactionNutrition(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_NUTRITION_COL, row));
-        monitoring.setSatisfactionLife(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_LIFE_COL, row));
-        monitoring.setSatisfactionInformation(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_INFORMATION_COL, row));
-        monitoring.setSatisfactionLeisure(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_LEISURE_COL, row));
-        monitoring.setJgpInterventions(ImportHandlerUtils.readAsString(MonitoringConstants.JGP_INTERVENTIONS_COL, row));
-        monitoring.setTechnicalTraining(ImportHandlerUtils.readAsString(MonitoringConstants.TECHNICAL_TRAINING_COL, row));
-        monitoring.setNewPractices(ImportHandlerUtils.readAsString(MonitoringConstants.NEW_PRACTICES_COL, row));
-        monitoring.setImprovedPractices(ImportHandlerUtils.readAsString(MonitoringConstants.IMPROVED_PRACTICES_COL, row));
-        monitoring.setTrainingImprovements(ImportHandlerUtils.readAsString(MonitoringConstants.TRAINING_IMPROVEMENTS_COL, row));
-        monitoring.setBusinessChanges(ImportHandlerUtils.readAsString(MonitoringConstants.BUSINESS_CHANGES_COL, row));
-        monitoring.setProfitabilityGrowth(ImportHandlerUtils.readAsString(MonitoringConstants.PROFITABILITY_GROWTH_COL, row));
         final var revenueChangeDouble = DataValidator.validateTemplateDoubleValue(MonitoringConstants.REVENUE_CHANGE_COL, row, rowErrorMap);
-        monitoring.setRevenueChange(null == revenueChangeDouble ? null : BigDecimal.valueOf(revenueChangeDouble));
-        monitoring.setLoanApplication(ImportHandlerUtils.readAsString(MonitoringConstants.LOAN_APPLICATION_COL, row));
-        monitoring.setNumberOfLoans(ImportHandlerUtils.readAsInt(MonitoringConstants.NUMBER_OF_LOANS_COL, row));
-        monitoring.setLoanPlatform(ImportHandlerUtils.readAsString(MonitoringConstants.LOAN_PLATFORM_COL, row));
-        monitoring.setExternalFinancing(ImportHandlerUtils.readAsString(MonitoringConstants.EXTERNAL_FINANCING_COL, row));
-        monitoring.setFinancingSources(ImportHandlerUtils.readAsString(MonitoringConstants.FINANCING_SOURCES_COL, row));
-        monitoring.setJgpImpact(ImportHandlerUtils.readAsString(MonitoringConstants.JGP_IMPACT_COL, row));
-        monitoring.setChangesWithoutJgp(ImportHandlerUtils.readAsString(MonitoringConstants.CHANGES_WITHOUT_JGP_COL, row));
-        monitoring.setMarketAccess(ImportHandlerUtils.readAsString(MonitoringConstants.MARKET_ACCESS_COL, row));
-        monitoring.setBusinessOpportunities(ImportHandlerUtils.readAsString(MonitoringConstants.BUSINESS_OPPORTUNITIES_COL, row));
-        monitoring.setMarketChallenges(ImportHandlerUtils.readAsString(MonitoringConstants.MARKET_CHALLENGES_COL, row));
-        monitoring.setRowIndex(row.getRowNum());
+        final var monitoringDto = OutComeMonitoringDto.builder()
+            .surveyDate(ImportHandlerUtils.readAsDate(MonitoringConstants.SURVEY_DATE_COL, row))
+            .surveyLanguage(ImportHandlerUtils.readAsString(MonitoringConstants.SURVEY_LANGUAGE_COL, row))
+            .consented("YES".equalsIgnoreCase(ImportHandlerUtils.readAsString(MonitoringConstants.CONSENTED_COL, row)))
+            .locationLatitude(locationLatDouble == null ? null : BigDecimal.valueOf(locationLatDouble))
+            .locationLongitude(locationLangDouble == null ? null : BigDecimal.valueOf(locationLangDouble))
+            .age(ImportHandlerUtils.readAsInt(MonitoringConstants.AGE_COL, row))
+            .genderCategory(ImportHandlerUtils.readAsString(MonitoringConstants.GENDER_CATEGORY_COL, row))
+            .segment(ImportHandlerUtils.readAsString(MonitoringConstants.SEGMENT_COL, row))
+            .partner(ImportHandlerUtils.readAsString(MonitoringConstants.PARTNER_COL, row))
+            .gender(ImportHandlerUtils.readAsString(MonitoringConstants.GENDER_COL, row))
+            .region(ImportHandlerUtils.readAsString(MonitoringConstants.REGION_COL, row))
+            .countyCode(ImportHandlerUtils.readAsString(MonitoringConstants.COUNTY_CODE_COL, row))
+            .countyName(ImportHandlerUtils.readAsString(MonitoringConstants.COUNTY_NAME_COL, row))
+            .businessSetting(ImportHandlerUtils.readAsString(MonitoringConstants.BUSINESS_SETTING_COL, row))
+            .businessAgeCategory(ImportHandlerUtils.readAsString(MonitoringConstants.BUSINESS_AGE_CATEGORY_COL, row))
+            .groupMembership(ImportHandlerUtils.readAsString(MonitoringConstants.GROUP_MEMBERSHIP_COL, row))
+            .educationLevel(ImportHandlerUtils.readAsString(MonitoringConstants.EDUCATION_LEVEL_COL, row))
+            .businessAge(ImportHandlerUtils.readAsInt(MonitoringConstants.BUSINESS_AGE_COL, row))
+            .regularEmployees(ImportHandlerUtils.readAsInt(MonitoringConstants.REGULAR_EMPLOYEES_COL, row))
+            .casualEmployees(ImportHandlerUtils.readAsInt(MonitoringConstants.CASUAL_EMPLOYEES_COL, row))
+            .householdIncomeChange(ImportHandlerUtils.readAsString(MonitoringConstants.HOUSEHOLD_INCOME_CHANGE_COL, row))
+            .financialStability(ImportHandlerUtils.readAsString(MonitoringConstants.FINANCIAL_STABILITY_COL, row))
+            .qualityOfLife(ImportHandlerUtils.readAsString(MonitoringConstants.QUALITY_OF_LIFE_COL, row))
+            .empowerment(ImportHandlerUtils.readAsString(MonitoringConstants.EMPOWERMENT_COL, row))
+            .voiceInCommunity(ImportHandlerUtils.readAsString(MonitoringConstants.VOICE_IN_COMMUNITY_COL, row))
+            .respectInCommunity(ImportHandlerUtils.readAsString(MonitoringConstants.RESPECT_IN_COMMUNITY_COL, row))
+            .reliableIncome(ImportHandlerUtils.readAsString(MonitoringConstants.RELIABLE_INCOME_COL, row))
+            .reputableWork(ImportHandlerUtils.readAsString(MonitoringConstants.REPUTABLE_WORK_COL, row))
+            .senseOfPurpose(ImportHandlerUtils.readAsString(MonitoringConstants.SENSE_OF_PURPOSE_COL, row))
+            .businessSectorGrowth(ImportHandlerUtils.readAsString(MonitoringConstants.BUSINESS_SECTOR_GROWTH_COL, row))
+            .communityGrowth(ImportHandlerUtils.readAsString(MonitoringConstants.COMMUNITY_GROWTH_COL, row))
+            .workOpportunities(ImportHandlerUtils.readAsString(MonitoringConstants.WORK_OPPORTUNITIES_COL, row))
+            .incomeRegularity(ImportHandlerUtils.readAsString(MonitoringConstants.INCOME_REGULARITY_COL, row))
+            .incomeSufficiency(ImportHandlerUtils.readAsString(MonitoringConstants.INCOME_SUFFICIENCY_COL, row))
+            .incomePredictability(ImportHandlerUtils.readAsString(MonitoringConstants.INCOME_PREDICTABILITY_COL, row))
+            .financialSecurity(ImportHandlerUtils.readAsString(MonitoringConstants.FINANCIAL_SECURITY_COL, row))
+            .communityGroups(ImportHandlerUtils.readAsString(MonitoringConstants.COMMUNITY_GROUPS_COL, row))
+            .leadershipRole(ImportHandlerUtils.readAsString(MonitoringConstants.LEADERSHIP_ROLE_COL, row))
+            .decisionMakingConfidence(ImportHandlerUtils.readAsString(MonitoringConstants.DECISION_MAKING_CONFIDENCE_COL, row))
+            .communityChange(ImportHandlerUtils.readAsString(MonitoringConstants.COMMUNITY_CHANGE_COL, row))
+            .communityIssues(ImportHandlerUtils.readAsString(MonitoringConstants.COMMUNITY_ISSUES_COL, row))
+            .satisfactionEducation(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_EDUCATION_COL, row))
+            .satisfactionRelationships(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_RELATIONSHIPS_COL, row))
+            .satisfactionBusinessType(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_BUSINESS_TYPE_COL, row))
+            .satisfactionIncome(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_INCOME_COL, row))
+            .satisfactionHousing(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_HOUSING_COL, row))
+            .satisfactionHealthcare(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_HEALTHCARE_COL, row))
+            .satisfactionWater(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_WATER_COL, row))
+            .satisfactionFood(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_FOOD_COL, row))
+            .satisfactionNutrition(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_NUTRITION_COL, row))
+            .satisfactionLife(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_LIFE_COL, row))
+            .satisfactionInformation(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_INFORMATION_COL, row))
+            .satisfactionLeisure(ImportHandlerUtils.readAsString(MonitoringConstants.SATISFACTION_LEISURE_COL, row))
+            .jgpInterventions(ImportHandlerUtils.readAsString(MonitoringConstants.JGP_INTERVENTIONS_COL, row))
+            .technicalTraining(ImportHandlerUtils.readAsString(MonitoringConstants.TECHNICAL_TRAINING_COL, row))
+            .newPractices(ImportHandlerUtils.readAsString(MonitoringConstants.NEW_PRACTICES_COL, row))
+            .improvedPractices(ImportHandlerUtils.readAsString(MonitoringConstants.IMPROVED_PRACTICES_COL, row))
+            .trainingImprovements(ImportHandlerUtils.readAsString(MonitoringConstants.TRAINING_IMPROVEMENTS_COL, row))
+            .businessChanges(ImportHandlerUtils.readAsString(MonitoringConstants.BUSINESS_CHANGES_COL, row))
+            .profitabilityGrowth(ImportHandlerUtils.readAsString(MonitoringConstants.PROFITABILITY_GROWTH_COL, row))
+            .revenueChange(revenueChangeDouble == null ? null : BigDecimal.valueOf(revenueChangeDouble))
+            .loanApplication(ImportHandlerUtils.readAsString(MonitoringConstants.LOAN_APPLICATION_COL, row))
+            .numberOfLoans(ImportHandlerUtils.readAsInt(MonitoringConstants.NUMBER_OF_LOANS_COL, row))
+            .loanPlatform(ImportHandlerUtils.readAsString(MonitoringConstants.LOAN_PLATFORM_COL, row))
+            .externalFinancing(ImportHandlerUtils.readAsString(MonitoringConstants.EXTERNAL_FINANCING_COL, row))
+            .financingSources(ImportHandlerUtils.readAsString(MonitoringConstants.FINANCING_SOURCES_COL, row))
+            .jgpImpact(ImportHandlerUtils.readAsString(MonitoringConstants.JGP_IMPACT_COL, row))
+            .changesWithoutJgp(ImportHandlerUtils.readAsString(MonitoringConstants.CHANGES_WITHOUT_JGP_COL, row))
+            .marketAccess(ImportHandlerUtils.readAsString(MonitoringConstants.MARKET_ACCESS_COL, row))
+            .businessOpportunities(ImportHandlerUtils.readAsString(MonitoringConstants.BUSINESS_OPPORTUNITIES_COL, row))
+            .marketChallenges(ImportHandlerUtils.readAsString(MonitoringConstants.MARKET_CHALLENGES_COL, row))
+            .build();
+        var monitoring = new OutComeMonitoring(monitoringDto, participant, row.getRowNum());
         monitoring.setCreatedBy(userService.currentUser());
         statuses.add(status);
         return monitoring;

@@ -1,5 +1,7 @@
 package com.jgp.monitoring.domain;
 
+import com.jgp.authentication.domain.AppUser;
+import com.jgp.monitoring.dto.OutComeMonitoringDto;
 import com.jgp.participant.domain.Participant;
 import com.jgp.shared.domain.BaseEntity;
 import jakarta.persistence.Column;
@@ -15,6 +17,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Setter
 @Getter
@@ -239,7 +244,102 @@ public class OutComeMonitoring extends BaseEntity {
     @Column(name = "market_challenges")
     private String marketChallenges;
 
+    @Column(name = "is_approved")
+    private boolean isDataApproved;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "approval_by_id")
+    private AppUser approvalBy;
+
+    @Column(name = "date_approved")
+    private LocalDate dateApproved;
+
     private transient Integer rowIndex;
+
+    public OutComeMonitoring() {
+        // Default constructor
+    }
+    public OutComeMonitoring(OutComeMonitoringDto outComeMonitoringResponseDto, Participant participant, Integer rowIndex) {
+        this.surveyDate = outComeMonitoringResponseDto.surveyDate();
+        this.surveyLanguage = outComeMonitoringResponseDto.surveyLanguage();
+        this.consented = outComeMonitoringResponseDto.consented();
+        this.locationLatitude = outComeMonitoringResponseDto.locationLatitude();
+        this.locationLongitude = outComeMonitoringResponseDto.locationLongitude();
+        this.participant = participant;
+        this.age = outComeMonitoringResponseDto.age();
+        this.genderCategory = outComeMonitoringResponseDto.genderCategory();
+        this.segment = outComeMonitoringResponseDto.segment();
+        this.partner = outComeMonitoringResponseDto.partner();
+        this.gender = outComeMonitoringResponseDto.gender();
+        this.region = outComeMonitoringResponseDto.region();
+        this.countyCode = outComeMonitoringResponseDto.countyCode();
+        this.countyName = outComeMonitoringResponseDto.countyName();
+        this.businessSetting = outComeMonitoringResponseDto.businessSetting();
+        this.businessAgeCategory = outComeMonitoringResponseDto.businessAgeCategory();
+        this.groupMembership = outComeMonitoringResponseDto.groupMembership();
+        this.educationLevel = outComeMonitoringResponseDto.educationLevel();
+        this.businessAge = outComeMonitoringResponseDto.businessAge();
+        this.regularEmployees = outComeMonitoringResponseDto.regularEmployees();
+        this.casualEmployees = outComeMonitoringResponseDto.casualEmployees();
+        this.householdIncomeChange = outComeMonitoringResponseDto.householdIncomeChange();
+        this.financialStability = outComeMonitoringResponseDto.financialStability();
+        this.qualityOfLife = outComeMonitoringResponseDto.qualityOfLife();
+        this.empowerment = outComeMonitoringResponseDto.empowerment();
+        this.voiceInCommunity = outComeMonitoringResponseDto.voiceInCommunity();
+        this.respectInCommunity = outComeMonitoringResponseDto.respectInCommunity();
+        this.reliableIncome = outComeMonitoringResponseDto.reliableIncome();
+        this.reputableWork = outComeMonitoringResponseDto.reputableWork();
+        this.senseOfPurpose = outComeMonitoringResponseDto.senseOfPurpose();
+        this.businessSectorGrowth = outComeMonitoringResponseDto.businessSectorGrowth();
+        this.communityGrowth = outComeMonitoringResponseDto.communityGrowth();
+        this.workOpportunities = outComeMonitoringResponseDto.workOpportunities();
+        this.incomeRegularity = outComeMonitoringResponseDto.incomeRegularity();
+        this.incomeSufficiency = outComeMonitoringResponseDto.incomeSufficiency();
+        this.incomePredictability = outComeMonitoringResponseDto.incomePredictability();
+        this.financialSecurity = outComeMonitoringResponseDto.financialSecurity();
+        this.communityGroups = outComeMonitoringResponseDto.communityGroups() != null ? Arrays.stream(outComeMonitoringResponseDto.communityGroups().split(",")).map(String::trim).collect(Collectors.joining(",")) : null;
+        this.leadershipRole = outComeMonitoringResponseDto.leadershipRole();
+        this.decisionMakingConfidence = outComeMonitoringResponseDto.decisionMakingConfidence();
+        this.communityChange = outComeMonitoringResponseDto.communityChange();
+        this.communityIssues = outComeMonitoringResponseDto.communityIssues();
+        this.satisfactionEducation = outComeMonitoringResponseDto.satisfactionEducation();
+        this.satisfactionRelationships = outComeMonitoringResponseDto.satisfactionRelationships();
+        this.satisfactionBusinessType = outComeMonitoringResponseDto.satisfactionBusinessType();
+        this.satisfactionIncome = outComeMonitoringResponseDto.satisfactionIncome();
+        this.satisfactionHousing = outComeMonitoringResponseDto.satisfactionHousing();
+        this.satisfactionHealthcare = outComeMonitoringResponseDto.satisfactionHealthcare();
+        this.satisfactionWater = outComeMonitoringResponseDto.satisfactionWater();
+        this.satisfactionFood = outComeMonitoringResponseDto.satisfactionFood();
+        this.satisfactionNutrition = outComeMonitoringResponseDto.satisfactionNutrition();
+        this.satisfactionLife = outComeMonitoringResponseDto.satisfactionLife();
+        this.satisfactionInformation = outComeMonitoringResponseDto.satisfactionInformation();
+        this.satisfactionLeisure = outComeMonitoringResponseDto.satisfactionLeisure();
+        this.jgpInterventions = outComeMonitoringResponseDto.jgpInterventions() != null ? Arrays.stream(outComeMonitoringResponseDto.jgpInterventions().split(",")).map(String::trim).collect(Collectors.joining(",")) : null;
+        this.technicalTraining = outComeMonitoringResponseDto.technicalTraining() != null ? Arrays.stream(outComeMonitoringResponseDto.technicalTraining().split(",")).map(String::trim).collect(Collectors.joining(",")) : null;
+        this.newPractices = outComeMonitoringResponseDto.newPractices() != null ? Arrays.stream(outComeMonitoringResponseDto.newPractices().split(",")).map(String::trim).collect(Collectors.joining(",")) : null;
+        this.improvedPractices = outComeMonitoringResponseDto.improvedPractices() != null ? Arrays.stream(outComeMonitoringResponseDto.improvedPractices().split(",")).map(String::trim).collect(Collectors.joining(",")) : null;
+        this.trainingImprovements = outComeMonitoringResponseDto.trainingImprovements();
+        this.businessChanges = outComeMonitoringResponseDto.businessChanges();
+        this.profitabilityGrowth = outComeMonitoringResponseDto.profitabilityGrowth();
+        this.revenueChange = outComeMonitoringResponseDto.revenueChange();
+        this.loanApplication = outComeMonitoringResponseDto.loanApplication();
+        this.numberOfLoans = outComeMonitoringResponseDto.numberOfLoans();
+        this.loanPlatform = outComeMonitoringResponseDto.loanPlatform();
+        this.externalFinancing = outComeMonitoringResponseDto.externalFinancing();
+        this.financingSources = outComeMonitoringResponseDto.financingSources() != null ? Arrays.stream(outComeMonitoringResponseDto.financingSources().split(",")).map(String::trim).collect(Collectors.joining(",")) : null;
+        this.jgpImpact = outComeMonitoringResponseDto.jgpImpact();
+        this.changesWithoutJgp = outComeMonitoringResponseDto.changesWithoutJgp();
+        this.marketAccess = outComeMonitoringResponseDto.marketAccess() != null ? Arrays.stream(outComeMonitoringResponseDto.marketAccess().split(",")).map(String::trim).collect(Collectors.joining(",")) : null;
+        this.businessOpportunities = outComeMonitoringResponseDto.businessOpportunities();
+        this.marketChallenges = outComeMonitoringResponseDto.marketChallenges();
+        this.rowIndex = rowIndex;
+    }
+
+    public void approveData(Boolean approval, AppUser user){
+        this.isDataApproved = approval;
+        this.approvalBy = user;
+        this.dateApproved = LocalDate.now(ZoneId.systemDefault());
+    }
 
     @Override
     public boolean equals(Object o) {

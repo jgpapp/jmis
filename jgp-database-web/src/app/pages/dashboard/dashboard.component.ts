@@ -19,6 +19,7 @@ import { GlobalService } from '@services/shared/global.service';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { FormsModule } from '@angular/forms';
 import { PerformanceSummaryComponent } from "./performance-summary/performance-summary.component";
+import { MonitoringDashboardComponent } from './monitoring-dashboard/monitoring-dashboard.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -38,7 +39,8 @@ import { PerformanceSummaryComponent } from "./performance-summary/performance-s
     MatIconModule,
     MatButtonToggleModule,
     FormsModule,
-    PerformanceSummaryComponent
+    PerformanceSummaryComponent,
+    MonitoringDashboardComponent
 ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
@@ -244,6 +246,9 @@ export class DashboardComponent {
   isMentorShipDashboard(): boolean {
     return 'MENTOR' === this.selectedDashboardView;
   }
+  isMonitoringDashBoard(): boolean {
+    return 'MONITOR' === this.selectedDashboardView;
+  }
 
   get filterFieldFlex(): number {
     if(this.isFinancialDashboard()){
@@ -258,6 +263,8 @@ export class DashboardComponent {
       } else {
         return 25;
       }
+    } else if(this.isMonitoringDashBoard()){
+        return 20;
     } else {
       return 25;
     }

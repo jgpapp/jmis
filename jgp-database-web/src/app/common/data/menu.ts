@@ -10,11 +10,12 @@ export const verticalMenuItems = [
     new Menu(7, 'Technical Assistance', '/data-list', null, 'pending', null, false, 5),
     new Menu(8, 'Lending Data', '/loans', null, 'real_estate_agent', null, false, 5),
     new Menu(9, 'Mentorship', '/mentorship', null, 'real_estate_agent', null, false, 5),
-    new Menu(10, 'Analytics Update', '/analytics-update', null, 'query_stats', null, false, 5),
-    new Menu(11, 'User Management', null, null, 'manage_accounts', null, true, 0),
-    new Menu(12, 'Users', '/users', null, 'supervisor_account', null, false, 11),
-    new Menu(13, 'User Roles', '/user-roles', null, 'accessibility', null, false, 11),
-    new Menu(14, 'System Resources', '/system-resources', null, 'engineering', null, false, 0)
+    new Menu(10, 'Outcome Monitoring', '/monitoring', null, 'real_estate_agent', null, false, 5),
+    new Menu(11, 'Analytics Update', '/analytics-update', null, 'query_stats', null, false, 5),
+    new Menu(12, 'User Management', null, null, 'manage_accounts', null, true, 0),
+    new Menu(13, 'Users', '/users', null, 'supervisor_account', null, false, 12),
+    new Menu(14, 'User Roles', '/user-roles', null, 'accessibility', null, false, 12),
+    new Menu(15, 'System Resources', '/system-resources', null, 'engineering', null, false, 0)
     /*new Menu(5, 'Cards', '/ui/cards', null, 'card_membership', null, false, 3),
     new Menu(6, 'Lists', '/ui/lists', null, 'list', null, false, 3),
     new Menu(7, 'Grids', '/ui/grids', null, 'grid_on', null, false, 3),
@@ -85,11 +86,12 @@ export const horizontalMenuItems = [
     new Menu(7, 'Technical Assistance', '/data-list', null, 'pending', null, false, 5),
     new Menu(8, 'Lending Data', '/loans', null, 'real_estate_agent', null, false, 5),
     new Menu(9, 'Mentorship', '/mentorship', null, 'real_estate_agent', null, false, 5),
-    new Menu(10, 'Analytics Update', '/analytics-update', null, 'query_stats', null, false, 5),
-    new Menu(11, 'User Management', null, null, 'manage_accounts', null, true, 0),
-    new Menu(12, 'Users', '/users', null, 'supervisor_account', null, false, 11),
-    new Menu(13, 'User Roles', '/user-roles', null, 'accessibility', null, false, 11),
-    new Menu(14, 'System Resources', '/system-resources', null, 'engineering', null, false, 0)
+    new Menu(10, 'Outcome Monitoring', '/monitoring', null, 'real_estate_agent', null, false, 5),
+    new Menu(11, 'Analytics Update', '/analytics-update', null, 'query_stats', null, false, 5),
+    new Menu(12, 'User Management', null, null, 'manage_accounts', null, true, 0),
+    new Menu(13, 'Users', '/users', null, 'supervisor_account', null, false, 12),
+    new Menu(14, 'User Roles', '/user-roles', null, 'accessibility', null, false, 12),
+    new Menu(15, 'System Resources', '/system-resources', null, 'engineering', null, false, 0)
     
     /*new Menu(5, 'Cards', '/ui/cards', null, 'card_membership', null, false, 3),
     new Menu(6, 'Lists', '/ui/lists', null, 'list', null, false, 3),
