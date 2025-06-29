@@ -68,40 +68,6 @@ public class LoanServiceImpl implements LoanService {
 
     @Transactional
     @Override
-    public void approvedParticipantsLoansData(List<Long> dataIds, Boolean approval) {
-        var loans = this.loanRepository.findAllById(dataIds);
-        var currentUser = this.platformSecurityContext.getAuthenticatedUserIfPresent();
-        var currentUserPartner = Objects.nonNull(currentUser) ? currentUser.getPartner() : null;
-        if (dataIds.isEmpty() && Objects.nonNull(currentUserPartner)) {
-                loans = this.loanRepository.findAll(this.loanPredicateBuilder.buildPredicateForSearchLoans(new LoanSearchCriteria(currentUserPartner.getId(), null, null, null,  false, null, null)), Pageable.unpaged()).getContent();
-            }
-
-        int count = 0;
-        var loansToSave = new ArrayList<Loan>();
-        Set<LocalDate> dataDates = new HashSet<>();
-        for(Loan loan : loans) {
-            loan.approveData(approval, currentUser);
-            var participant = loan.getParticipant();
-            if (Boolean.TRUE.equals(approval) && Boolean.FALSE.equals(participant.getIsActive())){
-                participant.activateParticipant();
-            }
-            loansToSave.add(loan);
-            count++;
-            if (count % 20 == 0) { // Flush and clear the session every 20 entities
-                this.loanRepository.saveAllAndFlush(loansToSave);
-                count = 0;
-                loansToSave = new ArrayList<>();
-            }
-            dataDates.add(loan.getDateDisbursed());
-        }
-        this.loanRepository.saveAllAndFlush(loansToSave);
-        if (Objects.nonNull(currentUserPartner)) {
-            this.applicationContext.publishEvent(new DataApprovedEvent(Set.of(currentUserPartner.getId()), dataDates));
-        }
-    }
-
-    @Transactional
-    @Override
     public void approvedTransactionsLoans(List<Long> transactionsIds, Boolean approval) {
         var loanTransactions = this.loanTransactionRepository.findAllById(transactionsIds);
         var currentUser = this.platformSecurityContext.getAuthenticatedUserIfPresent();

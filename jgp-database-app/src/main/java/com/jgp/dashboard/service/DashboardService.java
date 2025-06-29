@@ -9,6 +9,7 @@ import com.jgp.dashboard.dto.PartnerYearlyDataDto;
 import com.jgp.dashboard.dto.PerformanceSummaryDto;
 import com.jgp.dashboard.dto.SeriesDataPointDto;
 import com.jgp.dashboard.dto.TaTypeTrainedBusinessDto;
+import com.jgp.monitoring.domain.predicate.OutComeMonitoringSearchCriteria;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -49,6 +50,8 @@ public interface DashboardService {
     List<DataPointDto> getTaTrainingBySectorSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
     List<DataPointDto> getLoansDisbursedByLoanProductSummary(DashboardSearchCriteria dashboardSearchCriteria);
+
+    List<DataPointDto> getOutcomeMonitoringSummary(OutComeMonitoringSearchCriteria searchCriteria);
 
     List<DataPointDto> getParticipantsEmployeesSummary(DashboardSearchCriteria dashboardSearchCriteria);
 

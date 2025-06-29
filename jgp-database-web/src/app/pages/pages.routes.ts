@@ -56,6 +56,12 @@ export const routes: Routes = [
         data: { breadcrumb: 'Mentorship Data Approval' }
       },
       {
+        path: 'monitoring',
+        loadComponent: () => import('./outcome-monitoring/outcome-monitoring.component').then(c => c.OutcomeMonitoringComponent),
+        canActivate: [AuthGuard],
+        data: { breadcrumb: 'Outcome Monitoring Data Approval' }
+      },
+      {
         path: 'users',
         loadChildren: () => import('./users/user.routes').then(p => p.routes),
         canActivate: [AuthGuard],

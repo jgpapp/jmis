@@ -17,7 +17,14 @@
         <div fxLayout="row" fxLayoutAlign="center center">
             <a class="dash-board-reset-link" mat-menu-item (click)="doResetDashBoardFilters()">Reset Filters</a>
         </div>
-        <app-dashboard-filters (dashBoardFilters)="setDashBoardFilters($event)" [isPartnerDashBoard]="true" [showTADashboard]="isTADashboard()" [resetDashBoardFilters]="resetDashBoardFilters" [fieldFlex]="filterFieldFlex"/>
+        <app-dashboard-filters 
+        (dashBoardFilters)="setDashBoardFilters($event)" 
+        [isPartnerDashBoard]="true" 
+        [showTADashboard]="isTADashboard()" 
+        [resetDashBoardFilters]="resetDashBoardFilters" 
+        [fieldFlex]="filterFieldFlex"
+        [isMonitoringDashBoard]="false"
+        />
         <app-tiles [dashBoardFilters]="dashBoardFilters" [selectedDashboardView]="selectedDashboardView"/>
         <app-info-cards [dashBoardFilters]="dashBoardFilters" [selectedDashboardView]="selectedDashboardView"/>
         

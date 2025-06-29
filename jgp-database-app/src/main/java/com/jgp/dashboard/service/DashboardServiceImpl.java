@@ -10,6 +10,7 @@ import com.jgp.dashboard.dto.PartnerYearlyDataDto;
 import com.jgp.dashboard.dto.PerformanceSummaryDto;
 import com.jgp.dashboard.dto.TaTypeTrainedBusinessDto;
 import com.jgp.infrastructure.bulkimport.event.DataApprovedEvent;
+import com.jgp.monitoring.domain.predicate.OutComeMonitoringSearchCriteria;
 import com.jgp.patner.domain.Partner;
 import com.jgp.patner.domain.PartnerRepository;
 import com.jgp.util.CommonUtil;
@@ -79,6 +80,7 @@ public class DashboardServiceImpl implements DashboardService {
     private static final String PARTNER_NAME_PARAM = "partnerName";
     private static final String VALUE_PARAM = "value";
     private static final String TOTAL_PARAM_PARAM = "%s Totals";
+    private static final Set<String> ALLOWED_SUMMARIZING_COLUMNS = Set.of("gender", "age_group", "county_code", "region");
 
     @Value("${jgp.dashboard.default.view.period.in.months}")
     private Integer jgpDashboardDefaultViewPeriodInMonths;
@@ -523,6 +525,57 @@ public class DashboardServiceImpl implements DashboardService {
             whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
         }
         var sqlQuery = String.format(DataPointMapper.LOANS_DISBURSED_BY_LOAN_PRODUCT_SCHEMA, whereClause);
+
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
+    public List<DataPointDto> getOutcomeMonitoringSummary(OutComeMonitoringSearchCriteria searchCriteria) {
+        final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
+        var fromDate = searchCriteria.fromDate();
+        var toDate = searchCriteria.toDate();
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = getDefaultQueryDates().getLeft();
+            toDate = getDefaultQueryDates().getRight();
+        }
+        var whereClause = "WHERE mon.survey_date between :fromDate and :toDate  and mon.is_approved = true ";
+        var parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        if (Objects.nonNull(searchCriteria.partner())){
+            parameters.addValue("partner", searchCriteria.partner());
+            whereClause = String.format("%s and mon.partner = :partner ", whereClause);
+        }
+        if (Objects.nonNull(searchCriteria.countyCode())) {
+            parameters.addValue(COUNTY_CODE_PARAM, searchCriteria.countyCode());
+            whereClause = String.format("%s%s", whereClause, "and mon.county_code = :countyCode ");
+        }
+        if (Objects.nonNull(searchCriteria.region())) {
+            parameters.addValue("region", searchCriteria.region());
+            whereClause = String.format("%s%s", whereClause, "and mon.region = :region ");
+        }
+        if (Objects.nonNull(searchCriteria.participantAgeGroup())) {
+            final var ageRange = CommonUtil.getAgeRangeFromAgeGroup(searchCriteria.participantAgeGroup());
+            parameters.addValue("participantAgeGroupFrom", ageRange.getLeft());
+            parameters.addValue("participantAgeGroupTo", ageRange.getRight());
+            whereClause = String.format("%s%s", whereClause, "and mon.age between :participantAgeGroupFrom and :participantAgeGroupTo ");
+        }
+        if (Objects.nonNull(searchCriteria.gender())) {
+            parameters.addValue("gender", searchCriteria.gender());
+            whereClause = String.format("%s%s", whereClause, "and mon.gender = :gender ");
+        }
+        if (Objects.nonNull(searchCriteria.genderCategory())) {
+            parameters.addValue(GENDER_CATEGORY_PARAM, searchCriteria.genderCategory());
+            whereClause = String.format("%s%s", whereClause, "and mon.genderCategory = :genderCategory ");
+        }
+        if (Objects.nonNull(searchCriteria.jgpIntervention())) {
+            parameters.addValue("jgpIntervention", "%"+searchCriteria.jgpIntervention()+"%");
+            whereClause = String.format("%s%s", whereClause, "and mon.jgp_interventions LIKE :jgpIntervention ");
+        }
+        if (!ALLOWED_SUMMARIZING_COLUMNS.contains(searchCriteria.summarizingColumn())) {
+            throw new IllegalArgumentException("Invalid summarizing column");
+        }
+
+        var sqlQuery = String.format(DataPointMapper.OUT_COME_MONITORING_SCHEMA, searchCriteria.summarizingColumn(), whereClause);
 
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
     }
@@ -1252,6 +1305,12 @@ public class DashboardServiceImpl implements DashboardService {
                 select l.loan_product as dataKey, sum(lt.amount) as dataValue,\s
                 SUM(lt.amount) * 100.0 / SUM(SUM(lt.amount)) OVER () AS percentage\s
                 from loan_transactions lt inner join loans l on lt.loan_id = l.id inner join participants cl on l.participant_id = cl.id %s group by 1;\s
+                """;
+
+        public static final String OUT_COME_MONITORING_SCHEMA = """
+                select unnest(string_to_array(mon.%s, ',')) as dataKey, count(mon.id) as dataValue,\s
+                count(mon.id) * 100.0 / count(count(mon.id)) OVER () AS percentage\s
+                from outcome_monitoring mon inner join participants cl on mon.participant_id = cl.id %s group by 1;\s
                 """;
 
         public static final String BUSINESSES_TRAINED_BY_SECTOR_SCHEMA = """

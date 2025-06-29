@@ -1,0 +1,96 @@
+@if(authService.hasPermission('MENTOR_SHIP_READ')){
+    <app-content-header 
+        [icon]="'keyboard'" 
+        [title]="'Monitoring Data Pending Approval'" 
+        [hideBreadcrumb]="false"
+        [hasBgImage]="true" 
+        [class]="'pb-4'"></app-content-header>
+    
+    <div fxLayout="column" fxLayout.gt-sm="row wrap" class="p-2">
+        <div fxFlex="100" class="p-2">
+            <mat-card>
+                <mat-card-header>                
+                    <mat-card-title>New Monitoring Data</mat-card-title>
+                </mat-card-header>
+                <mat-card-content class="pt-3">
+                    <div fxLayout="column" class="p-2">
+                        <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="end center" class="px-2 user-toolbar">
+                            <div class="action-button" fxLayoutGap="25px">
+                                <button mat-raised-button color="primary" *jgpHasPermission="'MONITORING_OUTCOME_APPROVE'" routerLink="new" [disabled]="selection.selected.length == 0" (click)="approveSelectedRows()">
+                                  <mat-icon>verified</mat-icon>&nbsp;&nbsp;Approve Selected
+                                </button>
+                                <button mat-raised-button color="warn" *jgpHasPermission="'MONITORING_OUTCOME_APPROVE'" routerLink="new" [disabled]="selection.selected.length == 0" (click)="rejectSelectedRows()">
+                                    <mat-icon>verified</mat-icon>&nbsp;&nbsp;Reject Selected
+                                  </button>
+                              </div>
+                        </mat-toolbar>
+                        <div class="p-2">
+                            <mat-table #table [dataSource]="dataSource" class="mat-elevation-z8">
+                                <ng-container matColumnDef="select">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        <mat-checkbox (change)="$event ? masterToggle() : null"
+                                                      [checked]="selection.hasValue() && isAllSelected()"
+                                                      [indeterminate]="selection.hasValue() && !isAllSelected()">
+                                        </mat-checkbox>
+                                    </th>
+                                    <td mat-cell *matCellDef="let row">
+                                        <mat-checkbox (click)="$event.stopPropagation()"
+                                                      (change)="$event ? selection.toggle(row) : null"
+                                                      [checked]="selection.isSelected(row)">
+                                        </mat-checkbox>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="surveyDate">
+                                    <mat-header-cell *matHeaderCellDef> Survey Date </mat-header-cell>
+                                    <mat-cell *matCellDef="let element"> {{element.surveyDate}} </mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="surveyLanguage">
+                                    <mat-header-cell *matHeaderCellDef> Survey Language </mat-header-cell>
+                                    <mat-cell *matCellDef="let element"> {{element.surveyLanguage}} </mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="consented">
+                                    <mat-header-cell *matHeaderCellDef> Participant Consented </mat-header-cell>
+                                    <mat-cell *matCellDef="let element"> {{element.consented}} </mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="gender">
+                                    <mat-header-cell *matHeaderCellDef> Gender </mat-header-cell>
+                                    <mat-cell *matCellDef="let element"> {{element.gender}} </mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="countyName">
+                                    <mat-header-cell *matHeaderCellDef> County Name </mat-header-cell>
+                                    <mat-cell *matCellDef="let element"> {{element.countyName}} </mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="businessAge">
+                                    <mat-header-cell *matHeaderCellDef> Business Age </mat-header-cell>
+                                    <mat-cell *matCellDef="let element"> {{element.businessAge}} </mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="dateUploaded">
+                                    <mat-header-cell *matHeaderCellDef> Date Uploaded </mat-header-cell>
+                                    <mat-cell *matCellDef="let element"> {{element.dateUploaded}} </mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="uploadedBy">
+                                  <mat-header-cell *matHeaderCellDef> Uploaded By </mat-header-cell>
+                                  <mat-cell *matCellDef="let element"> {{element.uploadedBy}} </mat-cell>
+                              </ng-container>
+                                <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                                <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)"></mat-row>
+                            </mat-table>
+                            <mat-paginator 
+                            #paginator 
+                            [length]="totalItems" 
+                            [pageSize]="pageSize" 
+                            [pageIndex]="pageIndex"
+                            [pageSizeOptions]="[5, 10, 20]" 
+                            (page)="onPageChange($event)"
+                            />
+                        </div>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+        </div> 
+                  
+    </div>
+    }
+    @else {
+        <app-no-permission />
+    }
