@@ -169,8 +169,12 @@ export class DashboardService {
 
     getDashBoardQueryParams(dashBoardFilters: any, summarizingColumn: any = undefined): string {
       let queryParam = ``
-      if(!dashBoardFilters){
+      if(!dashBoardFilters && !summarizingColumn){
         return queryParam;
+      }
+
+      if(!dashBoardFilters && summarizingColumn){
+        return `${queryParam}&summarizing-column=${summarizingColumn}`;
       }
 
       if(dashBoardFilters.selectedDateFrom && dashBoardFilters.selectedDateTo) {
@@ -202,6 +206,7 @@ export class DashboardService {
       if(dashBoardFilters.region){
         queryParam = `${queryParam}&region=${dashBoardFilters.region}`
       }
+
       if(summarizingColumn){
         queryParam = `${queryParam}&summarizing-column=${summarizingColumn}`
       }

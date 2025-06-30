@@ -1,1 +1,47 @@
-<p>monitoring-dashboard works!</p>
+<div fxLayout="row" fxLayoutGap="1rem" style="height: 80vh;">
+  <!-- Left Panel: 4 parts -->
+  <div #chartContainer fxFlex="80" style="background: #fafafa; padding: 1rem; border-radius: 8px; box-shadow: 0 1px 4px #0001; position: relative;">
+  <!-- Expand Button at top-right -->
+  <button mat-icon-button style="position: absolute; top: 0.5rem; right: 0.5rem; z-index: 10;" (click)="expandOutcomeMonitoringSummary()">
+    <mat-icon>open_in_full</mat-icon>
+  </button>
+   @if (monitoringData && monitoringData.length > 0) {
+  <ngx-charts-bar-horizontal
+    [view]="[parentWidth, parentHeight]"
+    [scheme]="chartSColorScheme"
+    [results]="monitoringData"
+    [gradient]="false"
+    [xAxis]="true"
+    [yAxis]="true"
+    [legend]="false"
+    [showXAxisLabel]="true"
+    [showYAxisLabel]="true"
+    [xAxisLabel]="'Count'"
+    [yAxisLabel]="'Outcome Monitoring'"
+    />
+  } @else {
+    <ng-container *ngTemplateOutlet="noDataPlaceholder"/>
+    } 
+</div>
+
+  <!-- Right Panel: 1 part -->
+  <div fxFlex="20" style="background: #fff; padding: 1rem; border-radius: 8px; box-shadow: 0 1px 4px #0001; overflow-y: auto; max-height: 80vh;">
+    <div style="margin-bottom: 1.5rem;">
+        <h2>Monitoring Questions</h2>
+    </div>
+        <mat-radio-group [(ngModel)]="questionOption" (change)="chooseQuestion()">
+            @for (q of questions; track q) {
+                <div style="margin-bottom: 1.5rem;">
+                    <mat-radio-button  [value]="q.value">{{q.text}}</mat-radio-button>
+                </div>
+            }               
+        </mat-radio-group>
+  </div>
+</div>
+
+<!-- Template for no data placeholder -->
+<ng-template #noDataPlaceholder>
+    <div class="no-data-placeholder">
+      <p>No data available to display</p>
+    </div>
+  </ng-template>

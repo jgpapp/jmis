@@ -264,7 +264,7 @@ export class DashboardComponent {
         return 25;
       }
     } else if(this.isMonitoringDashBoard()){
-        return 20;
+        return 100/7; // 14.28
     } else {
       return 25;
     }

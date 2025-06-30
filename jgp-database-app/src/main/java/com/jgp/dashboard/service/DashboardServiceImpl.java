@@ -80,7 +80,6 @@ public class DashboardServiceImpl implements DashboardService {
     private static final String PARTNER_NAME_PARAM = "partnerName";
     private static final String VALUE_PARAM = "value";
     private static final String TOTAL_PARAM_PARAM = "%s Totals";
-    private static final Set<String> ALLOWED_SUMMARIZING_COLUMNS = Set.of("gender", "age_group", "county_code", "region");
 
     @Value("${jgp.dashboard.default.view.period.in.months}")
     private Integer jgpDashboardDefaultViewPeriodInMonths;
@@ -570,9 +569,6 @@ public class DashboardServiceImpl implements DashboardService {
         if (Objects.nonNull(searchCriteria.jgpIntervention())) {
             parameters.addValue("jgpIntervention", "%"+searchCriteria.jgpIntervention()+"%");
             whereClause = String.format("%s%s", whereClause, "and mon.jgp_interventions LIKE :jgpIntervention ");
-        }
-        if (!ALLOWED_SUMMARIZING_COLUMNS.contains(searchCriteria.summarizingColumn())) {
-            throw new IllegalArgumentException("Invalid summarizing column");
         }
 
         var sqlQuery = String.format(DataPointMapper.OUT_COME_MONITORING_SCHEMA, searchCriteria.summarizingColumn(), whereClause);
@@ -1308,7 +1304,7 @@ public class DashboardServiceImpl implements DashboardService {
                 """;
 
         public static final String OUT_COME_MONITORING_SCHEMA = """
-                select unnest(string_to_array(mon.%s, ',')) as dataKey, count(mon.id) as dataValue,\s
+                select unnest(string_to_array(mon.%s::TEXT, ',')) as dataKey, count(mon.id) as dataValue,\s
                 count(mon.id) * 100.0 / count(count(mon.id)) OVER () AS percentage\s
                 from outcome_monitoring mon inner join participants cl on mon.participant_id = cl.id %s group by 1;\s
                 """;
