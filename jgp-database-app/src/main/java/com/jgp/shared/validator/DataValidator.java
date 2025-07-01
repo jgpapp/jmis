@@ -1,10 +1,17 @@
 package com.jgp.shared.validator;
 
+import com.jgp.finance.domain.Loan;
 import com.jgp.infrastructure.bulkimport.importhandler.ImportHandlerUtils;
+import com.jgp.monitoring.dto.OutComeMonitoringDto;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
 
 import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 public class DataValidator {
@@ -30,5 +37,22 @@ public class DataValidator {
             rowErrorMap.put(row, "Invalid Value for one/more columns that should be a number !!");
         }
         return null;
+    }
+
+    public static void validateMonitoringData(OutComeMonitoringDto dto, Row row, Map<Row, String> rowErrorMap) {
+        // Create a Validator instance
+        Validator validator;
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
+
+        // Validate the object
+        Set<ConstraintViolation<OutComeMonitoringDto>> violations = validator.validate(dto);
+
+        // Get the first error, if any
+        if (null == rowErrorMap.get(row) && !violations.isEmpty()) {
+            ConstraintViolation<OutComeMonitoringDto> firstViolation = violations.iterator().next();
+            rowErrorMap.put(row, firstViolation.getMessage());
+        }
     }
 }

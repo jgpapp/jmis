@@ -14,6 +14,7 @@ import com.jgp.monitoring.dto.OutComeMonitoringDto;
 import com.jgp.monitoring.service.OutComeMonitoringService;
 import com.jgp.participant.service.ParticipantService;
 import com.jgp.shared.validator.DataValidator;
+import com.jgp.shared.validator.LoanValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
@@ -92,7 +93,7 @@ public class MonitoringImportHandler implements ImportHandler {
             .consented("YES".equalsIgnoreCase(ImportHandlerUtils.readAsString(MonitoringConstants.CONSENTED_COL, row)))
             .locationLatitude(locationLatDouble == null ? null : BigDecimal.valueOf(locationLatDouble))
             .locationLongitude(locationLangDouble == null ? null : BigDecimal.valueOf(locationLangDouble))
-            .age(ImportHandlerUtils.readAsInt(MonitoringConstants.AGE_COL, row))
+            .age(DataValidator.validateTemplateIntegerValue(MonitoringConstants.AGE_COL, row, rowErrorMap))
             .genderCategory(ImportHandlerUtils.readAsString(MonitoringConstants.GENDER_CATEGORY_COL, row))
             .segment(ImportHandlerUtils.readAsString(MonitoringConstants.SEGMENT_COL, row))
             .partner(ImportHandlerUtils.readAsString(MonitoringConstants.PARTNER_COL, row))
@@ -104,9 +105,9 @@ public class MonitoringImportHandler implements ImportHandler {
             .businessAgeCategory(ImportHandlerUtils.readAsString(MonitoringConstants.BUSINESS_AGE_CATEGORY_COL, row))
             .groupMembership(ImportHandlerUtils.readAsString(MonitoringConstants.GROUP_MEMBERSHIP_COL, row))
             .educationLevel(ImportHandlerUtils.readAsString(MonitoringConstants.EDUCATION_LEVEL_COL, row))
-            .businessAge(ImportHandlerUtils.readAsInt(MonitoringConstants.BUSINESS_AGE_COL, row))
-            .regularEmployees(ImportHandlerUtils.readAsInt(MonitoringConstants.REGULAR_EMPLOYEES_COL, row))
-            .casualEmployees(ImportHandlerUtils.readAsInt(MonitoringConstants.CASUAL_EMPLOYEES_COL, row))
+            .businessAge(DataValidator.validateTemplateIntegerValue(MonitoringConstants.BUSINESS_AGE_COL, row, rowErrorMap))
+            .regularEmployees(DataValidator.validateTemplateIntegerValue(MonitoringConstants.REGULAR_EMPLOYEES_COL, row, rowErrorMap))
+            .casualEmployees(DataValidator.validateTemplateIntegerValue(MonitoringConstants.CASUAL_EMPLOYEES_COL, row, rowErrorMap))
             .householdIncomeChange(ImportHandlerUtils.readAsString(MonitoringConstants.HOUSEHOLD_INCOME_CHANGE_COL, row))
             .financialStability(ImportHandlerUtils.readAsString(MonitoringConstants.FINANCIAL_STABILITY_COL, row))
             .qualityOfLife(ImportHandlerUtils.readAsString(MonitoringConstants.QUALITY_OF_LIFE_COL, row))
@@ -149,7 +150,7 @@ public class MonitoringImportHandler implements ImportHandler {
             .profitabilityGrowth(ImportHandlerUtils.readAsString(MonitoringConstants.PROFITABILITY_GROWTH_COL, row))
             .revenueChange(revenueChangeDouble == null ? null : BigDecimal.valueOf(revenueChangeDouble))
             .loanApplication(ImportHandlerUtils.readAsString(MonitoringConstants.LOAN_APPLICATION_COL, row))
-            .numberOfLoans(ImportHandlerUtils.readAsInt(MonitoringConstants.NUMBER_OF_LOANS_COL, row))
+            .numberOfLoans(DataValidator.validateTemplateIntegerValue(MonitoringConstants.NUMBER_OF_LOANS_COL, row, rowErrorMap))
             .loanPlatform(ImportHandlerUtils.readAsString(MonitoringConstants.LOAN_PLATFORM_COL, row))
             .externalFinancing(ImportHandlerUtils.readAsString(MonitoringConstants.EXTERNAL_FINANCING_COL, row))
             .financingSources(ImportHandlerUtils.readAsString(MonitoringConstants.FINANCING_SOURCES_COL, row))
@@ -159,6 +160,9 @@ public class MonitoringImportHandler implements ImportHandler {
             .businessOpportunities(ImportHandlerUtils.readAsString(MonitoringConstants.BUSINESS_OPPORTUNITIES_COL, row))
             .marketChallenges(ImportHandlerUtils.readAsString(MonitoringConstants.MARKET_CHALLENGES_COL, row))
             .build();
+        if (null == rowErrorMap.get(row)){
+            DataValidator.validateMonitoringData(monitoringDto, row, rowErrorMap);
+        }
         var monitoring = new OutComeMonitoring(monitoringDto, participant, row.getRowNum());
         monitoring.setCreatedBy(userService.currentUser());
         statuses.add(status);
