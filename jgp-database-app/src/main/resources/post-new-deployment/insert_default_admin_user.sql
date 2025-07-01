@@ -9,8 +9,8 @@ INSERT INTO user_roles
 VALUES('Super User', 'All functions');
 
 INSERT INTO users
-(cell_phone, designation, first_name, force_change_pass, is_active, last_name, "password", email_address)
-VALUES('5464336455', 'Administrator', 'Admin', false, true, 'User', '$2a$10$O4gp07pGBTqthaxYkDEglOaBEY65reC1409H/DQMvmjA1CxZcNAYW', 'admin@admin.com');
+(cell_phone, designation, first_name, force_change_pass, is_active, last_name, "password", email_address, last_modified)
+VALUES('5464336455', 'Administrator', 'Admin', false, true, 'User', '$2a$10$O4gp07pGBTqthaxYkDEglOaBEY65reC1409H/DQMvmjA1CxZcNAYW', 'admin@admin.com', CURRENT_TIMESTAMP);
 
 INSERT INTO role_permission
 (role_id, permission_id)

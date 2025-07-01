@@ -77,6 +77,10 @@ public class AppUser extends BaseEntity implements PlatformUser {
     @JoinTable(name = "appuser_role", joinColumns = @JoinColumn(name = "appuser_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+    @Setter
+    @Column(name = "date_password_changed")
+    private LocalDate datePasswordChanged;
+
     public AppUser() {
     }
 
@@ -128,10 +132,11 @@ public class AppUser extends BaseEntity implements PlatformUser {
         if(!StringUtils.equals(userDto.cellPhone(), this.cellPhone)){
             this.cellPhone = userDto.cellPhone();
         }
+        this.setLastModified(LocalDate.now(ZoneId.systemDefault()));
     }
 
     public boolean forceChangePassword(final Integer passwordLifeSpan) {
-        return this.forceChangePass || this.getLastModified().plusMonths(passwordLifeSpan).isBefore(LocalDate.now(ZoneId.systemDefault()));
+        return this.forceChangePass || this.getDatePasswordChanged().plusMonths(passwordLifeSpan).isBefore(LocalDate.now(ZoneId.systemDefault()));
     }
 
     public void changeUserStatus(boolean status){
