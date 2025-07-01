@@ -117,6 +117,7 @@ public class UserServiceImpl implements UserService{
         currentUser.setPassword(this.passwordEncoder.encode(userPassChangeDto.newPass()));
         currentUser.setForceChangePass(false);
         currentUser.setLastModified(LocalDate.now(ZoneId.systemDefault()));
+        currentUser.setDatePasswordChanged(LocalDate.now(ZoneId.systemDefault()));
         this.userRepository.save(currentUser);
     }
 
