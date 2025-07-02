@@ -2,7 +2,6 @@ package com.jgp.infrastructure.bulkimport.importhandler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jgp.authentication.service.UserService;
-import com.jgp.infrastructure.bulkimport.constants.MentorShipConstants;
 import com.jgp.infrastructure.bulkimport.data.Count;
 import com.jgp.infrastructure.bulkimport.data.MonitoringConstants;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
@@ -10,11 +9,10 @@ import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
 import com.jgp.infrastructure.bulkimport.exception.InvalidDataException;
 import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
 import com.jgp.monitoring.domain.OutComeMonitoring;
-import com.jgp.monitoring.dto.OutComeMonitoringDto;
+import com.jgp.monitoring.dto.OutComeMonitoringRequestDto;
 import com.jgp.monitoring.service.OutComeMonitoringService;
 import com.jgp.participant.service.ParticipantService;
 import com.jgp.shared.validator.DataValidator;
-import com.jgp.shared.validator.LoanValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
@@ -81,16 +79,16 @@ public class MonitoringImportHandler implements ImportHandler {
     }
 
     private OutComeMonitoring readMonitoringData(Row row) {
-        final var status = ImportHandlerUtils.readAsString(MentorShipConstants.STATUS_COL, row);
+        final var status = ImportHandlerUtils.readAsString(MonitoringConstants.STATUS_COL, row);
         final var jgpID = ImportHandlerUtils.readAsString(MonitoringConstants.JGP_ID_COL, row);
         final var participant = (null == jgpID ? null : this.participantService.findOneParticipantByJGPID(jgpID).orElse(null));
         final var locationLatDouble = DataValidator.validateTemplateDoubleValue(MonitoringConstants.LOCATION_LATITUDE_COL, row, rowErrorMap);
         final var locationLangDouble = DataValidator.validateTemplateDoubleValue(MonitoringConstants.LOCATION_LONGITUDE_COL, row, rowErrorMap);
         final var revenueChangeDouble = DataValidator.validateTemplateDoubleValue(MonitoringConstants.REVENUE_CHANGE_COL, row, rowErrorMap);
-        final var monitoringDto = OutComeMonitoringDto.builder()
+        final var monitoringDto = OutComeMonitoringRequestDto.builder()
             .surveyDate(ImportHandlerUtils.readAsDate(MonitoringConstants.SURVEY_DATE_COL, row))
             .surveyLanguage(ImportHandlerUtils.readAsString(MonitoringConstants.SURVEY_LANGUAGE_COL, row))
-            .consented("YES".equalsIgnoreCase(ImportHandlerUtils.readAsString(MonitoringConstants.CONSENTED_COL, row)))
+            .consented(ImportHandlerUtils.readAsString(MonitoringConstants.CONSENTED_COL, row))
             .locationLatitude(locationLatDouble == null ? null : BigDecimal.valueOf(locationLatDouble))
             .locationLongitude(locationLangDouble == null ? null : BigDecimal.valueOf(locationLangDouble))
             .age(DataValidator.validateTemplateIntegerValue(MonitoringConstants.AGE_COL, row, rowErrorMap))
@@ -179,8 +177,8 @@ public class MonitoringImportHandler implements ImportHandler {
         for (int i = 0; i < loanDataSize; i++) {
             final var monitoringData = monitoringDataList.get(i);
             Row row = monitoringSheet.getRow(monitoringData.getRowIndex());
-            Cell errorReportCell = row.createCell(MentorShipConstants.FAILURE_COL);
-            Cell statusCell = row.createCell(MentorShipConstants.STATUS_COL);
+            Cell errorReportCell = row.createCell(MonitoringConstants.FAILURE_COL);
+            Cell statusCell = row.createCell(MonitoringConstants.STATUS_COL);
             if (null == rowErrorMap.get(row) && Objects.isNull(monitoringData.getParticipant())){
                 rowErrorMap.put(row, "Can not associate mentorship Data data to a participant !!");
             }
@@ -234,9 +232,9 @@ public class MonitoringImportHandler implements ImportHandler {
     }
 
     private void setReportHeaders(Sheet bmpSheet) {
-        ImportHandlerUtils.writeString(MentorShipConstants.STATUS_COL, bmpSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX),
+        ImportHandlerUtils.writeString(MonitoringConstants.STATUS_COL, bmpSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX),
                 TemplatePopulateImportConstants.STATUS_COL_REPORT_HEADER);
-        ImportHandlerUtils.writeString(MentorShipConstants.FAILURE_COL, bmpSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX),
+        ImportHandlerUtils.writeString(MonitoringConstants.FAILURE_COL, bmpSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX),
                 TemplatePopulateImportConstants.FAILURE_COL_REPORT_HEADER);
     }
 

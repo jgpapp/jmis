@@ -1,8 +1,8 @@
 package com.jgp.shared.validator;
 
-import com.jgp.finance.domain.Loan;
 import com.jgp.infrastructure.bulkimport.importhandler.ImportHandlerUtils;
-import com.jgp.monitoring.dto.OutComeMonitoringDto;
+import com.jgp.monitoring.dto.OutComeMonitoringRequestDto;
+import com.jgp.monitoring.dto.OutComeMonitoringResponseDto;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -39,7 +39,7 @@ public class DataValidator {
         return null;
     }
 
-    public static void validateMonitoringData(OutComeMonitoringDto dto, Row row, Map<Row, String> rowErrorMap) {
+    public static void validateMonitoringData(OutComeMonitoringRequestDto dto, Row row, Map<Row, String> rowErrorMap) {
         // Create a Validator instance
         Validator validator;
         try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
@@ -47,11 +47,11 @@ public class DataValidator {
         }
 
         // Validate the object
-        Set<ConstraintViolation<OutComeMonitoringDto>> violations = validator.validate(dto);
+        Set<ConstraintViolation<OutComeMonitoringRequestDto>> violations = validator.validate(dto);
 
         // Get the first error, if any
         if (null == rowErrorMap.get(row) && !violations.isEmpty()) {
-            ConstraintViolation<OutComeMonitoringDto> firstViolation = violations.iterator().next();
+            ConstraintViolation<OutComeMonitoringRequestDto> firstViolation = violations.iterator().next();
             rowErrorMap.put(row, firstViolation.getMessage());
         }
     }
