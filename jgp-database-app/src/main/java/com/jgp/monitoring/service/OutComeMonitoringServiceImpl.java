@@ -5,7 +5,7 @@ import com.jgp.monitoring.domain.OutComeMonitoring;
 import com.jgp.monitoring.domain.OutComeMonitoringRepository;
 import com.jgp.monitoring.domain.predicate.OutComeMonitoringPredicateBuilder;
 import com.jgp.monitoring.domain.predicate.OutComeMonitoringSearchCriteria;
-import com.jgp.monitoring.dto.OutComeMonitoringDto;
+import com.jgp.monitoring.dto.OutComeMonitoringResponseDto;
 import com.jgp.monitoring.mapper.OutComeMonitoringMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
@@ -35,7 +35,7 @@ public class OutComeMonitoringServiceImpl implements OutComeMonitoringService {
     }
 
     @Override
-    public OutComeMonitoringDto findOneById(Long id) {
+    public OutComeMonitoringResponseDto findOneById(Long id) {
         return outComeMonitoringRepository.findById(id).map(outComeMonitoringMapper::toDto).orElse(null);
     }
 
@@ -70,7 +70,7 @@ public class OutComeMonitoringServiceImpl implements OutComeMonitoringService {
     }
 
     @Override
-    public Page<OutComeMonitoringDto> getOutComeMonitoringDataRecords(OutComeMonitoringSearchCriteria searchCriteria, Pageable pageable) {
+    public Page<OutComeMonitoringResponseDto> getOutComeMonitoringDataRecords(OutComeMonitoringSearchCriteria searchCriteria, Pageable pageable) {
         final var bmoData = this.outComeMonitoringRepository.findAll(this.outComeMonitoringPredicateBuilder.buildPredicateForSearchOutComeMonitorings(searchCriteria), pageable);
         return new PageImpl<>(this.outComeMonitoringMapper.toDto(bmoData.stream().toList()), pageable, bmoData.getTotalElements());
     }

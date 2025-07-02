@@ -2,7 +2,7 @@ package com.jgp.monitoring.service;
 
 import com.jgp.monitoring.domain.OutComeMonitoring;
 import com.jgp.monitoring.domain.predicate.OutComeMonitoringSearchCriteria;
-import com.jgp.monitoring.dto.OutComeMonitoringDto;
+import com.jgp.monitoring.dto.OutComeMonitoringResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -21,7 +21,7 @@ public interface OutComeMonitoringService {
      * @param id the ID of the OutComeMonitoring record to find
      * @return the OutComeMonitoring record with the specified ID, or null if not found
      */
-    OutComeMonitoringDto findOneById(Long id);
+    OutComeMonitoringResponseDto findOneById(Long id);
     /**
      * Approves or rejects a list of OutComeMonitoring records based on their IDs.
      *
@@ -37,6 +37,6 @@ public interface OutComeMonitoringService {
      * @param pageable pagination information
      * @return a paginated list of OutComeMonitoring records matching the search criteria
      */
-    Page<OutComeMonitoringDto> getOutComeMonitoringDataRecords(OutComeMonitoringSearchCriteria searchCriteria, Pageable pageable);
+    Page<OutComeMonitoringResponseDto> getOutComeMonitoringDataRecords(OutComeMonitoringSearchCriteria searchCriteria, Pageable pageable);
 }
 
