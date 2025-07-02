@@ -1,8 +1,7 @@
 package com.jgp.monitoring.api;
 
-import com.jgp.bmo.dto.BMOParticipantSearchCriteria;
 import com.jgp.monitoring.domain.predicate.OutComeMonitoringSearchCriteria;
-import com.jgp.monitoring.dto.OutComeMonitoringDto;
+import com.jgp.monitoring.dto.OutComeMonitoringResponseDto;
 import com.jgp.monitoring.service.OutComeMonitoringService;
 import com.jgp.shared.dto.ApiResponseDto;
 import com.jgp.util.CommonUtil;
@@ -32,9 +31,9 @@ public class OutComeMonitoringController {
     private final OutComeMonitoringService outComeMonitoringService;
 
     @GetMapping
-    public ResponseEntity<Page<OutComeMonitoringDto>> getOutComeMonitoringDataRecords(@RequestParam(name = "approved", required = false) Boolean approved,
-                                                                                 @RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
-                                                                                 @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
+    public ResponseEntity<Page<OutComeMonitoringResponseDto>> getOutComeMonitoringDataRecords(@RequestParam(name = "approved", required = false) Boolean approved,
+                                                                                              @RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
+                                                                                              @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
         final var sortedByDateCreated =
                 PageRequest.of(pageNumber, pageSize, Sort.by("dateCreated").descending());
         final var searchCriteria = OutComeMonitoringSearchCriteria.builder()
@@ -44,7 +43,7 @@ public class OutComeMonitoringController {
     }
 
     @GetMapping("{outcomeId}")
-    public ResponseEntity<OutComeMonitoringDto> findOneById(@PathVariable("outcomeId") Long outcomeId){
+    public ResponseEntity<OutComeMonitoringResponseDto> findOneById(@PathVariable("outcomeId") Long outcomeId){
         return new ResponseEntity<>(this.outComeMonitoringService.findOneById(outcomeId), HttpStatus.OK);
     }
 

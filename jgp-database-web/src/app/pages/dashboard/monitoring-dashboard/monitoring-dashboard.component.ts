@@ -37,7 +37,22 @@ questions = [
   { value: 'regular_employees', text: 'How many regular employees do you have in your business?' },
   { value: 'casual_employees', text: 'How many casual employees do you have in your business?' },
   { value: 'household_income_change', text: 'How has your household income changed in the last 6 months since engaging with the Jiinue Growth Program?' },
-  { value: 'financial_stability', text: 'How has the financial stability of your household changed since engaging with Jiinue?' }
+  { value: 'financial_stability', text: 'How has the financial stability of your household changed since engaging with Jiinue?' },
+  { value: 'group_membership', text: 'Do you belong to any of these groups of people?' },
+  { value: 'quality_of_life', text: 'Has Quality of life improved?' },
+  { value: 'empowerment', text: 'Do you feel more empowered?' },
+  { value: 'voice_in_community', text: 'Voice heard in community?' },
+  { value: 'respect_in_community', text: 'Feel respected in the community?' },
+  { value: 'reliable_income', text: 'Reliable income' },
+  { value: 'reputable_work', text: 'Work is reputable' },
+  { value: 'sense_of_purpose', text: 'Sense of purpose' },
+  { value: 'business_sector_growth', text: 'Participate in business sector growth' },
+  { value: 'community_growth', text: 'Participate in community growth' },
+  { value: 'work_opportunities', text: 'Access work opportunities' },
+  { value: 'income_regularity', text: 'Regularity of business income' },
+  { value: 'income_sufficiency', text: 'Income meets basic needs' },
+  { value: 'income_predictability', text: 'Predictability of business income' },
+  { value: 'financial_security', text: 'Financial security from work' }
 ];
 
 questionsMap: any = new Map();
@@ -95,6 +110,9 @@ public chooseQuestion() {
   }
 
    expandOutcomeMonitoringSummary(){
+    if (!this.monitoringData || this.monitoringData.length < 1) {
+      return;
+    }
     const data = { 
       content: this.chartContainer.nativeElement.cloneNode(true),
       mapContainerElement: this.chartContainer,

@@ -1,7 +1,7 @@
 package com.jgp.monitoring.mapper;
 
 import com.jgp.monitoring.domain.OutComeMonitoring;
-import com.jgp.monitoring.dto.OutComeMonitoringDto;
+import com.jgp.monitoring.dto.OutComeMonitoringResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueCheckStrategy;
@@ -89,7 +89,7 @@ public interface OutComeMonitoringMapper {
     @Mapping(target = "dateUploaded", expression = "java(null != outComeMonitoring.getDateCreated() ? outComeMonitoring.getDateCreated() : null)")
     @Mapping(target = "approvedBy", expression = "java(null != outComeMonitoring.getApprovalBy() ? outComeMonitoring.getApprovalBy().getUserFullName() : null)")
     @Mapping(target = "dateApproved", expression = "java(null != outComeMonitoring.getDateApproved() ? outComeMonitoring.getDateApproved() : null)")
-    OutComeMonitoringDto toDto(OutComeMonitoring outComeMonitoring);
+    OutComeMonitoringResponseDto toDto(OutComeMonitoring outComeMonitoring);
 
-    List<OutComeMonitoringDto> toDto(List<OutComeMonitoring> outComeMonitoringList);
+    List<OutComeMonitoringResponseDto> toDto(List<OutComeMonitoring> outComeMonitoringList);
 }
