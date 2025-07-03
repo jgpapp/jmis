@@ -16,5 +16,6 @@ public record OutComeMonitoringSearchCriteria(
         String region,
         Boolean approved,
         String partner,
+        Long participantId,
         String summarizingColumn) {
 }

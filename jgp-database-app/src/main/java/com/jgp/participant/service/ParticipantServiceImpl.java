@@ -6,6 +6,8 @@ import com.jgp.bmo.service.BMOClientDataService;
 import com.jgp.bmo.service.MentorshipService;
 import com.jgp.finance.dto.LoanSearchCriteria;
 import com.jgp.finance.service.LoanService;
+import com.jgp.monitoring.domain.predicate.OutComeMonitoringSearchCriteria;
+import com.jgp.monitoring.service.OutComeMonitoringService;
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.domain.ParticipantRepository;
 import com.jgp.participant.domain.QParticipant;
@@ -33,6 +35,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final LoanService loanService;
     private final BMOClientDataService bmoClientDataService;
     private final MentorshipService mentorshipService;
+    private final OutComeMonitoringService outComeMonitoringService;
 
     @Transactional
     @Override
@@ -70,6 +73,10 @@ public class ParticipantServiceImpl implements ParticipantService {
             participant.setLoanDtos(this.loanService.getLoans(LoanSearchCriteria.builder().participantId(participantId).approvedByPartner(true).build(), Pageable.unpaged()).stream().toList());
             participant.setBmoClientDtos(this.bmoClientDataService.getBMODataRecords(BMOParticipantSearchCriteria.builder().approvedByPartner(true).participantId(participantId).build(), Pageable.unpaged()).stream().toList());
             participant.setMentorshipResponseDtos(this.mentorshipService.getMentorshipDataRecords(MentorshipSearchCriteria.builder().approvedByPartner(true).participantId(participantId).build(), Pageable.unpaged()).stream().toList());
+            participant.setMonitoringResponseDtos(this.outComeMonitoringService.getOutComeMonitoringDataRecords(OutComeMonitoringSearchCriteria.builder()
+                            .approved(true)
+                            .participantId(participantId)
+                            .build(), Pageable.unpaged()).stream().toList());
         }
 
         return participant;
