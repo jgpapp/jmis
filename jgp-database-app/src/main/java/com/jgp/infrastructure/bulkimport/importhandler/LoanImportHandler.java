@@ -5,7 +5,6 @@ import com.jgp.authentication.service.UserService;
 import com.jgp.finance.domain.Loan;
 import com.jgp.finance.domain.LoanTransaction;
 import com.jgp.finance.service.LoanService;
-import com.jgp.infrastructure.bulkimport.constants.BMOConstants;
 import com.jgp.infrastructure.bulkimport.constants.LoanConstants;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import com.jgp.infrastructure.bulkimport.data.Count;
@@ -18,7 +17,6 @@ import com.jgp.participant.service.ParticipantService;
 import com.jgp.shared.validator.DataValidator;
 import com.jgp.shared.validator.LoanValidator;
 import com.jgp.shared.validator.ParticipantValidator;
-import com.jgp.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
@@ -32,7 +30,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -186,8 +183,7 @@ public class LoanImportHandler implements ImportHandler {
         gender = ParticipantValidator.validateGender(gender, row, rowErrorMap);
         var age = DataValidator.validateTemplateIntegerValue(LoanConstants.AGE_COL, row, rowErrorMap);
         age = ParticipantValidator.validateParticipantAge(age, row, rowErrorMap);
-        final var businessLocation = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_LOCATION_COL, row);
-        final var locationCountyCode = CommonUtil.KenyanCounty.getKenyanCountyFromName(businessLocation);
+        var locationCounty = DataValidator.validateCountyName(LoanConstants.BUSINESS_LOCATION_COL, row, rowErrorMap);
         final var industrySector = ImportHandlerUtils.readAsString(LoanConstants.INDUSTRY_SECTOR_COL, row);
 
         final var totalRegularEmployees = DataValidator.validateTemplateIntegerValue(LoanConstants.TOTAL_REGULAR_EMPLOYEES_COL, row, rowErrorMap);
@@ -199,12 +195,12 @@ public class LoanImportHandler implements ImportHandler {
         final var youthCasualEmployees = DataValidator.validateTemplateIntegerValue(LoanConstants.YOUTH_CASUAL_EMPLOYEES_COL, row, rowErrorMap);
 
         return ParticipantDto.builder()
-                .phoneNumber(phoneNumber).businessLocation(businessLocation).businessName(businessName)
+                .phoneNumber(phoneNumber).businessLocation(locationCounty.getCountyName()).businessName(businessName)
                 .ownerGender(gender).ownerAge(age).industrySector(industrySector).businessSegment("Other")
                 .totalRegularEmployees(totalRegularEmployees)
                 .youthRegularEmployees(youthRegularEmployees).totalCasualEmployees(totalCasualEmployees)
                 .youthCasualEmployees(youthCasualEmployees).jgpId(jgpId)
-                .locationCountyCode(locationCountyCode.isPresent() ? locationCountyCode.get().getCountyCode() : "999")
+                .locationCountyCode(locationCounty.getCountyCode())
                 .businessRegNumber(businessRegNumber).participantName(participantName).build();
     }
 
