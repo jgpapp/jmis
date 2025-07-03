@@ -59,7 +59,7 @@ public abstract class CommonUtil {
         map.put("018", "Nyandarua");
         map.put("019", "Nyeri");
         map.put("020", "Kirinyaga");
-        map.put("021", "Murang\'a");
+        map.put("021", "Murang'a");
         map.put("022", "Kiambu");
         map.put("023", "Turkana");
         map.put("024", "West Pokot");
@@ -113,7 +113,7 @@ public abstract class CommonUtil {
         NYANDARUA("18", "Nyandarua"),
         NYERI("19", "Nyeri"),
         KIRINYAGA("20", "Kirinyaga"),
-        MURANG_A("21", "Murang\'a"),
+        MURANG_A("21", "Murang'a"),
         KIAMBU("22", "Kiambu"),
         TURKANA("23", "Turkana"),
         WEST_POKOT("24", "West Pokot"),
@@ -157,18 +157,6 @@ public abstract class CommonUtil {
                     .findAny();
             return county.isPresent() ? county : Optional.of(KenyanCounty.UNKNOWN);
         }
-
-        public static Optional<KenyanCounty> getKenyanCountyFromCode(String code) {
-            if (null == code) {
-                return Optional.empty();
-            }
-            var county =  Arrays.stream(KenyanCounty.values())
-                    .filter(kc -> code.equals(kc.countyCode))
-                    .findAny();
-            return county.isPresent() ? county : Optional.of(KenyanCounty.UNKNOWN);
-        }
-
-
     }
 
     public static boolean isStringValueLengthNotValid(String stringValue, int min, int max){
