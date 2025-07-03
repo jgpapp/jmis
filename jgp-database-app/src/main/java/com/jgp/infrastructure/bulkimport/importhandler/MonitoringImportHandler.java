@@ -85,6 +85,7 @@ public class MonitoringImportHandler implements ImportHandler {
         final var locationLatDouble = DataValidator.validateTemplateDoubleValue(MonitoringConstants.LOCATION_LATITUDE_COL, row, rowErrorMap);
         final var locationLangDouble = DataValidator.validateTemplateDoubleValue(MonitoringConstants.LOCATION_LONGITUDE_COL, row, rowErrorMap);
         final var revenueChangeDouble = DataValidator.validateTemplateDoubleValue(MonitoringConstants.REVENUE_CHANGE_COL, row, rowErrorMap);
+        var locationCounty = DataValidator.validateCountyName(MonitoringConstants.COUNTY_NAME_COL, row, rowErrorMap);
         final var monitoringDto = OutComeMonitoringRequestDto.builder()
             .surveyDate(ImportHandlerUtils.readAsDate(MonitoringConstants.SURVEY_DATE_COL, row))
             .surveyLanguage(ImportHandlerUtils.readAsString(MonitoringConstants.SURVEY_LANGUAGE_COL, row))
@@ -97,8 +98,8 @@ public class MonitoringImportHandler implements ImportHandler {
             .partner(ImportHandlerUtils.readAsString(MonitoringConstants.PARTNER_COL, row))
             .gender(ImportHandlerUtils.readAsString(MonitoringConstants.GENDER_COL, row))
             .region(ImportHandlerUtils.readAsString(MonitoringConstants.REGION_COL, row))
-            .countyCode(ImportHandlerUtils.readAsString(MonitoringConstants.COUNTY_CODE_COL, row))
-            .countyName(ImportHandlerUtils.readAsString(MonitoringConstants.COUNTY_NAME_COL, row))
+            .countyCode(locationCounty.getCountyCode())
+            .countyName(locationCounty.getCountyName())
             .businessSetting(ImportHandlerUtils.readAsString(MonitoringConstants.BUSINESS_SETTING_COL, row))
             .businessAgeCategory(ImportHandlerUtils.readAsString(MonitoringConstants.BUSINESS_AGE_CATEGORY_COL, row))
             .groupMembership(ImportHandlerUtils.readAsString(MonitoringConstants.GROUP_MEMBERSHIP_COL, row))

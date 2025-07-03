@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jgp.authentication.service.UserService;
 import com.jgp.bmo.domain.BMOParticipantData;
 import com.jgp.bmo.service.BMOClientDataService;
+import com.jgp.infrastructure.bulkimport.constants.LoanConstants;
 import com.jgp.infrastructure.bulkimport.exception.InvalidDataException;
 import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
 import com.jgp.participant.domain.Participant;
@@ -159,8 +160,7 @@ public class BMOImportHandler implements ImportHandler {
         gender = ParticipantValidator.validateGender(gender, row, rowErrorMap);
         var age = DataValidator.validateTemplateIntegerValue(BMOConstants.AGE_COL, row, rowErrorMap);
         age = ParticipantValidator.validateParticipantAge(age, row, rowErrorMap);
-        final var businessLocation = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_LOCATION_COL, row);
-        final var locationCountyCode = CommonUtil.KenyanCounty.getKenyanCountyFromName(businessLocation);
+        var locationCounty = DataValidator.validateCountyName(BMOConstants.BUSINESS_LOCATION_COL, row, rowErrorMap);
         final var industrySector = ImportHandlerUtils.readAsString(BMOConstants.INDUSTRY_SECTOR_COL, row);
         var businessSegment = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_SEGMENT_COL, row);
         businessSegment = TAValidator.validateBusinessSegment(businessSegment, row, rowErrorMap);
@@ -185,13 +185,13 @@ public class BMOImportHandler implements ImportHandler {
 
         return ParticipantDto.builder()
                 .phoneNumber(phoneNumber).alternativePhoneNumber(alternativePhoneNumber).bestMonthlyRevenue(bestMonthlyRevenue)
-                .businessLocation(businessLocation).participantName(participantName)
+                .businessLocation(locationCounty.getCountyName()).participantName(participantName)
                 .ownerGender(gender).ownerAge(age).industrySector(industrySector).businessSegment(businessSegment)
                 .worstMonthlyRevenue(worstMonthlyRevenue).totalRegularEmployees(totalRegularEmployees)
                 .youthRegularEmployees(youthRegularEmployees).totalCasualEmployees(totalCasualEmployees)
                 .youthCasualEmployees(youthCasualEmployees).sampleRecords(sampleRecordsKept != null ? Arrays.stream(sampleRecordsKept.split(",")).map(String::trim).toList() : null)
                 .personWithDisability("YES".equalsIgnoreCase(personWithDisability) ? "Yes" : "No").refugeeStatus("YES".equalsIgnoreCase(refugeeStatus) ? "Yes" : "No").jgpId(jgpId)
-                .locationCountyCode(locationCountyCode.isPresent() ? locationCountyCode.get().getCountyCode() : "999")
+                .locationCountyCode(locationCounty.getCountyCode())
                 .businessRegNumber(registrationNumber).build();
 
     }

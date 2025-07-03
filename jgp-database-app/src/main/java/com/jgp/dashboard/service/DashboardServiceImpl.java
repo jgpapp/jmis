@@ -1305,7 +1305,7 @@ public class DashboardServiceImpl implements DashboardService {
 
         public static final String OUT_COME_MONITORING_SCHEMA = """
                 select unnest(string_to_array(mon.%s::TEXT, ',')) as dataKey, count(mon.id) as dataValue,\s
-                count(mon.id) * 100.0 / count(count(mon.id)) OVER () AS percentage\s
+                count(mon.id) * 100.0 / sum(count(mon.id)) OVER () AS percentage\s
                 from outcome_monitoring mon inner join participants cl on mon.participant_id = cl.id %s group by 1;\s
                 """;
 
