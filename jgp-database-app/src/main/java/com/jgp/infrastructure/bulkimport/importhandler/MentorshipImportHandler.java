@@ -198,11 +198,11 @@ public class MentorshipImportHandler implements ImportHandler {
         }
         final var financier = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_FINANCIER_COL, row);
         ParticipantValidator.validateFinanciers(financier, row, rowErrorMap);
-        final var businessLocation = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_COUNTY_LOCATION_COL, row);
+        var businessLocation = DataValidator.validateCountyName(MentorShipConstants.BUSINESS_COUNTY_LOCATION_COL, row, rowErrorMap);
         if (null == businessLocation && null == rowErrorMap.get(row)){
             rowErrorMap.put(row, "Business Location Is Required !!");
+            businessLocation = CommonUtil.KenyanCounty.UNKNOWN;
         }
-        final var locationCountyCode = CommonUtil.KenyanCounty.getKenyanCountyFromName(businessLocation);
         final var businessLocationSubCounty = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_SUB_COUNTY_LOCATION_COL, row);
         if (null == businessLocationSubCounty && null == rowErrorMap.get(row)){
             rowErrorMap.put(row, "Business Location SubCounty Is Required !!");
@@ -228,9 +228,9 @@ public class MentorshipImportHandler implements ImportHandler {
 
 
         return ParticipantDto.builder()
-                .phoneNumber(phoneNumber).businessLocation(businessLocation).businessName(businessName)
+                .phoneNumber(phoneNumber).businessLocation(businessLocation.getCountyName()).businessName(businessName)
                 .ownerGender(gender).ownerAge(age).industrySector(industrySector).jgpId(jgpId)
-                .locationCountyCode(locationCountyCode.isPresent() ? locationCountyCode.get().getCountyCode() : "999")
+                .locationCountyCode(businessLocation.getCountyCode())
                 .locationSubCounty(businessLocationSubCounty).locationLatitude(businessLocationLatitude)
                 .locationLongitude(businessLocationLongitude).businessSegment(businessSegment)
                 .participantName(participantName).businessFinancier(financier)

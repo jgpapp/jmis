@@ -70,7 +70,7 @@ public class MentorshipWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(MentorShipConstants.MENTEE_GENDER_COL, rowHeader, "Gender of Mentee* (Male/Female/Intersex)");
         writeString(MentorShipConstants.IS_MENTEE_DISABLED, rowHeader, "Do you have a disability?*(Yes/No)");
         writeString(MentorShipConstants.MENTEE_DISABILITY_TYPE, rowHeader, "Type of Disability/Impairment ?*(Visual impairment/Hearing impairment/Speech impairment/Physical impairment/Intellectual impairment/Psychosocial impairment/Multiple impairments)");
-        writeString(MentorShipConstants.BUSINESS_COUNTY_LOCATION_COL, rowHeader, "Business Location*(County)");
+        writeString(MentorShipConstants.BUSINESS_COUNTY_LOCATION_COL, rowHeader, "Business Location*(Valid County name e.g. Nairobi, Kisumu, Mombasa, etc.)");
         writeString(MentorShipConstants.BUSINESS_SUB_COUNTY_LOCATION_COL, rowHeader, "Sub-County*");
         writeString(MentorShipConstants.GEO_LOCATION_LATITUDE, rowHeader, "Geo Location Latitude");
         writeString(MentorShipConstants.GEO_LOCATION_LONGITUDE, rowHeader, "Geo Location Longitude");

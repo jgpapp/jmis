@@ -68,7 +68,7 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(BMOConstants.BUSINESS_ALTERNATIVE_PHONE_NUMBER_COL, rowHeader, "Alternative phone number");
         writeString(BMOConstants.GENDER_COL, rowHeader, "Gender of owner* (Male/Female/Intersex)");
         writeString(BMOConstants.AGE_COL, rowHeader, "Age of owner (full years)*");
-        writeString(BMOConstants.BUSINESS_LOCATION_COL, rowHeader, "Business Location (County)*");
+        writeString(BMOConstants.BUSINESS_LOCATION_COL, rowHeader, "Business Location* (Valid County name e.g. Nairobi, Kisumu, Mombasa, etc.)");
         writeString(BMOConstants.INDUSTRY_SECTOR_COL, rowHeader, "Industry sector(Agriculture, Artists/artisans, Manufacturing, Trading & Retail, Other)");
         writeString(BMOConstants.BUSINESS_SEGMENT_COL, rowHeader, "Business segment*(Micro/SME)");
         writeString(BMOConstants.TA_DELIVERY_MODE, rowHeader, "TA delivery mode*(In person/Virtual/Mixed)");
