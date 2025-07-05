@@ -1,0 +1,14 @@
+ALTER TABLE outcome_monitoring ALTER COLUMN education_level TYPE TEXT;
+ALTER TABLE outcome_monitoring ALTER COLUMN community_groups TYPE TEXT;
+ALTER TABLE outcome_monitoring ALTER COLUMN jgp_interventions TYPE TEXT;
+ALTER TABLE outcome_monitoring ALTER COLUMN technical_training TYPE TEXT;
+ALTER TABLE outcome_monitoring ALTER COLUMN new_practices TYPE TEXT;
+ALTER TABLE outcome_monitoring ALTER COLUMN improved_practices TYPE TEXT;
+ALTER TABLE outcome_monitoring ALTER COLUMN financing_sources TYPE TEXT;
+ALTER TABLE outcome_monitoring ALTER COLUMN market_access TYPE TEXT;
+ALTER TABLE outcome_monitoring ALTER COLUMN business_opportunities TYPE TEXT;
+ALTER TABLE outcome_monitoring ALTER COLUMN community_change TYPE TEXT;
+ALTER TABLE outcome_monitoring ALTER COLUMN community_issues TYPE TEXT;
+ALTER TABLE outcome_monitoring ALTER COLUMN training_improvements TYPE TEXT;
+ALTER TABLE outcome_monitoring ALTER COLUMN profitability_growth TYPE TEXT;
+ALTER TABLE outcome_monitoring ALTER COLUMN business_changes TYPE TEXT;
