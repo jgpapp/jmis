@@ -19,9 +19,15 @@
                                 <button mat-raised-button color="primary" *jgpHasPermission="'MONITORING_OUTCOME_APPROVE'" routerLink="new" [disabled]="selection.selected.length == 0" (click)="approveSelectedRows()">
                                   <mat-icon>verified</mat-icon>&nbsp;&nbsp;Approve Selected
                                 </button>
+                                <button mat-raised-button color="primary" *jgpHasPermission="'MONITORING_OUTCOME_APPROVE'" routerLink="new" [disabled]="newMonitoringData && newMonitoringData.length == 0" (click)="approveAllMonitoringData()">
+                                    <mat-icon>verified</mat-icon>&nbsp;&nbsp;Approve All
+                                </button>
                                 <button mat-raised-button color="warn" *jgpHasPermission="'MONITORING_OUTCOME_APPROVE'" routerLink="new" [disabled]="selection.selected.length == 0" (click)="rejectSelectedRows()">
                                     <mat-icon>verified</mat-icon>&nbsp;&nbsp;Reject Selected
-                                  </button>
+                                </button>
+                                <button mat-raised-button color="warn" *jgpHasPermission="'MONITORING_OUTCOME_APPROVE'" routerLink="new" [disabled]="newMonitoringData && newMonitoringData.length == 0" (click)="rejectAllMonitoringData()">
+                                    <mat-icon>verified</mat-icon>&nbsp;&nbsp;Reject All
+                                </button>
                               </div>
                         </mat-toolbar>
                         <div class="p-2">
