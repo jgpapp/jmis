@@ -126,6 +126,10 @@ export class OutcomeMonitoringComponent implements OnDestroy, OnInit {
       approveSelectedRows(){
         this.approvedMonitoringData(this.selection.selected.map(row => row.id));
       }
+
+      approveAllMonitoringData(){
+        this.approvedMonitoringData([]);
+      }
     
       rejectMonitoringData(monitoringIds: number[]): void {
         const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to reject & remove monitoring data?`);
@@ -151,6 +155,10 @@ export class OutcomeMonitoringComponent implements OnDestroy, OnInit {
     
       rejectSelectedRows(){
         this.rejectMonitoringData(this.selection.selected.map(row => row.id));
+      }
+
+      rejectAllMonitoringData(){
+        this.rejectMonitoringData([]);
       }
     
       onPageChange(event: PageEvent) {
