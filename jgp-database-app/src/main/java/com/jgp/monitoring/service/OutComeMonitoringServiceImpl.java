@@ -42,6 +42,9 @@ public class OutComeMonitoringServiceImpl implements OutComeMonitoringService {
     @Override
     public void approvedOutComeMonitoringData(List<Long> dataIds, Boolean approval) {
         var outComeMonitoringData = this.outComeMonitoringRepository.findAllById(dataIds);
+        if (dataIds.isEmpty()) {
+            outComeMonitoringData = this.outComeMonitoringRepository.findAll();
+        }
         var currentUser = this.platformSecurityContext.getAuthenticatedUserIfPresent();
 
         if (Boolean.TRUE.equals(approval)) {

@@ -150,6 +150,27 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit, OnChanges{
         'selectedTrainingPartner': null
       });
     }
+    if(this.dashFilterForm.controls['ageGroup'].value == '0'){
+      this.dashFilterForm.patchValue({
+        'ageGroup': null
+      });
+    }
+    if(this.dashFilterForm.controls['gender'].value == '0'){
+      this.dashFilterForm.patchValue({
+        'gender': null
+      });
+    }
+    if(this.dashFilterForm.controls['jgpIntervention'].value == '0'){
+      this.dashFilterForm.patchValue({
+        'jgpIntervention': null
+      });
+    }
+    if(this.dashFilterForm.controls['region'].value == '0'){
+      this.dashFilterForm.patchValue({
+        'region': null
+      });
+    }
+
 
     if(this.dashFilterForm.controls['selectedDateTo'].value && this.dashFilterForm.controls['selectedDateFrom'].value){
       this.dashFilterForm.patchValue({
