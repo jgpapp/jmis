@@ -233,6 +233,20 @@ public class DashboardController {
         return new ResponseEntity<>(this.dashboardService.getLoanDisbursedByPipelineSourceSummary(searchCriteria), HttpStatus.OK);
     }
 
+    @GetMapping("mentorship-by-gender")
+    public ResponseEntity<List<DataPointDto>> getMentorshipGenderSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                                 @RequestParam(value = "county-code", required = false) String countyCode,
+                                                                                 @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                                 @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getMentorshipGenderSummary(searchCriteria), HttpStatus.OK);
+    }
+
     @GetMapping("loans-disbursed-by-quality")
     public ResponseEntity<List<DataPointDto>> getLoansDisbursedByQualitySummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
                                                                                 @RequestParam(value = "county-code", required = false) String countyCode,
@@ -261,6 +275,20 @@ public class DashboardController {
                 .trainingPartner(trainingPartner)
                 .build();
         return new ResponseEntity<>(this.dashboardService.getTaNeedsByGenderSummary(searchCriteria), HttpStatus.OK);
+    }
+
+    @GetMapping("business-category-by-county")
+    public ResponseEntity<List<SeriesDataPointDto>> getBusinessCategoryByCountySummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                              @RequestParam(value = "county-code", required = false) String countyCode,
+                                                                              @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                              @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getBusinessCategoryByCountySummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("ta-training-by-sector")
@@ -345,6 +373,20 @@ public class DashboardController {
                 .trainingPartner(trainingPartner)
                 .build();
         return new ResponseEntity<>(this.dashboardService.getTaTrainingBySegmentSummary(searchCriteria), HttpStatus.OK);
+    }
+
+    @GetMapping("mentorship-by-delivery-mode")
+    public ResponseEntity<List<DataPointDto>> getParticipantsMentorshipDeliveryModeSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                            @RequestParam(value = "county-code", required = false) String countyCode,
+                                                                            @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                            @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getParticipantsMentorshipDeliveryModeSummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("training-by-partner-by-gender")
