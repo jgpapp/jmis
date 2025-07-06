@@ -72,6 +72,10 @@ export class DashboardService {
       return this.httpClient.get(`/reports/loans-disbursed-by-pipeline?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
+    getMentorshipGenderSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`/reports/mentorship-by-gender?${this.getDashBoardQueryParams(dashBoardFilters)}`);
+    }
+
     getLoansDisbursedByStatusSummary(dashBoardFilters: any = undefined): Observable<any> {
       return this.httpClient.get(`/reports/loans-disbursed-by-quality?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
@@ -90,6 +94,13 @@ export class DashboardService {
 
     getParticipantsEmployeesSummary(dashBoardFilters: any = undefined): Observable<any> {
       return this.httpClient.get(`/reports/employees-summary?${this.getDashBoardQueryParams(dashBoardFilters)}`);
+    }
+
+    getParticipantsMentorshipDeliveryModeSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`/reports/mentorship-by-delivery-mode?${this.getDashBoardQueryParams(dashBoardFilters)}`);
+    }
+    getParticipantsMentorshipBusiCategoryByCountySummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`/reports/business-category-by-county?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
     getTaTrainingBySegmentSummary(dashBoardFilters: any = undefined): Observable<any> {
