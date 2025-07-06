@@ -55,6 +55,33 @@
     </div> 
 }
 
+@if(isMentorShipDashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #mentorshipGenderSummaryContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandMentorshipGenderSummaryPieChart()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{mentorshipGenderSummaryChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (mentorshipGenderSummary && mentorshipGenderSummary.length > 0) {
+                <app-pie-chart 
+            [data]="mentorshipGenderSummary" 
+            [showLegend]="mentorshipGenderSummaryShowLegend" 
+            [colorScheme]="chartSColorScheme" 
+            [showLabels]="mentorshipGenderSummaryShowLabels" 
+            [explodeSlices]="mentorshipGenderSummaryExplodeSlices" 
+            [doughnut]="mentorshipGenderSummaryDoughnut" 
+            />
+        } @else {
+            <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+        }         
+            </div>
+        </mat-card>
+    </div> 
+}
+
 @if(isFinancialDashboard()){
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByStatusContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByStatusBarChart()">
@@ -472,6 +499,72 @@
                     [showDataLabel]="true"
                     (select)="onSelect($event)"
                 />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }          
+            </div>
+        </mat-card>
+    </div>  
+}
+
+@if(isMentorShipDashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #mentorshipDeliveryModeSummaryContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandMentorshipDeliveryModeSummaryBarChart()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{mentorshipDeliveryModeSummaryChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (mentorshipDeliveryModeSummary && mentorshipDeliveryModeSummary.length > 0) {
+                <ngx-charts-bar-horizontal
+                    [scheme]="chartSColorScheme"
+                    [results]="mentorshipDeliveryModeSummary"
+                    [gradient]="gradient"
+                    [xAxis]="mentorshipDeliveryModeSummaryShowXAxis"
+                    [yAxis]="mentorshipDeliveryModeSummaryShowYAxis"
+                    [legend]="mentorshipDeliveryModeSummaryShowLegend"
+                    [showXAxisLabel]="mentorshipDeliveryModeSummaryShowXAxisLabel"
+                    [showYAxisLabel]="mentorshipDeliveryModeSummaryShowYAxisLabel"
+                    [xAxisLabel]="mentorshipDeliveryModeSummaryYAxisLabel"
+                    [yAxisLabel]="mentorshipDeliveryModeSummaryXAxisLabel"
+                    [showDataLabel]="true"
+                    (select)="onSelect($event)"
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }          
+            </div>
+        </mat-card>
+    </div>  
+}
+
+@if(isMentorShipDashboard()){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #mentorshipBusiCategoryByCountySummaryContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandMentorshipBusiCategoryByCountySummaryBarChart()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{mentorshipBusiCategoryByCountySummaryChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (mentorshipBusiCategoryByCountySummary && mentorshipBusiCategoryByCountySummary.length > 0) {
+
+                <ngx-charts-bar-horizontal-stacked
+                    [scheme]="chartSColorScheme"
+                    [results]="mentorshipBusiCategoryByCountySummary"
+                    [gradient]="gradient"
+                    [xAxis]="mentorshipBusiCategoryByCountySummaryShowXAxis"
+                    [yAxis]="mentorshipBusiCategoryByCountySummaryShowYAxis"
+                    [legend]="mentorshipBusiCategoryByCountySummaryShowLegend"
+                    [showXAxisLabel]="mentorshipBusiCategoryByCountySummaryShowXAxisLabel"
+                    [showYAxisLabel]="mentorshipBusiCategoryByCountySummaryShowYAxisLabel"
+                    [xAxisLabel]="mentorshipBusiCategoryByCountySummaryXAxisLabel"
+                    [yAxisLabel]="mentorshipBusiCategoryByCountySummaryYAxisLabel"
+                    (select)="onSelect($event)">
+                </ngx-charts-bar-horizontal-stacked> 
             } @else {
                 <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
             }          

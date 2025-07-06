@@ -96,6 +96,23 @@
 />  
   }
 
+  @if (data.chartType === 'ngx-charts-bar-horizontal-stacked') {
+    <ngx-charts-bar-horizontal-stacked
+    [scheme]="data.chartSColorScheme"
+    [results]="data.chartData"
+    [gradient]="data.chartGradient"
+    [xAxis]="data.chartShowXAxis"
+    [yAxis]="data.chartShowYAxis"
+    [legend]="data.chartShowLegend"
+    [showXAxisLabel]="data.chartShowXAxisLabel"
+    [showYAxisLabel]="data.chartShowYAxisLabel"
+    [xAxisLabel]="data.chartXAxisLabel"
+    [yAxisLabel]="data.chartYAxisLabel"
+    [showDataLabel]="true"
+    (select)="onSelect($event)"
+/>  
+  }
+
   @if (data.chartType === 'ngx-charts-line-chart') {
     <ngx-charts-line-chart
     [scheme]="data.chartSColorScheme"

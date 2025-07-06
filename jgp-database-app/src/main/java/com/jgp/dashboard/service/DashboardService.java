@@ -43,9 +43,13 @@ public interface DashboardService {
 
     List<DataPointDto> getLoanDisbursedByPipelineSourceSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
+    List<DataPointDto> getMentorshipGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);
+
     List<DataPointDto> getLoansDisbursedByQualitySummary(DashboardSearchCriteria dashboardSearchCriteria);
 
     List<SeriesDataPointDto> getTaNeedsByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);
+
+    List<SeriesDataPointDto> getBusinessCategoryByCountySummary(DashboardSearchCriteria dashboardSearchCriteria);
 
     List<DataPointDto> getTaTrainingBySectorSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
@@ -56,6 +60,8 @@ public interface DashboardService {
     List<DataPointDto> getParticipantsEmployeesSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
     List<DataPointDto> getTaTrainingBySegmentSummary(DashboardSearchCriteria dashboardSearchCriteria);
+
+    List<DataPointDto> getParticipantsMentorshipDeliveryModeSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
     List<SeriesDataPointDto> getTrainingByPartnerByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);
 

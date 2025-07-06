@@ -74,6 +74,13 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   public loansDisbursedByPipelineDoughnut: boolean = false;
   public loansDisbursedByPipelineChartTitle: string = 'Loan Disbursed by Pipeline Source';
 
+  public mentorshipGenderSummary: any[];
+  public mentorshipGenderSummaryShowLegend: boolean = false;
+  public mentorshipGenderSummaryShowLabels: boolean = true;
+  public mentorshipGenderSummaryExplodeSlices: boolean = false;
+  public mentorshipGenderSummaryDoughnut: boolean = false;
+  public mentorshipGenderSummaryChartTitle: string = 'Gender Distribution';
+
   public loansDisbursedByStatus: any[];
   public loansDisbursedByStatusShowXAxis: boolean = true;
   public loansDisbursedByStatusShowYAxis: boolean = true;
@@ -164,6 +171,26 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   public employeesSummaryYAxisLabel: string = 'Number Of Employees';
   public employeesSummaryChartTitle: string = 'Employees Summary';
 
+  public mentorshipDeliveryModeSummary: any[];
+  public mentorshipDeliveryModeSummaryShowXAxis: boolean = true;
+  public mentorshipDeliveryModeSummaryShowYAxis: boolean = true;
+  public mentorshipDeliveryModeSummaryShowLegend: boolean = false;
+  public mentorshipDeliveryModeSummaryShowXAxisLabel: boolean = true;
+  public mentorshipDeliveryModeSummaryShowYAxisLabel: boolean = true;
+  public mentorshipDeliveryModeSummaryXAxisLabel: string = 'Delivery Mode';
+  public mentorshipDeliveryModeSummaryYAxisLabel: string = 'Count';
+  public mentorshipDeliveryModeSummaryChartTitle: string = 'Delivery Mode Distribution';
+
+  public mentorshipBusiCategoryByCountySummary: any[];
+  public mentorshipBusiCategoryByCountySummaryShowXAxis: boolean = true;
+  public mentorshipBusiCategoryByCountySummaryShowYAxis: boolean = true;
+  public mentorshipBusiCategoryByCountySummaryShowLegend: boolean = false;
+  public mentorshipBusiCategoryByCountySummaryShowXAxisLabel: boolean = true;
+  public mentorshipBusiCategoryByCountySummaryShowYAxisLabel: boolean = true;
+  public mentorshipBusiCategoryByCountySummaryXAxisLabel: string = 'Business Categories';
+  public mentorshipBusiCategoryByCountySummaryYAxisLabel: string = 'Counties';
+  public mentorshipBusiCategoryByCountySummaryChartTitle: string = 'Business Category By County';
+
   public accessedVSOutStandingAmount: any[]
   public accessedVSOutStandingAmountShowXAxis = true;
   public accessedVSOutStandingAmountShowYAxis = true;
@@ -250,6 +277,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   @ViewChild('businessesTainedByGenderContentDiv', { static: false }) businessesTainedByGenderContentDiv!: ElementRef;
   @ViewChild('loanedBusinessesByGenderContentDiv', { static: false }) loanedBusinessesByGenderContentDiv!: ElementRef;
   @ViewChild('loansDisbursedByPipelineContentDiv', { static: false }) loansDisbursedByPipelineContentDiv!: ElementRef;
+  @ViewChild('mentorshipGenderSummaryContentDiv', { static: false }) mentorshipGenderSummaryContentDiv!: ElementRef;
   @ViewChild('countyTrainedBusinessesMapContentDiv', { static: false }) countyTrainedBusinessesMapContentDiv!: ElementRef;
   @ViewChild('loansDisbursedByStatusContentDiv', { static: false }) loansDisbursedByStatusContentDiv!: ElementRef;
   @ViewChild('taNeedsByGenderContentDiv', { static: false }) taNeedsByGenderContentDiv!: ElementRef;
@@ -260,6 +288,8 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   @ViewChild('taTrainedBySectorContentDiv', { static: false }) taTrainedBySectorContentDiv!: ElementRef;
   @ViewChild('loansDisbursedByProductContentDiv', { static: false }) loansDisbursedByProductContentDiv!: ElementRef;
   @ViewChild('employeesSummaryContentDiv', { static: false }) employeesSummaryContentDiv!: ElementRef;
+  @ViewChild('mentorshipDeliveryModeSummaryContentDiv', { static: false }) mentorshipDeliveryModeSummaryContentDiv!: ElementRef;
+  @ViewChild('mentorshipBusiCategoryByCountySummaryContentDiv', { static: false }) mentorshipBusiCategoryByCountySummaryContentDiv!: ElementRef;
   @ViewChild('accessedVSOutStandingAmountContentDiv', { static: false }) accessedVSOutStandingAmountContentDiv!: ElementRef;
   @ViewChild('accessedVSOutStandingAmountByGenderContentDiv', { static: false }) accessedVSOutStandingAmountByGenderContentDiv!: ElementRef;
   @ViewChild('taTrainedBySegmentContentDiv', { static: false }) taTrainedBySegmentContentDiv!: ElementRef;
@@ -289,6 +319,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
     this.getLoansDisbursedByGenderSummary();
     this.getLoanDisbursedByIndustrySectorSummary();
     this.getLoansDisbursedByPipelineSummary();
+    this.getMentorshipGenderSummary();
     this.getBusinessesTrainedByGenderSummary();
     this.getLoansDisbursedByStatusSummary();
     this.getTaNeedsByGenderSummary();
@@ -304,6 +335,8 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
     this.getLoanDisbursedTopFourCountiesSummary();
     this.getBusinessTrainedTopFourCountiesSummary();
     this.getParticipantsEmployeesSummary();
+    this.getParticipantsMentorshipDeliveryModeSummary();
+    this.getParticipantsMentorshipBusiCategoryByCountySummary();
     this.getDisabledBusinessOwnersTrainedByGenderSummary();
     this.getRefugeeBusinessOwnersTrainedByGenderSummary();
     this.getLoansDisbursedByLoanProductSummary();
@@ -350,6 +383,17 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       .subscribe({
         next: (response) => {
           this.loansDisbursedByPipeline = response;
+        },
+        error: (error) => { }
+      });
+  }
+
+  getMentorshipGenderSummary() {
+    this.dashBoardService.getMentorshipGenderSummary(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.mentorshipGenderSummary = response;
         },
         error: (error) => { }
       });
@@ -438,6 +482,32 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       .subscribe({
         next: (response) => {
           this.employeesSummary = response;
+        },
+        error: (error) => { 
+          console.log(error)
+        }
+      });
+  }
+
+  getParticipantsMentorshipDeliveryModeSummary() {
+    this.dashBoardService.getParticipantsMentorshipDeliveryModeSummary(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.mentorshipDeliveryModeSummary = response;
+        },
+        error: (error) => { 
+          console.log(error)
+        }
+      });
+  }
+
+  getParticipantsMentorshipBusiCategoryByCountySummary() {
+    this.dashBoardService.getParticipantsMentorshipBusiCategoryByCountySummary(this.dashBoardFilters)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.mentorshipBusiCategoryByCountySummary = response;
         },
         error: (error) => { 
           console.log(error)
@@ -717,6 +787,26 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
     this.dashBoardService.openExpandedChartDialog(this.dialog, data);
   }
 
+  expandMentorshipGenderSummaryPieChart(){
+    const data = { 
+      content: this.mentorshipGenderSummaryContentDiv.nativeElement.cloneNode(true),
+      chartType: 'app-pie-chart',
+      chartData: this.mentorshipGenderSummary,
+      chartShowLegend: this.mentorshipGenderSummaryShowLegend,
+      chartSColorScheme: this.chartSColorScheme,
+      chartShowLabels: this.mentorshipGenderSummaryShowLabels,
+      chartExplodeSlices: this.mentorshipGenderSummaryExplodeSlices,
+      chartIsDoughnut: this.mentorshipGenderSummaryDoughnut,
+      chartTitle: this.mentorshipGenderSummaryChartTitle,
+      chartFormatLabel: (label: string): string => {
+        // Find the data object by name and return the value instead of name
+        const item = this.mentorshipGenderSummary.find(data => data.name === label);
+        return item ? `${this.valueFormatting(item.value)}` : label; // If found, return the value; otherwise return the name as fallback
+      }
+    };
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
+  }
+
   expandCountyTrainedBusinessesMap(){
     const data = { 
       content: this.countyTrainedBusinessesMapContentDiv.nativeElement.cloneNode(true),
@@ -876,6 +966,48 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
     this.dashBoardService.openExpandedChartDialog(this.dialog, data);
   }
 
+  expandMentorshipDeliveryModeSummaryBarChart(){
+    const data = { 
+      content: this.mentorshipDeliveryModeSummaryContentDiv.nativeElement.cloneNode(true),
+      mapContainerElement: this.mentorshipDeliveryModeSummaryContentDiv,
+      chartType: 'ngx-charts-bar-horizontal',
+      chartData: this.mentorshipDeliveryModeSummary,
+      chartGradient: this.gradient,
+      chartShowXAxis: this.mentorshipDeliveryModeSummaryShowXAxis,
+      chartShowYAxis: this.mentorshipDeliveryModeSummaryShowYAxis,
+      chartSColorScheme: this.chartSColorScheme,
+      chartShowLegend: true,
+      chartShowXAxisLabel: this.mentorshipDeliveryModeSummaryShowXAxisLabel,
+      chartShowYAxisLabel: this.mentorshipDeliveryModeSummaryShowYAxisLabel,
+      chartYAxisLabel: this.mentorshipDeliveryModeSummaryXAxisLabel,
+      chartXAxisLabel: this.mentorshipDeliveryModeSummaryYAxisLabel,
+      chartFormatLabel: this.valueFormatting,
+      chartTitle: this.mentorshipDeliveryModeSummaryChartTitle,
+    };
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
+  }
+
+  expandMentorshipBusiCategoryByCountySummaryBarChart(){
+    const data = { 
+      content: this.mentorshipBusiCategoryByCountySummaryContentDiv.nativeElement.cloneNode(true),
+      mapContainerElement: this.mentorshipBusiCategoryByCountySummaryContentDiv,
+      chartType: 'ngx-charts-bar-horizontal-stacked',
+      chartData: this.mentorshipBusiCategoryByCountySummary,
+      chartGradient: this.gradient,
+      chartShowXAxis: this.mentorshipBusiCategoryByCountySummaryShowXAxis,
+      chartShowYAxis: this.mentorshipBusiCategoryByCountySummaryShowYAxis,
+      chartSColorScheme: this.chartSColorScheme,
+      chartShowLegend: true,
+      chartShowXAxisLabel: this.mentorshipBusiCategoryByCountySummaryShowXAxisLabel,
+      chartShowYAxisLabel: this.mentorshipBusiCategoryByCountySummaryShowYAxisLabel,
+      chartYAxisLabel: this.mentorshipBusiCategoryByCountySummaryXAxisLabel,
+      chartXAxisLabel: this.mentorshipBusiCategoryByCountySummaryYAxisLabel,
+      chartFormatLabel: this.valueFormatting,
+      chartTitle: this.mentorshipBusiCategoryByCountySummaryChartTitle,
+    };
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
+  }
+
   expandAccessedVSOutStandingAmountBarChart(){
     const data = { 
       content: this.accessedVSOutStandingAmountContentDiv.nativeElement.cloneNode(true),
@@ -985,5 +1117,9 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
 
   isTADashboard(): boolean {
     return 'TA' === this.selectedDashboardView;
+  }
+
+  isMentorShipDashboard(): boolean {
+    return 'MENTOR' === this.selectedDashboardView;
   }
 }
