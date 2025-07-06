@@ -421,6 +421,31 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    public List<DataPointDto> getMentorshipGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
+        final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
+        LocalDate fromDate = dashboardSearchCriteria.fromDate();
+        LocalDate toDate = dashboardSearchCriteria.toDate();
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = getDefaultQueryDates().getLeft();
+            toDate = getDefaultQueryDates().getRight();
+        }
+        var loanWhereClause = MENTORSHIP_WHERE_CLAUSE_BY_MENTORSHIP_DATE_PARAM;
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
+            parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
+            loanWhereClause = String.format(MENTORSHIP_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
+            parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
+            loanWhereClause = String.format("%s%s", loanWhereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        var sqlQuery = String.format(DataPointMapper.MENTORSHIP_BY_GENDER_SCHEMA, loanWhereClause);
+
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
     public List<DataPointDto> getLoansDisbursedByQualitySummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -470,6 +495,31 @@ public class DashboardServiceImpl implements DashboardService {
             whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_TRAINING_PARTNER_PARAM);
         }
         var sqlQuery = String.format(SeriesDataPointMapper.TA_NEEDS_BY_GENDER_SCHEMA, whereClause);
+
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
+    public List<SeriesDataPointDto> getBusinessCategoryByCountySummary(DashboardSearchCriteria dashboardSearchCriteria) {
+        final var rm = new SeriesDataPointMapper();
+        LocalDate fromDate = dashboardSearchCriteria.fromDate();
+        LocalDate toDate = dashboardSearchCriteria.toDate();
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = getDefaultQueryDates().getLeft();
+            toDate = getDefaultQueryDates().getRight();
+        }
+        var whereClause = MENTORSHIP_WHERE_CLAUSE_BY_MENTORSHIP_DATE_PARAM;
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
+            parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
+            whereClause = String.format(MENTORSHIP_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
+            parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
+            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        var sqlQuery = String.format(SeriesDataPointMapper.MENTORSHIP_BUSINESS_CATEGORIES_BY_COUNTY_SCHEMA, whereClause);
 
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
     }
@@ -630,6 +680,31 @@ public class DashboardServiceImpl implements DashboardService {
             whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_TRAINING_PARTNER_PARAM);
         }
         var sqlQuery = String.format(DataPointMapper.BUSINESSES_TRAINED_BY_SEGMENT_SCHEMA, whereClause);
+
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
+    public List<DataPointDto> getParticipantsMentorshipDeliveryModeSummary(DashboardSearchCriteria dashboardSearchCriteria) {
+        final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
+        LocalDate fromDate = dashboardSearchCriteria.fromDate();
+        LocalDate toDate = dashboardSearchCriteria.toDate();
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = getDefaultQueryDates().getLeft();
+            toDate = getDefaultQueryDates().getRight();
+        }
+        var whereClause = MENTORSHIP_WHERE_CLAUSE_BY_MENTORSHIP_DATE_PARAM;
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
+            parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
+            whereClause = String.format(MENTORSHIP_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
+            parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
+            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        var sqlQuery = String.format(DataPointMapper.MENTORSHIP_DELIVERY_MODE_SCHEMA, whereClause);
 
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
     }
@@ -1291,6 +1366,12 @@ public class DashboardServiceImpl implements DashboardService {
                 from loan_transactions lt inner join loans l on lt.loan_id = l.id inner join participants cl on l.participant_id = cl.id %s group by 1;\s
                 """;
 
+        public static final String MENTORSHIP_BY_GENDER_SCHEMA = """
+                select cl.owner_gender as dataKey, count(m.id) as dataValue,\s
+                count(m.id) * 100.0 / SUM(count(m.id)) OVER () AS percentage\s
+                from mentor_ships m inner join participants cl on m.participant_id = cl.id %s group by 1;\s
+                """;
+
         public static final String LOANS_DISBURSED_BY_QUALITY_SCHEMA = """
                 select l.loan_quality as dataKey, sum(lt.amount) as dataValue,\s
                 SUM(lt.amount) * 100.0 / SUM(SUM(lt.amount)) OVER () AS percentage\s
@@ -1320,6 +1401,13 @@ public class DashboardServiceImpl implements DashboardService {
                 select cl.business_segment as dataKey, count(cl.id) as dataValue,\s
                 count(cl.id) * 100.0 / sum(count(cl.id)) OVER () AS percentage\s
                 from participants cl inner join bmo_participants_data bpd on bpd.participant_id = cl.id\s
+                %s group by 1;\s
+                """;
+
+        public static final String MENTORSHIP_DELIVERY_MODE_SCHEMA = """
+                select m.mentor_ship_delivery_mode as dataKey, count(m.id) as dataValue,\s
+                count(m.id) * 100.0 / sum(count(m.id)) OVER () AS percentage\s
+                from mentor_ships m inner join participants cl on m.participant_id = cl.id\s
                 %s group by 1;\s
                 """;
 
@@ -1355,6 +1443,11 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
     public static final String TA_NEEDS_BY_GENDER_SCHEMA = """
                 SELECT unnest(string_to_array(bpd.ta_needs, ',')) AS name, cl.gender_category as seriesName, COUNT(*) AS value\s
                 FROM participants cl inner join bmo_participants_data bpd on bpd.participant_id = cl.id %s group by 1, 2;\s
+               \s""";
+
+    public static final String MENTORSHIP_BUSINESS_CATEGORIES_BY_COUNTY_SCHEMA = """
+                SELECT cl.industry_sector AS name, cl.business_location as seriesName, COUNT(m.id) AS value\s
+                FROM mentor_ships m inner join participants cl on m.participant_id = cl.id %s group by 1, 2;\s
                \s""";
 
     public static final String TRAINING_BY_PARTNER_BY_GENDER_SCHEMA = """

@@ -41,6 +41,10 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
        // THIS IS THE KEY DETECTION POINT FOR 401
       if (error.status === 401 && !req.url.includes('/authenticate')) {
         // Handle 401 error: Token expired or invalid
+        if (req.url.includes('/refresh-token')) {
+            authService.doLogout(); // AuthService handles navigation to login
+            return throwError(() => error);
+          }
         if (!isRefreshing) {
           isRefreshing = true;
           refreshTokenSubject.next(null); // Clear previous token
@@ -70,28 +74,7 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
             })
           );
         }
-      } else {
-
-
-      if (error instanceof HttpErrorResponse) {
-        // Handle HTTP errors
-        if (error.status === 401) {
-          // Specific handling for unauthorized errors         
-          globalService.openSnackBar(`${error.error.detail}`, "Dismiss");
-          // You might trigger a re-authentication flow or redirect the user here
-        } else {
-          // Handle other HTTP error codes
-          globalService.openSnackBar(`${error.error.detail}`, "Dismiss");
-        }
-      } else {
-        // Handle non-HTTP errors
-        globalService.openSnackBar(`${error}`, "Dismiss");
       }
-
-    }
-
-
-
       // Re-throw the error to propagate it further
       return throwError(() => error); 
     })
