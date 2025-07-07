@@ -44,7 +44,7 @@ export class BmoFiDashboardComponent implements OnInit{
  
   selectedDashboardView: string = 'FI';
   dashBoardFilters: any;
-  partnerName: string = '';
+  //partnerName: string = '';
   resetDashBoardFilters: boolean = false;
 
   accessedLoanData: any;
@@ -88,7 +88,7 @@ export class BmoFiDashboardComponent implements OnInit{
 
   ngOnInit(): void {
     this.dashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId}
-    this.partnerName = `${this.authService.currentUser()?.partnerName} Dashboard !`;
+    //this.partnerName = `${this.authService.currentUser()?.partnerName} Dashboard !`;
     this.partnerId = this.authService.currentUser()?.partnerId;
     this.getLastThreeYearsAccessedLoanPerPartnerYearly();
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
