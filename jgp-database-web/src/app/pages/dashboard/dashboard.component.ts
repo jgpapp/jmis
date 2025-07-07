@@ -20,6 +20,9 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { FormsModule } from '@angular/forms';
 import { PerformanceSummaryComponent } from "./performance-summary/performance-summary.component";
 import { MonitoringDashboardComponent } from './monitoring-dashboard/monitoring-dashboard.component';
+import { ActivatedRoute } from '@angular/router';
+import { DashboardTypeFilter } from '../../dto/dashboard-type-filter';
+import { AnalyticsComponent } from './analytics/analytics.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -40,14 +43,15 @@ import { MonitoringDashboardComponent } from './monitoring-dashboard/monitoring-
     MatButtonToggleModule,
     FormsModule,
     PerformanceSummaryComponent,
-    MonitoringDashboardComponent
+    MonitoringDashboardComponent,
+    AnalyticsComponent
 ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
 
-  selectedDashboardView: string = 'FI';
+  private _selectedDashboardView: string = 'FI';
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   public displayedColumns = ['year', 'partnerName', 'genderName', 'value' ];
@@ -64,18 +68,25 @@ export class DashboardComponent {
   public accessedLoanCountDataDataSource: any;
   public trainedBusinessesCountDataDataSource: any;
   private unsubscribe$ = new Subject<void>();
+  isPartnerDashboard: boolean = false;
+  currentUserPartnerId: any;
+  partnerType: string | undefined = 'NONE';
 
 
   dashBoardFilters: any;
   partnerSpecificDashBoardFilters: any;
   resetDashBoardFilters: boolean = false;
-  constructor(private dashBoardService: DashboardService, public authService: AuthService, public gs: GlobalService){}
+  currentDashBoardTypeFilters: DashboardTypeFilter = {};
+  constructor(private dashBoardService: DashboardService, public authService: AuthService, public gs: GlobalService, private route: ActivatedRoute){}
 
   
 
   setDashBoardFilters(currentDashBoardFilters: any){
     this.dashBoardFilters = currentDashBoardFilters;
     this.partnerSpecificDashBoardFilters = currentDashBoardFilters;
+    if(this.currentDashBoardTypeFilters.isPartnerDashboard){
+      this.dashBoardFilters['selectedPartnerId'] = this.currentUserPartnerId;
+    }
     this.resetDashBoardFilters = false;
     this.getLastThreeYearsAccessedLoanPerPartnerYearly();
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
@@ -86,7 +97,10 @@ export class DashboardComponent {
 
   doResetDashBoardFilters(){
     this.dashBoardFilters = {};
-    this.partnerSpecificDashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId};
+    if(this.currentDashBoardTypeFilters.isPartnerDashboard){
+      this.dashBoardFilters = {'selectedPartnerId': this.currentUserPartnerId}
+    }
+    this.partnerSpecificDashBoardFilters = {'selectedPartnerId': this.currentUserPartnerId};
     this.resetDashBoardFilters = true;
     this.getLastThreeYearsAccessedLoanPerPartnerYearly();
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
@@ -219,9 +233,46 @@ export class DashboardComponent {
     return data[index].taType !== data[index - 1].taType;
   }
 
+  get selectedDashboardView(): string {
+  return this._selectedDashboardView;
+  }
+
+  set selectedDashboardView(value: string) {
+    this._selectedDashboardView = value;
+    this.updateCurrentDashBoardTypeFilters();
+  }
+
+  updateCurrentDashBoardTypeFilters() {
+  this.currentDashBoardTypeFilters = {
+    isPartnerDashboard: this.isPartnerDashboard,
+    currentUserPartnerId: this.currentUserPartnerId,
+    partnerType: this.partnerType,
+    isFinancialDashboard: 'FI' === this.selectedDashboardView,
+    isTADashboard: 'TA' === this.selectedDashboardView,
+    isMentorShipDashboard: 'MENTOR' === this.selectedDashboardView,
+    isMonitoringDashBoard: 'MONITOR' === this.selectedDashboardView
+  };
+}
+
   ngOnInit(): void {
+    this.route.data.subscribe(data => {
+      this.isPartnerDashboard = data['isPartnerDashboard'];
+    });
+    const currentUser = this.authService.currentUser();
+    this.currentUserPartnerId = currentUser?.partnerId;
+    this.partnerType = currentUser?.partnerType === '-' ? 'NONE' : currentUser?.partnerType;
     this.dashBoardFilters = {};
-    this.partnerSpecificDashBoardFilters = {'selectedPartnerId': this.authService.currentUser()?.partnerId};
+    if(this.currentDashBoardTypeFilters.isPartnerDashboard){
+      this.dashBoardFilters = {'selectedPartnerId': this.currentUserPartnerId}
+    }
+    this.partnerSpecificDashBoardFilters = {'selectedPartnerId': this.currentUserPartnerId};
+
+    // Set initial dashboard type filters
+    if (this.partnerType === 'TA' && this.isPartnerDashboard) {
+      this._selectedDashboardView = 'TA';
+    }
+    this.updateCurrentDashBoardTypeFilters();
+
     this.getLastThreeYearsAccessedLoanPerPartnerYearly();
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
     this.getLastThreeYearsTrainedBusinessesPerPartnerYearly();
@@ -235,38 +286,48 @@ export class DashboardComponent {
     this.unsubscribe$.complete();
   }
 
-  isFinancialDashboard(): boolean {
-    return 'FI' === this.selectedDashboardView;
+  showFinancialDashboardSelector(): boolean {
+    return !this.currentDashBoardTypeFilters.isPartnerDashboard || 'FI' === this.partnerType || 'NONE' === this.partnerType || 'FI_TA' === this.partnerType;
   }
 
-  isTADashboard(): boolean {
-    return 'TA' === this.selectedDashboardView;
+  showTADashboardSelector(): boolean {
+    return !this.currentDashBoardTypeFilters.isPartnerDashboard || 'TA' === this.partnerType || 'NONE' === this.partnerType || 'FI_TA' === this.partnerType;
   }
 
-  isMentorShipDashboard(): boolean {
-    return 'MENTOR' === this.selectedDashboardView;
+  showMentorShipDashboardSelector(): boolean {
+    return true;
   }
-  isMonitoringDashBoard(): boolean {
-    return 'MONITOR' === this.selectedDashboardView;
+  showMonitoringDashBoardSelector(): boolean {
+    return !this.currentDashBoardTypeFilters.isPartnerDashboard;
   }
 
   get filterFieldFlex(): number {
-    if(this.isFinancialDashboard()){
+    if(this.currentDashBoardTypeFilters.isFinancialDashboard){
+      if(this.currentDashBoardTypeFilters.isPartnerDashboard){
+        return 33.3;
+      }
       if(this.authService.hasPermission('DASHBOARD_VIEW_WITH_PARTNER_FILTER')){
         return 25;
       } else {
         return 33.3;
       }
-    } else if(this.isTADashboard()){
+    } else if(this.currentDashBoardTypeFilters.isTADashboard){
+      if(this.currentDashBoardTypeFilters.isPartnerDashboard){
+        return 25;
+      }
       if(this.authService.hasPermission('DASHBOARD_VIEW_WITH_PARTNER_FILTER')){
         return 20;
       } else {
         return 25;
       }
-    } else if(this.isMonitoringDashBoard()){
+    } else if(this.currentDashBoardTypeFilters.isMonitoringDashBoard){
         return 100/7; // 14.28
-    } else {
+    } else if(this.currentDashBoardTypeFilters.isMentorShipDashboard){
+      if(this.currentDashBoardTypeFilters.isPartnerDashboard){
+        return 33.3;
+      }
       return 25;
     }
+    return 20;
   }
 }

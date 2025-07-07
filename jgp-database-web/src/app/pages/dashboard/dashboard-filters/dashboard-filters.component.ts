@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, input, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -13,6 +13,7 @@ import { GlobalService } from '@services/shared/global.service';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { AuthService } from '@services/users/auth.service';
 import { DatePipe } from '@angular/common';
+import { DashboardTypeFilter } from '../../../dto/dashboard-type-filter';
 
 @Component({
   selector: 'app-dashboard-filters',
@@ -34,12 +35,9 @@ import { DatePipe } from '@angular/common';
 export class DashboardFiltersComponent implements OnDestroy, OnInit, OnChanges{
 
   @Output() dashBoardFilters: EventEmitter<any> = new EventEmitter();
-  @Input({required: true, alias: 'isPartnerDashBoard'}) isPartnerDashBoard: boolean;
-  @Input({required: true, alias: 'showTADashboard'}) showTADashboard: boolean;
-  @Input('partnerId') partnerId: number;
   @Input({required: true, alias: 'fieldFlex'}) fieldFlex: number;
   @Input({required: true, alias: 'resetDashBoardFilters'}) resetDashBoardFilters: boolean;
-  @Input({required: true, alias: 'isMonitoringDashBoard'}) isMonitoringDashBoard: boolean;
+  @Input({required: true, alias: 'dashboardTypeFilter'}) dashboardTypeFilter: DashboardTypeFilter;
   public disableToDate: boolean = true;
   maxDate: Date = new Date();
   toDateMinValue = new Date();
@@ -130,9 +128,9 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit, OnChanges{
   }
 
   filterFormChanged() {
-    if(this.isPartnerDashBoard){
+    if(this.dashboardTypeFilter.isPartnerDashboard && this.dashboardTypeFilter.currentUserPartnerId){
       this.dashFilterForm.patchValue({
-        'selectedPartnerId': this.partnerId
+        'selectedPartnerId': this.dashboardTypeFilter.currentUserPartnerId
       });
     }
     if(this.dashFilterForm.controls['selectedPartnerId'].value == '0'){

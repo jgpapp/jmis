@@ -11,19 +11,19 @@ export const routes: Routes = [
         path: '',
         loadComponent: () => import('./dashboard/dashboard.component').then(c => c.DashboardComponent),
         canActivate: [AuthGuard],
-        data: { breadcrumb: 'Dashboard' }
+        data: { breadcrumb: 'Dashboard', isPartnerDashboard: false }
       },
       {
         path: 'my-partner-dashboard',
-        loadComponent: () => import('./dashboard/my-dashboard/my-dashboard.component').then(c => c.MyDashboardComponent),
+        loadComponent: () => import('./dashboard/dashboard.component').then(c => c.DashboardComponent),
         canActivate: [AuthGuard],
-        data: { breadcrumb: 'Dashboard' }
+        data: { breadcrumb: 'Dashboard', isPartnerDashboard: true }
       },
       {
         path: 'participants',
         loadChildren: () => import('./clients/client.routes').then(p => p.routes),
         canActivate: [AuthGuard],
-        data: { breadcrumb: 'Project Participants' }
+        data: { breadcrumb: 'Participants' }
       },
       {
         path: 'data-upload',
@@ -35,7 +35,7 @@ export const routes: Routes = [
         path: 'data-list',
         loadComponent: () => import('./data/data-list/data-list.component').then(c => c.DataListComponent),
         canActivate: [AuthGuard],
-        data: { breadcrumb: 'Data Management' }
+        data: { breadcrumb: 'Technical Assitance Data Management' }
       },
       {
         path: 'loans',

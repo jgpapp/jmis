@@ -12,7 +12,7 @@
             </mat-select>
         </mat-form-field>
 
-        @if(isMonitoringDashBoard){
+        @if(dashboardTypeFilter.isMonitoringDashBoard){
             <mat-form-field appearance="outline" fxFlex="100" [fxFlex.xl]="fieldFlex" [fxFlex.lg]="fieldFlex" fxFlex.md="20" fxFlex.sm="50" class="px-2">
                 <mat-label>Age Group</mat-label>
                 <mat-select formControlName="ageGroup" (selectionChange)="filterFormChanged()">
@@ -61,7 +61,7 @@
                 </mat-select>
             </mat-form-field>
         }@else{
-            @if(!isPartnerDashBoard && authService.hasPermission('DASHBOARD_VIEW_WITH_PARTNER_FILTER')){
+            @if(!dashboardTypeFilter.isPartnerDashboard && authService.hasPermission('DASHBOARD_VIEW_WITH_PARTNER_FILTER')){
             <mat-form-field appearance="outline" fxFlex="100" [fxFlex.xl]="fieldFlex" [fxFlex.lg]="fieldFlex" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
                 <mat-label>Select Partner</mat-label>
                 <mat-select formControlName="selectedPartnerId" (selectionChange)="filterFormChanged()">
@@ -73,7 +73,7 @@
             </mat-form-field>
         }
 
-        @if(showTADashboard){
+        @if(dashboardTypeFilter.isTADashboard){
             <mat-form-field appearance="outline" fxFlex="100" [fxFlex.xl]="fieldFlex" [fxFlex.lg]="fieldFlex" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
                 <mat-label>Select Training Partner</mat-label>
                 <mat-select formControlName="selectedTrainingPartner" (selectionChange)="filterFormChanged()">
