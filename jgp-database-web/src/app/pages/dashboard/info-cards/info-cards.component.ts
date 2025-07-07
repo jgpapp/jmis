@@ -8,6 +8,7 @@ import { multi, single } from '@data/charts.data';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { Subject, takeUntil } from 'rxjs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { DashboardTypeFilter } from '../../../dto/dashboard-type-filter';
 
 @Component({
   selector: 'app-info-cards',
@@ -25,7 +26,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 })
 export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, OnDestroy {
   @Input('dashBoardFilters') dashBoardFilters: any;
-  @Input('selectedDashboardView') selectedDashboardView: any;
+  @Input({required: true, alias: 'dashboardTypeFilter'}) dashboardTypeFilter: DashboardTypeFilter;
   public displayChart: boolean = false;
   public colorScheme: any = {
     domain: ['rgba(255,255,255,0.8)']
@@ -187,8 +188,8 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   public mentorshipBusiCategoryByCountySummaryShowLegend: boolean = false;
   public mentorshipBusiCategoryByCountySummaryShowXAxisLabel: boolean = true;
   public mentorshipBusiCategoryByCountySummaryShowYAxisLabel: boolean = true;
-  public mentorshipBusiCategoryByCountySummaryXAxisLabel: string = 'Business Categories';
-  public mentorshipBusiCategoryByCountySummaryYAxisLabel: string = 'Counties';
+  public mentorshipBusiCategoryByCountySummaryXAxisLabel: string = 'Counties';
+  public mentorshipBusiCategoryByCountySummaryYAxisLabel: string = 'Business Categories';
   public mentorshipBusiCategoryByCountySummaryChartTitle: string = 'Business Category By County';
 
   public accessedVSOutStandingAmount: any[]
@@ -301,8 +302,9 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['selectedDashboardView']) {
-      this.selectedDashboardView = changes['selectedDashboardView']['currentValue']
+    if (changes['dashboardTypeFilter']) {
+      this.dashboardTypeFilter = changes['dashboardTypeFilter']['currentValue']
+      this.reloadData();
     }
     if (changes['dashBoardFilters']) {
       this.dashBoardFilters = changes['dashBoardFilters']['currentValue']
@@ -316,32 +318,39 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   reloadData(){
-    this.getLoansDisbursedByGenderSummary();
-    this.getLoanDisbursedByIndustrySectorSummary();
-    this.getLoansDisbursedByPipelineSummary();
-    this.getMentorshipGenderSummary();
-    this.getBusinessesTrainedByGenderSummary();
-    this.getLoansDisbursedByStatusSummary();
-    this.getTaNeedsByGenderSummary();
-    this.getTaTrainingBySectorSummary();
-    this.getTaTrainingBySegmentSummary();
-    this.getTrainingByPartnerByGenderSummary();
-    this.getLoansAccessedVsOutStandingByPartnerSummary();
-    this.getCountySummaryMap();
-    this.getLastThreeYearsAccessedLoanPerPartnerSummary();
-    this.getLoansAccessedVsOutStandingByGenderSummary();
-    this.getLoanDisbursedByIndustrySegmentSummary();
-    this.getLoanDisbursedTopFourPartnersSummary();
-    this.getLoanDisbursedTopFourCountiesSummary();
-    this.getBusinessTrainedTopFourCountiesSummary();
-    this.getParticipantsEmployeesSummary();
-    this.getParticipantsMentorshipDeliveryModeSummary();
-    this.getParticipantsMentorshipBusiCategoryByCountySummary();
-    this.getDisabledBusinessOwnersTrainedByGenderSummary();
-    this.getRefugeeBusinessOwnersTrainedByGenderSummary();
-    this.getLoansDisbursedByLoanProductSummary();
-    this.getLoanedBusinessesByGenderSummary();
-    this.getLoanDisbursedByLoanProductByGenderSummary();
+    console.log(JSON.stringify(this.dashboardTypeFilter));
+    if (this.dashboardTypeFilter.isFinancialDashboard) {
+      this.getLoansDisbursedByGenderSummary();
+      this.getLoanDisbursedByIndustrySectorSummary();
+      this.getLoansDisbursedByPipelineSummary();
+      this.getLoansDisbursedByStatusSummary();
+      this.getLoansAccessedVsOutStandingByPartnerSummary();
+      this.getLastThreeYearsAccessedLoanPerPartnerSummary();
+      this.getLoansAccessedVsOutStandingByGenderSummary();
+      this.getLoanDisbursedByIndustrySegmentSummary();
+      this.getLoanDisbursedTopFourPartnersSummary();
+      this.getLoanDisbursedTopFourCountiesSummary();
+      this.getLoansDisbursedByLoanProductSummary();
+      this.getLoanedBusinessesByGenderSummary();
+      this.getLoanDisbursedByLoanProductByGenderSummary();
+    } else if (this.dashboardTypeFilter.isMentorShipDashboard) {
+      this.getMentorshipGenderSummary();
+      this.getParticipantsMentorshipDeliveryModeSummary();
+      this.getParticipantsMentorshipBusiCategoryByCountySummary();
+    } else if (this.dashboardTypeFilter.isTADashboard) {
+      this.getBusinessesTrainedByGenderSummary();
+      this.getTaNeedsByGenderSummary();
+      this.getTaTrainingBySectorSummary();
+      this.getTaTrainingBySegmentSummary();
+      this.getTrainingByPartnerByGenderSummary();
+      this.getBusinessTrainedTopFourCountiesSummary();
+      this.getParticipantsEmployeesSummary();
+      this.getDisabledBusinessOwnersTrainedByGenderSummary();
+      this.getRefugeeBusinessOwnersTrainedByGenderSummary();
+      this.getCountySummaryMap();
+    } 
+    
+    
   }
 
   getLoansDisbursedByGenderSummary() {
@@ -1000,8 +1009,8 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartShowLegend: true,
       chartShowXAxisLabel: this.mentorshipBusiCategoryByCountySummaryShowXAxisLabel,
       chartShowYAxisLabel: this.mentorshipBusiCategoryByCountySummaryShowYAxisLabel,
-      chartYAxisLabel: this.mentorshipBusiCategoryByCountySummaryXAxisLabel,
-      chartXAxisLabel: this.mentorshipBusiCategoryByCountySummaryYAxisLabel,
+      chartYAxisLabel: this.mentorshipBusiCategoryByCountySummaryYAxisLabel,
+      chartXAxisLabel: this.mentorshipBusiCategoryByCountySummaryXAxisLabel,
       chartFormatLabel: this.valueFormatting,
       chartTitle: this.mentorshipBusiCategoryByCountySummaryChartTitle,
     };
@@ -1108,18 +1117,5 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       }
     };
     this.dashBoardService.openExpandedChartDialog(this.dialog, data);
-  }
-  
-
-  isFinancialDashboard(): boolean {
-    return 'FI' === this.selectedDashboardView;
-  }
-
-  isTADashboard(): boolean {
-    return 'TA' === this.selectedDashboardView;
-  }
-
-  isMentorShipDashboard(): boolean {
-    return 'MENTOR' === this.selectedDashboardView;
   }
 }

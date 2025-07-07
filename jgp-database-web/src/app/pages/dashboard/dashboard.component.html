@@ -9,29 +9,43 @@
 <div class="p-2">
     <div fxLayout="row" fxLayoutAlign="center center">
         <mat-button-toggle-group [(ngModel)]="selectedDashboardView" name="fontStyle" aria-label="Font Style">
-            <mat-button-toggle value="FI">Financial Summary</mat-button-toggle>
-            <mat-button-toggle value="TA">Technical Assistance Summary</mat-button-toggle>
-            <mat-button-toggle value="MENTOR">Mentorship Summary</mat-button-toggle>
-            <mat-button-toggle value="MONITOR">Monitoring Summary</mat-button-toggle>
+            @if (showFinancialDashboardSelector()) {
+                <mat-button-toggle value="FI">Financial Summary</mat-button-toggle>
+            }
+            @if (showTADashboardSelector()) {
+                <mat-button-toggle value="TA">Technical Assistance Summary</mat-button-toggle>
+            }                  
+            @if (showMentorShipDashboardSelector()) {
+                <mat-button-toggle value="MENTOR">Mentorship Summary</mat-button-toggle>
+            }           
+            @if (showMonitoringDashBoardSelector()) {
+                <mat-button-toggle value="MONITOR">Monitoring Summary</mat-button-toggle>
+            }
           </mat-button-toggle-group>
     </div>
     <div fxLayout="row" fxLayoutAlign="center center">
         <a class="dash-board-reset-link" mat-menu-item (click)="doResetDashBoardFilters()">Reset Filters</a>
     </div>
     <app-dashboard-filters 
-    (dashBoardFilters)="setDashBoardFilters($event)" 
-    [isPartnerDashBoard]="false" 
-    [showTADashboard]="isTADashboard()" 
+    (dashBoardFilters)="setDashBoardFilters($event)"
     [resetDashBoardFilters]="resetDashBoardFilters" 
     [fieldFlex]="filterFieldFlex"
-    [isMonitoringDashBoard]="isMonitoringDashBoard()"
+    [dashboardTypeFilter]="currentDashBoardTypeFilters"
     />
-    <app-tiles [dashBoardFilters]="dashBoardFilters" [selectedDashboardView]="selectedDashboardView"/>
-    <app-info-cards [dashBoardFilters]="dashBoardFilters" [selectedDashboardView]="selectedDashboardView"/>
+    <app-tiles [dashBoardFilters]="dashBoardFilters" [dashboardTypeFilter]="currentDashBoardTypeFilters"/>
+    <app-info-cards [dashBoardFilters]="dashBoardFilters" [dashboardTypeFilter]="currentDashBoardTypeFilters"/>
+
+    @if(currentDashBoardTypeFilters.isFinancialDashboard){
+    <div fxLayout="row wrap">
+        <div fxFlex="100" fxFlex.gt-sm="100" class="p-2"> 
+            <app-analytics [dashBoardFilters]="dashBoardFilters"/>
+        </div>
+    </div>
+    }
 
     
     <div fxLayout="row wrap">
-        @if(isFinancialDashboard()){
+        @if(currentDashBoardTypeFilters.isFinancialDashboard){
         <div fxFlex="100" fxFlex.gt-sm="50" fxFlex.gt-md="50" class="p-2"> 
             <mat-card>
                 <mat-card-header fxLayoutAlign="space-between center">                
@@ -71,7 +85,7 @@
         </div>
     }
 
-    @if(isTADashboard()){
+    @if(currentDashBoardTypeFilters.isTADashboard){
         <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
             <mat-card>
                 <mat-card-header fxLayoutAlign="space-between center">                
@@ -96,7 +110,7 @@
         </div>
     }
 
-    @if(isTADashboard()){
+    @if(currentDashBoardTypeFilters.isTADashboard){
         <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
             <mat-card>
                 <mat-card-header fxLayoutAlign="space-between center">                
@@ -136,7 +150,7 @@
         </div>
     }
 
-    @if(isTADashboard()){
+    @if(currentDashBoardTypeFilters.isTADashboard){
         <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
             <mat-card>
                 <mat-card-header fxLayoutAlign="space-between center">                
@@ -176,7 +190,7 @@
         </div>
     }
 
-    @if(isFinancialDashboard()){
+    @if(currentDashBoardTypeFilters.isFinancialDashboard){
         <div fxFlex="100" fxFlex.gt-sm="50" fxFlex.gt-md="50" class="p-2"> 
             <mat-card>
                 <mat-card-header fxLayoutAlign="space-between center">                
@@ -214,13 +228,13 @@
             </mat-card>
         </div>
     }
-    @if(!isMentorShipDashboard() && !isMonitoringDashBoard()){
+    @if(!currentDashBoardTypeFilters.isMentorShipDashboard && !currentDashBoardTypeFilters.isMonitoringDashBoard){
     <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
         <app-performance-summary [selectedDashboardView]="selectedDashboardView"/>
     </div>
   }
 
-  @if(isMonitoringDashBoard()){
+  @if(currentDashBoardTypeFilters.isMonitoringDashBoard){
     <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
         <app-monitoring-dashboard [dashBoardFilters]="dashBoardFilters"/>
     </div>

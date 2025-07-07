@@ -5,6 +5,7 @@ import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { HighLevelSummaryDto } from '../dto/highLevelSummaryDto';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { Subject, takeUntil } from 'rxjs';
+import { DashboardTypeFilter } from '../../../dto/dashboard-type-filter';
 
 @Component({
   selector: 'app-tiles',
@@ -20,7 +21,7 @@ import { Subject, takeUntil } from 'rxjs';
 export class TilesComponent implements OnInit, OnDestroy, OnChanges {
 
   @Input('dashBoardFilters') dashBoardFilters: any;
-  @Input('selectedDashboardView') selectedDashboardView: any;
+  @Input({required: true, alias: 'dashboardTypeFilter'}) dashboardTypeFilter: DashboardTypeFilter;
   highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', amountDisbursedByTranches: '0', businessesMentored: '0'};
   private unsubscribe$ = new Subject<void>();
   constructor(private dashBoardService: DashboardService){
@@ -29,8 +30,8 @@ export class TilesComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     
-    if (changes['selectedDashboardView']) {
-      this.selectedDashboardView = changes['selectedDashboardView']['currentValue']
+    if (changes['dashboardTypeFilter']) {
+      this.dashboardTypeFilter = changes['dashboardTypeFilter']['currentValue']
     }
     if (changes['dashBoardFilters']) {
       this.dashBoardFilters = changes['dashBoardFilters']['currentValue']
@@ -56,18 +57,6 @@ export class TilesComponent implements OnInit, OnDestroy, OnChanges {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
-  }
-
-  isFinancialDashboard(): boolean {
-    return 'FI' === this.selectedDashboardView;
-  }
-
-  isTADashboard(): boolean {
-    return 'TA' === this.selectedDashboardView;
-  }
-
-  isMentorShipDashboard(): boolean {
-    return 'MENTOR' === this.selectedDashboardView;
   }
 
 }
