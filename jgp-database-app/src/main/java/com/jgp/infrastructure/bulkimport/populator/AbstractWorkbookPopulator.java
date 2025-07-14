@@ -1,8 +1,18 @@
 package com.jgp.infrastructure.bulkimport.populator;
 
+import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.DataValidation;
+import org.apache.poi.ss.usermodel.DataValidationConstraint;
+import org.apache.poi.ss.usermodel.DataValidationHelper;
 import org.apache.poi.ss.usermodel.Name;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.usermodel.XSSFDataValidationHelper;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -70,5 +80,32 @@ public abstract class AbstractWorkbookPopulator implements WorkbookPopulator {
     protected void setSanitized(Name poiName, String roughName) {
         String sanitized = NAME_REGEX.matcher(roughName.trim()).replaceAll("_");
         poiName.setNameName(sanitized);
+    }
+
+    protected void setDateColumnFormat(Workbook workbook, String workSheetName, int colIndex) {
+        CreationHelper creationHelper = workbook.getCreationHelper();
+        CellStyle dateCellStyle = workbook.createCellStyle();
+        short dateFormat = creationHelper.createDataFormat().getFormat("yyyy-MM-dd");
+        dateCellStyle.setDataFormat(dateFormat);
+        Sheet workSheet = workbook.getSheet(workSheetName);
+        if (null != workSheet) {
+           workSheet.setDefaultColumnStyle(colIndex, dateCellStyle);
+        }else {
+            return;
+        }
+        DataValidation validation = createDateColumnValidation(colIndex, (XSSFSheet) workSheet);
+        workSheet.addValidationData(validation);
+    }
+
+    private static DataValidation createDateColumnValidation(int colIndex, XSSFSheet workSheet) {
+        DataValidationHelper dvHelper = new XSSFDataValidationHelper(workSheet);
+        DataValidationConstraint dvConstraint = dvHelper.createDateConstraint(
+                DataValidationConstraint.OperatorType.BETWEEN,
+                "1900-01-01", "9999-12-31", "yyyy-MM-dd");
+        CellRangeAddressList addressList = new CellRangeAddressList(1, 1048575, colIndex, colIndex); // A2:A1048576
+        DataValidation validation = dvHelper.createValidation(dvConstraint, addressList);
+        validation.setSuppressDropDownArrow(true);
+        validation.setShowErrorBox(true);
+        return validation;
     }
 }

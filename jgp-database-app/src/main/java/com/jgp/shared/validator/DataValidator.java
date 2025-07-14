@@ -14,6 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.WordUtils;
 import org.apache.poi.ss.usermodel.Row;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Map;
 import java.util.Set;
 
@@ -73,5 +77,21 @@ public class DataValidator {
             rowErrorMap.put(row, e.getMessage());
         }
         return CommonUtil.KenyanCounty.UNKNOWN;
+    }
+
+    public static LocalDate validateLocalDate(int column, Row row, Map<Row, String> rowErrorMap, String dateFieldName) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        final var dateStr = ImportHandlerUtils.readAsString(column, row);
+        try {
+            if (null == dateStr) {
+                rowErrorMap.put(row, String.format("%s is required field !!", WordUtils.capitalizeFully(dateFieldName)));
+                return  LocalDate.now(ZoneId.systemDefault());
+            }
+            return LocalDate.parse(dateStr, formatter);
+        } catch (DateTimeParseException e) {
+            log.error("Invalid value for county colum", e);
+            rowErrorMap.put(row, String.format("%s must be formatted as 'yyyy-MM-dd' !!", WordUtils.capitalizeFully(dateFieldName)));
+            return  LocalDate.now(ZoneId.systemDefault());
+        }
     }
 }

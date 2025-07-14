@@ -1,5 +1,6 @@
 package com.jgp.infrastructure.bulkimport.populator.monitoring;
 
+import com.jgp.infrastructure.bulkimport.constants.MentorShipConstants;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import com.jgp.infrastructure.bulkimport.data.MonitoringConstants;
 import com.jgp.infrastructure.bulkimport.populator.AbstractWorkbookPopulator;
@@ -91,7 +92,8 @@ public class MonitoringWorkbookPopulator extends AbstractWorkbookPopulator {
         worksheet.setColumnWidth(MonitoringConstants.BUSINESS_OPPORTUNITIES_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(MonitoringConstants.MARKET_CHALLENGES_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
 
-        writeString(MonitoringConstants.SURVEY_DATE_COL, rowHeader, "Survey Date* (yyyy-MM-dd)");
+        writeString(MonitoringConstants.SURVEY_DATE_COL, rowHeader, "Survey Date* (yyyy-MM-dd example:2000-04-20)");
+        setDateColumnFormat(worksheet.getWorkbook(), TemplatePopulateImportConstants.MONITORING_SHEET_NAME, MonitoringConstants.SURVEY_DATE_COL);
         writeString(MonitoringConstants.SURVEY_LANGUAGE_COL, rowHeader, "Survey Language*");
         writeString(MonitoringConstants.CONSENTED_COL, rowHeader, "Consented* (Yes|No)");
         writeString(MonitoringConstants.LOCATION_LATITUDE_COL, rowHeader, "Location Latitude");

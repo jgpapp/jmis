@@ -60,7 +60,9 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(LoanConstants.INDUSTRY_SECTOR_COL, rowHeader, "Industry sector*(Agriculture, Artists/artisans, Manufacturing, Trading & Retail, Other)");
         writeString(LoanConstants.PIPELINE_SOURCE, rowHeader, "Pipeline source*");
         writeString(LoanConstants.DATE_APPLIED, rowHeader, "Date loan application(yyyy-MM-dd example:2000-04-20)*");
+        setDateColumnFormat(worksheet.getWorkbook(), TemplatePopulateImportConstants.LOAN_SHEET_NAME, LoanConstants.DATE_APPLIED);
         writeString(LoanConstants.DATE_DISBURSED, rowHeader, "Date loan disbursed(yyyy-MM-dd example:2000-04-20)*");
+        setDateColumnFormat(worksheet.getWorkbook(), TemplatePopulateImportConstants.LOAN_SHEET_NAME, LoanConstants.DATE_DISBURSED);
         writeString(LoanConstants.LOAN_AMOUNT_KES, rowHeader, "Loan Amount (KES)*");
         writeString(LoanConstants.LOAN_DURATION, rowHeader, "Loan duration (months)*");
         writeString(LoanConstants.OUT_STANDING_AMOUNT, rowHeader, "Outstanding amount*");
@@ -76,7 +78,5 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(LoanConstants.TRANCH_ALLOCATED_COL, rowHeader, "Tranch Allocated (Tranch 1/Tranch 2/Tranch 3/Tranch 4/Tranch 5/Not Applicable)");
         writeString(LoanConstants.TRANCH_AMOUNT_COL, rowHeader, "Tranch Amount (KES)");
         writeString(LoanConstants.LOAN_IDENTIFIER_COL, rowHeader, "Loan Identifier");
-
-
     }
 }

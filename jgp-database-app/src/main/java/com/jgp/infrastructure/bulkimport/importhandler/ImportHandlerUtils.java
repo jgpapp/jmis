@@ -2,8 +2,10 @@
 package com.jgp.infrastructure.bulkimport.importhandler;
 
 import com.google.common.base.Splitter;
+import com.jgp.infrastructure.bulkimport.constants.LoanConstants;
 import com.jgp.shared.dto.ApiParameterError;
 import com.jgp.util.CommonUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
@@ -22,6 +24,7 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 public final class ImportHandlerUtils {
 
     private ImportHandlerUtils() {
@@ -32,7 +35,7 @@ public final class ImportHandlerUtils {
         int noOfEntries = 0;
         // getLastRowNum and getPhysicalNumberOfRows showing false values
         // sometimes
-        while (sheet.getRow(noOfEntries + 1) != null && sheet.getRow(noOfEntries + 1).getCell(primaryColumn) != null) {
+        while (sheet.getRow(noOfEntries + 1) != null && sheet.getRow(noOfEntries + 1).getCell(primaryColumn) != null && CellType.BLANK != sheet.getRow(noOfEntries + 1).getCell(primaryColumn).getCellType()) {
             noOfEntries++;
         }
 
