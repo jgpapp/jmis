@@ -318,7 +318,6 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   reloadData(){
-    console.log(JSON.stringify(this.dashboardTypeFilter));
     if (this.dashboardTypeFilter.isFinancialDashboard) {
       this.getLoansDisbursedByGenderSummary();
       this.getLoanDisbursedByIndustrySectorSummary();

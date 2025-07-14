@@ -58,6 +58,7 @@ public class MentorshipWorkbookPopulator extends AbstractWorkbookPopulator {
 
 
         writeString(MentorShipConstants.MENTORSHIP_DATE_COL, rowHeader, "Mentorship Date*(yyyy-MM-dd example:2000-04-20)");
+        setDateColumnFormat(worksheet.getWorkbook(), TemplatePopulateImportConstants.MENTOR_SHIP_SHEET_NAME, MentorShipConstants.MENTORSHIP_DATE_COL);
         writeString(MentorShipConstants.MENTOR_ORGANIZATION_COL, rowHeader, "Mentor Organization* (JETs/KEPSA/4G/GBF/KNCCI/PBP/GROOTS)");
         writeString(MentorShipConstants.BMO_MEMBERSHIP_COL, rowHeader, "BMO Membership* (KNCCI/KEPSA/PBP/GROOTS/Other)");
         writeString(MentorShipConstants.OTHER_BMO_MEMBERSHIP_COL, rowHeader, "If other, specify* (BMO membership)");

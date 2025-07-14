@@ -98,8 +98,8 @@ public class LoanImportHandler implements ImportHandler {
     private Loan readLoanData(Row row) {
         final var status = ImportHandlerUtils.readAsString(LoanConstants.STATUS_COL, row);
         final var pipeLineSource = ImportHandlerUtils.readAsString(LoanConstants.PIPELINE_SOURCE, row);
-        final var applicationDate = ImportHandlerUtils.readAsDate(LoanConstants.DATE_APPLIED, row);
-        final var dateDisbursed = ImportHandlerUtils.readAsDate(LoanConstants.DATE_DISBURSED, row);
+        final var applicationDate = DataValidator.validateLocalDate(LoanConstants.DATE_APPLIED, row, rowErrorMap, "Application Date");
+        final var dateDisbursed = DataValidator.validateLocalDate(LoanConstants.DATE_DISBURSED, row, rowErrorMap, "Date Disbursed");
         final var amountApproved = DataValidator.validateTemplateDoubleValue(LoanConstants.LOAN_AMOUNT_KES, row, rowErrorMap);
         final var loanAmount = null == amountApproved ? BigDecimal.ZERO : BigDecimal.valueOf(amountApproved);
         final var loanDuration = DataValidator.validateTemplateIntegerValue(LoanConstants.LOAN_DURATION, row, rowErrorMap);
@@ -111,7 +111,7 @@ public class LoanImportHandler implements ImportHandler {
         if (null == rowErrorMap.get(row)){
             loanQualityEnum = (null != loanQuality) ? Loan.LoanQuality.valueOf(loanQuality.toUpperCase()) : Loan.LoanQuality.NORMAL;
         }
-        final var recordedToJGPDBOnDate = ImportHandlerUtils.readAsDate(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, row);
+        final var recordedToJGPDBOnDate = DataValidator.validateLocalDate(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, row, rowErrorMap, "Date Recorded To JGP DB");
         final var loanAmountRepaidDouble = DataValidator.validateTemplateDoubleValue(LoanConstants.REPAID_LOAN_AMOUNT, row, rowErrorMap);
         final var loanAmountRepaid = null == loanAmountRepaidDouble ? BigDecimal.ZERO : BigDecimal.valueOf(loanAmountRepaidDouble);
         final var tranchAmountDouble = DataValidator.validateTemplateDoubleValue(LoanConstants.TRANCH_AMOUNT_COL, row, rowErrorMap);
