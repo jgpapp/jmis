@@ -5,7 +5,6 @@ import com.jgp.authentication.service.UserService;
 import com.jgp.bmo.domain.Mentorship;
 import com.jgp.bmo.dto.MentorshipRequestDto;
 import com.jgp.bmo.service.MentorshipService;
-import com.jgp.infrastructure.bulkimport.constants.LoanConstants;
 import com.jgp.infrastructure.bulkimport.constants.MentorShipConstants;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import com.jgp.infrastructure.bulkimport.data.Count;
@@ -98,7 +97,7 @@ public class MentorshipImportHandler implements ImportHandler {
 
     private Mentorship readMentorShipData(Row row) {
         final var status = ImportHandlerUtils.readAsString(MentorShipConstants.STATUS_COL, row);
-        final var mentorShipDate = ImportHandlerUtils.readAsDate(MentorShipConstants.MENTORSHIP_DATE_COL, row);
+        final var mentorShipDate = DataValidator.validateLocalDate(MentorShipConstants.MENTORSHIP_DATE_COL, row, rowErrorMap, "Mentorship Date");
         final var mentorShipOrg = ImportHandlerUtils.readAsString(MentorShipConstants.MENTOR_ORGANIZATION_COL, row);
         var bmoMembership = ImportHandlerUtils.readAsString(MentorShipConstants.BMO_MEMBERSHIP_COL, row);
         if (StringUtils.isNotBlank(bmoMembership) && OTHER.equals(bmoMembership.toUpperCase(Locale.ROOT))){

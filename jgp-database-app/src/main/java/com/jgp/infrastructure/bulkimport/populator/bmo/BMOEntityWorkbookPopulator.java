@@ -89,8 +89,10 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(BMOConstants.IS_APPLICANT_ELIGIBLE_COL, rowHeader, "Is applicant eligible?(Yes/No)");
         writeString(BMOConstants.RECOMMENDED_FOR_FINANCE_COL, rowHeader, "Recommended for finance (Yes/No)");
         writeString(BMOConstants.DATE_OF_PIPELINE_DECISION_COL, rowHeader, "Pipeline Decision Date (yyyy-MM-dd example:2000-04-20)");
+        setDateColumnFormat(worksheet.getWorkbook(), TemplatePopulateImportConstants.BMO_SHEET_NAME, BMOConstants.DATE_OF_PIPELINE_DECISION_COL);
         writeString(BMOConstants.REFERRED_FI_BUSINESS_COL, rowHeader, "FI business is referred to*");
         writeString(BMOConstants.DATE_RECORD_ENTERED_BY_PARTNER_COL, rowHeader, "Training date(yyyy-MM-dd example:2000-04-20)*");
+        setDateColumnFormat(worksheet.getWorkbook(), TemplatePopulateImportConstants.BMO_SHEET_NAME, BMOConstants.DATE_RECORD_ENTERED_BY_PARTNER_COL);
 
     }
 
