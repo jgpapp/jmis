@@ -80,14 +80,13 @@ public class DataValidator {
     }
 
     public static LocalDate validateLocalDate(int column, Row row, Map<Row, String> rowErrorMap, String dateFieldName) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        final var dateStr = ImportHandlerUtils.readAsString(column, row);
         try {
-            if (null == dateStr) {
+            final var formattedDate = ImportHandlerUtils.readAsISOFormattedDate(column, row);
+            if (null == formattedDate) {
                 rowErrorMap.put(row, String.format("%s is required field !!", WordUtils.capitalizeFully(dateFieldName)));
                 return  LocalDate.now(ZoneId.systemDefault());
             }
-            return LocalDate.parse(dateStr, formatter);
+            return formattedDate;
         } catch (DateTimeParseException e) {
             log.error("Invalid value for county colum", e);
             rowErrorMap.put(row, String.format("%s must be formatted as 'yyyy-MM-dd' !!", WordUtils.capitalizeFully(dateFieldName)));
