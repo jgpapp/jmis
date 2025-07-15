@@ -2,7 +2,6 @@
 package com.jgp.infrastructure.bulkimport.importhandler;
 
 import com.google.common.base.Splitter;
-import com.jgp.infrastructure.bulkimport.constants.LoanConstants;
 import com.jgp.shared.dto.ApiParameterError;
 import com.jgp.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +9,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.CellValue;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.IndexedColors;
@@ -21,6 +21,7 @@ import org.apache.poi.ss.util.CellReference;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -134,6 +135,27 @@ public final class ImportHandlerUtils {
 
         }
         return c.getLocalDateTimeCellValue().atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+
+    public static LocalDate readAsISOFormattedDate(int colIndex, Row row) {
+        Cell c = row.getCell(colIndex);
+
+        if (c == null || c.getCellType() == CellType.BLANK) {
+            return null;
+        } else {
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            DataFormatter formatter = new DataFormatter();
+
+            String cellValue;
+            if (c.getCellType() == CellType.FORMULA) {
+                cellValue = c.getCellFormula(); // Get the formula string itself
+            } else {
+                cellValue = formatter.formatCellValue(c); // For other cell types, format as usual
+            }
+            String res = trimEmptyDecimalPortion(cellValue.trim());
+            return Objects.nonNull(res) ? LocalDate.parse(res.trim().replaceAll("\\s+", ""), dateFormatter) : null;
+
+        }
     }
 
     public static Boolean readAsBoolean(int colIndex, Row row) {
