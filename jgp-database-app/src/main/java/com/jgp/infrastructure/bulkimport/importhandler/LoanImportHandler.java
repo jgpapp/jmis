@@ -178,7 +178,7 @@ public class LoanImportHandler implements ImportHandler {
         String businessName = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_NAME_COL, row);
         String businessRegNumber = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_REGISTRATION_NUMBER_COL, row);
         String jgpId = ImportHandlerUtils.readAsString(LoanConstants.JGP_ID_COL, row);
-        final var phoneNumber = ImportHandlerUtils.readAsString(LoanConstants.BUSINESS_PHONE_NUMBER_COL, row);
+        final var phoneNumber = DataValidator.validatePhoneNumber(LoanConstants.BUSINESS_PHONE_NUMBER_COL, row, rowErrorMap);
         var gender = ImportHandlerUtils.readAsString(LoanConstants.GENDER_COL, row);
         gender = ParticipantValidator.validateGender(gender, row, rowErrorMap);
         var age = DataValidator.validateTemplateIntegerValue(LoanConstants.AGE_COL, row, rowErrorMap);
@@ -239,7 +239,7 @@ public class LoanImportHandler implements ImportHandler {
                 log.error("Problem occurred When Uploading Lending Data: {}", ex.getMessage());
                 errorMessage = ImportHandlerUtils.getErrorMessage(ex);
                 if (errorMessage.contains("unique_loan") || errorMessage.contains("Duplicate Disbursement On Same Day")){
-                    errorMessage = "Row with same partner/participant/disburse date already exist !!";
+                    errorMessage = "Row with same partner/participant/disburse date/Loan Identifier already exist !!";
                 }
                 writeGroupErrorMessage(errorMessage, progressLevel, statusCell, errorReportCell);
             }finally {

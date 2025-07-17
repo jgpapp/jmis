@@ -203,9 +203,6 @@ public class MonitoringImportHandler implements ImportHandler {
                 errorCount++;
                 log.error("Problem occurred When Uploading Monitoring Data: {}", ex.getMessage());
                 errorMessage = ImportHandlerUtils.getErrorMessage(ex);
-                if (errorMessage.contains("unique_loan") || errorMessage.contains("Duplicate Disbursement On Same Day")){
-                    errorMessage = "Row with same partner/participant/disburse date already exist !!";
-                }
                 writeGroupErrorMessage(errorMessage, progressLevel, statusCell, errorReportCell);
             }finally {
                 updateImportProgress(this.documentImportProgressUUId, false, 0);
