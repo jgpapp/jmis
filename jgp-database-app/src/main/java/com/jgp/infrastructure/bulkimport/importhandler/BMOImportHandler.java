@@ -152,7 +152,7 @@ public class BMOImportHandler implements ImportHandler {
     private ParticipantDto getParticipantDto(Row row){
         final var participantName = ImportHandlerUtils.readAsString(BMOConstants.PARTICIPANT_NAME_COL, row);
         final var jgpId = ImportHandlerUtils.readAsString(BMOConstants.JGP_ID_COL, row);
-        final var phoneNumber = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_PHONE_NUMBER_COL, row);
+        final var phoneNumber = DataValidator.validatePhoneNumber(BMOConstants.BUSINESS_PHONE_NUMBER_COL, row, rowErrorMap);
         final var alternativePhoneNumber = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_ALTERNATIVE_PHONE_NUMBER_COL, row);
         var gender = ImportHandlerUtils.readAsString(BMOConstants.GENDER_COL, row);
         gender = ParticipantValidator.validateGender(gender, row, rowErrorMap);
