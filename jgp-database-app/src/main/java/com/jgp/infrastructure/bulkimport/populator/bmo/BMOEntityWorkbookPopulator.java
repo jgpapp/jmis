@@ -39,6 +39,7 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         worksheet.setColumnWidth(BMOConstants.GENDER_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.AGE_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.BUSINESS_LOCATION_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+        worksheet.setColumnWidth(BMOConstants.BUSINESS_SUB_COUNTY_LOCATION_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.INDUSTRY_SECTOR_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.BUSINESS_SEGMENT_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(BMOConstants.TA_DELIVERY_MODE, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
@@ -69,6 +70,7 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(BMOConstants.GENDER_COL, rowHeader, "Gender of owner* (Male/Female/Intersex)");
         writeString(BMOConstants.AGE_COL, rowHeader, "Age of owner (full years)*");
         writeString(BMOConstants.BUSINESS_LOCATION_COL, rowHeader, "Business Location* (Valid County name e.g. Nairobi, Kisumu, Mombasa, etc.)");
+        writeString(BMOConstants.BUSINESS_SUB_COUNTY_LOCATION_COL, rowHeader, "Sub-County");
         writeString(BMOConstants.INDUSTRY_SECTOR_COL, rowHeader, "Industry sector(Agriculture, Artists/artisans, Manufacturing, Trading & Retail, Other)");
         writeString(BMOConstants.BUSINESS_SEGMENT_COL, rowHeader, "Business segment*(Micro/SME)");
         writeString(BMOConstants.TA_DELIVERY_MODE, rowHeader, "TA delivery mode*(In person/Virtual/Mixed)");

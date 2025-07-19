@@ -159,6 +159,7 @@ public class BMOImportHandler implements ImportHandler {
         var age = DataValidator.validateTemplateIntegerValue(BMOConstants.AGE_COL, row, rowErrorMap);
         age = ParticipantValidator.validateParticipantAge(age, row, rowErrorMap);
         var locationCounty = DataValidator.validateCountyName(BMOConstants.BUSINESS_LOCATION_COL, row, rowErrorMap);
+        final var businessLocationSubCounty = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_SUB_COUNTY_LOCATION_COL, row);
         final var industrySector = ImportHandlerUtils.readAsString(BMOConstants.INDUSTRY_SECTOR_COL, row);
         var businessSegment = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_SEGMENT_COL, row);
         businessSegment = TAValidator.validateBusinessSegment(businessSegment, row, rowErrorMap);
@@ -183,7 +184,7 @@ public class BMOImportHandler implements ImportHandler {
 
         return ParticipantDto.builder()
                 .phoneNumber(phoneNumber).alternativePhoneNumber(alternativePhoneNumber).bestMonthlyRevenue(bestMonthlyRevenue)
-                .businessLocation(locationCounty.getCountyName()).participantName(participantName)
+                .businessLocation(locationCounty.getCountyName()).locationSubCounty(businessLocationSubCounty).participantName(participantName)
                 .ownerGender(gender).ownerAge(age).industrySector(industrySector).businessSegment(businessSegment)
                 .worstMonthlyRevenue(worstMonthlyRevenue).totalRegularEmployees(totalRegularEmployees)
                 .youthRegularEmployees(youthRegularEmployees).totalCasualEmployees(totalCasualEmployees)
