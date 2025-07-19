@@ -77,6 +77,6 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(LoanConstants.LOAN_PRODUCT_COL, rowHeader, "Loan product* (Working Capital/Asset Finance/Stahimili/Purchase Order/Consignment Finance/Shariah Compliant)");
         writeString(LoanConstants.TRANCH_ALLOCATED_COL, rowHeader, "Tranch Allocated (Tranch 1/Tranch 2/Tranch 3/Tranch 4/Tranch 5/Not Applicable)");
         writeString(LoanConstants.TRANCH_AMOUNT_COL, rowHeader, "Tranch Amount (KES)");
-        writeString(LoanConstants.LOAN_IDENTIFIER_COL, rowHeader, "Loan Identifier");
+        writeString(LoanConstants.LOAN_IDENTIFIER_COL, rowHeader, "Loan Identifier* (Unique identifier for the loan, e.g. Loan12345)*");
     }
 }
