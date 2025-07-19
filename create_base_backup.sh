@@ -1,17 +1,17 @@
 #!/bin/bash
 
 # Configuration
-POSTGRES_CONTAINER_NAME="postgres_jgp_db" # Service name of your Postgres container in docker-compose.yml
-POSTGRES_USER="jgp_user"     # *** CHANGE THIS to your actual PostgreSQL superuser ***
+POSTGRES_CONTAINER_NAME="${POSTGRES_HOST}" # Service name of your Postgres container in docker-compose.yml
+POSTGRES_USER="${POSTGRES_USER}"     # *** CHANGE THIS to your actual PostgreSQL superuser ***
 # If you used 'POSTGRES_USER: your_postgres_user' in docker-compose.yml, use that here.
 # For pg_basebackup, you generally need a superuser or a user with REPLICATION privilege.
 # 'postgres' is the default superuser.
-POSTGRES_HOST="localhost"    # Since you're running inside the same container (via docker exec)
-POSTGRES_PORT="5432"         # Default PostgreSQL port
-LOCAL_BASE_BACKUP_DIR="/home/jmis/backup" # Directory on your host for base backups
-REMOTE_USER="jgsadmin"
-REMOTE_HOST="20.242.125.65"
-REMOTE_BASE_BACKUP_PATH="/home/jmis/anotherbackup"
+POSTGRES_HOST="${POSTGRES_HOST}"    # Since you're running inside the same container (via docker exec)
+POSTGRES_PORT="${POSTGRES_PORT}"         # Default PostgreSQL port
+LOCAL_BASE_BACKUP_DIR="/temp_backups" # Directory on your host for base backups
+REMOTE_USER="${REMOTE_USER}"
+REMOTE_HOST="${REMOTE_HOST}"
+REMOTE_BASE_BACKUP_PATH="${REMOTE_BASE_BACKUP_PATH}"
 RETENTION_HOURS=2
 
 # Create local backup directory if it doesn't exist

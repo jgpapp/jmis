@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Configuration
-LOCAL_WAL_ARCHIVE_DIR="/home/jmis/wal_archive" # This should match the volume mount on your host
-REMOTE_USER="jgsadmin"
-REMOTE_HOST="20.242.125.65"
-REMOTE_WAL_ARCHIVE_PATH="/home/jmis/wal_archive_location"
+LOCAL_WAL_ARCHIVE_DIR="/var/lib/postgresql/wal_archive" # This should match the volume mount on your host
+REMOTE_USER="${REMOTE_USER}"
+REMOTE_HOST="${REMOTE_HOST}"
+REMOTE_WAL_ARCHIVE_PATH="${REMOTE_WAL_ARCHIVE_PATH}"
 
 echo "Starting WAL archive synchronization to remote server: $REMOTE_HOST:$REMOTE_WAL_ARCHIVE_PATH"
 

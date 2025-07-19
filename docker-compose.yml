@@ -12,7 +12,29 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - jgp_data:/var/lib/postgresql/data
+      - jgp_data:/var/lib/postgresql/data # Persistent data for the database
+      - ./postgresql.conf:/etc/postgresql/postgresql.conf # Mount your custom config
+      - ./wal_archive:/var/lib/postgresql/wal_archive # New volume for WAL archives
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf # Tell Postgres to use your config
+  db_backup_service:
+    build: ./backuo_Dockerfile
+    volumes:
+      - ./temp_backups:/temp_backups # Local volume for temporary backups
+      - ~/.ssh:/root/.ssh:ro # Mount your SSH keys for rsync
+      - ./wal_archive:/var/lib/postgresql/wal_archive # If you are syncing WALs, this volume is crucial
+      - ./logs:/var/log # Mount for container logs
+    environment:
+      POSTGRES_HOST: postgres_jgp_db # Service name of your postgres container
+      POSTGRES_USER: jgp_user
+      POSTGRES_PASSWORD: S3cretJmIs@#321
+      POSTGRES_PORT: 5432
+      REMOTE_USER: jgsadmin
+      REMOTE_HOST: 20.242.125.65
+      REMOTE_BASE_BACKUP_PATH: /home/jmis/jgp_backups
+      REMOTE_WAL_ARCHIVE_PATH: /home/jmis/jgp_backups/wal_archive
+    command: crond -f -l 8
+    depends_on:
+      - postgres_jgp_db # Ensure 'db' service starts before 'backup'
   jgp_app:
     container_name: jgp_app
     build:
@@ -79,3 +101,6 @@ networks:
 volumes:
   jgp_data:
     driver: local
+  wal_archive:
+  backups: # For local base backup staging
+  logs: # For persistent container logs
