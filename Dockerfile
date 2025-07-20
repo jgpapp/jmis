@@ -1,7 +1,7 @@
 # Dockerfile for backup service
-FROM alpine/git
+FROM alpine:latest
 
-RUN apk add --no-cache postgresql-client rsync cronie
+RUN apk add --no-cache postgresql-client rsync cronie openssh-client
 
 # Copy your crontab configuration for the backup user (e.g., root)
 # This assumes your backup_script.sh is generic enough or sources env vars
@@ -17,4 +17,4 @@ RUN chmod +x /create_base_backup.sh /sync_wals.sh
 VOLUME /var/log
 
 # The command that starts the cron daemon in the foreground
-CMD ["crond", "-f", "-l", "8"]
+CMD ["crond", "-f"]

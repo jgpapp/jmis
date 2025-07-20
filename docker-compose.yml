@@ -14,10 +14,11 @@ services:
     volumes:
       - jgp_data:/var/lib/postgresql/data # Persistent data for the database
       - ./postgresql.conf:/etc/postgresql/postgresql.conf # Mount your custom config
+      - ./pg_hba.conf:/etc/postgresql/pg_hba.conf # Mount your custom config
       - ./wal_archive:/var/lib/postgresql/wal_archive # New volume for WAL archives
-    command: postgres -c config_file=/etc/postgresql/postgresql.conf # Tell Postgres to use your config
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf  -c hba_file=/etc/postgresql/pg_hba.conf # Tell Postgres to use your config
   db_backup_service:
-    build: ./backuo_Dockerfile
+    build: .
     volumes:
       - ./temp_backups:/temp_backups # Local volume for temporary backups
       - ~/.ssh:/root/.ssh:ro # Mount your SSH keys for rsync
@@ -32,7 +33,9 @@ services:
       REMOTE_HOST: 20.242.125.65
       REMOTE_BASE_BACKUP_PATH: /home/jmis/jgp_backups
       REMOTE_WAL_ARCHIVE_PATH: /home/jmis/jgp_backups/wal_archive
-    command: crond -f -l 8
+    command: crond -f
+    networks:
+      - jgp-app-network
     depends_on:
       - postgres_jgp_db # Ensure 'db' service starts before 'backup'
   jgp_app:
