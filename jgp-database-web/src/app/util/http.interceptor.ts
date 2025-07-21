@@ -1,6 +1,6 @@
 import { HttpErrorResponse, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { BehaviorSubject, catchError, filter, switchMap, take, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, filter, switchMap, take, throwError, timeout } from 'rxjs';
 import { GlobalService } from '@services/shared/global.service';
 import { AuthService } from '@services/users/auth.service';
 
@@ -50,6 +50,7 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
           refreshTokenSubject.next(null); // Clear previous token
 
           return authService.refreshToken().pipe(
+            timeout(10000), // Optional: Set a timeout for the refresh token request
             switchMap(response => {
               isRefreshing = false;
               refreshTokenSubject.next(response.accessToken); // Set new access token
@@ -59,6 +60,7 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
             catchError((refreshError) => {
               // If refresh token fails (e.g., refresh token expired/invalid), force logout
               isRefreshing = false;
+              refreshTokenSubject.next(null); // Clear the subject
               authService.doLogout(); // AuthService handles navigation to login
               return throwError(() => refreshError); // Propagate the error
             })

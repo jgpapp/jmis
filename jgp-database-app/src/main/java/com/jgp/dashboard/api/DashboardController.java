@@ -237,14 +237,15 @@ public class DashboardController {
     public ResponseEntity<List<DataPointDto>> getMentorshipGenderSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
                                                                                  @RequestParam(value = "county-code", required = false) String countyCode,
                                                                                  @RequestParam(value = "from-date", required = false) LocalDate fromDate,
-                                                                                 @RequestParam(value = "to-date", required = false) LocalDate toDate){
+                                                                                 @RequestParam(value = "to-date", required = false) LocalDate toDate,
+                                                                         @RequestParam(value = "is-gender-category") boolean isGenderCategory){
         final var searchCriteria = DashboardSearchCriteria.builder()
                 .fromDate(fromDate)
                 .toDate(toDate)
                 .partnerId(partnerId)
                 .countyCode(countyCode)
                 .build();
-        return new ResponseEntity<>(this.dashboardService.getMentorshipGenderSummary(searchCriteria), HttpStatus.OK);
+        return new ResponseEntity<>(this.dashboardService.getMentorshipGenderSummary(searchCriteria, isGenderCategory), HttpStatus.OK);
     }
 
     @GetMapping("loans-disbursed-by-quality")
