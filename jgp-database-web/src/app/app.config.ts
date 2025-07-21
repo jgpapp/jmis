@@ -1,4 +1,4 @@
-import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, inject } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -10,6 +10,12 @@ import { CalendarModule, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns'; 
 import { httpInterceptor } from './util/http.interceptor';
 import { apiPrefixInterceptor } from './util/api-prefix.interceptor';
+import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
+import { AuthService } from '@services/users/auth.service';
+
+export function tokenGetter() {
+  return inject(AuthService).getAccessToken();
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,6 +26,13 @@ export const appConfig: ApplicationConfig = {
     ), 
     provideAnimationsAsync(),
     provideHttpClient(withInterceptors([apiPrefixInterceptor, httpInterceptor])),
+    {
+      provide: JWT_OPTIONS,
+      useValue: {
+        tokenGetter: tokenGetter,
+      },
+    },
+    JwtHelperService,
    // importProvidersFrom(InMemoryWebApiModule.forRoot(UsersData, { delay: 1000 })),
     importProvidersFrom(CalendarModule.forRoot({
       provide: DateAdapter,

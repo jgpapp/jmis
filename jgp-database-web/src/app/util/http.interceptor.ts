@@ -1,6 +1,6 @@
 import { HttpErrorResponse, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { BehaviorSubject, catchError, filter, switchMap, take, throwError, timeout } from 'rxjs';
+import { BehaviorSubject, catchError, filter, finalize, switchMap, take, throwError, timeout } from 'rxjs';
 import { GlobalService } from '@services/shared/global.service';
 import { AuthService } from '@services/users/auth.service';
 
@@ -21,8 +21,36 @@ let refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
 export const httpInterceptor: HttpInterceptorFn = (req, next) => {
   const globalService = inject(GlobalService);
-  const token: string = localStorage.getItem("auth_token")!;
-  const authService: AuthService = inject(AuthService)
+  const authService = inject(AuthService);
+  const token: string = authService.getAccessToken()!;
+
+  // 1. Proactive Check: If token exists and is about to expire, try to refresh
+  if (token && authService.isAccessTokenAboutToExpire() && !isRefreshing) {
+    // Don't refresh auth/login or auth/refresh requests
+    if (!req.url.includes('/authenticate') && !req.url.includes('/refresh-token')) {
+      isRefreshing = true;
+      refreshTokenSubject.next(null); // Clear previous token
+
+      return authService.refreshToken().pipe(
+        switchMap((response: any) => {
+          isRefreshing = false;
+          refreshTokenSubject.next(response.accessToken);
+          // Retry the original request with the new token
+          return next(addToken(req, response.accessToken));
+        }),
+        catchError((error) => {
+          isRefreshing = false;
+          authService.doLogout(); // If refresh token fails, log out
+          return throwError(() => error);
+        }),
+        finalize(() => {
+          isRefreshing = false; // Ensure flag is reset
+        })
+      );
+    }
+  }
+
+
   const forceChangePassword: boolean | undefined = authService.currentUser()?.forceChangePassword;
   if(forceChangePassword && true === forceChangePassword){
     authService.redirectToChangePassword()
@@ -39,12 +67,8 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
        // THIS IS THE KEY DETECTION POINT FOR 401
-      if (error.status === 401 && !req.url.includes('/authenticate')) {
+      if (error.status === 401 && !req.url.includes('/authenticate') && !req.url.includes('/refresh-token')) {
         // Handle 401 error: Token expired or invalid
-        if (req.url.includes('/refresh-token')) {
-            authService.doLogout(); // AuthService handles navigation to login
-            return throwError(() => error);
-          }
         if (!isRefreshing) {
           isRefreshing = true;
           refreshTokenSubject.next(null); // Clear previous token

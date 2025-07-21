@@ -57,7 +57,10 @@ export class LoginComponent implements OnDestroy {
     .pipe(takeUntil(this.unsubscribe$))
     .subscribe({
       next: () => {
-        this.gs.openSnackBar("Welcome Back !!", "Dismiss");
+        this.gs.openSnackBar("You're logged in successfully!", "Dismiss");
+      },
+      error: (error) => {
+        this.gs.openSnackBar(error, "Dismiss");
       }
     });
   }
