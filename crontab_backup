@@ -1,0 +1,7 @@
+# crontab_backup
+
+# Run base backup script weekly (e.g., every Sunday at 4:00 AM)
+0 4 * * 0 /create_base_backup.sh >> /var/log/backup_base_backup.log 2>&1
+
+# Run WAL synchronization script daily (e.g., every day at 00:30 AM)
+30 0 * * * /sync_wals.sh >> /var/log/backup_wal_sync.log 2>&1
