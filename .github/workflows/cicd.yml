@@ -27,10 +27,10 @@ jobs:
 
           # Stop and remove existing containers, then start new ones in detached mode
           # This ensures a clean deployment with the new images
-          docker-compose down
+          docker compose down
           docker rmi jmis-jgp_app_ui
           docker rmi jmis-jgp_app
-          docker-compose up --build -d
+          docker compose up --build -d
 
           # Optional: Clean up old Docker images to save space
           docker image prune -f
@@ -52,10 +52,10 @@ jobs:
 
           # Stop and remove existing containers, then start new ones in detached mode
           # This ensures a clean deployment with the new images
-          docker-compose down
+          docker compose down
           docker rmi jmis-jgp_app_ui
           docker rmi jmis-jgp_app
-          docker-compose up --build -d
+          docker compose up --build -d
 
           # Optional: Clean up old Docker images to save space
           docker image prune -f

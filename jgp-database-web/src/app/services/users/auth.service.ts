@@ -23,11 +23,12 @@ export class AuthService {
   USER_PARTNER_TYPE: string = 'user_partner_type';
   USER_REGISTRATION: string = 'user_registration';
   FORCE_PASS_CHANGE: string = 'force_change_password';
-  jwtService: JwtHelperService = new JwtHelperService();
   private loggedIn = new BehaviorSubject<boolean>(this.hasTokens());
   redirectUrl: string | null = null;
 
-  constructor(private httpClient: HttpClient, private router: Router) { }
+  constructor(private httpClient: HttpClient, private router: Router, private jwtHelper: JwtHelperService) { 
+    this.checkTokenStatus();
+  }
 
   get isLoggedIn(): Observable<boolean> {
     return this.loggedIn.asObservable();
@@ -42,8 +43,7 @@ export class AuthService {
         this.redirectUrl = null; // Reset redirect URL after successful login
       }),
       catchError(error => {
-        console.error('Login failed:', error);
-        return throwError(() => new Error('Invalid credentials or server error.'));
+        return throwError(() => new Error(error.error.detail || 'Login failed'));
       })
     );
   }
@@ -81,12 +81,43 @@ export class AuthService {
     return localStorage.getItem(this.REFRESH_TOKEN_KEY);
   }
 
+  private checkTokenStatus(): void {
+    const accessToken = this.getAccessToken();
+    if (accessToken && !this.jwtHelper.isTokenExpired(accessToken)) {
+      this.loggedIn.next(true);
+    } else {
+      this.refreshToken().subscribe({
+        next: () => this.loggedIn.next(true),
+        error: () => {
+          this.loggedIn.next(false);
+          this.doLogout();
+        }
+      });
+    }
+  }
+
+  // Proactive check: Check if access token is about to expire
+  isAccessTokenAboutToExpire(thresholdSeconds: number = 60): boolean {
+    const accessToken = this.getAccessToken();
+    if (!accessToken) {
+      return true; // No token, consider it expired
+    }
+    const expirationDate = this.jwtHelper.getTokenExpirationDate(accessToken);
+    if (!expirationDate) {
+      return true; // Cannot determine expiration, treat as expired
+    }
+    const now = new Date();
+    const expiresInMs = expirationDate.getTime() - now.getTime();
+    return expiresInMs / 1000 < thresholdSeconds;
+  }
+
+
   saveTokens(accessToken: string, refreshToken: string): void {
     localStorage.setItem(this.ACCESS_TOKEN_KEY, accessToken);
     localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
   }
   
-  public decodeAuthToken = (): any =>  this.getAccessToken() === null ? null : this.jwtService.decodeToken(this.getAccessToken()!);
+  public decodeAuthToken = (): any =>  this.getAccessToken() === null ? null : this.jwtHelper.decodeToken(this.getAccessToken()!);
 
   public storeUserDetails = (token?: string, refreshToken?: string) : void => {
     if(token && refreshToken){
@@ -111,7 +142,7 @@ export class AuthService {
     }
   };
 
-  public isAuthenticatedw = () : boolean => this.getAccessToken() !== null && !this.jwtService.isTokenExpired(this.getAccessToken());
+  public isAuthenticated = () : boolean => this.getAccessToken() !== null && !this.jwtHelper.isTokenExpired(this.getAccessToken());
 
   public isUserAdmin(): boolean {
     return (this.decodeAuthToken()['roles'] as Array<string>).includes('Admin');
