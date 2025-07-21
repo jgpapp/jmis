@@ -99,6 +99,13 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   public businessesTainedByGenderDoughnut: boolean = true;
   public businessesTainedByGenderChartTitle: string = 'Business Trained By Gender';
 
+  public mentorshipByGenderCategory: any[];
+  public mentorshipByGenderCategoryShowLegend: boolean = false;
+  public mentorshipByGenderCategoryShowLabels: boolean = true;
+  public mentorshipByGenderCategoryExplodeSlices: boolean = false;
+  public mentorshipByGenderCategoryDoughnut: boolean = true;
+  public mentorshipByGenderCategoryChartTitle: string = 'Gender Category Distribution';
+
   public loanedBusinessesByGender: any[];
   public loanedBusinessesByGenderShowLegend: boolean = false;
   public loanedBusinessesByGenderShowLabels: boolean = true;
@@ -276,6 +283,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
 
   @ViewChild('loansDisbursedByGenderContentDiv', { static: false }) loansDisbursedByGenderContentDiv!: ElementRef;
   @ViewChild('businessesTainedByGenderContentDiv', { static: false }) businessesTainedByGenderContentDiv!: ElementRef;
+  @ViewChild('mentorshipByGenderCategoryContentDiv', { static: false }) mentorshipByGenderCategoryContentDiv!: ElementRef;
   @ViewChild('loanedBusinessesByGenderContentDiv', { static: false }) loanedBusinessesByGenderContentDiv!: ElementRef;
   @ViewChild('loansDisbursedByPipelineContentDiv', { static: false }) loansDisbursedByPipelineContentDiv!: ElementRef;
   @ViewChild('mentorshipGenderSummaryContentDiv', { static: false }) mentorshipGenderSummaryContentDiv!: ElementRef;
@@ -336,6 +344,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       this.getMentorshipGenderSummary();
       this.getParticipantsMentorshipDeliveryModeSummary();
       this.getParticipantsMentorshipBusiCategoryByCountySummary();
+      this.getMentorshipByGenderCategorySummary();
     } else if (this.dashboardTypeFilter.isTADashboard) {
       this.getBusinessesTrainedByGenderSummary();
       this.getTaNeedsByGenderSummary();
@@ -397,7 +406,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getMentorshipGenderSummary() {
-    this.dashBoardService.getMentorshipGenderSummary(this.dashBoardFilters)
+    this.dashBoardService.getMentorshipGenderSummary(this.dashBoardFilters, false)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -424,6 +433,17 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       .subscribe({
         next: (response) => {
           this.businessesTainedByGender = response;
+        },
+        error: (error) => { }
+      });
+  }
+
+  getMentorshipByGenderCategorySummary() {
+    this.dashBoardService.getMentorshipGenderSummary(this.dashBoardFilters, true)
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.mentorshipByGenderCategory = response;
         },
         error: (error) => { }
       });
@@ -705,6 +725,27 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartFormatLabel: (label: string): string => {
         // Find the data object by name and return the value instead of name
         const item = this.businessesTainedByGender.find(data => data.name === label);
+        return item ? `${this.valueFormatting(item.value)}` : label; // If found, return the value; otherwise return the name as fallback
+      }
+    };
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
+  }
+
+  expandMentorshipByGenderCategoryContentDivDoughnut(){
+    const data = { 
+      content: this.mentorshipByGenderCategoryContentDiv.nativeElement.cloneNode(true),
+      chartType: 'app-pie-chart',
+      chartData: this.mentorshipByGenderCategory,
+      chartShowLegend: this.mentorshipByGenderCategoryShowLegend,
+      chartSColorScheme: this.chartSColorScheme,
+      chartShowLabels: this.mentorshipByGenderCategoryShowLabels,
+      chartExplodeSlices: this.mentorshipByGenderCategoryExplodeSlices,
+      chartIsDoughnut: this.mentorshipByGenderCategoryDoughnut,
+      labelFormatting: this.valueFormatting,
+      chartTitle: this.mentorshipByGenderCategoryChartTitle,
+      chartFormatLabel: (label: string): string => {
+        // Find the data object by name and return the value instead of name
+        const item = this.mentorshipByGenderCategory.find(data => data.name === label);
         return item ? `${this.valueFormatting(item.value)}` : label; // If found, return the value; otherwise return the name as fallback
       }
     };

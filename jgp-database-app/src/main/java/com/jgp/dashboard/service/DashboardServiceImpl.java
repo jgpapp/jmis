@@ -421,7 +421,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<DataPointDto> getMentorshipGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
+    public List<DataPointDto> getMentorshipGenderSummary(DashboardSearchCriteria dashboardSearchCriteria, boolean isGenderCategory) {
         final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
@@ -440,7 +440,8 @@ public class DashboardServiceImpl implements DashboardService {
             parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
             loanWhereClause = String.format("%s%s", loanWhereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
         }
-        var sqlQuery = String.format(DataPointMapper.MENTORSHIP_BY_GENDER_SCHEMA, loanWhereClause);
+        final var genderField = isGenderCategory ? "gender_category" : "owner_gender";
+        var sqlQuery = String.format(DataPointMapper.MENTORSHIP_BY_GENDER_SCHEMA, genderField, loanWhereClause);
 
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
     }
@@ -1367,7 +1368,7 @@ public class DashboardServiceImpl implements DashboardService {
                 """;
 
         public static final String MENTORSHIP_BY_GENDER_SCHEMA = """
-                select cl.owner_gender as dataKey, count(m.id) as dataValue,\s
+                select cl.%s as dataKey, count(m.id) as dataValue,\s
                 count(m.id) * 100.0 / SUM(count(m.id)) OVER () AS percentage\s
                 from mentor_ships m inner join participants cl on m.participant_id = cl.id %s group by 1;\s
                 """;

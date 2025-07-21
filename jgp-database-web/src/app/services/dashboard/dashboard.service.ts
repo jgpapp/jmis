@@ -52,6 +52,10 @@ export class DashboardService {
       return this.httpClient.get(`/reports/businesses-trained-by-gender?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
+    getMentorshipByGenderSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`/reports/mentorship-by-gender?${this.getDashBoardQueryParams(dashBoardFilters)}`);
+    }
+
     getLoanedBusinessesByGenderSummary(dashBoardFilters: any = undefined): Observable<any> {
       return this.httpClient.get(`/reports/loaned-businesses-by-gender?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
@@ -72,8 +76,8 @@ export class DashboardService {
       return this.httpClient.get(`/reports/loans-disbursed-by-pipeline?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
-    getMentorshipGenderSummary(dashBoardFilters: any = undefined): Observable<any> {
-      return this.httpClient.get(`/reports/mentorship-by-gender?${this.getDashBoardQueryParams(dashBoardFilters)}`);
+    getMentorshipGenderSummary(dashBoardFilters: any = undefined, isGenderCategory: boolean): Observable<any> {
+      return this.httpClient.get(`/reports/mentorship-by-gender?${this.getDashBoardQueryParams(dashBoardFilters)}&is-gender-category=${isGenderCategory}`);
     }
 
     getLoansDisbursedByStatusSummary(dashBoardFilters: any = undefined): Observable<any> {

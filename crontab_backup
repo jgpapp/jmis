@@ -5,4 +5,3 @@
 
 # Run WAL synchronization script daily (e.g., every day at 00:30 AM)
 30 0 * * * /sync_wals.sh >> /var/log/backup_wal_sync.log 2>&1
-
