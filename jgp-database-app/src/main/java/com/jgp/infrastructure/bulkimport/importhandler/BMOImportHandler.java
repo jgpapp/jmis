@@ -100,9 +100,9 @@ public class BMOImportHandler implements ImportHandler {
         String status = ImportHandlerUtils.readAsString(BMOConstants.STATUS_COL, row);
         Boolean isApplicantEligible = "YES".equalsIgnoreCase(ImportHandlerUtils.readAsString(BMOConstants.IS_APPLICANT_ELIGIBLE_COL, row));
         Boolean isRecommendedForFinance = "YES".equalsIgnoreCase(ImportHandlerUtils.readAsString(BMOConstants.RECOMMENDED_FOR_FINANCE_COL, row));
-        LocalDate pipelineDecisionDate = DataValidator.validateLocalDate(BMOConstants.DATE_OF_PIPELINE_DECISION_COL, row, rowErrorMap, "Date of Pipeline Decision");
+        LocalDate pipelineDecisionDate = DataValidator.validateLocalDate(BMOConstants.DATE_OF_PIPELINE_DECISION_COL, row, rowErrorMap, "Date of Pipeline Decision", false);
         String referredFIBusiness = ImportHandlerUtils.readAsString(BMOConstants.REFERRED_FI_BUSINESS_COL, row);
-        LocalDate dateRecordedByPartner = DataValidator.validateLocalDate(BMOConstants.DATE_RECORD_ENTERED_BY_PARTNER_COL, row, rowErrorMap, "Date Recorded By Partner");
+        LocalDate dateRecordedByPartner = DataValidator.validateLocalDate(BMOConstants.DATE_RECORD_ENTERED_BY_PARTNER_COL, row, rowErrorMap, "Date Recorded By Partner", true);
         var taNeeds = ImportHandlerUtils.readAsString(BMOConstants.TA_NEEDS_COL, row);
         taNeeds = taNeeds == null ? null : TAValidator.validateTANeeds(taNeeds, row, rowErrorMap);
         final var trainingPartner = ImportHandlerUtils.readAsString(BMOConstants.TRAINING_PARTNER, row);
