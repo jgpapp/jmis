@@ -86,7 +86,7 @@ public class MonitoringImportHandler implements ImportHandler {
         final var locationLangDouble = DataValidator.validateTemplateDoubleValue(MonitoringConstants.LOCATION_LONGITUDE_COL, row, rowErrorMap);
         final var revenueChangeDouble = DataValidator.validateTemplateDoubleValue(MonitoringConstants.REVENUE_CHANGE_COL, row, rowErrorMap);
         var locationCounty = DataValidator.validateCountyName(MonitoringConstants.COUNTY_NAME_COL, row, rowErrorMap);
-        var surveyDate = DataValidator.validateLocalDate(MonitoringConstants.SURVEY_DATE_COL, row, rowErrorMap, "Survey Date");
+        var surveyDate = DataValidator.validateLocalDate(MonitoringConstants.SURVEY_DATE_COL, row, rowErrorMap, "Survey Date", true);
         final var monitoringDto = OutComeMonitoringRequestDto.builder()
             .surveyDate(surveyDate)
             .surveyLanguage(ImportHandlerUtils.readAsString(MonitoringConstants.SURVEY_LANGUAGE_COL, row))
