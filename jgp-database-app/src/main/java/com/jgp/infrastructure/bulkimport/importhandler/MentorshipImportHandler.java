@@ -97,7 +97,7 @@ public class MentorshipImportHandler implements ImportHandler {
 
     private Mentorship readMentorShipData(Row row) {
         final var status = ImportHandlerUtils.readAsString(MentorShipConstants.STATUS_COL, row);
-        final var mentorShipDate = DataValidator.validateLocalDate(MentorShipConstants.MENTORSHIP_DATE_COL, row, rowErrorMap, "Mentorship Date");
+        final var mentorShipDate = DataValidator.validateLocalDate(MentorShipConstants.MENTORSHIP_DATE_COL, row, rowErrorMap, "Mentorship Date", true);
         final var mentorShipOrg = ImportHandlerUtils.readAsString(MentorShipConstants.MENTOR_ORGANIZATION_COL, row);
         var bmoMembership = ImportHandlerUtils.readAsString(MentorShipConstants.BMO_MEMBERSHIP_COL, row);
         if (StringUtils.isNotBlank(bmoMembership) && OTHER.equals(bmoMembership.toUpperCase(Locale.ROOT))){

@@ -81,10 +81,10 @@ public class DataValidator {
         return CommonUtil.KenyanCounty.UNKNOWN;
     }
 
-    public static LocalDate validateLocalDate(int column, Row row, Map<Row, String> rowErrorMap, String dateFieldName) {
+    public static LocalDate validateLocalDate(int column, Row row, Map<Row, String> rowErrorMap, String dateFieldName, boolean isRequired) {
         try {
             final var formattedDate = ImportHandlerUtils.readAsISOFormattedDate(column, row);
-            if (null == formattedDate) {
+            if (null == formattedDate && isRequired) {
                 rowErrorMap.put(row, String.format("%s is required field !!", WordUtils.capitalizeFully(dateFieldName)));
                 return  LocalDate.now(ZoneId.systemDefault());
             }
