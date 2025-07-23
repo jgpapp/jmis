@@ -90,7 +90,7 @@ public class DataValidator {
             }
             return formattedDate;
         } catch (DateTimeParseException e) {
-            log.error("Invalid value for county colum", e);
+            log.error("Invalid value for {} colum", dateFieldName, e);
             rowErrorMap.put(row, String.format("%s must be formatted as 'yyyy-MM-dd' !!", WordUtils.capitalizeFully(dateFieldName)));
             return  LocalDate.now(ZoneId.systemDefault());
         }
