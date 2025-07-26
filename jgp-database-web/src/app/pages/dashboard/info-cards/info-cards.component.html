@@ -600,6 +600,39 @@
     </div> 
 }
 
+@if(dashboardTypeFilter.isMentorShipDashboard){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #mentorshipByDisabilitySummaryContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandMentorshipByDisabilitySummaryBarChart()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{mentorshipByDisabilitySummaryChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (mentorshipByDisabilitySummary && mentorshipByDisabilitySummary.length > 0) {
+                <ngx-charts-bar-horizontal
+                    [scheme]="chartSColorScheme"
+                    [results]="mentorshipByDisabilitySummary"
+                    [gradient]="gradient"
+                    [xAxis]="mentorshipByDisabilitySummaryShowXAxis"
+                    [yAxis]="mentorshipByDisabilitySummaryShowYAxis"
+                    [legend]="mentorshipByDisabilitySummaryShowLegend"
+                    [showXAxisLabel]="mentorshipByDisabilitySummaryShowXAxisLabel"
+                    [showYAxisLabel]="mentorshipByDisabilitySummaryShowYAxisLabel"
+                    [xAxisLabel]="mentorshipByDisabilitySummaryYAxisLabel"
+                    [yAxisLabel]="mentorshipByDisabilitySummaryXAxisLabel"
+                    [showDataLabel]="true"
+                    (select)="onSelect($event)"
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }          
+            </div>
+        </mat-card>
+    </div>  
+}
+
 @if(dashboardTypeFilter.isTADashboard){
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #refugeeBusinessesTainedByGenderContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandRefugeeBusinessesTainedByGenderPieChart()">

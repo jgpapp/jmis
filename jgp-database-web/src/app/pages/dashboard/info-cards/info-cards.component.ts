@@ -189,6 +189,16 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   public mentorshipDeliveryModeSummaryYAxisLabel: string = 'Count';
   public mentorshipDeliveryModeSummaryChartTitle: string = 'Delivery Mode Distribution';
 
+  public mentorshipByDisabilitySummary: any[];
+  public mentorshipByDisabilitySummaryShowXAxis: boolean = true;
+  public mentorshipByDisabilitySummaryShowYAxis: boolean = true;
+  public mentorshipByDisabilitySummaryShowLegend: boolean = false;
+  public mentorshipByDisabilitySummaryShowXAxisLabel: boolean = true;
+  public mentorshipByDisabilitySummaryShowYAxisLabel: boolean = true;
+  public mentorshipByDisabilitySummaryXAxisLabel: string = 'Disability Type';
+  public mentorshipByDisabilitySummaryYAxisLabel: string = 'Count';
+  public mentorshipByDisabilitySummaryChartTitle: string = 'Disability Type Distribution';
+
   public mentorshipBusiCategoryByCountySummary: any[];
   public mentorshipBusiCategoryByCountySummaryShowXAxis: boolean = true;
   public mentorshipBusiCategoryByCountySummaryShowYAxis: boolean = true;
@@ -298,6 +308,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   @ViewChild('loansDisbursedByProductContentDiv', { static: false }) loansDisbursedByProductContentDiv!: ElementRef;
   @ViewChild('employeesSummaryContentDiv', { static: false }) employeesSummaryContentDiv!: ElementRef;
   @ViewChild('mentorshipDeliveryModeSummaryContentDiv', { static: false }) mentorshipDeliveryModeSummaryContentDiv!: ElementRef;
+  @ViewChild('mentorshipByDisabilitySummaryContentDiv', { static: false }) mentorshipByDisabilitySummaryContentDiv!: ElementRef;
   @ViewChild('mentorshipBusiCategoryByCountySummaryContentDiv', { static: false }) mentorshipBusiCategoryByCountySummaryContentDiv!: ElementRef;
   @ViewChild('accessedVSOutStandingAmountContentDiv', { static: false }) accessedVSOutStandingAmountContentDiv!: ElementRef;
   @ViewChild('accessedVSOutStandingAmountByGenderContentDiv', { static: false }) accessedVSOutStandingAmountByGenderContentDiv!: ElementRef;
@@ -345,6 +356,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       this.getParticipantsMentorshipDeliveryModeSummary();
       this.getParticipantsMentorshipBusiCategoryByCountySummary();
       this.getMentorshipByGenderCategorySummary();
+      this.getMentorshipByDisabilitySummary();
     } else if (this.dashboardTypeFilter.isTADashboard) {
       this.getBusinessesTrainedByGenderSummary();
       this.getTaNeedsByGenderSummary();
@@ -406,7 +418,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getMentorshipGenderSummary() {
-    this.dashBoardService.getMentorshipGenderSummary(this.dashBoardFilters, false)
+    this.dashBoardService.getMentorshipByGivenFieldSummary(this.dashBoardFilters, 'owner_gender')
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
@@ -439,11 +451,22 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getMentorshipByGenderCategorySummary() {
-    this.dashBoardService.getMentorshipGenderSummary(this.dashBoardFilters, true)
+    this.dashBoardService.getMentorshipByGivenFieldSummary(this.dashBoardFilters, 'gender_category')
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
           this.mentorshipByGenderCategory = response;
+        },
+        error: (error) => { }
+      });
+  }
+
+  getMentorshipByDisabilitySummary() {
+    this.dashBoardService.getMentorshipByGivenFieldSummary(this.dashBoardFilters, 'disability_type')
+    .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response) => {
+          this.mentorshipByDisabilitySummary = response;
         },
         error: (error) => { }
       });
@@ -1011,6 +1034,27 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartXAxisLabel: this.employeesSummaryYAxisLabel,
       chartFormatLabel: this.valueFormatting,
       chartTitle: this.employeesSummaryChartTitle,
+    };
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
+  }
+
+  expandMentorshipByDisabilitySummaryBarChart(){
+    const data = { 
+      content: this.mentorshipByDisabilitySummaryContentDiv.nativeElement.cloneNode(true),
+      mapContainerElement: this.mentorshipByDisabilitySummaryContentDiv,
+      chartType: 'ngx-charts-bar-horizontal',
+      chartData: this.mentorshipByDisabilitySummary,
+      chartGradient: this.gradient,
+      chartShowXAxis: this.mentorshipByDisabilitySummaryShowXAxis,
+      chartShowYAxis: this.mentorshipByDisabilitySummaryShowYAxis,
+      chartSColorScheme: this.chartSColorScheme,
+      chartShowLegend: true,
+      chartShowXAxisLabel: this.mentorshipByDisabilitySummaryShowXAxisLabel,
+      chartShowYAxisLabel: this.mentorshipByDisabilitySummaryShowYAxisLabel,
+      chartYAxisLabel: this.mentorshipByDisabilitySummaryXAxisLabel,
+      chartXAxisLabel: this.mentorshipByDisabilitySummaryYAxisLabel,
+      chartFormatLabel: this.valueFormatting,
+      chartTitle: this.mentorshipByDisabilitySummaryChartTitle,
     };
     this.dashBoardService.openExpandedChartDialog(this.dialog, data);
   }
