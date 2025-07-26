@@ -43,7 +43,7 @@ public interface DashboardService {
 
     List<DataPointDto> getLoanDisbursedByPipelineSourceSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
-    List<DataPointDto> getMentorshipGenderSummary(DashboardSearchCriteria dashboardSearchCriteria, boolean isGenderCategory);
+    List<DataPointDto> getMentorshipByGivenFieldSummary(DashboardSearchCriteria dashboardSearchCriteria, String givenField);
 
     List<DataPointDto> getLoansDisbursedByQualitySummary(DashboardSearchCriteria dashboardSearchCriteria);
 
