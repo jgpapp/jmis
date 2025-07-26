@@ -298,6 +298,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   @ViewChild('loansDisbursedByPipelineContentDiv', { static: false }) loansDisbursedByPipelineContentDiv!: ElementRef;
   @ViewChild('mentorshipGenderSummaryContentDiv', { static: false }) mentorshipGenderSummaryContentDiv!: ElementRef;
   @ViewChild('countyTrainedBusinessesMapContentDiv', { static: false }) countyTrainedBusinessesMapContentDiv!: ElementRef;
+  @ViewChild('countyMentorshipMapContentDiv', { static: false }) countyMentorshipMapContentDiv!: ElementRef;
   @ViewChild('loansDisbursedByStatusContentDiv', { static: false }) loansDisbursedByStatusContentDiv!: ElementRef;
   @ViewChild('taNeedsByGenderContentDiv', { static: false }) taNeedsByGenderContentDiv!: ElementRef;
   @ViewChild('loansDisbursedBySegmentContentDiv', { static: false }) loansDisbursedBySegmentContentDiv!: ElementRef;
@@ -884,6 +885,18 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       content: this.countyTrainedBusinessesMapContentDiv.nativeElement.cloneNode(true),
       mapContainerElement: this.countyTrainedBusinessesMapContentDiv,
       chartType: 'kenyan-county-map',
+      chartData: this.countyData,
+      countyDataToBePicked: 'businessesTrained',
+      chartTitle: 'Training By County'
+    };
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
+  }
+
+  expandCountyMentorshipMap(){
+    const data = { 
+      content: this.countyMentorshipMapContentDiv.nativeElement.cloneNode(true),
+      mapContainerElement: this.countyMentorshipMapContentDiv,
+      chartType: 'kenyan-leaflet-map',
       chartData: this.countyData,
       countyDataToBePicked: 'businessesTrained',
       chartTitle: 'Training By County'

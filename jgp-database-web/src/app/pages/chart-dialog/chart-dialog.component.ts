@@ -11,6 +11,7 @@ import jsPDF from 'jspdf';
 import domtoimage from 'dom-to-image';
 import { ExportAsService, ExportAsConfig, ExportAsModule } from 'ngx-export-as';
 import { KenyanMapComponent } from "../dashboard/kenyan-map/kenyan-map.component";
+import { KeLeafletMapComponent } from '../ke-leaflet-map/ke-leaflet-map.component';
 
 @Component({
   selector: 'app-chart-dialog',
@@ -23,7 +24,8 @@ import { KenyanMapComponent } from "../dashboard/kenyan-map/kenyan-map.component
     NgxChartsModule,
     MatButtonModule,
     ExportAsModule,
-    KenyanMapComponent
+    KenyanMapComponent,
+    KeLeafletMapComponent
 ],
   templateUrl: './chart-dialog.component.html',
   styleUrl: './chart-dialog.component.scss'

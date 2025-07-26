@@ -26,6 +26,9 @@
     [countyDataToBePicked]="data.countyDataToBePicked"
     [kenyanMapChartContainer]="chartContainerRef"  />
   }
+  @if (data.chartType === 'kenyan-leaflet-map') {
+    <app-ke-leaflet-map />
+  }
   @if (data.chartType === 'ngx-charts-bar-vertical') {
     <ngx-charts-bar-vertical
     [scheme]="data.chartSColorScheme"
