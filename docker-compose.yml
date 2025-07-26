@@ -1,6 +1,8 @@
 services:
   jgp_app:
     container_name: jgp_app
+    env_file:
+      - ./env/.env
     build:
       context: https://github.com/jgpapp/jmis.git#main:jgp-database-app
       dockerfile: Dockerfile
@@ -34,6 +36,8 @@ services:
       - /home/jmis/.jgp_documents:/root/.jgp_documents  # Persist JGP documents on the host
   jgp_app_ui:
     container_name: jgp_app_ui
+    env_file:
+      - ./env/.env
     build:
       context: https://github.com/jgpapp/jmis.git#main:jgp-database-web
       dockerfile: Dockerfile
