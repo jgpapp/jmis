@@ -1,6 +1,7 @@
 package com.jgp.dashboard.service;
 
 import com.jgp.dashboard.dto.AnalyticsUpdateRequestDto;
+import com.jgp.dashboard.dto.CountyDataSummaryResponseDto;
 import com.jgp.dashboard.dto.DataSummaryDto;
 import com.jgp.dashboard.dto.DashboardSearchCriteria;
 import com.jgp.dashboard.dto.DataPointDto;
@@ -81,8 +82,6 @@ public class DashboardServiceImpl implements DashboardService {
     private static final String VALUE_PARAM = "value";
     private static final String TOTAL_PARAM_PARAM = "%s Totals";
 
-    @Value("${jgp.dashboard.default.view.period.in.months}")
-    private Integer jgpDashboardDefaultViewPeriodInMonths;
 
     @Override
     public HighLevelSummaryDto getHighLevelSummary(DashboardSearchCriteria dashboardSearchCriteria) {
@@ -90,8 +89,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var bpdWhereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
@@ -125,8 +124,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -144,13 +143,49 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    public List<CountyDataSummaryResponseDto> getCountySummary(DashboardSearchCriteria dashboardSearchCriteria) {
+        final var rm = new CountyDataSummaryResponseMapper();
+        LocalDate fromDate = dashboardSearchCriteria.fromDate();
+        LocalDate toDate = dashboardSearchCriteria.toDate();
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
+        }
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+
+        var bpdWhereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
+        var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
+        var mentorShipWhereClause = MENTORSHIP_WHERE_CLAUSE_BY_MENTORSHIP_DATE_PARAM;
+        if (Objects.nonNull(dashboardSearchCriteria.partnerId())) {
+            parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
+            bpdWhereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, bpdWhereClause);
+            loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
+            mentorShipWhereClause = String.format(MENTORSHIP_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, mentorShipWhereClause);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
+            parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
+            bpdWhereClause = String.format("%s%s", bpdWhereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+            loanWhereClause = String.format("%s%s", loanWhereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+            mentorShipWhereClause = String.format("%s%s", mentorShipWhereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.trainingPartner())) {
+            parameters.addValue(TRAINING_PARTNER_PARAM, dashboardSearchCriteria.trainingPartner().toLowerCase(Locale.getDefault()));
+            bpdWhereClause = String.format("%s%s", bpdWhereClause, WHERE_CLAUSE_BY_TRAINING_PARTNER_PARAM);
+        }
+        var sqlQuery = String.format(CountyDataSummaryResponseMapper.SCHEMA, bpdWhereClause, loanWhereClause, mentorShipWhereClause);
+
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
     public List<DataPointDto> getLoanedBusinessesByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -173,8 +208,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -197,8 +232,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -221,8 +256,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -241,8 +276,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -261,8 +296,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -282,8 +317,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -311,8 +346,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -341,8 +376,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -371,8 +406,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -401,8 +436,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -421,13 +456,13 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<DataPointDto> getMentorshipGenderSummary(DashboardSearchCriteria dashboardSearchCriteria, boolean isGenderCategory) {
+    public List<DataPointDto> getMentorshipByGivenFieldSummary(DashboardSearchCriteria dashboardSearchCriteria, String givenField) {
         final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var loanWhereClause = MENTORSHIP_WHERE_CLAUSE_BY_MENTORSHIP_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -440,8 +475,8 @@ public class DashboardServiceImpl implements DashboardService {
             parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
             loanWhereClause = String.format("%s%s", loanWhereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
         }
-        final var genderField = isGenderCategory ? "gender_category" : "owner_gender";
-        var sqlQuery = String.format(DataPointMapper.MENTORSHIP_BY_GENDER_SCHEMA, genderField, loanWhereClause);
+
+        var sqlQuery = String.format(DataPointMapper.MENTORSHIP_BY_DIFFERENT_FIELDS_SCHEMA, givenField, loanWhereClause);
 
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
     }
@@ -452,8 +487,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -477,8 +512,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -506,8 +541,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var whereClause = MENTORSHIP_WHERE_CLAUSE_BY_MENTORSHIP_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -531,8 +566,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -560,8 +595,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var whereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -585,8 +620,8 @@ public class DashboardServiceImpl implements DashboardService {
         var fromDate = searchCriteria.fromDate();
         var toDate = searchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var whereClause = "WHERE mon.survey_date between :fromDate and :toDate  and mon.is_approved = true ";
         var parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -633,8 +668,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -662,8 +697,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -691,8 +726,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var whereClause = MENTORSHIP_WHERE_CLAUSE_BY_MENTORSHIP_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -716,8 +751,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -744,8 +779,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var whereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -787,8 +822,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
@@ -812,8 +847,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
@@ -837,8 +872,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
@@ -866,8 +901,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
@@ -896,8 +931,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -921,8 +956,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
@@ -944,8 +979,8 @@ public class DashboardServiceImpl implements DashboardService {
     public List<DataSummaryDto> getDataSummary(LocalDate fromDate, LocalDate toDate, Long partnerId) {
         final var countySummaryMapper = new DataSummaryDataMapper();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
         var bpdWhereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
@@ -1276,6 +1311,50 @@ public class DashboardServiceImpl implements DashboardService {
         }
     }
 
+    private static final class CountyDataSummaryResponseMapper implements ResultSetExtractor<List<CountyDataSummaryResponseDto>> {
+
+        public static final String SCHEMA = """
+                with countySummary as (\s
+                select cl.location_county_code as countyCode, count(bpd.*) as businessesTrained,\s
+                0 as businessesLoaned, 0 as amountDisbursed,\s
+                0 as businessesMentored from bmo_participants_data bpd inner join participants cl on bpd.participant_id = cl.id %s group by 1 \s
+                union
+                select cl.location_county_code as countyCode, 0 as businessesTrained, count(distinct l.*) as businessesLoaned,\s
+                sum(lt.amount) as amountDisbursed, 0 as businessesMentored from loan_transactions lt\s
+                inner join loans l on lt.loan_id = l.id inner join participants cl on l.participant_id = cl.id %s group by 1\s
+                union
+                 select cl.location_county_code as countyCode, 0 as businessesTrained, 0 as businessesLoaned,\s
+                 0 as amountDisbursed, count(distinct m.*) as businessesMentored from mentor_ships m\s
+                 inner join participants cl on m.participant_id = cl.id %s group by 1\s
+                    )
+                    select countyCode, sum(businessesTrained) as businessesTrained, sum(businessesLoaned) as businessesLoaned,\s
+                    sum(amountDisbursed) as amountDisbursed, sum(businessesMentored) as businessesMentored\s
+                    from countySummary group by 1;
+                   \s""";
+
+        @Override
+        public List<CountyDataSummaryResponseDto> extractData(ResultSet rs) throws SQLException, DataAccessException {
+            var dataPoints = new ArrayList<CountyDataSummaryResponseDto>();
+            while (rs.next()){
+                final var countyCode = rs.getString(COUNTY_CODE_PARAM);
+                final var countyName = CommonUtil.getCountyByCode(countyCode);
+                final var countyDetails = CommonUtil.KenyanCounty.getKenyanCountyFromName(countyName);
+                if (countyDetails.isPresent()){
+                    // Extracting county details
+                    final var county = countyDetails.get();
+                    final var approximateCenterLatitude = county.getApproximateCenterLatitude();
+                    final var approximateCenterLongitude = county.getApproximateCenterLongitude();
+                    final var businessesTrained = rs.getInt(BUSINESSES_TRAINED);
+                    final var businessesLoaned = rs.getInt(BUSINESSES_LOANED);
+                    final var amountDisbursed = rs.getBigDecimal(AMOUNT_DISBURSED);
+                    final var businessesMentored = rs.getInt("businessesMentored");
+                    dataPoints.add(new CountyDataSummaryResponseDto(countyCode, countyName, approximateCenterLatitude, approximateCenterLongitude, businessesTrained, businessesLoaned, amountDisbursed, businessesMentored));
+                }
+            }
+            return dataPoints;
+        }
+    }
+
 
     private static final class EmployeesSummaryMapper implements RowMapper<EmployeesSummaryDto> {
 
@@ -1367,7 +1446,7 @@ public class DashboardServiceImpl implements DashboardService {
                 from loan_transactions lt inner join loans l on lt.loan_id = l.id inner join participants cl on l.participant_id = cl.id %s group by 1;\s
                 """;
 
-        public static final String MENTORSHIP_BY_GENDER_SCHEMA = """
+        public static final String MENTORSHIP_BY_DIFFERENT_FIELDS_SCHEMA = """
                 select cl.%s as dataKey, count(m.id) as dataValue,\s
                 count(m.id) * 100.0 / SUM(count(m.id)) OVER () AS percentage\s
                 from mentor_ships m inner join participants cl on m.participant_id = cl.id %s group by 1;\s
@@ -1663,11 +1742,5 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
             return dataPoints;
         }
     }
-
-
-private Pair<LocalDate, LocalDate> getDefaultQueryDates(){
-        final var dateToday = LocalDate.now();
-        return new ImmutablePair<>(LocalDate.now(ZoneId.systemDefault()).minusMonths(jgpDashboardDefaultViewPeriodInMonths), dateToday);
-}
 
 }

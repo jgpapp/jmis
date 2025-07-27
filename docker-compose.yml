@@ -1,45 +1,8 @@
-version: '3.9'  
 services:
-  postgres_jgp_db:
-    container_name: postgres_jgp_db
-    image: postgres:15.4-alpine
-    environment:  
-      - POSTGRES_PASSWORD=S3cretJmIs@#321
-      - POSTGRES_USER=jgp_user
-      - POSTGRES_DB=jgp_db
-    networks:
-      - jgp-app-network
-    ports:
-      - "5433:5432"
-    volumes:
-      - jgp_data:/var/lib/postgresql/data # Persistent data for the database
-      - ./postgresql.conf:/etc/postgresql/postgresql.conf # Mount your custom config
-      - ./pg_hba.conf:/etc/postgresql/pg_hba.conf # Mount your custom config
-      - ./wal_archive:/var/lib/postgresql/wal_archive # New volume for WAL archives
-    command: postgres -c config_file=/etc/postgresql/postgresql.conf  -c hba_file=/etc/postgresql/pg_hba.conf # Tell Postgres to use your config
-  db_backup_service:
-    build: .
-    volumes:
-      - ./temp_backups:/temp_backups # Local volume for temporary backups
-      - ~/.ssh:/root/.ssh:ro # Mount your SSH keys for rsync
-      - ./wal_archive:/var/lib/postgresql/wal_archive # If you are syncing WALs, this volume is crucial
-      - ./logs:/var/log # Mount for container logs
-    environment:
-      POSTGRES_HOST: postgres_jgp_db # Service name of your postgres container
-      POSTGRES_USER: jgp_user
-      POSTGRES_PASSWORD: S3cretJmIs@#321
-      POSTGRES_PORT: 5432
-      REMOTE_USER: jgsadmin
-      REMOTE_HOST: 20.242.125.65
-      REMOTE_BASE_BACKUP_PATH: /home/jmis/jgp_backups
-      REMOTE_WAL_ARCHIVE_PATH: /home/jmis/jgp_backups/wal_archive
-    command: crond -f
-    networks:
-      - jgp-app-network
-    depends_on:
-      - postgres_jgp_db # Ensure 'db' service starts before 'backup'
   jgp_app:
     container_name: jgp_app
+    env_file:
+      - ./env/.env
     build:
       context: https://github.com/jgpapp/jmis.git#main:jgp-database-app
       dockerfile: Dockerfile
@@ -49,26 +12,23 @@ services:
     networks:
       - jgp-app-network
     environment:
-      - POSTGRESQL_HOST=postgres_jgp_db
-      - POSTGRESQL_PORT=5432
-      - POSTGRESQL_USER=jgp_user
-      - POSTGRESQL_PASSWORD=S3cretJmIs@#321
-      - POSTGRESQL_DATABASE=jgp_db
-      - SPRING_PROFILES_ACTIVE=production
-      - KEY_STORE_PATH=/etc/letsencrypt/live/jmis.dt-global.com/keystore.p12
-      - KEY_STORE_PASS_PHRASE=jGP@#dataBase
+      - POSTGRESQL_HOST=${POSTGRESQL_HOST:-jgp_postgres}
+      - POSTGRESQL_PORT=${POSTGRESQL_PORT:-5432}
+      - POSTGRESQL_USER=${POSTGRESQL_USER:-postgres}
+      - POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD:-postgres}
+      - POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE:-jgp_db}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-production}
+      - KEY_STORE_PATH=${KEY_STORE_PATH:-/etc/path/keystore.p12}
+      - KEY_STORE_PASS_PHRASE=${KEY_STORE_PASS_PHRASE:-passphrase}
       - KEY_STORE_ALIAS=tomcat
       - SPRING_HTTPS_PORT=8082
       - JGP_DASHBOARD_DEFAULT_VIEW_PERIOD_IN_MONTHS=6
       - JGP_NOTIFICATION_ENABLED=true
-      - JGP_NOTIFICATION_MAIL_HOST=smtp.gmail.com
-      - JGP_NOTIFICATION_USERNAME=your-email@gmail.com
-      - JGP_NOTIFICATION_PASSWORD=your-app-password
-      - JGP_JWT_SECRET=MyVeryLongAndSecureSecretKeyThatIsAtLeast32BytesLongForHS256Encryption
-      - JGP_JWT_ACCESS_TOKEN_TTL=3600000
-      - JGP_JWT_REFRESH_TOKEN_TTL=604800000
-    depends_on:
-      - postgres_jgp_db
+      - JGP_NOTIFICATION_MAIL_HOST=${JGP_EMAIL_NOTIFICATION_MAIL_HOST:-smtp.example.com}
+      - JGP_NOTIFICATION_USERNAME=${JGP_EMAIL_NOTIFICATION_USERNAME:-server@gmail.com}
+      - JGP_NOTIFICATION_PASSWORD=${JGP_EMAIL_NOTIFICATION_PASSWORD:-secretpassword}
+      - JGP_JWT_ACCESS_TOKEN_TTL=21600000
+      - JGP_JWT_REFRESH_TOKEN_TTL=86400000
     ports:
       - "8082:8082"
     volumes:
@@ -76,6 +36,8 @@ services:
       - /home/jmis/.jgp_documents:/root/.jgp_documents  # Persist JGP documents on the host
   jgp_app_ui:
     container_name: jgp_app_ui
+    env_file:
+      - ./env/.env
     build:
       context: https://github.com/jgpapp/jmis.git#main:jgp-database-web
       dockerfile: Dockerfile
@@ -85,11 +47,11 @@ services:
     networks:
       - jgp-app-network
     environment:
-      - JGP_APP_BASE_URL=http://localhost:8082/jgp-app/api/v1
-      - JGP_APP_BASE_WEBSOCKET_URL=http://localhost:8082/jgp-app/ws
-      - SERVER_NAME=localhost
-      - SSL_CERT_PATH=/etc/ssl/certs/nginx-default.crt
-      - SSL_KEY_PATH=/etc/ssl/private/nginx-default.key
+      - JGP_APP_BASE_URL=${JGP_APP_BASE_URL:-http://localhost:8082}
+      - JGP_APP_BASE_WEBSOCKET_URL=${JGP_APP_BASE_WEBSOCKET_URL}
+      - SERVER_NAME=${SERVER_NAME:-somedomain.com}
+      - SSL_CERT_PATH=${SSL_CERT_PATH:-/etc/path/fullchain.pem}
+      - SSL_KEY_PATH=${SSL_KEY_PATH:-/etc/path/privkey.pem}
     depends_on:
       - jgp_app
     ports:
@@ -101,9 +63,3 @@ services:
 networks:
   jgp-app-network:
     driver: bridge
-volumes:
-  jgp_data:
-    driver: local
-  wal_archive:
-  backups: # For local base backup staging
-  logs: # For persistent container logs

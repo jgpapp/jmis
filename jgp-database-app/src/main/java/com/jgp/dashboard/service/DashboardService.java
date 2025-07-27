@@ -1,6 +1,7 @@
 package com.jgp.dashboard.service;
 
 import com.jgp.dashboard.dto.AnalyticsUpdateRequestDto;
+import com.jgp.dashboard.dto.CountyDataSummaryResponseDto;
 import com.jgp.dashboard.dto.DataSummaryDto;
 import com.jgp.dashboard.dto.DashboardSearchCriteria;
 import com.jgp.dashboard.dto.DataPointDto;
@@ -20,6 +21,8 @@ public interface DashboardService {
     HighLevelSummaryDto getHighLevelSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
     List<DataPointDto> getLoanDisbursedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);
+
+    List<CountyDataSummaryResponseDto> getCountySummary(DashboardSearchCriteria dashboardSearchCriteria);
 
     List<DataPointDto> getLoanedBusinessesByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
@@ -43,7 +46,7 @@ public interface DashboardService {
 
     List<DataPointDto> getLoanDisbursedByPipelineSourceSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
-    List<DataPointDto> getMentorshipGenderSummary(DashboardSearchCriteria dashboardSearchCriteria, boolean isGenderCategory);
+    List<DataPointDto> getMentorshipByGivenFieldSummary(DashboardSearchCriteria dashboardSearchCriteria, String givenField);
 
     List<DataPointDto> getLoansDisbursedByQualitySummary(DashboardSearchCriteria dashboardSearchCriteria);
 

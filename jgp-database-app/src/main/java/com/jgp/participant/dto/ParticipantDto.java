@@ -60,6 +60,8 @@ public record ParticipantDto(
 
         String personWithDisability,
 
+        String disabilityType,
+
         String refugeeStatus,
 
         List<BMOClientDto> bmoClientDtos,
@@ -76,7 +78,7 @@ public record ParticipantDto(
 
         Boolean isEligible,
 
-        String businessFinancier,
+        String businessFinancier
 
-        String disabilityType) {
+        ) {
 }
