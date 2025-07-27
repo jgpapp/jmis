@@ -9,6 +9,7 @@ import { DashboardService } from '@services/dashboard/dashboard.service';
 import { Subject, takeUntil } from 'rxjs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DashboardTypeFilter } from '../../../dto/dashboard-type-filter';
+import { CountySummaryDto } from '../dto/county-summary-dto';
 
 @Component({
   selector: 'app-info-cards',
@@ -283,7 +284,8 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   public refugeeBusinessesTainedByGenderDoughnut: boolean = true;
   public refugeeBusinessesTainedByGenderChartTitle: string = 'Refugee Businesses Trained';
   
-  public countyData: Map<number, any>;
+  //public countyData: Map<number, any>;
+  public countySummary: CountySummaryDto[] = [];
   public businessesTrained: string;
   public businessesLoaned: string;
   public keMapImage = "ke_map/KE-MAP.png";
@@ -299,6 +301,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   @ViewChild('mentorshipGenderSummaryContentDiv', { static: false }) mentorshipGenderSummaryContentDiv!: ElementRef;
   @ViewChild('countyTrainedBusinessesMapContentDiv', { static: false }) countyTrainedBusinessesMapContentDiv!: ElementRef;
   @ViewChild('countyMentorshipMapContentDiv', { static: false }) countyMentorshipMapContentDiv!: ElementRef;
+  @ViewChild('countyLendingMapContentDiv', { static: false }) countyLendingMapContentDiv!: ElementRef;
   @ViewChild('loansDisbursedByStatusContentDiv', { static: false }) loansDisbursedByStatusContentDiv!: ElementRef;
   @ViewChild('taNeedsByGenderContentDiv', { static: false }) taNeedsByGenderContentDiv!: ElementRef;
   @ViewChild('loansDisbursedBySegmentContentDiv', { static: false }) loansDisbursedBySegmentContentDiv!: ElementRef;
@@ -368,9 +371,8 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       this.getParticipantsEmployeesSummary();
       this.getDisabledBusinessOwnersTrainedByGenderSummary();
       this.getRefugeeBusinessOwnersTrainedByGenderSummary();
-      this.getCountySummaryMap();
     } 
-    
+    this.getCountySummary();
     
   }
 
@@ -633,12 +635,12 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       });
   }
 
-  getCountySummaryMap() {
-    this.dashBoardService.getCountySummaryMap(this.dashBoardFilters)
+  getCountySummary() {
+    this.dashBoardService.getCountySummary(this.dashBoardFilters)
     .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
-          this.countyData = response;
+          this.countySummary = response;
         },
         error: (error) => { }
       });
@@ -881,25 +883,25 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   expandCountyTrainedBusinessesMap(){
-    const data = { 
-      content: this.countyTrainedBusinessesMapContentDiv.nativeElement.cloneNode(true),
-      mapContainerElement: this.countyTrainedBusinessesMapContentDiv,
-      chartType: 'kenyan-county-map',
-      chartData: this.countyData,
-      countyDataToBePicked: 'businessesTrained',
-      chartTitle: 'Training By County'
-    };
-    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
+    this.expandCountyMap(this.countyTrainedBusinessesMapContentDiv, this.countySummary, 'businessesTrained', 'Training By County');
   }
 
   expandCountyMentorshipMap(){
+    this.expandCountyMap(this.countyMentorshipMapContentDiv, this.countySummary, 'businessesMentored', 'Mentorship By County');
+  }
+
+  expandCountyLendingMap(){
+    this.expandCountyMap(this.countyLendingMapContentDiv, this.countySummary, 'loanFields', 'Lending By County');
+  }
+
+  expandCountyMap(contentDivChild: any, mapData: any, countyDataToBePicked: string, chartTitle: string){
     const data = { 
-      content: this.countyMentorshipMapContentDiv.nativeElement.cloneNode(true),
-      mapContainerElement: this.countyMentorshipMapContentDiv,
+      content: contentDivChild.nativeElement.cloneNode(true),
+      mapContainerElement: contentDivChild,
       chartType: 'kenyan-leaflet-map',
-      chartData: this.countyData,
-      countyDataToBePicked: 'businessesTrained',
-      chartTitle: 'Training By County'
+      chartData: mapData,
+      countyDataToBePicked: countyDataToBePicked,
+      chartTitle: chartTitle
     };
     this.dashBoardService.openExpandedChartDialog(this.dialog, data);
   }

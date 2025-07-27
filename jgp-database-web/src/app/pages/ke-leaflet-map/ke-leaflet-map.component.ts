@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import * as L from 'leaflet';
 import { HttpClient } from '@angular/common/http';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
@@ -16,6 +16,8 @@ export class KeLeafletMapComponent implements OnInit, AfterViewInit, OnDestroy {
   private map!: L.Map;
   private geoJsonLayer: L.GeoJSON | undefined;
   private kenyanMapJson = 'data/kenya-counties.json';
+  @Input({required: true, alias: 'countyDataSummary'}) countyDataSummary: any[];
+  @Input({required: true, alias: 'measureField'}) measureField: string;
 
   constructor(private http: HttpClient) { }
 
@@ -28,6 +30,18 @@ export class KeLeafletMapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loadKenyanCountiesGeoJSON();
     this.addCircularMarkersWithTooltip(); // <--- Call the new method to add markers
   }
+
+  ngOnChanges(changes: SimpleChanges): void {
+      if (changes['countyDataSummary']) {
+        this.countyDataSummary = changes['countyDataSummary']['currentValue']
+        this.addCircularMarkersWithTooltip();
+      }
+      if (changes['measureField']) {
+        this.measureField = changes['measureField']['currentValue']
+        this.addCircularMarkersWithTooltip();
+      }
+      
+    }
 
   private initMap(): void {
     // Center the map on Kenya
@@ -64,12 +78,25 @@ export class KeLeafletMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Updated method to add circular markers
   private addCircularMarkersWithTooltip(): void {
-    const markerData = [
-      { lat: -1.2921, lng: 36.8219, tooltip: 'Nairobi City (Capital)' },
-      { lat: -0.5167, lng: 35.2667, tooltip: 'Eldoret (Uasin Gishu)' },
-      { lat: -4.0437, lng: 39.6682, tooltip: 'Mombasa (Coastal City)' },
-      { lat: 0.5283, lng: 34.7829, tooltip: 'Kisumu (Lake Victoria)' }
+    let markerData: {
+      lat: any; // Replace with actual latitude property
+      lng: any; // Replace with actual longitude property
+      tooltip: string; // Replace with actual tooltip text, e.g., county name
+    }[] = [
+      //{ lat: -1.2921, lng: 36.8219, tooltip: 'Nairobi City (Capital)' },
+     // { lat: -0.5167, lng: 35.2667, tooltip: 'Eldoret (Uasin Gishu)' },
+      //{ lat: -4.0437, lng: 39.6682, tooltip: 'Mombasa (Coastal City)' },
+     // { lat: 0.5283, lng: 34.7829, tooltip: 'Kisumu (Lake Victoria)' }
     ];
+
+    this.countyDataSummary.forEach(county => {
+      // Assuming each county has 'lat', 'lng', and 'tooltip' properties
+      markerData.push({
+        lat: county.approximateCenterLatitude, // Replace with actual latitude property
+        lng: county.approximateCenterLongitude, // Replace with actual longitude property
+        tooltip: this.getMapToolTip(county) // Replace with actual tooltip text, e.g., county name
+      });
+    });
 
     markerData.forEach(data => {
       L.circleMarker([data.lat, data.lng], {
@@ -88,6 +115,13 @@ export class KeLeafletMapComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     });
   }
+
+  getMapToolTip(county: any): string {
+      if (this.measureField === 'loanFields') {
+        return `<b>County: ${county.countyName}</b><br><i>Loaned Businesses: ${county.businessesLoaned}</i><br><i>Amount Disbursed: ${county.amountDisbursed}</i>`;
+      } 
+      return `<b>County: ${county.countyName}</b><br><i>Result: ${county[this.measureField]}</i>`;
+    }
   
   private loadKenyanCountiesGeoJSON(): void {
     // Path to your Kenyan counties GeoJSON file

@@ -27,7 +27,10 @@
     [kenyanMapChartContainer]="chartContainerRef"  />
   }
   @if (data.chartType === 'kenyan-leaflet-map') {
-    <app-ke-leaflet-map />
+    <app-ke-leaflet-map 
+      [countyDataSummary]="data.chartData"
+      [measureField]="data.countyDataToBePicked"
+    />
   }
   @if (data.chartType === 'ngx-charts-bar-vertical') {
     <ngx-charts-bar-vertical
@@ -138,6 +141,9 @@
 </div>
 <div fxLayout="row" fxLayoutAlign="center center" fxFlex="8%" fxLayoutGap="2%">
   <button mat-raised-button color="primary" (click)="exportAsPDF()">Export As PDF</button>
-  <button mat-raised-button color="primary" (click)="downloadChart()">Export As Image (PNG)</button>
+  @if (data.chartType !== 'kenyan-leaflet-map') {
+    <button mat-raised-button color="primary" (click)="downloadChart()">Export As Image (PNG)</button>
+  }
+  
 </div>
 </div>

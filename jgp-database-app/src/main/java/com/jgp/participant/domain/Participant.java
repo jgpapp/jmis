@@ -208,12 +208,7 @@ public class Participant extends BaseEntity {
         }
         if (StringUtils.isNotBlank(dto.locationCountyCode())){
             var countyCode = dto.locationCountyCode().trim();
-            if (countyCode.length() == 1){
-                countyCode = String.format("00%s", countyCode);
-            }
-            if (countyCode.length() == 2){
-                countyCode = String.format("0%s", countyCode);
-            }
+            countyCode = CommonUtil.getConvertedCountyCode(countyCode);
             final var county = CommonUtil.getCountyByCode(countyCode);
             if (null != county){
                 this.locationCountyCode = countyCode;
