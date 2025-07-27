@@ -82,16 +82,9 @@ export class KeLeafletMapComponent implements OnInit, AfterViewInit, OnDestroy {
       lat: any; // Replace with actual latitude property
       lng: any; // Replace with actual longitude property
       tooltip: string; // Replace with actual tooltip text, e.g., county name
-    }[] = [];
+    }[] = this.createMarkers();
 
-    this.countyDataSummary.forEach(county => {
-      // Assuming each county has 'lat', 'lng', and 'tooltip' properties
-      markerData.push({
-        lat: county.approximateCenterLatitude, // Replace with actual latitude property
-        lng: county.approximateCenterLongitude, // Replace with actual longitude property
-        tooltip: this.getMapToolTip(county) // Replace with actual tooltip text, e.g., county name
-      });
-    });
+  
 
     markerData.forEach(data => {
       L.circleMarker([data.lat, data.lng], {
