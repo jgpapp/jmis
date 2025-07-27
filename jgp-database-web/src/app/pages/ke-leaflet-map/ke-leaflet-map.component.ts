@@ -82,21 +82,8 @@ export class KeLeafletMapComponent implements OnInit, AfterViewInit, OnDestroy {
       lat: any; // Replace with actual latitude property
       lng: any; // Replace with actual longitude property
       tooltip: string; // Replace with actual tooltip text, e.g., county name
-    }[] = [
-      //{ lat: -1.2921, lng: 36.8219, tooltip: 'Nairobi City (Capital)' },
-     // { lat: -0.5167, lng: 35.2667, tooltip: 'Eldoret (Uasin Gishu)' },
-      //{ lat: -4.0437, lng: 39.6682, tooltip: 'Mombasa (Coastal City)' },
-     // { lat: 0.5283, lng: 34.7829, tooltip: 'Kisumu (Lake Victoria)' }
-    ];
+    }[] = this.createMarkers();
 
-    this.countyDataSummary.forEach(county => {
-      // Assuming each county has 'lat', 'lng', and 'tooltip' properties
-      markerData.push({
-        lat: county.approximateCenterLatitude, // Replace with actual latitude property
-        lng: county.approximateCenterLongitude, // Replace with actual longitude property
-        tooltip: this.getMapToolTip(county) // Replace with actual tooltip text, e.g., county name
-      });
-    });
 
     markerData.forEach(data => {
       L.circleMarker([data.lat, data.lng], {
@@ -116,12 +103,42 @@ export class KeLeafletMapComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  createMarkers(): {lat: any, lng: any, tooltip: string}[] {
+    let markerData: {
+      lat: any; // Replace with actual latitude property
+      lng: any; // Replace with actual longitude property
+      tooltip: string; // Replace with actual tooltip text, e.g., county name
+    }[] = [];
+
+    this.countyDataSummary.forEach(county => {
+      // Assuming each county has 'lat', 'lng', and 'tooltip' properties
+      if (this.showMapMarker(county)) {
+        markerData.push({
+          lat: county.approximateCenterLatitude, // Replace with actual latitude property
+          lng: county.approximateCenterLongitude, // Replace with actual longitude property
+          tooltip: this.getMapToolTip(county) // Replace with actual tooltip text, e.g., county name
+        });
+      }
+    });
+
+    return markerData;
+  }
+
+
   getMapToolTip(county: any): string {
       if (this.measureField === 'loanFields') {
         return `<b>County: ${county.countyName}</b><br><i>Loaned Businesses: ${county.businessesLoaned}</i><br><i>Amount Disbursed: ${county.amountDisbursed}</i>`;
       } 
       return `<b>County: ${county.countyName}</b><br><i>Result: ${county[this.measureField]}</i>`;
     }
+
+    showMapMarker(county: any): boolean {
+      if (this.measureField === 'loanFields') {
+        return county.businessesLoaned > 0 || county.amountDisbursed > 0;
+      }
+      return county[this.measureField] > 0;
+    }
+
   
   private loadKenyanCountiesGeoJSON(): void {
     // Path to your Kenyan counties GeoJSON file
