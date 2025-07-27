@@ -422,7 +422,7 @@
                 <mat-card-title>Training By County</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
-                @if (countyData) {
+                @if (countySummary && countySummary.length > 0) {
                 <img matListItemAvatar [src]="keMapImage" class="map-place-holder-img">
             } @else {
                 <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
@@ -633,6 +633,26 @@
     </div>  
 }
 
+@if(dashboardTypeFilter.isMentorShipDashboard){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #countyMentorshipMapContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandCountyMentorshipMap()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>Mentorship By County</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (countySummary && countySummary.length > 0) {
+                <img matListItemAvatar [src]="keMapImage" class="map-place-holder-img">
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }        
+            </div>
+        </mat-card>
+    </div>
+}
+
 @if(dashboardTypeFilter.isTADashboard){
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #refugeeBusinessesTainedByGenderContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandRefugeeBusinessesTainedByGenderPieChart()">
@@ -788,6 +808,26 @@
             </div>
         </mat-card>
     </div>  
+}
+
+@if(dashboardTypeFilter.isFinancialDashboard){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #countyLendingMapContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandCountyLendingMap()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>Lending By County</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (countySummary && countySummary.length > 0) {
+                <img matListItemAvatar [src]="keMapImage" class="map-place-holder-img">
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }        
+            </div>
+        </mat-card>
+    </div>
 }
 
 </div>

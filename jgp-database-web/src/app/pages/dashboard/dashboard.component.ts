@@ -20,7 +20,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { FormsModule } from '@angular/forms';
 import { PerformanceSummaryComponent } from "./performance-summary/performance-summary.component";
 import { MonitoringDashboardComponent } from './monitoring-dashboard/monitoring-dashboard.component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardTypeFilter } from '../../dto/dashboard-type-filter';
 import { AnalyticsComponent } from './analytics/analytics.component';
 
@@ -77,7 +77,13 @@ export class DashboardComponent {
   partnerSpecificDashBoardFilters: any;
   resetDashBoardFilters: boolean = false;
   currentDashBoardTypeFilters: DashboardTypeFilter = {};
-  constructor(private dashBoardService: DashboardService, public authService: AuthService, public gs: GlobalService, private route: ActivatedRoute){}
+  constructor(private dashBoardService: DashboardService, 
+    public authService: AuthService, 
+    public gs: GlobalService, 
+    private route: ActivatedRoute,
+    public router: Router){
+     
+    }
 
   
 
@@ -255,23 +261,21 @@ export class DashboardComponent {
 }
 
   ngOnInit(): void {
-    this.route.data.subscribe(data => {
-      this.isPartnerDashboard = data['isPartnerDashboard'];
-    });
+    this.isPartnerDashboard = this.route.snapshot.data['isPartnerDashboard'];
     const currentUser = this.authService.currentUser();
     this.currentUserPartnerId = currentUser?.partnerId;
     this.partnerType = currentUser?.partnerType === '-' ? 'NONE' : currentUser?.partnerType;
     this.dashBoardFilters = {};
+    this.updateCurrentDashBoardTypeFilters();
     if(this.currentDashBoardTypeFilters.isPartnerDashboard){
       this.dashBoardFilters = {'selectedPartnerId': this.currentUserPartnerId}
     }
     this.partnerSpecificDashBoardFilters = {'selectedPartnerId': this.currentUserPartnerId};
-
     // Set initial dashboard type filters
     if (this.partnerType === 'TA' && this.isPartnerDashboard) {
       this._selectedDashboardView = 'TA';
     }
-    this.updateCurrentDashBoardTypeFilters();
+    
 
     this.getLastThreeYearsAccessedLoanPerPartnerYearly();
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();

@@ -148,6 +148,10 @@ export class DashboardService {
       return this.httpClient.get(`/reports/data-summary-map?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
+    getCountySummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`/reports/county-summary?${this.getDashBoardQueryParams(dashBoardFilters)}`);
+    }
+
     getPerformanceSummary(year: string | undefined, partnerId: number | undefined): Observable<any> {
       return this.httpClient.get(`/reports/performance-summary${this.getPerformanceSummaryQueryParams(year, partnerId)}`);
     }

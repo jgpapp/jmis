@@ -1,6 +1,7 @@
 package com.jgp.dashboard.api;
 
 import com.jgp.dashboard.dto.AnalyticsUpdateRequestDto;
+import com.jgp.dashboard.dto.CountyDataSummaryResponseDto;
 import com.jgp.dashboard.dto.CountyDto;
 import com.jgp.dashboard.dto.DataSummaryDto;
 import com.jgp.dashboard.dto.DashboardSearchCriteria;
@@ -61,6 +62,22 @@ public class DashboardController {
                 .trainingPartner(trainingPartner)
                 .build();
         return new ResponseEntity<>(this.dashboardService.getHighLevelSummary(searchCriteria), HttpStatus.OK);
+    }
+
+    @GetMapping("county-summary")
+    public ResponseEntity<List<CountyDataSummaryResponseDto>> getCountySummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                                  @RequestParam(value = "county-code", required = false) String countyCode,
+                                                                                  @RequestParam(value = "training-partner", required = false) String trainingPartner,
+                                                                                  @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                                  @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .trainingPartner(trainingPartner)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getCountySummary(searchCriteria), HttpStatus.OK);
     }
 
     @GetMapping("loans-disbursed-by-gender")
@@ -535,7 +552,7 @@ public class DashboardController {
     @GetMapping("kenyan-counties")
     public ResponseEntity<List<CountyDto>> getKenyanCounties(){
         return new ResponseEntity<>(new ArrayList<>(EnumSet.allOf(CommonUtil.KenyanCounty.class))
-                .stream().map(county -> new CountyDto(county.getCountyCode(), county.getCountyName()))
+                .stream().map(county -> new CountyDto(county.getCountyCode(), county.getCountyName(), county.getApproximateCenterLatitude(), county.getApproximateCenterLongitude()))
                 .sorted(Comparator.comparing(CountyDto::countyName))
                 .toList(), HttpStatus.OK);
     }
