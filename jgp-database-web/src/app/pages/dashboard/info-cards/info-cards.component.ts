@@ -1110,7 +1110,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartShowYAxisLabel: this.mentorshipBusiCategoryByCountySummaryShowYAxisLabel,
       chartYAxisLabel: this.mentorshipBusiCategoryByCountySummaryYAxisLabel,
       chartXAxisLabel: this.mentorshipBusiCategoryByCountySummaryXAxisLabel,
-      chartFormatLabel: this.valueFormatting,
+      //chartFormatLabel: this.valueFormatting,
       chartTitle: this.mentorshipBusiCategoryByCountySummaryChartTitle,
     };
     this.dashBoardService.openExpandedChartDialog(this.dialog, data);
