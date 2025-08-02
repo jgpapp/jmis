@@ -6,6 +6,7 @@ import { HighLevelSummaryDto } from '../dto/highLevelSummaryDto';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { Subject, takeUntil } from 'rxjs';
 import { DashboardTypeFilter } from '../../../dto/dashboard-type-filter';
+import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-tiles',
@@ -23,7 +24,7 @@ export class TilesComponent implements OnInit, OnDestroy, OnChanges {
   @Input('dashBoardFilters') dashBoardFilters: any;
   @Input({required: true, alias: 'dashboardTypeFilter'}) dashboardTypeFilter: DashboardTypeFilter;
   highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', amountDisbursedByTranches: '0', businessesMentored: '0'};
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
   constructor(private dashBoardService: DashboardService){
 
   }
@@ -40,8 +41,7 @@ export class TilesComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   getHighLevelSummary() {
-    this.dashBoardService.getHighLevelSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getHighLevelSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.highLevelSummary = this.dashBoardService.getFormattedTileData(response);
@@ -55,8 +55,7 @@ export class TilesComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 
 }

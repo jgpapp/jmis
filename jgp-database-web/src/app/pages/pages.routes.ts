@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { PagesComponent } from './pages.component';
 import { AuthGuard } from '../util/AuthGuard';
+import { DataUploaderComponent } from './data/data-uploader/data-uploader.component';
 
 export const routes: Routes = [
   {
@@ -29,7 +30,13 @@ export const routes: Routes = [
         path: 'data-upload',
         loadComponent: () => import('./data/data-uploader/data-uploader.component').then(c => c.DataUploaderComponent),
         canActivate: [AuthGuard],
-        data: { breadcrumb: 'Data Upload' }
+        data: { breadcrumb: 'Data Upload' },
+      },
+      {
+        path: 'data-upload/:id/:entityType',
+        loadComponent: () => import('./data/data-uploader/data-uploader.component').then(c => c.DataUploaderComponent),
+        canActivate: [AuthGuard],
+        data: { breadcrumb: 'Data Upload' },
       },
       {
         path: 'data-list',

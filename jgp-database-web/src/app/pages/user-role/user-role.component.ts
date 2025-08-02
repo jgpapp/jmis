@@ -16,6 +16,7 @@ import { NoPermissionComponent } from '../errors/no-permission/no-permission.com
 import { AuthService } from '@services/users/auth.service';
 import { HasPermissionDirective } from '../../directives/has-permission.directive';
 import { Subject, takeUntil } from 'rxjs';
+import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-user-role',
@@ -47,12 +48,11 @@ export class UserRoleComponent implements OnInit, OnDestroy{
   public dataSource: any;
 
   userRoles: any
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
   constructor(public dialog: MatDialog, private userRoleServive: UserRoleService, public authService: AuthService) { }
 
   getAvailableUserRoles() {
-    this.userRoleServive.getAvailableUserRoles()
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.userRoleServive.getAvailableUserRoles()
       .subscribe({
         next: (response) => {
           this.userRoles = response;
@@ -93,7 +93,6 @@ export class UserRoleComponent implements OnInit, OnDestroy{
 
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 }

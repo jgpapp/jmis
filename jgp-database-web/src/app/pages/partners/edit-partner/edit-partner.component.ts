@@ -18,6 +18,7 @@ import { ContentHeaderComponent } from '../../../theme/components/content-header
 import { MatCardModule } from '@angular/material/card';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map, Subject, takeUntil } from 'rxjs';
+import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-edit-partner',
@@ -47,7 +48,7 @@ export class EditPartnerComponent implements OnDestroy{
   public editPartnerForm: FormGroup;
 
   selectedPartner: PartnerDto;
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
   constructor(
     public fb: FormBuilder, 
     private partnerService: PartnerService,
@@ -62,8 +63,7 @@ export class EditPartnerComponent implements OnDestroy{
     }
 
     ngOnInit(): void {
-      this.activatedRoute.data.pipe(map(data => data['selectedPartner']))
-      .pipe(takeUntil(this.unsubscribe$))
+      this.subs.add = this.activatedRoute.data.pipe(map(data => data['selectedPartner']))
       .subscribe({
         next: (response) => {
           this.selectedPartner = response;
@@ -77,8 +77,7 @@ export class EditPartnerComponent implements OnDestroy{
 
     onSubmitEditPartner(): void {
       if (this.editPartnerForm.valid && this.selectedPartner.id) {
-          this.partnerService.updatePartner(this.selectedPartner.id, this.editPartnerForm.value)
-          .pipe(takeUntil(this.unsubscribe$))
+          this.subs.add = this.partnerService.updatePartner(this.selectedPartner.id, this.editPartnerForm.value)
           .subscribe({
             next: (response) => {
               this.gs.openSnackBar("Done sucessfully!!", "Dismiss");
@@ -93,7 +92,6 @@ export class EditPartnerComponent implements OnDestroy{
 
 
     ngOnDestroy(): void {
-      this.unsubscribe$.next();
-      this.unsubscribe$.complete();
+      this.subs.dispose();
     }
 }

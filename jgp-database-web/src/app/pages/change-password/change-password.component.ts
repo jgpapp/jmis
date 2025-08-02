@@ -13,6 +13,7 @@ import { UserService } from '@services/users/user.service';
 import { GlobalService } from '@services/shared/global.service';
 import { AuthService } from '@services/users/auth.service';
 import { Subject, takeUntil } from 'rxjs';
+import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-change-password',
@@ -38,7 +39,7 @@ export class ChangePasswordComponent implements OnDestroy {
   msg: string = "";
   hide = true;
   authResponse: any
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
   constructor(public settingsService: SettingsService, public fb: FormBuilder, public router: Router, private userService: UserService, private gs: GlobalService, private authService: AuthService) {
     this.settings = this.settingsService.settings;
     this.passwordChangeForm = this.fb.group({
@@ -49,8 +50,7 @@ export class ChangePasswordComponent implements OnDestroy {
   }
 
   public onSubmit(): void {
-    this.userService.updateUserPassword(this.passwordChangeForm.value)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.userService.updateUserPassword(this.passwordChangeForm.value)
     .subscribe({
       next: (response) => {
         this.gs.openSnackBar(response.message, '')
@@ -75,8 +75,7 @@ export class ChangePasswordComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 
 }

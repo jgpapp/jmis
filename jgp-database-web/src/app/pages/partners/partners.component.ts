@@ -18,6 +18,7 @@ import { AuthService } from '@services/users/auth.service';
 import { HasPermissionDirective } from '../../directives/has-permission.directive';
 import { Subject, takeUntil } from 'rxjs';
 import { GlobalService } from '@services/shared/global.service';
+import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-partners',
@@ -53,12 +54,11 @@ export class PartnersComponent implements OnInit, OnDestroy{
   public dataSource: any;
 
   partners: any
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
   constructor(public dialog: MatDialog, private partnerService: PartnerService, public authService: AuthService, public gs: GlobalService) { }
 
   getAvailablePartners() {
-    this.partnerService.getAvailablePartners(this.pageIndex, this.pageSize)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.partnerService.getAvailablePartners(this.pageIndex, this.pageSize)
       .subscribe({
         next: (response) => {
           this.partners = response.content;
@@ -106,7 +106,6 @@ export class PartnersComponent implements OnInit, OnDestroy{
 
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 }

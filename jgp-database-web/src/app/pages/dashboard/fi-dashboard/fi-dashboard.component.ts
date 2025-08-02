@@ -8,8 +8,6 @@ import { DashboardService } from '@services/dashboard/dashboard.service';
 import { MatIconModule } from '@angular/material/icon';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { PieChartComponent } from '../pie-chart/pie-chart.component';
-import { Subject, takeUntil } from 'rxjs';
-import { DashboardFiltersComponent } from "../dashboard-filters/dashboard-filters.component";
 import { HighLevelSummaryDto } from '../dto/highLevelSummaryDto';
 import { PerformanceSummaryComponent } from "../performance-summary/performance-summary.component";
 import { GlobalService } from '@services/shared/global.service';
@@ -18,6 +16,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { FormsModule } from '@angular/forms';
+import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 @Component({
   selector: 'app-fi-dashboard',
   standalone: true,
@@ -31,7 +30,6 @@ import { FormsModule } from '@angular/forms';
     MatIconModule,
     NgxChartsModule,
     PieChartComponent,
-    DashboardFiltersComponent,
     PerformanceSummaryComponent,
     MatButtonModule,
     MatTableModule,
@@ -148,7 +146,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
 
   highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', amountDisbursedByTranches: '0', businessesMentored: '0'}
 
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
   constructor(private authService: AuthService, private dashBoardService: DashboardService, public gs: GlobalService, public dialog: MatDialog){
 
   }
@@ -175,8 +173,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   }
 
   getLastThreeYearsAccessedLoanPerPartnerYearly() {
-      this.dashBoardService.getLastThreeYearsAccessedLoanPerPartnerYearly(this.dashBoardFilters)
-      .pipe(takeUntil(this.unsubscribe$))
+      this.subs.add = this.dashBoardService.getLastThreeYearsAccessedLoanPerPartnerYearly(this.dashBoardFilters)
         .subscribe({
           next: (response) => {
             this.accessedLoanData = response;
@@ -187,8 +184,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
     }
   
     getLastThreeYearsAccessedLoansCountPerPartnerYearly() {
-      this.dashBoardService.getLastThreeYearsAccessedLoansCountPerPartnerYearly(this.dashBoardFilters)
-      .pipe(takeUntil(this.unsubscribe$))
+      this.subs.add = this.dashBoardService.getLastThreeYearsAccessedLoansCountPerPartnerYearly(this.dashBoardFilters)
         .subscribe({
           next: (response) => {
             this.accessedLoanCountData = response;
@@ -216,8 +212,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   }
 
   getLoanedBusinessesByGenderSummary() {
-    this.dashBoardService.getLoanedBusinessesByGenderSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoanedBusinessesByGenderSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.loanedBusinessesByGender = response;
@@ -227,8 +222,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   }
 
   getLoanDisbursedByLoanProductByGenderSummary() {
-    this.dashBoardService.getLoanDisbursedByLoanProductByGenderSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoanDisbursedByLoanProductByGenderSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.loanDisbursedByProductByGender = response;
@@ -238,8 +232,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   }
 
   getHighLevelSummary() {
-    this.dashBoardService.getHighLevelSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getHighLevelSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.highLevelSummary = this.dashBoardService.getFormattedTileData(response);
@@ -250,8 +243,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
 
 
   getLoansDisbursedByGenderSummary() {
-    this.dashBoardService.getLoansDisbursedByGenderSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoansDisbursedByGenderSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.loansDisbursedByGender = response;
@@ -261,8 +253,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   }
 
   getLoansDisbursedByPipelineSummary() {
-    this.dashBoardService.getLoansDisbursedByPipelineSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoansDisbursedByPipelineSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.loansDisbursedByPipeline = response;
@@ -272,8 +263,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   }
 
   getLoansDisbursedByStatusSummary() {
-    this.dashBoardService.getLoansDisbursedByStatusSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoansDisbursedByStatusSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.loansDisbursedByStatus = response;
@@ -283,8 +273,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   }
 
   getLoanDisbursedByIndustrySectorSummary() {
-    this.dashBoardService.getLoanDisbursedByIndustrySectorSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoanDisbursedByIndustrySectorSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.loansDisbursedBySector = response;
@@ -294,8 +283,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   }
 
   getLoansAccessedVsOutStandingByGenderSummary() {
-    this.dashBoardService.getLoansAccessedVsOutStandingByGenderSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoansAccessedVsOutStandingByGenderSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.accessedVSOutStandingAmountByGender = response;
@@ -305,8 +293,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   }
 
   getLoanDisbursedByIndustrySegmentSummary() {
-    this.dashBoardService.getLoanDisbursedByIndustrySegmentSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoanDisbursedByIndustrySegmentSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.loansDisbursedBySegment = response;
@@ -316,8 +303,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   }
 
   getLoanDisbursedTopFourCountiesSummary() {
-    this.dashBoardService.getLoanDisbursedTopFourCountiesSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoanDisbursedTopFourCountiesSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.topFourCountiesloansDisbursed = response;
@@ -327,8 +313,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   }
 
   getLoansDisbursedByLoanProductSummary() {
-    this.dashBoardService.getLoansDisbursedByLoanProductSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoansDisbursedByLoanProductSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.loansDisbursedByProduct = response;
@@ -450,8 +435,7 @@ export class FiDashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 
 }

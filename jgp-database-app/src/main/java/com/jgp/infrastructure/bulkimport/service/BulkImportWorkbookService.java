@@ -4,6 +4,7 @@ package com.jgp.infrastructure.bulkimport.service;
 
 import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.bulkimport.data.ImportData;
+import com.jgp.infrastructure.bulkimport.data.ImportRequestDto;
 import com.jgp.infrastructure.bulkimport.data.ResourceType;
 import com.jgp.infrastructure.documentmanagement.data.DocumentData;
 import jakarta.validation.constraints.NotNull;
@@ -16,7 +17,7 @@ import java.util.Collection;
 
 public interface BulkImportWorkbookService {
 
-    Long importWorkbook(String entityType, MultipartFile fileDetail, String importProgressUUID, String updateParticipantInfo);
+    Long importWorkbook(ImportRequestDto importRequestDto);
 
     void importFileToDirectory(String entityType, ResourceType resourceType, MultipartFile fileDetail);
 

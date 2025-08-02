@@ -72,7 +72,7 @@ public class BulkImportEventListener {
         this.importRepository.saveAndFlush(importDocument);
 
         if (successfullyUploadedCount > 0){
-            notifyDataReviewers(entityType);
+            notifyDataReviewers(entityType, bulkImportEvent.appDomainForNotification());
         }
         final Set<String> modifiedParams = new HashSet<>();
         modifiedParams.add("fileName");
@@ -100,7 +100,7 @@ public class BulkImportEventListener {
     }
 
 
-    private void notifyDataReviewers(final GlobalEntityType entityType){
+    private void notifyDataReviewers(final GlobalEntityType entityType, String appDomain) {
         if (!notificationEnabled) {
             return;
         }
@@ -115,6 +115,6 @@ public class BulkImportEventListener {
         if (null == entityType){
             return;
         }
-        this.applicationContext.publishEvent(new DataUploadedEvent(currentUserPartner.getId(), entityType));
+        this.applicationContext.publishEvent(new DataUploadedEvent(currentUserPartner.getId(), entityType, appDomain));
     }
 }

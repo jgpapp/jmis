@@ -17,8 +17,10 @@ export class DataUploadService {
 
 
     uploadDataTemplate(file: File, templateName: string, uploadProgressID: string, updateParticipantInfo: string = 'NO'): Observable<any> {
+        const appDomain = `${window.location.origin}/data-upload/`;
         const formData = new FormData();
         formData.append('excelFile', file, file.name);
+        formData.append('appDomain', appDomain);
         let templateEntityType = 'INVALID';
         if(templateName.toUpperCase().includes('TA_IMPORT_TEMPLATE')){
             templateEntityType = 'TA_IMPORT_TEMPLATE';

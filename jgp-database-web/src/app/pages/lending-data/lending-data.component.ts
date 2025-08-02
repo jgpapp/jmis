@@ -19,6 +19,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { ConfirmDialogModel } from '../../dto/confirm-dialog-model';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-lending-data',
@@ -56,18 +57,17 @@ export class LendingDataComponent implements OnDestroy, OnInit {
   newLoansData: any
   public selection = new SelectionModel<any>(true, []);
 
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
   constructor(private loanService: LoanService, public authService: AuthService, private gs: GlobalService, private dialog: MatDialog) { }
 
   getAvailableNewLendingData() {
     const partnerId = this.authService.currentUser()?.partnerId;
     if (partnerId) {
-    this.loanService.getLoanTransactions(this.pageIndex, this.pageSize, false, partnerId)
-    .pipe(takeUntil(this.unsubscribe$))
-      .subscribe({
-        next: (response) => {
-          this.newLoansData = response.content;
-          this.dataSource = new MatTableDataSource(this.newLoansData);
+      this.subs.add = this.loanService.getLoanTransactions(this.pageIndex, this.pageSize, false, partnerId)
+        .subscribe({
+          next: (response) => {
+            this.newLoansData = response.content;
+            this.dataSource = new MatTableDataSource(this.newLoansData);
           this.totalItems = response.page.totalElements;
         },
         error: (error) => { }
@@ -109,8 +109,7 @@ export class LendingDataComponent implements OnDestroy, OnInit {
 
     dialogRef.afterClosed().subscribe(dialogResult => {
       if(dialogResult){
-        this.loanService.approveLoanTransactions(transactionsIds)
-        .pipe(takeUntil(this.unsubscribe$))
+        this.subs.add = this.loanService.approveLoanTransactions(transactionsIds)
           .subscribe({
             next: (response) => {
               this.gs.openSnackBar(response.message, "Dismiss");
@@ -139,8 +138,7 @@ export class LendingDataComponent implements OnDestroy, OnInit {
 
     dialogRef.afterClosed().subscribe(dialogResult => {
       if(dialogResult){
-        this.loanService.rejectLoanTransactions(transactionsIds)
-        .pipe(takeUntil(this.unsubscribe$))
+        this.subs.add = this.loanService.rejectLoanTransactions(transactionsIds)
           .subscribe({
             next: (response) => {
               this.gs.openSnackBar(response.message, "Dismiss");
@@ -168,7 +166,6 @@ export class LendingDataComponent implements OnDestroy, OnInit {
 
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 }

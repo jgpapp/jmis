@@ -48,13 +48,14 @@ public class EmailServiceImpl implements EmailService{
     }
 
     @Override
-    public void sendEmailNotificationForDataReview(String toEmail, String toName, String dataType) {
+    public void sendEmailNotificationForDataReview(String toEmail, String toName, String dataType, String appDomain) {
         if (!notificationEnabled) {
             return;
         }
         Context context = new Context();
         context.setVariable("name", toName);
         context.setVariable("dataType", dataType);
+        context.setVariable("appDomain", appDomain);
         String htmlContent = templateEngine.process("email-template", context);
 
         MimeMessage message = mailSender.createMimeMessage();

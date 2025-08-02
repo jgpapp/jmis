@@ -24,6 +24,7 @@ import { NoPermissionComponent } from '../errors/no-permission/no-permission.com
 import { AuthService } from '@services/users/auth.service';
 import { HasPermissionDirective } from '../../directives/has-permission.directive';
 import { Subject, takeUntil } from 'rxjs';
+import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-users',
@@ -61,7 +62,7 @@ export class UsersComponent implements OnInit, OnDestroy {
   public viewType: string = 'grid';
   public userImage = "img/users/default-user.jpg";
 
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
   constructor(public dialog: MatDialog, public userService: UserService, public authService: AuthService) { }
 
   ngOnInit() {
@@ -70,8 +71,7 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   public getUsers(): void {
     this.users = null; //for show spinner each time
-    this.userService.getAvailableUsers()
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.userService.getAvailableUsers()
     .subscribe(users => this.users = users);
   }
   public addUser(user: User) {
@@ -110,7 +110,6 @@ export class UsersComponent implements OnInit, OnDestroy {
 
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 }

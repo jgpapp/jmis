@@ -19,6 +19,7 @@ import { AuthService } from '@services/users/auth.service';
 import { ConfirmDialogModel } from '../../dto/confirm-dialog-model';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { MonitoringServiceService } from '@services/monitoring.service.service';
+import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-outcome-monitoring',
@@ -56,15 +57,14 @@ export class OutcomeMonitoringComponent implements OnDestroy, OnInit {
     newMonitoringData: any
     public selection = new SelectionModel<any>(true, []);
   
-    private unsubscribe$ = new Subject<void>();
+    subs = new SubscriptionsContainer();
 
     constructor(private monitoringService: MonitoringServiceService, public authService: AuthService, private gs: GlobalService, private dialog: MatDialog) { }
     
       getOutComeMonitoringDataRecords() {
         const partnerId = this.authService.currentUser()?.partnerId;
         if (partnerId) {
-        this.monitoringService.getOutComeMonitoringDataRecords(this.pageIndex, this.pageSize, false)
-        .pipe(takeUntil(this.unsubscribe$))
+          this.subs.add = this.monitoringService.getOutComeMonitoringDataRecords(this.pageIndex, this.pageSize, false)
           .subscribe({
             next: (response) => {
               this.newMonitoringData = response.content;
@@ -110,8 +110,7 @@ export class OutcomeMonitoringComponent implements OnDestroy, OnInit {
     
         dialogRef.afterClosed().subscribe(dialogResult => {
           if(dialogResult){
-            this.monitoringService.approvedMonitoringData(monitoringIds)
-            .pipe(takeUntil(this.unsubscribe$))
+            this.subs.add = this.monitoringService.approvedMonitoringData(monitoringIds)
               .subscribe({
                 next: (response) => {
                   this.gs.openSnackBar(response.message, "Dismiss");
@@ -140,8 +139,7 @@ export class OutcomeMonitoringComponent implements OnDestroy, OnInit {
     
         dialogRef.afterClosed().subscribe(dialogResult => {
           if(dialogResult){
-            this.monitoringService.rejectMonitoringData(monitoringIds)
-            .pipe(takeUntil(this.unsubscribe$))
+            this.subs.add = this.monitoringService.rejectMonitoringData(monitoringIds)
               .subscribe({
                 next: (response) => {
                   this.gs.openSnackBar(response.message, "Dismiss");
@@ -169,7 +167,6 @@ export class OutcomeMonitoringComponent implements OnDestroy, OnInit {
     
     
       ngOnDestroy(): void {
-        this.unsubscribe$.next();
-        this.unsubscribe$.complete();
+        this.subs.dispose();
       }
     }

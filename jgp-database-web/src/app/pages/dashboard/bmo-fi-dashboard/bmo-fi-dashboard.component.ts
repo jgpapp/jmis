@@ -1,10 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '@services/users/auth.service';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
-import { DashboardFiltersComponent } from '../dashboard-filters/dashboard-filters.component';
 import { AnalyticsComponent } from '../analytics/analytics.component';
-import { InfoCardsComponent } from '../info-cards/info-cards.component';
-import { TilesComponent } from '../tiles/tiles.component';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -15,20 +12,17 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { GlobalService } from '@services/shared/global.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { Subject, takeUntil } from 'rxjs';
 import { DashboardService } from '@services/dashboard/dashboard.service';
+import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-bmo-fi-dashboard',
   standalone: true,
   imports: [
     ContentHeaderComponent,
-    DashboardFiltersComponent,
     FlexLayoutModule,
     MatProgressBarModule,
     MatCardModule,
-    TilesComponent,
-    InfoCardsComponent,
     AnalyticsComponent,
     MatButtonToggleModule,
     FormsModule,
@@ -56,7 +50,7 @@ export class BmoFiDashboardComponent implements OnInit{
   public displayedColumns = ['year', 'partnerName', 'genderName', 'value' ];
   refugeesAndPlwdtrainedBusinessesCountDataPerGenderSource: any;
   public refugeesAndPlwdDisplayedColumnsTrainedPerGender = ['name', 'value'];
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
   partnerId: any;
 
   trainedBusinessesCountDataPerTaType: any;
@@ -99,8 +93,7 @@ export class BmoFiDashboardComponent implements OnInit{
 
 
   getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary() {
-    this.dashBoardService.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.refugeesAndPlwdtrainedBusinessesCountDataPerGenderSource = response;
@@ -110,8 +103,7 @@ export class BmoFiDashboardComponent implements OnInit{
   }
 
   getTaTypeTrainedBusinesses() {
-    this.dashBoardService.getTaTypeTrainedBusinesses(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getTaTypeTrainedBusinesses(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.trainedBusinessesCountDataPerTaType = response;
@@ -139,8 +131,7 @@ export class BmoFiDashboardComponent implements OnInit{
 
 
   getLastThreeYearsAccessedLoanPerPartnerYearly() {
-      this.dashBoardService.getLastThreeYearsAccessedLoanPerPartnerYearly(this.dashBoardFilters)
-      .pipe(takeUntil(this.unsubscribe$))
+      this.subs.add = this.dashBoardService.getLastThreeYearsAccessedLoanPerPartnerYearly(this.dashBoardFilters)
         .subscribe({
           next: (response) => {
             this.accessedLoanData = response;
@@ -151,8 +142,7 @@ export class BmoFiDashboardComponent implements OnInit{
     }
   
     getLastThreeYearsAccessedLoansCountPerPartnerYearly() {
-      this.dashBoardService.getLastThreeYearsAccessedLoansCountPerPartnerYearly(this.dashBoardFilters)
-      .pipe(takeUntil(this.unsubscribe$))
+      this.subs.add = this.dashBoardService.getLastThreeYearsAccessedLoansCountPerPartnerYearly(this.dashBoardFilters)
         .subscribe({
           next: (response) => {
             this.accessedLoanCountData = response;
@@ -163,8 +153,7 @@ export class BmoFiDashboardComponent implements OnInit{
     }
   
     getLastThreeYearsTrainedBusinessesPerPartnerYearly() {
-      this.dashBoardService.getLastThreeYearsTrainedBusinessesPerPartnerYearly(this.dashBoardFilters)
-      .pipe(takeUntil(this.unsubscribe$))
+      this.subs.add = this.dashBoardService.getLastThreeYearsTrainedBusinessesPerPartnerYearly(this.dashBoardFilters)
         .subscribe({
           next: (response) => {
             this.trainedBusinessesCountData = response;
@@ -240,7 +229,6 @@ export class BmoFiDashboardComponent implements OnInit{
   }
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 }

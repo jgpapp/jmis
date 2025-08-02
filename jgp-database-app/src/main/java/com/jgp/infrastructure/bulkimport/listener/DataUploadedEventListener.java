@@ -37,13 +37,21 @@ public class DataUploadedEventListener {
             dataReviewUsers = this.userService.findUsersByPartnerId(dataUploadedEvent.partnerId()).stream()
                     .filter(user -> user.hasAnyPermission("BMO_PARTICIPANTS_DATA_APPROVE"))
                     .toList();
+        }else if (GlobalEntityType.MENTORSHIP_IMPORT_TEMPLATE.equals(entityType)) {
+            dataReviewUsers = this.userService.findUsersByPartnerId(dataUploadedEvent.partnerId()).stream()
+                    .filter(user -> user.hasAnyPermission("MENTOR_SHIP_APPROVE"))
+                    .toList();
+        }else if (GlobalEntityType.MONITORING_IMPORT_TEMPLATE.equals(entityType)) {
+            dataReviewUsers = this.userService.findUsersByPartnerId(dataUploadedEvent.partnerId()).stream()
+                    .filter(user -> user.hasAnyPermission("MONITORING_OUTCOME_APPROVE"))
+                    .toList();
         }
         if(dataReviewUsers.isEmpty()){
             return;
         }
 
         for (var appUser: dataReviewUsers){
-            this.emailService.sendEmailNotificationForDataReview(appUser.getUsername(), appUser.getUserFullName(), entityType.getDataType());
+            this.emailService.sendEmailNotificationForDataReview(appUser.getUsername(), appUser.getUserFullName(), entityType.getDataType(), dataUploadedEvent.appDomainForNotification());
         }
     }
 }

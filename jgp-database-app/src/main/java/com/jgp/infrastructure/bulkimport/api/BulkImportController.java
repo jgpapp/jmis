@@ -2,6 +2,7 @@ package com.jgp.infrastructure.bulkimport.api;
 
 import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.bulkimport.data.ImportData;
+import com.jgp.infrastructure.bulkimport.data.ImportRequestDto;
 import com.jgp.infrastructure.bulkimport.data.ResourceType;
 import com.jgp.infrastructure.bulkimport.exception.ImportTypeNotFoundException;
 import com.jgp.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
@@ -47,13 +48,14 @@ public class BulkImportController {
     @PostMapping("upload-template/{entityType}/{documentProgressId}/{updateParticipantInfo}")
     public ResponseEntity<ApiResponseDto> createBMOParticipantData(
             @RequestParam("excelFile") MultipartFile excelFile,
+            @RequestParam("appDomain") String appDomain,
             @PathVariable("entityType") String entityType,
             @PathVariable("documentProgressId") String documentProgressId,
             @PathVariable("updateParticipantInfo") String updateParticipantInfo) {
         if (excelFile.isEmpty() || "INVALID".equalsIgnoreCase(entityType)) {
             return new ResponseEntity<>(new ApiResponseDto(false, CommonUtil.NO_FILE_TO_UPLOAD), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(new ApiResponseDto(true, this.bulkImportWorkbookService.importWorkbook(entityType, excelFile, documentProgressId, updateParticipantInfo)+""), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponseDto(true, this.bulkImportWorkbookService.importWorkbook(new ImportRequestDto(entityType, excelFile, documentProgressId, updateParticipantInfo, appDomain))+""), HttpStatus.CREATED);
     }
 
     @GetMapping

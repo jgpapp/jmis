@@ -10,6 +10,7 @@ import { GlobalService } from '@services/shared/global.service';
 import { Subject, takeUntil } from 'rxjs';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { AuthService } from '@services/users/auth.service';
+import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 interface PerformanceSummaryDto {
   year: number | undefined;
@@ -84,7 +85,7 @@ export class PerformanceSummaryComponent implements OnInit {
 
   dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
 
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
   constructor(private dashBoardService: DashboardService, public gs: GlobalService, private authService: AuthService){}
 
   ngOnInit(): void {
@@ -92,8 +93,7 @@ export class PerformanceSummaryComponent implements OnInit {
   }
 
   getPerformanceSummary() {
-    this.dashBoardService.getPerformanceSummary(undefined, this.authService.currentUser()?.partnerId)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getPerformanceSummary(undefined, this.authService.currentUser()?.partnerId)
       .subscribe({
         next: (response) => {
           this.dataSource.data = response; // Set the hierarchical data
@@ -111,8 +111,7 @@ export class PerformanceSummaryComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 
 }

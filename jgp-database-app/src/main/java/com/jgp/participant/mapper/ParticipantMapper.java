@@ -79,7 +79,7 @@ public class ParticipantMapper {
             if ( participant.getAlternativePhoneNumber() != null ) {
                 participantResponseDto.setAlternativePhoneNumber( participant.getAlternativePhoneNumber() );
             }
-            participantResponseDto.setSavings( null != participant.getPrePayment() ? CommonUtil.NUMBER_FORMAT.format(participant.getPrePayment()) : "0.00");
+            participantResponseDto.setSavings( null != participant.getPrePayment() ? CommonUtil.getNumberFormat().format(participant.getPrePayment()) : "0.00");
             participantResponseDto.setOwnerGender( null != participant.getOwnerGender() ? participant.getOwnerGender().getName() : null );
         }
 

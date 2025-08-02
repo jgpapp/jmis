@@ -18,6 +18,7 @@ import { MatCardModule } from '@angular/material/card';
 import { GlobalService } from '@services/shared/global.service';
 import { ClientService } from '@services/data-management/clients.service';
 import { DashboardService } from '@services/dashboard/dashboard.service';
+import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-edit-participant',
@@ -49,7 +50,7 @@ export class EditParticipantComponent implements OnInit {
     allUserRoles: any;
     counties: any[]
     selectedParticipant: any;
-    private unsubscribe$ = new Subject<void>();
+    subs = new SubscriptionsContainer();
     constructor(
       public fb: FormBuilder, 
       private participantService: ClientService, 
@@ -84,8 +85,7 @@ export class EditParticipantComponent implements OnInit {
   
       ngOnInit(): void {
         this.getAvailableCounties();
-        this.activatedRoute.data.pipe(map(data => data['selectedParticipant']))
-        .pipe(takeUntil(this.unsubscribe$))
+        this.subs.add = this.activatedRoute.data.pipe(map(data => data['selectedParticipant']))
         .subscribe({
           next: (response) => {
             this.selectedParticipant = response;
@@ -116,8 +116,7 @@ export class EditParticipantComponent implements OnInit {
   
       onSubmitEditParticipant(): void {
         if (this.editParticipantForm.valid && this.selectedParticipant.id) {
-            this.participantService.updateParticipant(this.selectedParticipant.id, this.editParticipantForm.value)
-            .pipe(takeUntil(this.unsubscribe$))
+            this.subs.add = this.participantService.updateParticipant(this.selectedParticipant.id, this.editParticipantForm.value)
             .subscribe({
               next: () => {
                 this.gs.openSnackBar("Done sucessfully!!", "Dismiss");
@@ -131,8 +130,7 @@ export class EditParticipantComponent implements OnInit {
       }
 
       getAvailableCounties() {
-        this.dashBoardService.getKenyanCounties()
-        .pipe(takeUntil(this.unsubscribe$))
+        this.subs.add = this.dashBoardService.getKenyanCounties()
             .subscribe({
               next: (response) => {
                 this.counties = response
@@ -145,8 +143,7 @@ export class EditParticipantComponent implements OnInit {
   
   
       ngOnDestroy(): void {
-        this.unsubscribe$.next();
-        this.unsubscribe$.complete();
+        this.subs.dispose();
       }
 
 }

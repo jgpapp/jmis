@@ -8,8 +8,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { PieChartComponent } from '../pie-chart/pie-chart.component';
 import { DashboardService } from '@services/dashboard/dashboard.service';
-import { Subject, takeUntil } from 'rxjs';
-import { DashboardFiltersComponent } from '../dashboard-filters/dashboard-filters.component';
 import { HighLevelSummaryDto } from '../dto/highLevelSummaryDto';
 import { PerformanceSummaryComponent } from "../performance-summary/performance-summary.component";
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -17,6 +15,7 @@ import { GlobalService } from '@services/shared/global.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { FormsModule } from '@angular/forms';
+import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-bmo-dashboard',
@@ -29,7 +28,6 @@ import { FormsModule } from '@angular/forms';
     MatIconModule,
     NgxChartsModule,
     PieChartComponent,
-    DashboardFiltersComponent,
     PerformanceSummaryComponent,
     MatTableModule,
     MatButtonToggleModule,
@@ -129,7 +127,7 @@ export class BmoDashboardComponent implements OnInit {
 
   highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', amountDisbursedByTranches: '0', businessesMentored: '0'}
 
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
 
   @ViewChild('bmoTaNeedsByGenderContentDiv', { static: false }) bmoTaNeedsByGenderContentDiv!: ElementRef;
   constructor(
@@ -178,8 +176,7 @@ export class BmoDashboardComponent implements OnInit {
   }
 
   getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary() {
-    this.dashBoardService.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.refugeesAndPlwdtrainedBusinessesCountDataPerGenderSource = response;
@@ -189,8 +186,7 @@ export class BmoDashboardComponent implements OnInit {
   }
 
   getTaTypeTrainedBusinesses() {
-    this.dashBoardService.getTaTypeTrainedBusinesses(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getTaTypeTrainedBusinesses(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.trainedBusinessesCountDataPerTaType = response;
@@ -218,8 +214,7 @@ export class BmoDashboardComponent implements OnInit {
 
   
     getLastThreeYearsTrainedBusinessesPerPartnerYearly() {
-      this.dashBoardService.getLastThreeYearsTrainedBusinessesPerPartnerYearly(this.dashBoardFilters)
-      .pipe(takeUntil(this.unsubscribe$))
+      this.subs.add = this.dashBoardService.getLastThreeYearsTrainedBusinessesPerPartnerYearly(this.dashBoardFilters)
         .subscribe({
           next: (response) => {
             this.trainedBusinessesCountData = response;
@@ -230,8 +225,7 @@ export class BmoDashboardComponent implements OnInit {
     }
 
   getHighLevelSummary() {
-    this.dashBoardService.getHighLevelSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getHighLevelSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.highLevelSummary = this.dashBoardService.getFormattedTileData(response);
@@ -242,8 +236,7 @@ export class BmoDashboardComponent implements OnInit {
 
 
   getTaNeedsByGenderSummary() {
-    this.dashBoardService.getTaNeedsByGenderSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getTaNeedsByGenderSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.TANeedsByGender = response;
@@ -253,8 +246,7 @@ export class BmoDashboardComponent implements OnInit {
   }
 
   getTaTrainingBySectorSummary() {
-    this.dashBoardService.getTaTrainingBySectorSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getTaTrainingBySectorSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.taTrainedBySector = response;
@@ -264,8 +256,7 @@ export class BmoDashboardComponent implements OnInit {
   }
 
   getTaTrainingBySegmentSummary() {
-    this.dashBoardService.getTaTrainingBySegmentSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getTaTrainingBySegmentSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.taTrainedBySegment = response;
@@ -275,8 +266,7 @@ export class BmoDashboardComponent implements OnInit {
   }
 
   getBusinessesTrainedByGenderSummary() {
-    this.dashBoardService.getBusinessesTrainedByGenderSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getBusinessesTrainedByGenderSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.businessesTainedByGender = response;
@@ -286,8 +276,7 @@ export class BmoDashboardComponent implements OnInit {
   }
 
   getDisabledBusinessOwnersTrainedByGenderSummary() {
-    this.dashBoardService.getDisabledBusinessOwnersTrainedByGenderSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getDisabledBusinessOwnersTrainedByGenderSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.disabledBusinessesTainedByGender = response;
@@ -297,8 +286,7 @@ export class BmoDashboardComponent implements OnInit {
   }
 
   getRefugeeBusinessOwnersTrainedByGenderSummary() {
-    this.dashBoardService.getRefugeeBusinessOwnersTrainedByGenderSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getRefugeeBusinessOwnersTrainedByGenderSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.refugeeBusinessesTainedByGender = response;
@@ -308,8 +296,7 @@ export class BmoDashboardComponent implements OnInit {
   }
 
   getBusinessTrainedTopFourCountiesSummary() {
-    this.dashBoardService.getBusinessTrainedTopFourCountiesSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getBusinessTrainedTopFourCountiesSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.topFourCountiesBusinessesTrained = response;
@@ -319,8 +306,7 @@ export class BmoDashboardComponent implements OnInit {
   }
 
   getParticipantsEmployeesSummary() {
-    this.dashBoardService.getParticipantsEmployeesSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getParticipantsEmployeesSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.employeesSummary = response;
@@ -390,7 +376,6 @@ export class BmoDashboardComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 }

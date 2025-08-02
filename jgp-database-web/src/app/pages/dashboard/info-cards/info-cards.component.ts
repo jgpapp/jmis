@@ -10,6 +10,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DashboardTypeFilter } from '../../../dto/dashboard-type-filter';
 import { CountySummaryDto } from '../dto/county-summary-dto';
+import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-info-cards',
@@ -291,7 +292,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   public keMapImage = "ke_map/KE-MAP.png";
 
 
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
 
   @ViewChild('loansDisbursedByGenderContentDiv', { static: false }) loansDisbursedByGenderContentDiv!: ElementRef;
   @ViewChild('businessesTainedByGenderContentDiv', { static: false }) businessesTainedByGenderContentDiv!: ElementRef;
@@ -377,8 +378,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getLoansDisbursedByGenderSummary() {
-    this.dashBoardService.getLoansDisbursedByGenderSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoansDisbursedByGenderSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.loansDisbursedByGender = response;
@@ -388,8 +388,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getLoanDisbursedByIndustrySectorSummary() {
-    this.dashBoardService.getLoanDisbursedByIndustrySectorSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoanDisbursedByIndustrySectorSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.loansDisbursedBySector = response;
@@ -399,8 +398,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getLoansDisbursedByLoanProductSummary() {
-    this.dashBoardService.getLoansDisbursedByLoanProductSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoansDisbursedByLoanProductSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.loansDisbursedByProduct = response;
@@ -410,8 +408,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getLoansDisbursedByPipelineSummary() {
-    this.dashBoardService.getLoansDisbursedByPipelineSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoansDisbursedByPipelineSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.loansDisbursedByPipeline = response;
@@ -421,8 +418,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getMentorshipGenderSummary() {
-    this.dashBoardService.getMentorshipByGivenFieldSummary(this.dashBoardFilters, 'owner_gender')
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getMentorshipByGivenFieldSummary(this.dashBoardFilters, 'owner_gender')
       .subscribe({
         next: (response) => {
           this.mentorshipGenderSummary = response;
@@ -432,8 +428,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getLoansDisbursedByStatusSummary() {
-    this.dashBoardService.getLoansDisbursedByStatusSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoansDisbursedByStatusSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.loansDisbursedByStatus = response;
@@ -443,8 +438,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getBusinessesTrainedByGenderSummary() {
-    this.dashBoardService.getBusinessesTrainedByGenderSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getBusinessesTrainedByGenderSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.businessesTainedByGender = response;
@@ -454,8 +448,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getMentorshipByGenderCategorySummary() {
-    this.dashBoardService.getMentorshipByGivenFieldSummary(this.dashBoardFilters, 'gender_category')
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getMentorshipByGivenFieldSummary(this.dashBoardFilters, 'gender_category')
       .subscribe({
         next: (response) => {
           this.mentorshipByGenderCategory = response;
@@ -465,8 +458,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getMentorshipByDisabilitySummary() {
-    this.dashBoardService.getMentorshipByGivenFieldSummary(this.dashBoardFilters, 'disability_type')
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getMentorshipByGivenFieldSummary(this.dashBoardFilters, 'disability_type')
       .subscribe({
         next: (response) => {
           this.mentorshipByDisabilitySummary = response;
@@ -476,8 +468,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getLoanedBusinessesByGenderSummary() {
-    this.dashBoardService.getLoanedBusinessesByGenderSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoanedBusinessesByGenderSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.loanedBusinessesByGender = response;
@@ -487,8 +478,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getDisabledBusinessOwnersTrainedByGenderSummary() {
-    this.dashBoardService.getDisabledBusinessOwnersTrainedByGenderSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getDisabledBusinessOwnersTrainedByGenderSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.disabledBusinessesTainedByGender = response;
@@ -498,8 +488,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getRefugeeBusinessOwnersTrainedByGenderSummary() {
-    this.dashBoardService.getRefugeeBusinessOwnersTrainedByGenderSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getRefugeeBusinessOwnersTrainedByGenderSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.refugeeBusinessesTainedByGender = response;
@@ -509,8 +498,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getTaNeedsByGenderSummary() {
-    this.dashBoardService.getTaNeedsByGenderSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getTaNeedsByGenderSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.TANeedsByGender = response;
@@ -520,8 +508,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getTaTrainingBySectorSummary() {
-    this.dashBoardService.getTaTrainingBySectorSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getTaTrainingBySectorSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.taTrainedBySector = response;
@@ -531,8 +518,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getParticipantsEmployeesSummary() {
-    this.dashBoardService.getParticipantsEmployeesSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getParticipantsEmployeesSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.employeesSummary = response;
@@ -544,8 +530,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getParticipantsMentorshipDeliveryModeSummary() {
-    this.dashBoardService.getParticipantsMentorshipDeliveryModeSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getParticipantsMentorshipDeliveryModeSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.mentorshipDeliveryModeSummary = response;
@@ -557,8 +542,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getParticipantsMentorshipBusiCategoryByCountySummary() {
-    this.dashBoardService.getParticipantsMentorshipBusiCategoryByCountySummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getParticipantsMentorshipBusiCategoryByCountySummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.mentorshipBusiCategoryByCountySummary = response;
@@ -570,8 +554,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getTaTrainingBySegmentSummary() {
-    this.dashBoardService.getTaTrainingBySegmentSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getTaTrainingBySegmentSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.taTrainedBySegment = response;
@@ -581,8 +564,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getLoanDisbursedByIndustrySegmentSummary() {
-    this.dashBoardService.getLoanDisbursedByIndustrySegmentSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoanDisbursedByIndustrySegmentSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.loansDisbursedBySegment = response;
@@ -592,8 +574,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getTrainingByPartnerByGenderSummary() {
-    this.dashBoardService.getTrainingByPartnerByGenderSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getTrainingByPartnerByGenderSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.trainingByPartnerByGender = response;
@@ -603,8 +584,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getLoanDisbursedByLoanProductByGenderSummary() {
-    this.dashBoardService.getLoanDisbursedByLoanProductByGenderSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoanDisbursedByLoanProductByGenderSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.loanDisbursedByProductByGender = response;
@@ -614,8 +594,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getLoansAccessedVsOutStandingByPartnerSummary() {
-    this.dashBoardService.getLoansAccessedVsOutStandingByPartnerSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoansAccessedVsOutStandingByPartnerSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.accessedVSOutStandingAmount = response;
@@ -625,8 +604,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getLoansAccessedVsOutStandingByGenderSummary() {
-    this.dashBoardService.getLoansAccessedVsOutStandingByGenderSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoansAccessedVsOutStandingByGenderSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.accessedVSOutStandingAmountByGender = response;
@@ -636,8 +614,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getCountySummary() {
-    this.dashBoardService.getCountySummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getCountySummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.countySummary = response;
@@ -647,8 +624,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getLastThreeYearsAccessedLoanPerPartnerSummary() {
-    this.dashBoardService.getLastThreeYearsAccessedLoanPerPartnerSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLastThreeYearsAccessedLoanPerPartnerSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.lastThreeYearLoansAccessedPerPartner = response;
@@ -658,8 +634,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getLoanDisbursedTopFourPartnersSummary() {
-    this.dashBoardService.getLoanDisbursedTopFourPartnersSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoanDisbursedTopFourPartnersSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.topFourPartnersloansDisbursed = response;
@@ -669,8 +644,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getLoanDisbursedTopFourCountiesSummary() {
-    this.dashBoardService.getLoanDisbursedTopFourCountiesSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLoanDisbursedTopFourCountiesSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.topFourCountiesloansDisbursed = response;
@@ -680,8 +654,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   }
 
   getBusinessTrainedTopFourCountiesSummary() {
-    this.dashBoardService.getBusinessTrainedTopFourCountiesSummary(this.dashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getBusinessTrainedTopFourCountiesSummary(this.dashBoardFilters)
       .subscribe({
         next: (response) => {
           this.topFourCountiesBusinessesTrained = response;
@@ -707,8 +680,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
 
 
   ngOnDestroy() {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 
   ngAfterViewChecked() {

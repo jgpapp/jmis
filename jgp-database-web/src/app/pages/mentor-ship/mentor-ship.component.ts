@@ -19,6 +19,7 @@ import { AuthService } from '@services/users/auth.service';
 import { ConfirmDialogModel } from '../../dto/confirm-dialog-model';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { MentorShipService } from '@services/data-management/mentor-ship.service';
+import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-mentor-ship',
@@ -56,19 +57,18 @@ export class MentorShipComponent implements OnDestroy, OnInit {
     newMentorShipData: any
     public selection = new SelectionModel<any>(true, []);
   
-    private unsubscribe$ = new Subject<void>();
+    subs = new SubscriptionsContainer();
 
     constructor(private mentorshipService: MentorShipService, public authService: AuthService, private gs: GlobalService, private dialog: MatDialog) { }
     
       getAvailableNewMentorShipData() {
         const partnerId = this.authService.currentUser()?.partnerId;
         if (partnerId) {
-        this.mentorshipService.getAvailableMentorshipData(this.pageIndex, this.pageSize, false, partnerId)
-        .pipe(takeUntil(this.unsubscribe$))
-          .subscribe({
-            next: (response) => {
-              this.newMentorShipData = response.content;
-              this.dataSource = new MatTableDataSource(this.newMentorShipData);
+          this.subs.add = this.mentorshipService.getAvailableMentorshipData(this.pageIndex, this.pageSize, false, partnerId)
+            .subscribe({
+              next: (response) => {
+                this.newMentorShipData = response.content;
+                this.dataSource = new MatTableDataSource(this.newMentorShipData);
               this.totalItems = response.page.totalElements;
             },
             error: (error) => { }
@@ -110,8 +110,7 @@ export class MentorShipComponent implements OnDestroy, OnInit {
     
         dialogRef.afterClosed().subscribe(dialogResult => {
           if(dialogResult){
-            this.mentorshipService.approvedMentorShipData(mentorshipIds)
-            .pipe(takeUntil(this.unsubscribe$))
+            this.subs.add = this.mentorshipService.approvedMentorShipData(mentorshipIds)
               .subscribe({
                 next: (response) => {
                   this.gs.openSnackBar(response.message, "Dismiss");
@@ -140,8 +139,7 @@ export class MentorShipComponent implements OnDestroy, OnInit {
     
         dialogRef.afterClosed().subscribe(dialogResult => {
           if(dialogResult){
-            this.mentorshipService.rejectMentorShipData(mentorshipIds)
-            .pipe(takeUntil(this.unsubscribe$))
+            this.subs.add = this.mentorshipService.rejectMentorShipData(mentorshipIds)
               .subscribe({
                 next: (response) => {
                   this.gs.openSnackBar(response.message, "Dismiss");
@@ -169,7 +167,6 @@ export class MentorShipComponent implements OnDestroy, OnInit {
     
     
       ngOnDestroy(): void {
-        this.unsubscribe$.next();
-        this.unsubscribe$.complete();
+        this.subs.dispose();
       }
 }
