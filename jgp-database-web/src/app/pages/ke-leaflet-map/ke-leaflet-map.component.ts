@@ -84,8 +84,6 @@ export class KeLeafletMapComponent implements OnInit, AfterViewInit, OnDestroy {
       tooltip: string; // Replace with actual tooltip text, e.g., county name
     }[] = this.createMarkers();
 
-  
-
     markerData.forEach(data => {
       L.circleMarker([data.lat, data.lng], {
         radius: 6, // Smaller radius in pixels
@@ -125,6 +123,7 @@ export class KeLeafletMapComponent implements OnInit, AfterViewInit, OnDestroy {
     return markerData;
   }
 
+
   getMapToolTip(county: any): string {
       if (this.measureField === 'loanFields') {
         return `<b>County: ${county.countyName}</b><br><i>Loaned Businesses: ${county.businessesLoaned}</i><br><i>Amount Disbursed: ${county.amountDisbursed}</i>`;
@@ -138,6 +137,7 @@ export class KeLeafletMapComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       return county[this.measureField] > 0;
     }
+
   
   private loadKenyanCountiesGeoJSON(): void {
     // Path to your Kenyan counties GeoJSON file

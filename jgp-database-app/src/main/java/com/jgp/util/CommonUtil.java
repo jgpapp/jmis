@@ -40,6 +40,7 @@ public abstract class CommonUtil {
     @Value("${jgp.dashboard.default.view.period.in.months}")
     private Integer jgpDashboardDefaultViewPeriodInMonths;
 
+
     private CommonUtil() {
     }
 
@@ -50,6 +51,7 @@ public abstract class CommonUtil {
         nf.setMinimumFractionDigits(0);
         return nf;
     }
+
 
     public static String getConvertedCountyCode(String countyCode) {
         if (countyCode.length() == 1) {

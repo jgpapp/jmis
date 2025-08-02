@@ -973,6 +973,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartShowYAxis: this.taTrainedBySectorShowYAxis,
       chartSColorScheme: this.chartSColorScheme,
       chartShowLegend: true,
+      
       chartShowXAxisLabel: this.taTrainedBySectorShowXAxisLabel,
       chartShowYAxisLabel: this.taTrainedBySectorShowYAxisLabel,
       chartYAxisLabel: this.taTrainedBySectorXAxisLabel,
