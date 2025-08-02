@@ -19,6 +19,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { ConfirmDialogModel } from '../../../dto/confirm-dialog-model';
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-data-list',
@@ -52,12 +53,11 @@ export class DataListComponent implements OnDestroy{
   bmoClientsData: any
   public selection = new SelectionModel<any>(true, []);
 
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
   constructor(private bmoClientDataService: BMOClientDataService, public authService: AuthService, private gs: GlobalService, private dialog: MatDialog) { }
 
   getAvailableBMOClientData() {
-    this.bmoClientDataService.getAvailableBMOClientData(this.pageIndex, this.pageSize, false, this.authService.currentUser()?.partnerId)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.bmoClientDataService.getAvailableBMOClientData(this.pageIndex, this.pageSize, false, this.authService.currentUser()?.partnerId)
       .subscribe({
         next: (response) => {
           this.bmoClientsData = response.content;
@@ -101,8 +101,7 @@ export class DataListComponent implements OnDestroy{
 
     dialogRef.afterClosed().subscribe(dialogResult => {
       if(dialogResult){
-        this.bmoClientDataService.approveBMOClientData(bmoIds)
-        .pipe(takeUntil(this.unsubscribe$))
+        this.subs.add = this.bmoClientDataService.approveBMOClientData(bmoIds)
           .subscribe({
             next: (response) => {
               this.gs.openSnackBar(response.message, "Dismiss");
@@ -131,8 +130,7 @@ export class DataListComponent implements OnDestroy{
 
     dialogRef.afterClosed().subscribe(dialogResult => {
       if(dialogResult){
-        this.bmoClientDataService.rejectBMOClientData(bmoIds)
-        .pipe(takeUntil(this.unsubscribe$))
+        this.subs.add = this.bmoClientDataService.rejectBMOClientData(bmoIds)
           .subscribe({
             next: (response) => {
               this.gs.openSnackBar(response.message, "Dismiss");
@@ -159,7 +157,6 @@ export class DataListComponent implements OnDestroy{
     }
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 }

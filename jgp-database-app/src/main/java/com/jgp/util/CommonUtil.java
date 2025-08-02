@@ -40,10 +40,18 @@ public abstract class CommonUtil {
     @Value("${jgp.dashboard.default.view.period.in.months}")
     private Integer jgpDashboardDefaultViewPeriodInMonths;
 
-    public static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance();
 
     private CommonUtil() {
     }
+
+    public static NumberFormat getNumberFormat() {
+        var nf = NumberFormat.getInstance();
+        nf.setGroupingUsed(true);
+        nf.setMaximumFractionDigits(2);
+        nf.setMinimumFractionDigits(0);
+        return nf;
+    }
+
 
     public static String getConvertedCountyCode(String countyCode) {
         if (countyCode.length() == 1) {

@@ -4,7 +4,7 @@ import { AuthService } from '@services/users/auth.service';
 import { map, Observable, take } from 'rxjs';
 
 export const AuthGuard: CanActivateFn = (
-    route: ActivatedRouteSnapshot,
+    _route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ):
     Observable<boolean | UrlTree> 
@@ -20,8 +20,7 @@ export const AuthGuard: CanActivateFn = (
       map((isLoggedIn: boolean) => {
         if (!isLoggedIn) {
           authService.redirectUrl = state.url;
-          router.navigate(['/login']);
-          return false;
+          authService.refreshToken();
         }
         return true;
       })

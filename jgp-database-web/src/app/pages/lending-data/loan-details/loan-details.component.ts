@@ -14,6 +14,7 @@ import { HasPermissionDirective } from '../../../directives/has-permission.direc
 import { map, Observable, Subject, takeUntil } from 'rxjs';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { LoanService } from '@services/data-management/loan.service';
+import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-loan-details',
@@ -45,7 +46,7 @@ export class LoanDetailsComponent {
     pageSize = 10;
     pageIndex = 0;
     totalItems = 0;
-    private unsubscribe$ = new Subject<void>();
+    subs = new SubscriptionsContainer();
     constructor(private activatedRoute: ActivatedRoute, private dashBoardService: DashboardService, private loanService: LoanService){}
 
     ngOnInit(): void {
@@ -58,8 +59,7 @@ export class LoanDetailsComponent {
           next: (response) => {
             this.loanId = response.id;
             if (this.loanId) {
-              this.loanService.getLoanTransactions(this.pageIndex, this.pageSize, false, undefined, this.loanId)
-              .pipe(takeUntil(this.unsubscribe$))
+              this.subs.add = this.loanService.getLoanTransactions(this.pageIndex, this.pageSize, false, undefined, this.loanId)
                 .subscribe({
                   next: (response) => {
                     this.loanTransactions = response.content;
@@ -83,7 +83,6 @@ export class LoanDetailsComponent {
         
         
           ngOnDestroy(): void {
-            this.unsubscribe$.next();
-            this.unsubscribe$.complete();
+            this.subs.dispose();
           }
 }

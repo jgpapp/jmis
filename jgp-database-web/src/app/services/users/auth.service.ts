@@ -25,9 +25,10 @@ export class AuthService {
   FORCE_PASS_CHANGE: string = 'force_change_password';
   private loggedIn = new BehaviorSubject<boolean>(this.hasTokens());
   redirectUrl: string | null = null;
+  isLoggingOut = false;
 
   constructor(private httpClient: HttpClient, private router: Router, private jwtHelper: JwtHelperService) { 
-    this.checkTokenStatus();
+    this.refreshTokenIfNeeded();
   }
 
   get isLoggedIn(): Observable<boolean> {
@@ -38,7 +39,7 @@ export class AuthService {
     return this.httpClient.post<any>(`/users/authenticate`, JSON.stringify(authRequest)).pipe(
       tap(response => {
         this.storeUserDetails(response.accessToken, response.refreshToken);
-        this.loggedIn.next(true);
+        this.loggedIn.next(this.isAuthenticated());
         this.userRedirection(this.redirectUrl || '/');
         this.redirectUrl = null; // Reset redirect URL after successful login
       }),
@@ -69,6 +70,27 @@ export class AuthService {
     );
   }
 
+  refreshTokenIfNeeded(): boolean {
+    if (this.isAccessTokenAboutToExpire()) {
+      const refreshRequest: any = { refreshToken: this.getRefreshToken() };
+      let isRefreshed: boolean = false;
+      this.httpClient.post<any>(`/users/refresh-token`, JSON.stringify(refreshRequest))
+      .subscribe({
+          next: (response) => {
+            this.storeUserDetails(response.accessToken, response.refreshToken);
+          isRefreshed = true;
+          this.loggedIn.next(this.isAuthenticated());
+          },
+          error: (error) => {
+            isRefreshed = false;
+          }
+        });
+      return isRefreshed;
+    } else {
+      return false;
+      }
+    }
+
   private hasTokens(): boolean {
     return !!this.getAccessToken() && !!this.getRefreshToken();
   }
@@ -84,10 +106,10 @@ export class AuthService {
   private checkTokenStatus(): void {
     const accessToken = this.getAccessToken();
     if (accessToken && !this.jwtHelper.isTokenExpired(accessToken)) {
-      this.loggedIn.next(true);
+      this.loggedIn.next(this.isAuthenticated());
     } else {
       this.refreshToken().subscribe({
-        next: () => this.loggedIn.next(true),
+        next: () => this.loggedIn.next(this.isAuthenticated()),
         error: () => {
           this.loggedIn.next(false);
           this.doLogout();
@@ -162,9 +184,14 @@ export class AuthService {
 
 
   doLogout(): void {
+    if(this.isLoggingOut) {
+      return; // Prevent multiple logout calls
+    }
+    this.isLoggingOut = true;
     localStorage.clear();
     this.loggedIn.next(false);
     this.router.navigateByUrl('/login');
+    this.isLoggingOut = false;
   }
 
   currentUser(): CurrentUserCredentials | null {

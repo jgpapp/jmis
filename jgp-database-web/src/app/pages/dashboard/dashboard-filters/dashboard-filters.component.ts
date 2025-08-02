@@ -14,6 +14,7 @@ import { DashboardService } from '@services/dashboard/dashboard.service';
 import { AuthService } from '@services/users/auth.service';
 import { DatePipe } from '@angular/common';
 import { DashboardTypeFilter } from '../../../dto/dashboard-type-filter';
+import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-dashboard-filters',
@@ -44,7 +45,7 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit, OnChanges{
   public dashFilterForm: FormGroup;
   partners: PartnerDto[] = [];
   counties: any[]
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
   constructor(
     public fb: FormBuilder, 
     private partnerService: PartnerService,
@@ -89,13 +90,11 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit, OnChanges{
     this.getAvailableCounties();
   }
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 
   getAvailablePartners() {
-    this.partnerService.getAvailablePartners(0, 400)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.partnerService.getAvailablePartners(0, 400)
         .subscribe({
           next: (response) => {
             this.partners = response.content
@@ -107,8 +106,7 @@ export class DashboardFiltersComponent implements OnDestroy, OnInit, OnChanges{
   }
 
   getAvailableCounties() {
-    this.dashBoardService.getKenyanCounties()
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getKenyanCounties()
         .subscribe({
           next: (response) => {
             this.counties = response

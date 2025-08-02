@@ -14,7 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { GlobalService } from '@services/shared/global.service';
 import { NoPermissionComponent } from '../../errors/no-permission/no-permission.component';
 import { AuthService } from '@services/users/auth.service';
-import { interval, Subject, Subscription, takeUntil } from 'rxjs';
+import { interval } from 'rxjs';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -25,6 +25,8 @@ import { ConfirmDialogModel } from '../../../dto/confirm-dialog-model';
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { HasPermissionDirective } from '../../../directives/has-permission.directive';
+import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-data-uploader',
@@ -63,7 +65,6 @@ export class DataUploaderComponent implements OnDestroy {
   partnerType: string | undefined = 'NONE';
   public docsFilterForm: FormGroup;
   progress: { processed: number; total: number; finished: number } | null = null;
-  private subscription: Subscription | null = null;
   updateParticipantInfo: string;
   dotCount: number = 0;
   preparingText: string = 'Preparing the template';
@@ -79,13 +80,14 @@ export class DataUploaderComponent implements OnDestroy {
   documents: any[]
   importDocumentId: any;
 
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
   constructor(
     public fb: FormBuilder,
     private dataUploadService: DataUploadService, 
     private gs: GlobalService,
     private formBuilder: UntypedFormBuilder,
     public authService: AuthService, 
+    private route: ActivatedRoute,
     private dialog: MatDialog){
 
       this.docsFilterForm = this.fb.group({
@@ -107,11 +109,13 @@ export class DataUploaderComponent implements OnDestroy {
   ngOnInit() {
     this.partnerType = this.authService.currentUser()?.partnerType === '-' ? 'NONE' : this.authService.currentUser()?.partnerType;
     this.createBulkImportForm();
+    const importDocId = this.route.snapshot.paramMap.get('id');
+    const importDocEntityType = this.route.snapshot.paramMap.get('entityType');
+    this.getDocumentsById(importDocId, importDocEntityType);
   }
 
   subscribeToUploadProgress(documentId: any): void {
-    this.dataUploadService.subscribeToUploadProgress(documentId)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dataUploadService.subscribeToUploadProgress(documentId)
       .subscribe({
         next: (response) => {
           this.progress = JSON.parse(response);
@@ -121,11 +125,9 @@ export class DataUploaderComponent implements OnDestroy {
   }
 
 
-  getAvailableDocuments() {
-    let partnerId = this.authService.currentUser()?.partnerId;
-    if(this.importDocumentId){
-      this.dataUploadService.getDocumentsById(this.importDocumentId, this.entityType)
-      .pipe(takeUntil(this.unsubscribe$))
+  getDocumentsById(importDocumentId: string | null, entityType: string | null): void {
+    if (importDocumentId && entityType) {
+      this.subs.add = this.dataUploadService.getDocumentsById(Number(importDocumentId), entityType)
         .subscribe({
           next: (response) => {
             this.documents = response.content;
@@ -134,9 +136,15 @@ export class DataUploaderComponent implements OnDestroy {
           },
           error: (error) => { }
         });
+      }
+  }
+
+  getAvailableDocuments() {
+    let partnerId = this.authService.currentUser()?.partnerId;
+    if(this.importDocumentId){
+      this.getDocumentsById(this.importDocumentId, this.entityType);
     } else if(partnerId){
-      this.dataUploadService.getAvailableDocuments(partnerId, this.entityType, this.pageIndex, this.pageSize)
-      .pipe(takeUntil(this.unsubscribe$))
+      this.subs.add = this.dataUploadService.getAvailableDocuments(partnerId, this.entityType, this.pageIndex, this.pageSize)
         .subscribe({
           next: (response) => {
             this.documents = response.content;
@@ -189,8 +197,7 @@ export class DataUploaderComponent implements OnDestroy {
     if(this.legalFormType){
       this.uploadProgressID = uuidv4();
       this.subscribeToUploadProgress(this.uploadProgressID);
-    this.dataUploadService.uploadDataTemplate(this.template, this.legalFormType, this.uploadProgressID, this.updateParticipantInfo)
-      .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dataUploadService.uploadDataTemplate(this.template, this.legalFormType, this.uploadProgressID, this.updateParticipantInfo)
       .subscribe({
         next: (response) => {
           this.importDocumentId = response.message;
@@ -207,12 +214,11 @@ export class DataUploaderComponent implements OnDestroy {
   
   downloadTemplate() {
     if(this.bulkImportForm.valid){
-    this.dataUploadService.downloadDataTemplate(this.bulkImportForm.value.legalForm)
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe({
-        next: (response) => {
-            this.dataUploadService.downloadFileFromAPIResponse(response);
-        },
+      this.subs.add = this.dataUploadService.downloadDataTemplate(this.bulkImportForm.value.legalForm)
+        .subscribe({
+          next: (response) => {
+              this.dataUploadService.downloadFileFromAPIResponse(response);
+          },
         error: (error) => {
           console.error('Error downloading template:', error);
           this.gs.openSnackBar('Error downloading template', "Dismiss");
@@ -222,8 +228,7 @@ export class DataUploaderComponent implements OnDestroy {
   }
 
   downLoadDocument(row: any){
-      this.dataUploadService.downloadDataImportedFile(row, 'EXCEL')
-        .pipe(takeUntil(this.unsubscribe$))
+      this.subs.add = this.dataUploadService.downloadDataImportedFile(row, 'EXCEL')
         .subscribe({
           next: (response) => {
               this.dataUploadService.downloadFileFromAPIResponse(response);
@@ -240,8 +245,7 @@ export class DataUploaderComponent implements OnDestroy {
     
         dialogRef.afterClosed().subscribe(dialogResult => {
           if(dialogResult){
-            this.dataUploadService.deleteResourceFile(importId)
-          .pipe(takeUntil(this.unsubscribe$))
+          this.subs.add = this.dataUploadService.deleteResourceFile(importId)
           .subscribe({
             next: (response) => {
                 this.gs.openSnackBar('Imported Template successfully deleted!!', 'X');
@@ -274,8 +278,7 @@ export class DataUploaderComponent implements OnDestroy {
   }
 
   progressDots(){
-    interval(this.animationInterval)
-      .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = interval(this.animationInterval)
       .subscribe(() => {
         this.dotCount = (this.dotCount + 1) % 4; // Cycle through 0, 1, 2, 3
         this.preparingText = 'Preparing the template' + '.'.repeat(this.dotCount);
@@ -294,11 +297,7 @@ export class DataUploaderComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.dataUploadService.disconnectWebSocket()
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.dataUploadService.disconnectWebSocket();
+    this.subs.dispose();
   }
 }

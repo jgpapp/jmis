@@ -23,6 +23,7 @@ import { MonitoringDashboardComponent } from './monitoring-dashboard/monitoring-
 import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardTypeFilter } from '../../dto/dashboard-type-filter';
 import { AnalyticsComponent } from './analytics/analytics.component';
+import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-dashboard',
@@ -67,7 +68,7 @@ export class DashboardComponent {
   public accessedLoanDataDataSource: any;
   public accessedLoanCountDataDataSource: any;
   public trainedBusinessesCountDataDataSource: any;
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
   isPartnerDashboard: boolean = false;
   currentUserPartnerId: any;
   partnerType: string | undefined = 'NONE';
@@ -116,8 +117,7 @@ export class DashboardComponent {
   }
 
   getLastThreeYearsAccessedLoanPerPartnerYearly() {
-    this.dashBoardService.getLastThreeYearsAccessedLoanPerPartnerYearly(this.partnerSpecificDashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLastThreeYearsAccessedLoanPerPartnerYearly(this.partnerSpecificDashBoardFilters)
       .subscribe({
         next: (response) => {
           this.accessedLoanData = response;
@@ -128,8 +128,7 @@ export class DashboardComponent {
   }
 
   getLastThreeYearsAccessedLoansCountPerPartnerYearly() {
-    this.dashBoardService.getLastThreeYearsAccessedLoansCountPerPartnerYearly(this.partnerSpecificDashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLastThreeYearsAccessedLoansCountPerPartnerYearly(this.partnerSpecificDashBoardFilters)
       .subscribe({
         next: (response) => {
           this.accessedLoanCountData = response;
@@ -140,8 +139,7 @@ export class DashboardComponent {
   }
 
   getLastThreeYearsTrainedBusinessesPerPartnerYearly() {
-    this.dashBoardService.getLastThreeYearsTrainedBusinessesPerPartnerYearly(this.partnerSpecificDashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getLastThreeYearsTrainedBusinessesPerPartnerYearly(this.partnerSpecificDashBoardFilters)
       .subscribe({
         next: (response) => {
           this.trainedBusinessesCountData = response;
@@ -152,8 +150,7 @@ export class DashboardComponent {
   }
 
   getTaTypeTrainedBusinesses() {
-    this.dashBoardService.getTaTypeTrainedBusinesses(this.partnerSpecificDashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getTaTypeTrainedBusinesses(this.partnerSpecificDashBoardFilters)
       .subscribe({
         next: (response) => {
           this.trainedBusinessesCountDataPerTaType = response;
@@ -164,8 +161,7 @@ export class DashboardComponent {
   }
 
   getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary() {
-    this.dashBoardService.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary(this.partnerSpecificDashBoardFilters)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dashBoardService.getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary(this.partnerSpecificDashBoardFilters)
       .subscribe({
         next: (response) => {
           this.refugeesAndPlwdtrainedBusinessesCountDataPerGenderSource = response;
@@ -286,8 +282,7 @@ export class DashboardComponent {
 
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 
   showFinancialDashboardSelector(): boolean {

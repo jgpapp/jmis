@@ -21,6 +21,7 @@ import { ContentHeaderComponent } from '../../../theme/components/content-header
 import { MatCardModule } from '@angular/material/card';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map, Subject, takeUntil } from 'rxjs';
+import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-edit-role',
@@ -51,7 +52,7 @@ export class EditRoleComponent implements OnInit, OnDestroy {
 
   allPermissions: any
   selectedUserRole: UserRoleDto;
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
   constructor(
     public fb: FormBuilder, 
     private userRoleServive: UserRoleService,
@@ -69,8 +70,7 @@ export class EditRoleComponent implements OnInit, OnDestroy {
     
   ngOnInit(): void {
     this.getAvailablePermissions();
-    this.activatedRoute.data.pipe(map(data => data['selectedUserRole']))
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.activatedRoute.data.pipe(map(data => data['selectedUserRole']))
       .subscribe({
         next: (response) => {
           this.selectedUserRole = response;
@@ -84,8 +84,7 @@ export class EditRoleComponent implements OnInit, OnDestroy {
   }
 
     getAvailablePermissions() {
-      this.permissionsServive.getAvailablePermissions()
-      .pipe(takeUntil(this.unsubscribe$))
+      this.subs.add = this.permissionsServive.getAvailablePermissions()
         .subscribe({
           next: (response) => {
             this.allPermissions = response;
@@ -96,8 +95,7 @@ export class EditRoleComponent implements OnInit, OnDestroy {
 
     onSubmitEditUserRole(): void {
       if (this.editUserRoleForm.valid && this.selectedUserRole.id) {
-          this.userRoleServive.updateUserRole(this.selectedUserRole.id, this.editUserRoleForm.value)
-          .pipe(takeUntil(this.unsubscribe$))
+          this.subs.add = this.userRoleServive.updateUserRole(this.selectedUserRole.id, this.editUserRoleForm.value)
           .subscribe({
             next: (response) => {
               this.gs.openSnackBar("Done sucessfully!!", "Dismiss");
@@ -112,7 +110,6 @@ export class EditRoleComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-      this.unsubscribe$.next();
-      this.unsubscribe$.complete();
+      this.subs.dispose();
     }
 }

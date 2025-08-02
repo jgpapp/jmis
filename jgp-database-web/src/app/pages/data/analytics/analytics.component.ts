@@ -18,6 +18,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { AuthService } from '@services/users/auth.service';
 import { DatePipe } from '@angular/common';
+import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-analytics',
@@ -44,7 +45,7 @@ import { DatePipe } from '@angular/common';
 export class AnalyticsComponent implements OnInit, OnDestroy{
 
   public analyticsForm: FormGroup;
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
 
   constructor(
     public fb: FormBuilder, 
@@ -72,8 +73,7 @@ export class AnalyticsComponent implements OnInit, OnDestroy{
           'toDate': this.forMatDateToISO(this.analyticsForm.controls['toDate'].value)
         });
       }
-        this.dashBoardService.updateAnalyticsDataSummary(this.analyticsForm.value, this.authService.currentUser()?.partnerId)
-        .pipe(takeUntil(this.unsubscribe$))
+        this.subs.add = this.dashBoardService.updateAnalyticsDataSummary(this.analyticsForm.value, this.authService.currentUser()?.partnerId)
         .subscribe({
           next: (response) => {
             this.gs.openSnackBar("Started Updating Analytics!!", "Dismiss");
@@ -91,8 +91,7 @@ export class AnalyticsComponent implements OnInit, OnDestroy{
   }
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 
 }

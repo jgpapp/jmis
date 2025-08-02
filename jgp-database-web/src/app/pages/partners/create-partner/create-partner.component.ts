@@ -17,6 +17,7 @@ import { Router } from '@angular/router';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 import { MatCardModule } from '@angular/material/card';
 import { Subject, takeUntil } from 'rxjs';
+import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-create-partner',
@@ -44,7 +45,7 @@ import { Subject, takeUntil } from 'rxjs';
 export class CreatePartnerComponent implements OnDestroy{
 
   public newPartnerForm: FormGroup;
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
   constructor(
     public fb: FormBuilder, 
     private partnerService: PartnerService,
@@ -60,8 +61,7 @@ export class CreatePartnerComponent implements OnDestroy{
 
   onSubmitEditPartner(): void {
     if (this.newPartnerForm.valid) {
-        this.partnerService.createPartner(this.newPartnerForm.value)
-        .pipe(takeUntil(this.unsubscribe$))
+        this.subs.add = this.partnerService.createPartner(this.newPartnerForm.value)
         .subscribe({
           next: (response) => {
             this.gs.openSnackBar("Done sucessfully!!", "Dismiss");
@@ -77,7 +77,6 @@ export class CreatePartnerComponent implements OnDestroy{
 
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 }

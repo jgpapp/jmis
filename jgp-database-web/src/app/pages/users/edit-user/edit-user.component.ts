@@ -21,6 +21,7 @@ import { map, Subject, takeUntil } from 'rxjs';
 import { UserRoleService } from '@services/users/userroles.service';
 import { UserService } from '@services/users/user.service';
 import { User } from '../../../common/models/user.model';
+import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-edit-user',
@@ -51,7 +52,7 @@ export class EditUserComponent implements OnDestroy{
   partners: PartnerDto[] = [];
   allUserRoles: any;
   selectedUser: User;
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
   constructor(
     public fb: FormBuilder, 
     private userService: UserService, 
@@ -75,8 +76,7 @@ export class EditUserComponent implements OnDestroy{
     }
 
     getAvailableUserRoles() {
-      this.userRolesService.getAvailableUserRoles()
-      .pipe(takeUntil(this.unsubscribe$))
+      this.subs.add = this.userRolesService.getAvailableUserRoles()
         .subscribe({
           next: (response) => {
             this.allUserRoles = response;
@@ -86,8 +86,7 @@ export class EditUserComponent implements OnDestroy{
     }
     
     getAvailablePartners() {
-      this.partnerService.getAvailablePartners(0, 400)
-      .pipe(takeUntil(this.unsubscribe$))
+      this.subs.add = this.partnerService.getAvailablePartners(0, 400)
           .subscribe({
             next: (response) => {
               this.partners = response.content
@@ -108,8 +107,7 @@ export class EditUserComponent implements OnDestroy{
     ngOnInit(): void {
       this.getAvailablePartners();
       this.getAvailableUserRoles();
-      this.activatedRoute.data.pipe(map(data => data['selectedUser']))
-      .pipe(takeUntil(this.unsubscribe$))
+      this.subs.add = this.activatedRoute.data.pipe(map(data => data['selectedUser']))
       .subscribe({
         next: (response) => {
           this.selectedUser = response;
@@ -129,8 +127,7 @@ export class EditUserComponent implements OnDestroy{
 
     onSubmitEditUserer(): void {
       if (this.editUserForm.valid && this.selectedUser.id) {
-          this.userService.updateUser(this.selectedUser.id, this.editUserForm.value)
-          .pipe(takeUntil(this.unsubscribe$))
+          this.subs.add = this.userService.updateUser(this.selectedUser.id, this.editUserForm.value)
           .subscribe({
             next: () => {
               this.gs.openSnackBar("Done sucessfully!!", "Dismiss");
@@ -145,7 +142,6 @@ export class EditUserComponent implements OnDestroy{
 
 
     ngOnDestroy(): void {
-      this.unsubscribe$.next();
-      this.unsubscribe$.complete();
+      this.subs.dispose();
     }
 }

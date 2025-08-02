@@ -7,6 +7,7 @@ import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { Subject, takeUntil } from 'rxjs';
+import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-monitoring-dashboard',
@@ -61,7 +62,7 @@ parentWidth = 0;
 parentHeight = 0;
 public questionOption: string = 'survey_language';
 monitoringData: any[] = [];
-private unsubscribe$ = new Subject<void>();
+subs = new SubscriptionsContainer();
 
 @ViewChild('chartContainer', { static: true }) chartContainer!: ElementRef;
 @Input('dashBoardFilters') dashBoardFilters: any;
@@ -92,8 +93,7 @@ public chooseQuestion() {
 
 
   getOutcomeMonitoringSummary() {
-      this.dashboardService.getOutcomeMonitoringSummary(this.dashBoardFilters, this.questionOption)
-      .pipe(takeUntil(this.unsubscribe$))
+      this.subs.add = this.dashboardService.getOutcomeMonitoringSummary(this.dashBoardFilters, this.questionOption)
         .subscribe({
           next: (response) => {
             this.monitoringData = response;
@@ -138,7 +138,6 @@ public chooseQuestion() {
   };
 
   ngOnDestroy() {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 }

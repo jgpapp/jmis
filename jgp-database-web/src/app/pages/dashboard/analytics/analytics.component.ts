@@ -6,6 +6,7 @@ import { DashboardService } from '@services/dashboard/dashboard.service';
 import { GlobalService } from '@services/shared/global.service';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { Subject } from 'rxjs';
+import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-analytics',
@@ -39,14 +40,13 @@ export class AnalyticsComponent implements OnInit, OnChanges, OnDestroy {
   
   @ViewChild('resizedDiv') resizedDiv: ElementRef;
   public previousWidthOfResizedDiv: number = 0;
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
 
   constructor(private dashBoardService: DashboardService, private gs: GlobalService, private dialog: MatDialog){
     
   }
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 
   ngOnChanges(changes: SimpleChanges): void {

@@ -16,6 +16,7 @@ import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.comp
 import { MatDialog } from '@angular/material/dialog';
 import { GlobalService } from '@services/shared/global.service';
 import { UserService } from '@services/users/user.service';
+import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-user-details',
@@ -39,7 +40,7 @@ export class UserDetailsComponent implements OnDestroy, OnInit{
 
   lockButtonText: string = 'Lock';
   selectedUser: Observable<User>;
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
   constructor(private activatedRoute: ActivatedRoute, private gs: GlobalService, private dialog: MatDialog, private userService: UserService){}
 
   ngOnInit(): void {
@@ -56,8 +57,7 @@ export class UserDetailsComponent implements OnDestroy, OnInit{
 
     dialogRef.afterClosed().subscribe(dialogResult => {
       if(dialogResult){
-        this.userService.resetUserPassword(userId)
-        .pipe(takeUntil(this.unsubscribe$))
+        this.subs.add = this.userService.resetUserPassword(userId)
           .subscribe({
             next: (response) => {
               this.gs.openSnackBar(response.message, "X");
@@ -78,8 +78,7 @@ export class UserDetailsComponent implements OnDestroy, OnInit{
 
     dialogRef.afterClosed().subscribe(dialogResult => {
       if(dialogResult){
-        this.userService.lockOrUnlockUser(selectedUser)
-        .pipe(takeUntil(this.unsubscribe$))
+        this.subs.add = this.userService.lockOrUnlockUser(selectedUser)
           .subscribe({
             next: (response) => {
               this.gs.openSnackBar(response.message, "X");
@@ -91,7 +90,6 @@ export class UserDetailsComponent implements OnDestroy, OnInit{
   }
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 }

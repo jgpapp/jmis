@@ -20,7 +20,6 @@ let isRefreshing = false;
 let refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
 export const httpInterceptor: HttpInterceptorFn = (req, next) => {
-  const globalService = inject(GlobalService);
   const authService = inject(AuthService);
   const token: string = authService.getAccessToken()!;
 

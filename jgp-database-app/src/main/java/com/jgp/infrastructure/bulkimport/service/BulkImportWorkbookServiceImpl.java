@@ -4,6 +4,8 @@ package com.jgp.infrastructure.bulkimport.service;
 import com.jgp.authentication.service.PlatformSecurityContext;
 import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.bulkimport.data.ImportData;
+import com.jgp.infrastructure.bulkimport.data.ImportRequestDto;
+import com.jgp.infrastructure.bulkimport.data.PublishWorkbookImportEventRequestDto;
 import com.jgp.infrastructure.bulkimport.data.ResourceType;
 import com.jgp.infrastructure.bulkimport.domain.ImportDocument;
 import com.jgp.infrastructure.bulkimport.domain.ImportDocumentRepository;
@@ -74,36 +76,36 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
 
 
     @Override
-    public Long importWorkbook(String entity, MultipartFile fileDetail, String importProgressUUID, String updateParticipantInfo) {
+    public Long importWorkbook(ImportRequestDto dto) {
         try {
-            if (entity != null && fileDetail != null) {
+            if (dto.entity() != null && dto.fileDetail() != null) {
 
                 final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                IOUtils.copy(fileDetail.getInputStream(), baos);
+                IOUtils.copy(dto.fileDetail().getInputStream(), baos);
                 final byte[] bytes = baos.toByteArray();
                 final BufferedInputStream bis = new BufferedInputStream(new ByteArrayInputStream(bytes));
-                Workbook workbook = new XSSFWorkbook(fileDetail.getInputStream());
+                Workbook workbook = new XSSFWorkbook(dto.fileDetail().getInputStream());
                 GlobalEntityType entityType = null;
                 int primaryColumn = 0;
-                if (entity.trim().equalsIgnoreCase(GlobalEntityType.TA_IMPORT_TEMPLATE.toString())) {
+                if (dto.entity().trim().equalsIgnoreCase(GlobalEntityType.TA_IMPORT_TEMPLATE.toString())) {
                     entityType = GlobalEntityType.TA_IMPORT_TEMPLATE;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.LOAN_IMPORT_TEMPLATE.toString())) {
+                } else if (dto.entity().trim().equalsIgnoreCase(GlobalEntityType.LOAN_IMPORT_TEMPLATE.toString())) {
                     entityType = GlobalEntityType.LOAN_IMPORT_TEMPLATE;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.MENTORSHIP_IMPORT_TEMPLATE.toString())) {
+                } else if (dto.entity().trim().equalsIgnoreCase(GlobalEntityType.MENTORSHIP_IMPORT_TEMPLATE.toString())) {
                     entityType = GlobalEntityType.MENTORSHIP_IMPORT_TEMPLATE;
-                } else if (entity.trim().equalsIgnoreCase(GlobalEntityType.MONITORING_IMPORT_TEMPLATE.toString())) {
+                } else if (dto.entity().trim().equalsIgnoreCase(GlobalEntityType.MONITORING_IMPORT_TEMPLATE.toString())) {
                     entityType = GlobalEntityType.MONITORING_IMPORT_TEMPLATE;
                 } else {
                     workbook.close();
                     throw new InvalidEntityTypeForDocumentManagementException("Unable to find requested resource");
 
                 }
-                return publishEvent(primaryColumn, fileDetail, bis, entityType, workbook, importProgressUUID, updateParticipantInfo);
+                return publishEvent(new PublishWorkbookImportEventRequestDto(primaryColumn, dto.fileDetail(), bis, entityType, workbook, dto.importProgressUUID(), dto.updateParticipantInfo(), dto.appDomainForNotification()));
             }
             throw new InvalidEntityTypeForDocumentManagementException("One or more of the given parameters not found");
         } catch (IOException e) {
             log.error("Problem occurred in importWorkbook function", e);
-            throw new InvalidEntityTypeForDocumentManagementException("IO exception occurred with " + fileDetail.getOriginalFilename() + " " + e.getMessage());
+            throw new InvalidEntityTypeForDocumentManagementException("IO exception occurred with " + dto.fileDetail().getOriginalFilename() + " " + e.getMessage());
 
         }
     }
@@ -148,24 +150,30 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     }
 
 
-    private Long publishEvent(final Integer primaryColumn, final MultipartFile fileDetail,
-            final InputStream clonedInputStreamWorkbook, final GlobalEntityType entityType, final Workbook workbook, String importProgressUUID, String updateParticipantInfo) {
+    private Long publishEvent(final PublishWorkbookImportEventRequestDto dto) {
 
-        final String fileName = fileDetail.getOriginalFilename();
+        final String fileName = dto.fileDetail().getOriginalFilename();
 
         final Long documentId = this.documentWritePlatformService.createInternalDocument(
                 DocumentWritePlatformServiceJpaRepositoryImpl.DocumentManagementEntity.IMPORT.name(),
-                this.securityContext.getAuthenticatedUserIfPresent().getId(), null, clonedInputStreamWorkbook,
+                this.securityContext.getAuthenticatedUserIfPresent().getId(), null, dto.clonedInputStreamWorkbook(),
                 URLConnection.guessContentTypeFromName(fileName), fileName, null, fileName);
         final Document document = this.documentRepository.findById(documentId).orElse(null);
 
-        final ImportDocument importDocument = ImportDocument.instance(document, LocalDateTime.now(ZoneId.systemDefault()), entityType.getValue(),
-                ImportHandlerUtils.getNumberOfRows(workbook.getSheetAt(0), primaryColumn), this.securityContext.getAuthenticatedUserIfPresent().getPartner());
-        this.importDocumentRepository.saveAndFlush(importDocument);
+        try(Workbook workbook = dto.workbook()) {
+            final ImportDocument importDocument = ImportDocument.instance(document, LocalDateTime.now(ZoneId.systemDefault()), dto.entityType().getValue(),
+                    ImportHandlerUtils.getNumberOfRows(workbook.getSheetAt(0), dto.primaryColumn()), this.securityContext.getAuthenticatedUserIfPresent().getPartner());
+            this.importDocumentRepository.saveAndFlush(importDocument);
 
-        BulkImportEvent event = new BulkImportEvent(workbook, entityType.name(), importDocument.getId(), importProgressUUID, "YES".equalsIgnoreCase(updateParticipantInfo));
-        applicationContext.publishEvent(event);
-        return importDocument.getId();
+            final var importDocumentId = importDocument.getId();
+            final var appDocumentURL = null == dto.appDomainForNotification() ? "localhost" : dto.appDomainForNotification().concat(importDocumentId.toString()).concat("/").concat(dto.entityType().name());
+            BulkImportEvent event = new BulkImportEvent(workbook, dto.entityType().name(), importDocument.getId(), dto.importProgressUUID(), "YES".equalsIgnoreCase(dto.updateParticipantInfo()), appDocumentURL);
+            applicationContext.publishEvent(event);
+            return importDocumentId;
+        } catch (IOException e) {
+            log.error("Problem occurred in publishEvent function", e);
+        }
+        return -1L;
     }
 
     @Override

@@ -20,6 +20,7 @@ import { ConfirmDialogModel } from '../../dto/confirm-dialog-model';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { HasPermissionDirective } from '../../directives/has-permission.directive';
+import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-system-resources',
@@ -53,8 +54,7 @@ export class SystemResourcesComponent {
   totalItems = 0;
   entityType: any;
   documents: any[]
-  private unsubscribe$ = new Subject<void>();
-  private subscription: Subscription | null = null;
+  subs = new SubscriptionsContainer();
   bulkImport: any = {};
   legalFormType: string | undefined;
   template: File | null = null;
@@ -82,8 +82,7 @@ export class SystemResourcesComponent {
 
 
       getAvailableDocuments() {
-            this.dataUploadService.getAvailableDocuments(undefined, 'RESOURCES_IMPORT', this.pageIndex, this.pageSize)
-            .pipe(takeUntil(this.unsubscribe$))
+            this.subs.add = this.dataUploadService.getAvailableDocuments(undefined, 'RESOURCES_IMPORT', this.pageIndex, this.pageSize)
               .subscribe({
                 next: (response) => {
                   this.documents = response.content;
@@ -111,12 +110,11 @@ export class SystemResourcesComponent {
 
   uploadResourceFile() {
     if(this.legalFormType && this.template) {
-    this.dataUploadService.uploadResourceFile(this.template, this.legalFormType)
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe({
-        next: (response) => {
-          this.gs.openSnackBar(`${response.message}`, 'X');
-          this.template = null;
+      this.subs.add = this.dataUploadService.uploadResourceFile(this.template, this.legalFormType)
+        .subscribe({
+          next: (response) => {
+            this.gs.openSnackBar(`${response.message}`, 'X');
+            this.template = null;
           this.legalFormType = undefined;
           this.getAvailableDocuments();
         },
@@ -129,8 +127,7 @@ export class SystemResourcesComponent {
 
   
   viewDocument(row: any) {
-    this.dataUploadService.downloadDataImportedFile(row, 'PDF')
-        .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dataUploadService.downloadDataImportedFile(row, 'PDF')
         .subscribe({
           next: (response) => {
               this.dataUploadService.openPdfFileOnNewBrowserTab(response);
@@ -139,8 +136,7 @@ export class SystemResourcesComponent {
   }
 
   downloadDocument(row: any) {
-    this.dataUploadService.downloadFile(row)
-      .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.dataUploadService.downloadFile(row)
       .subscribe({
         next: (response) => {
             this.dataUploadService.downloadFileFromAPIResponse(response);
@@ -163,11 +159,10 @@ export class SystemResourcesComponent {
   
       dialogRef.afterClosed().subscribe(dialogResult => {
         if(dialogResult){
-          this.dataUploadService.deleteResourceFile(importId)
-        .pipe(takeUntil(this.unsubscribe$))
-        .subscribe({
-          next: (response) => {
-            console.log(response);
+          this.subs.add = this.dataUploadService.deleteResourceFile(importId)
+          .subscribe({
+            next: (response) => {
+              console.log(response);
               this.gs.openSnackBar('Document successfully deleted!!', 'X');
               this.getAvailableDocuments();
           },
@@ -195,10 +190,6 @@ export class SystemResourcesComponent {
   }
 
   ngOnDestroy(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 }

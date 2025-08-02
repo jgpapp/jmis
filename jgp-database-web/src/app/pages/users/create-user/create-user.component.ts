@@ -21,6 +21,7 @@ import { UserService } from '@services/users/user.service';
 import { UserRoleService } from '@services/users/userroles.service';
 import { PartnerDto } from '../../../dto/Partner';
 import { Subject, takeUntil } from 'rxjs';
+import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 
 @Component({
@@ -53,7 +54,7 @@ export class CreateUserComponent implements OnDestroy {
 
   partners: PartnerDto[] = [];
   allUserRoles: any;
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
   constructor(
     public fb: FormBuilder, private gs: GlobalService, 
     private userService: UserService, 
@@ -75,8 +76,7 @@ export class CreateUserComponent implements OnDestroy {
 }
 
 getAvailableUserRoles() {
-  this.userRolesService.getAvailableUserRoles()
-  .pipe(takeUntil(this.unsubscribe$))
+  this.subs.add = this.userRolesService.getAvailableUserRoles()
     .subscribe({
       next: (response) => {
         this.allUserRoles = response;
@@ -86,8 +86,7 @@ getAvailableUserRoles() {
 }
 
 getAvailablePartners() {
-  this.partnerService.getAvailablePartners(0, 400)
-  .pipe(takeUntil(this.unsubscribe$))
+  this.subs.add = this.partnerService.getAvailablePartners(0, 400)
       .subscribe({
         next: (response) => {
           this.partners = response.content
@@ -106,8 +105,7 @@ ngOnInit() {
 
 onSubmitCreateUser(): void {
   if (this.createUserForm.valid) {
-      this.userService.createUser(this.createUserForm.value)
-      .pipe(takeUntil(this.unsubscribe$))
+      this.subs.add = this.userService.createUser(this.createUserForm.value)
       .subscribe({
         next: (response) => {
           this.gs.openSnackBar("Done sucessfully!!", "Dismiss");
@@ -123,7 +121,6 @@ onSubmitCreateUser(): void {
 
 
 ngOnDestroy(): void {
-  this.unsubscribe$.next();
-  this.unsubscribe$.complete();
+  this.subs.dispose();
 }
 }

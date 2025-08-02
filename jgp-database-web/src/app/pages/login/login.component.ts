@@ -13,6 +13,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { GlobalService } from '@services/shared/global.service';
 import { AuthService } from '@services/users/auth.service';
 import { Subject, takeUntil } from 'rxjs';
+import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-login',
@@ -37,7 +38,7 @@ export class LoginComponent implements OnDestroy {
   hide = true;
   authResponse: any
   authResponse2?: { success: boolean, message: string, authToken: string }
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
   constructor(
     public settingsService: SettingsService, 
     public fb: FormBuilder, 
@@ -53,8 +54,7 @@ export class LoginComponent implements OnDestroy {
   }
 
   public onSubmit(): void {
-    this.authService.login(this.userloginForm.value)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.authService.login(this.userloginForm.value)
     .subscribe({
       next: () => {
         this.gs.openSnackBar("You're logged in successfully!", "Dismiss");
@@ -80,7 +80,6 @@ export class LoginComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 }

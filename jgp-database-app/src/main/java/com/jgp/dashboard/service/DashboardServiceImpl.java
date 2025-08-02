@@ -37,9 +37,6 @@ import com.jgp.dashboard.dto.SeriesDataPointDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -1307,7 +1304,7 @@ public class DashboardServiceImpl implements DashboardService {
             final var amountDisbursed = rs.getBigDecimal(AMOUNT_DISBURSED);
             final var amountDisbursedByTranches = rs.getBigDecimal("amountDisbursedByTranches");
             final var businessesMentored = rs.getBigDecimal("businessesMentored");
-            return new HighLevelSummaryDto(CommonUtil.NUMBER_FORMAT.format(businessesTrained), CommonUtil.NUMBER_FORMAT.format(businessesLoaned), amountDisbursed, amountDisbursedByTranches, CommonUtil.NUMBER_FORMAT.format(businessesMentored));
+            return new HighLevelSummaryDto(CommonUtil.getNumberFormat().format(businessesTrained), CommonUtil.getNumberFormat().format(businessesLoaned), amountDisbursed, amountDisbursedByTranches, CommonUtil.getNumberFormat().format(businessesMentored));
         }
     }
 
@@ -1344,10 +1341,10 @@ public class DashboardServiceImpl implements DashboardService {
                     final var county = countyDetails.get();
                     final var approximateCenterLatitude = county.getApproximateCenterLatitude();
                     final var approximateCenterLongitude = county.getApproximateCenterLongitude();
-                    final var businessesTrained = rs.getInt(BUSINESSES_TRAINED);
-                    final var businessesLoaned = rs.getInt(BUSINESSES_LOANED);
-                    final var amountDisbursed = rs.getBigDecimal(AMOUNT_DISBURSED);
-                    final var businessesMentored = rs.getInt("businessesMentored");
+                    final var businessesTrained = CommonUtil.getNumberFormat().format(rs.getInt(BUSINESSES_TRAINED));
+                    final var businessesLoaned = CommonUtil.getNumberFormat().format(rs.getInt(BUSINESSES_LOANED));
+                    final var amountDisbursed = CommonUtil.getNumberFormat().format(rs.getBigDecimal(AMOUNT_DISBURSED));
+                    final var businessesMentored = CommonUtil.getNumberFormat().format(rs.getInt("businessesMentored"));
                     dataPoints.add(new CountyDataSummaryResponseDto(countyCode, countyName, approximateCenterLatitude, approximateCenterLongitude, businessesTrained, businessesLoaned, amountDisbursed, businessesMentored));
                 }
             }
@@ -1673,7 +1670,7 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
                 final var genderName = rs.getString("genderName");
                 final var year = rs.getInt("year");
                 final var value = INTEGER_DATA_POINT_TYPE.equals(valueDataType) ? rs.getInt(VALUE_PARAM) : rs.getBigDecimal(VALUE_PARAM);
-                dataPoints.add(new PartnerYearlyDataDto(StringUtils.capitalize(CommonUtil.defaultToOtherIfStringIsNull(partnerName)), StringUtils.capitalize(CommonUtil.defaultToOtherIfStringIsNull(genderName)), year, CommonUtil.NUMBER_FORMAT.format(value)));
+                dataPoints.add(new PartnerYearlyDataDto(StringUtils.capitalize(CommonUtil.defaultToOtherIfStringIsNull(partnerName)), StringUtils.capitalize(CommonUtil.defaultToOtherIfStringIsNull(genderName)), year, CommonUtil.getNumberFormat().format(value)));
 
             }
             return dataPoints;
@@ -1699,7 +1696,7 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
                 final var taType = rs.getString("taType");
                 final var genderCategory = rs.getString(GENDER_CATEGORY_PARAM);
                 final var businessesTrained = rs.getInt(BUSINESSES_TRAINED);
-                dataPoints.add(new TaTypeTrainedBusinessDto(StringUtils.capitalize(CommonUtil.defaultToOtherIfStringIsNull(partnerName)), taType, genderCategory, CommonUtil.NUMBER_FORMAT.format(businessesTrained)));
+                dataPoints.add(new TaTypeTrainedBusinessDto(StringUtils.capitalize(CommonUtil.defaultToOtherIfStringIsNull(partnerName)), taType, genderCategory, CommonUtil.getNumberFormat().format(businessesTrained)));
             }
             return dataPoints;
         }

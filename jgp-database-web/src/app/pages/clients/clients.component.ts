@@ -14,6 +14,7 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { GlobalService } from '@services/shared/global.service';
+import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
   selector: 'app-clients',
@@ -47,12 +48,11 @@ export class ClientsComponent implements OnInit, OnDestroy{
   pageSize = 10;
   pageIndex = 0;
   totalItems = 0;
-  private unsubscribe$ = new Subject<void>();
+  subs = new SubscriptionsContainer();
   constructor(private clientService: ClientService, public authService: AuthService, public gs: GlobalService) { }
 
   getAvailableClients() {
-    this.clientService.getAvailableClients(this.searchText, this.pageIndex, this.pageSize)
-    .pipe(takeUntil(this.unsubscribe$))
+    this.subs.add = this.clientService.getAvailableClients(this.searchText, this.pageIndex, this.pageSize)
       .subscribe({
         next: (response) => {
           this.participants = response.content;
@@ -84,7 +84,6 @@ export class ClientsComponent implements OnInit, OnDestroy{
   }
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.subs.dispose();
   }
 }
