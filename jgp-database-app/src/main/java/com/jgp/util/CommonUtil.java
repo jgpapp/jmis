@@ -68,6 +68,7 @@ public abstract class CommonUtil {
         return getKenyanCountiesMap().get(sanitizedCode);
     }
 
+
     public static Map<String, String> getKenyanCountiesMap() {
         Map<String, String> map = new HashMap<>();
         map.put("001", "Mombasa");

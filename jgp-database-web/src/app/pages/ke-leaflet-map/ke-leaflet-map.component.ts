@@ -84,6 +84,7 @@ export class KeLeafletMapComponent implements OnInit, AfterViewInit, OnDestroy {
       tooltip: string; // Replace with actual tooltip text, e.g., county name
     }[] = this.createMarkers();
 
+
     markerData.forEach(data => {
       L.circleMarker([data.lat, data.lng], {
         radius: 6, // Smaller radius in pixels
@@ -122,6 +123,7 @@ export class KeLeafletMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     return markerData;
   }
+
 
 
   getMapToolTip(county: any): string {

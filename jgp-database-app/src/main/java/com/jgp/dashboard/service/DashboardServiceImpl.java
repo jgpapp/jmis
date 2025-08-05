@@ -1352,6 +1352,50 @@ public class DashboardServiceImpl implements DashboardService {
         }
     }
 
+    private static final class CountyDataSummaryResponseMapper implements ResultSetExtractor<List<CountyDataSummaryResponseDto>> {
+
+        public static final String SCHEMA = """
+                with countySummary as (\s
+                select cl.location_county_code as countyCode, count(bpd.*) as businessesTrained,\s
+                0 as businessesLoaned, 0 as amountDisbursed,\s
+                0 as businessesMentored from bmo_participants_data bpd inner join participants cl on bpd.participant_id = cl.id %s group by 1 \s
+                union
+                select cl.location_county_code as countyCode, 0 as businessesTrained, count(distinct l.*) as businessesLoaned,\s
+                sum(lt.amount) as amountDisbursed, 0 as businessesMentored from loan_transactions lt\s
+                inner join loans l on lt.loan_id = l.id inner join participants cl on l.participant_id = cl.id %s group by 1\s
+                union
+                 select cl.location_county_code as countyCode, 0 as businessesTrained, 0 as businessesLoaned,\s
+                 0 as amountDisbursed, count(distinct m.*) as businessesMentored from mentor_ships m\s
+                 inner join participants cl on m.participant_id = cl.id %s group by 1\s
+                    )
+                    select countyCode, sum(businessesTrained) as businessesTrained, sum(businessesLoaned) as businessesLoaned,\s
+                    sum(amountDisbursed) as amountDisbursed, sum(businessesMentored) as businessesMentored\s
+                    from countySummary group by 1;
+                   \s""";
+
+        @Override
+        public List<CountyDataSummaryResponseDto> extractData(ResultSet rs) throws SQLException, DataAccessException {
+            var dataPoints = new ArrayList<CountyDataSummaryResponseDto>();
+            while (rs.next()){
+                final var countyCode = rs.getString(COUNTY_CODE_PARAM);
+                final var countyName = CommonUtil.getCountyByCode(countyCode);
+                final var countyDetails = CommonUtil.KenyanCounty.getKenyanCountyFromName(countyName);
+                if (countyDetails.isPresent()){
+                    // Extracting county details
+                    final var county = countyDetails.get();
+                    final var approximateCenterLatitude = county.getApproximateCenterLatitude();
+                    final var approximateCenterLongitude = county.getApproximateCenterLongitude();
+                    final var businessesTrained = rs.getInt(BUSINESSES_TRAINED);
+                    final var businessesLoaned = rs.getInt(BUSINESSES_LOANED);
+                    final var amountDisbursed = rs.getBigDecimal(AMOUNT_DISBURSED);
+                    final var businessesMentored = rs.getInt("businessesMentored");
+                    dataPoints.add(new CountyDataSummaryResponseDto(countyCode, countyName, approximateCenterLatitude, approximateCenterLongitude, businessesTrained, businessesLoaned, amountDisbursed, businessesMentored));
+                }
+            }
+            return dataPoints;
+        }
+    }
+
 
     private static final class EmployeesSummaryMapper implements RowMapper<EmployeesSummaryDto> {
 

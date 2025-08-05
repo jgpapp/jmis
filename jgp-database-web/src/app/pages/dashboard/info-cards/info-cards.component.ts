@@ -12,6 +12,7 @@ import { DashboardTypeFilter } from '../../../dto/dashboard-type-filter';
 import { CountySummaryDto } from '../dto/county-summary-dto';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
+
 @Component({
   selector: 'app-info-cards',
   standalone: true,
@@ -419,6 +420,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
 
   getMentorshipGenderSummary() {
     this.subs.add = this.dashBoardService.getMentorshipByGivenFieldSummary(this.dashBoardFilters, 'owner_gender')
+
       .subscribe({
         next: (response) => {
           this.mentorshipGenderSummary = response;
@@ -449,6 +451,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
 
   getMentorshipByGenderCategorySummary() {
     this.subs.add = this.dashBoardService.getMentorshipByGivenFieldSummary(this.dashBoardFilters, 'gender_category')
+
       .subscribe({
         next: (response) => {
           this.mentorshipByGenderCategory = response;
@@ -459,6 +462,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
 
   getMentorshipByDisabilitySummary() {
     this.subs.add = this.dashBoardService.getMentorshipByGivenFieldSummary(this.dashBoardFilters, 'disability_type')
+
       .subscribe({
         next: (response) => {
           this.mentorshipByDisabilitySummary = response;
