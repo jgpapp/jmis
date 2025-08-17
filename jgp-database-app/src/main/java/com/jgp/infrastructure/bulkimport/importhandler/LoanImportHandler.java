@@ -100,10 +100,10 @@ public class LoanImportHandler implements ImportHandler {
         final var pipeLineSource = ImportHandlerUtils.readAsString(LoanConstants.PIPELINE_SOURCE, row);
         final var applicationDate = DataValidator.validateLocalDate(LoanConstants.DATE_APPLIED, row, rowErrorMap, "Application Date", true);
         final var dateDisbursed = DataValidator.validateLocalDate(LoanConstants.DATE_DISBURSED, row, rowErrorMap, "Date Disbursed", true);
-        final var amountApproved = DataValidator.validateTemplateDoubleValue(LoanConstants.LOAN_AMOUNT_KES, row, rowErrorMap);
+        final var amountApproved = DataValidator.validateTemplateDoubleValue(LoanConstants.LOAN_AMOUNT_KES, row, "amount approved", rowErrorMap, true);
         final var loanAmount = null == amountApproved ? BigDecimal.ZERO : BigDecimal.valueOf(amountApproved);
-        final var loanDuration = DataValidator.validateTemplateIntegerValue(LoanConstants.LOAN_DURATION, row, rowErrorMap);
-        final var outStandingAmountDouble = DataValidator.validateTemplateDoubleValue(LoanConstants.OUT_STANDING_AMOUNT, row, rowErrorMap);
+        final var loanDuration = DataValidator.validateTemplateIntegerValue(LoanConstants.LOAN_DURATION, row, "loan duration", rowErrorMap, true);
+        final var outStandingAmountDouble = DataValidator.validateTemplateDoubleValue(LoanConstants.OUT_STANDING_AMOUNT, row, "out-standing amount", rowErrorMap, true);
         final var outStandingAmount = null == outStandingAmountDouble ? BigDecimal.ZERO : BigDecimal.valueOf(outStandingAmountDouble);
         var loanQuality = ImportHandlerUtils.readAsString(LoanConstants.LOAN_QUALITY, row);
         loanQuality = LoanValidator.validateLoanQuality(loanQuality, row, rowErrorMap);
@@ -112,9 +112,9 @@ public class LoanImportHandler implements ImportHandler {
             loanQualityEnum = (null != loanQuality) ? Loan.LoanQuality.valueOf(loanQuality.toUpperCase()) : Loan.LoanQuality.NORMAL;
         }
         final var recordedToJGPDBOnDate = DataValidator.validateLocalDate(LoanConstants.DATE_RECORDED_TO_JGP_DB_COL, row, rowErrorMap, "Date Recorded To JGP DB", true);
-        final var loanAmountRepaidDouble = DataValidator.validateTemplateDoubleValue(LoanConstants.REPAID_LOAN_AMOUNT, row, rowErrorMap);
+        final var loanAmountRepaidDouble = DataValidator.validateTemplateDoubleValue(LoanConstants.REPAID_LOAN_AMOUNT, row, "amount repaid", rowErrorMap, true);
         final var loanAmountRepaid = null == loanAmountRepaidDouble ? BigDecimal.ZERO : BigDecimal.valueOf(loanAmountRepaidDouble);
-        final var tranchAmountDouble = DataValidator.validateTemplateDoubleValue(LoanConstants.TRANCH_AMOUNT_COL, row, rowErrorMap);
+        final var tranchAmountDouble = DataValidator.validateTemplateDoubleValue(LoanConstants.TRANCH_AMOUNT_COL, row, "tranch amount", rowErrorMap, false);
         final var tranchAmount = null == tranchAmountDouble ? BigDecimal.ZERO : BigDecimal.valueOf(tranchAmountDouble);
         var tranchAllocated = ImportHandlerUtils.readAsString(LoanConstants.TRANCH_ALLOCATED_COL, row);
         tranchAllocated = LoanValidator.validateTranchAllocated(tranchAllocated, tranchAmount, row, rowErrorMap);
@@ -181,18 +181,18 @@ public class LoanImportHandler implements ImportHandler {
         final var phoneNumber = DataValidator.validatePhoneNumber(LoanConstants.BUSINESS_PHONE_NUMBER_COL, row, rowErrorMap);
         var gender = ImportHandlerUtils.readAsString(LoanConstants.GENDER_COL, row);
         gender = ParticipantValidator.validateGender(gender, row, rowErrorMap);
-        var age = DataValidator.validateTemplateIntegerValue(LoanConstants.AGE_COL, row, rowErrorMap);
+        var age = DataValidator.validateTemplateIntegerValue(LoanConstants.AGE_COL, row, "age", rowErrorMap, false);
         age = ParticipantValidator.validateParticipantAge(age, row, rowErrorMap);
         var locationCounty = DataValidator.validateCountyName(LoanConstants.BUSINESS_LOCATION_COL, row, rowErrorMap);
         final var industrySector = ImportHandlerUtils.readAsString(LoanConstants.INDUSTRY_SECTOR_COL, row);
 
-        final var totalRegularEmployees = DataValidator.validateTemplateIntegerValue(LoanConstants.TOTAL_REGULAR_EMPLOYEES_COL, row, rowErrorMap);
+        final var totalRegularEmployees = DataValidator.validateTemplateIntegerValue(LoanConstants.TOTAL_REGULAR_EMPLOYEES_COL, row, "total regular employees", rowErrorMap, true);
         if ((null == totalRegularEmployees || totalRegularEmployees < 1) && null == rowErrorMap.get(row)){
             rowErrorMap.put(row, "Regular Employees Must Be Greater Than 0 !!");
         }
-        final var youthRegularEmployees = DataValidator.validateTemplateIntegerValue(LoanConstants.YOUTH_REGULAR_EMPLOYEES_COL, row, rowErrorMap);
-        final var totalCasualEmployees = DataValidator.validateTemplateIntegerValue(LoanConstants.TOTAL_CASUAL_EMPLOYEES_COL, row, rowErrorMap);
-        final var youthCasualEmployees = DataValidator.validateTemplateIntegerValue(LoanConstants.YOUTH_CASUAL_EMPLOYEES_COL, row, rowErrorMap);
+        final var youthRegularEmployees = DataValidator.validateTemplateIntegerValue(LoanConstants.YOUTH_REGULAR_EMPLOYEES_COL, row, "youth regular employees", rowErrorMap, false);
+        final var totalCasualEmployees = DataValidator.validateTemplateIntegerValue(LoanConstants.TOTAL_CASUAL_EMPLOYEES_COL, row, "total casual employees", rowErrorMap, false);
+        final var youthCasualEmployees = DataValidator.validateTemplateIntegerValue(LoanConstants.YOUTH_CASUAL_EMPLOYEES_COL, row, "youth casual employees", rowErrorMap, false);
 
         return ParticipantDto.builder()
                 .phoneNumber(phoneNumber).businessLocation(locationCounty.getCountyName()).businessName(businessName)

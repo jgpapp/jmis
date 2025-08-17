@@ -82,9 +82,9 @@ public class MonitoringImportHandler implements ImportHandler {
         final var status = ImportHandlerUtils.readAsString(MonitoringConstants.STATUS_COL, row);
         final var jgpID = ImportHandlerUtils.readAsString(MonitoringConstants.JGP_ID_COL, row);
         final var participant = (null == jgpID ? null : this.participantService.findOneParticipantByJGPID(jgpID).orElse(null));
-        final var locationLatDouble = DataValidator.validateTemplateDoubleValue(MonitoringConstants.LOCATION_LATITUDE_COL, row, rowErrorMap);
-        final var locationLangDouble = DataValidator.validateTemplateDoubleValue(MonitoringConstants.LOCATION_LONGITUDE_COL, row, rowErrorMap);
-        final var revenueChangeDouble = DataValidator.validateTemplateDoubleValue(MonitoringConstants.REVENUE_CHANGE_COL, row, rowErrorMap);
+        final var locationLatDouble = DataValidator.validateTemplateDoubleValue(MonitoringConstants.LOCATION_LATITUDE_COL, row, "location latitude", rowErrorMap, false);
+        final var locationLangDouble = DataValidator.validateTemplateDoubleValue(MonitoringConstants.LOCATION_LONGITUDE_COL, row, "location longitude", rowErrorMap, locationLatDouble != null);
+        final var revenueChangeDouble = DataValidator.validateTemplateDoubleValue(MonitoringConstants.REVENUE_CHANGE_COL, row, "revenue change", rowErrorMap, false);
         var locationCounty = DataValidator.validateCountyName(MonitoringConstants.COUNTY_NAME_COL, row, rowErrorMap);
         var surveyDate = DataValidator.validateLocalDate(MonitoringConstants.SURVEY_DATE_COL, row, rowErrorMap, "Survey Date", true);
         final var monitoringDto = OutComeMonitoringRequestDto.builder()
@@ -93,7 +93,7 @@ public class MonitoringImportHandler implements ImportHandler {
             .consented(ImportHandlerUtils.readAsString(MonitoringConstants.CONSENTED_COL, row))
             .locationLatitude(locationLatDouble == null ? null : BigDecimal.valueOf(locationLatDouble))
             .locationLongitude(locationLangDouble == null ? null : BigDecimal.valueOf(locationLangDouble))
-            .age(DataValidator.validateTemplateIntegerValue(MonitoringConstants.AGE_COL, row, rowErrorMap))
+            .age(DataValidator.validateTemplateIntegerValue(MonitoringConstants.AGE_COL, row, "age", rowErrorMap, true))
             .genderCategory(ImportHandlerUtils.readAsString(MonitoringConstants.GENDER_CATEGORY_COL, row))
             .segment(ImportHandlerUtils.readAsString(MonitoringConstants.SEGMENT_COL, row))
             .partner(ImportHandlerUtils.readAsString(MonitoringConstants.PARTNER_COL, row))
@@ -105,9 +105,9 @@ public class MonitoringImportHandler implements ImportHandler {
             .businessAgeCategory(ImportHandlerUtils.readAsString(MonitoringConstants.BUSINESS_AGE_CATEGORY_COL, row))
             .groupMembership(ImportHandlerUtils.readAsString(MonitoringConstants.GROUP_MEMBERSHIP_COL, row))
             .educationLevel(ImportHandlerUtils.readAsString(MonitoringConstants.EDUCATION_LEVEL_COL, row))
-            .businessAge(DataValidator.validateTemplateIntegerValue(MonitoringConstants.BUSINESS_AGE_COL, row, rowErrorMap))
-            .regularEmployees(DataValidator.validateTemplateIntegerValue(MonitoringConstants.REGULAR_EMPLOYEES_COL, row, rowErrorMap))
-            .casualEmployees(DataValidator.validateTemplateIntegerValue(MonitoringConstants.CASUAL_EMPLOYEES_COL, row, rowErrorMap))
+            .businessAge(DataValidator.validateTemplateIntegerValue(MonitoringConstants.BUSINESS_AGE_COL, row, "business age", rowErrorMap, false))
+            .regularEmployees(DataValidator.validateTemplateIntegerValue(MonitoringConstants.REGULAR_EMPLOYEES_COL, row, "regular employees", rowErrorMap, false))
+            .casualEmployees(DataValidator.validateTemplateIntegerValue(MonitoringConstants.CASUAL_EMPLOYEES_COL, row, "casual employees", rowErrorMap, false))
             .householdIncomeChange(ImportHandlerUtils.readAsString(MonitoringConstants.HOUSEHOLD_INCOME_CHANGE_COL, row))
             .financialStability(ImportHandlerUtils.readAsString(MonitoringConstants.FINANCIAL_STABILITY_COL, row))
             .qualityOfLife(ImportHandlerUtils.readAsString(MonitoringConstants.QUALITY_OF_LIFE_COL, row))
@@ -150,7 +150,7 @@ public class MonitoringImportHandler implements ImportHandler {
             .profitabilityGrowth(ImportHandlerUtils.readAsString(MonitoringConstants.PROFITABILITY_GROWTH_COL, row))
             .revenueChange(revenueChangeDouble == null ? null : BigDecimal.valueOf(revenueChangeDouble))
             .loanApplication(ImportHandlerUtils.readAsString(MonitoringConstants.LOAN_APPLICATION_COL, row))
-            .numberOfLoans(DataValidator.validateTemplateIntegerValue(MonitoringConstants.NUMBER_OF_LOANS_COL, row, rowErrorMap))
+            .numberOfLoans(DataValidator.validateTemplateIntegerValue(MonitoringConstants.NUMBER_OF_LOANS_COL, row, "number of loans", rowErrorMap, false))
             .loanPlatform(ImportHandlerUtils.readAsString(MonitoringConstants.LOAN_PLATFORM_COL, row))
             .externalFinancing(ImportHandlerUtils.readAsString(MonitoringConstants.EXTERNAL_FINANCING_COL, row))
             .financingSources(ImportHandlerUtils.readAsString(MonitoringConstants.FINANCING_SOURCES_COL, row))

@@ -117,15 +117,23 @@ public class MentorshipImportHandler implements ImportHandler {
             rowErrorMap.put(row, "Business Situation is required !!");
         }
         final var didHireMoreEmployees = ImportHandlerUtils.readAsString(MentorShipConstants.LOAN_MADE_HIRE_MORE_COL, row);
-        final var numberOfMoreEmployees = DataValidator.validateTemplateIntegerValue(MentorShipConstants.NEW_EMPLOYEES_18_35_COL, row, rowErrorMap);
-        if ((null == numberOfMoreEmployees || numberOfMoreEmployees < 1) && "YES".equalsIgnoreCase(didHireMoreEmployees) && null == rowErrorMap.get(row)){
-            rowErrorMap.put(row, "New hires 18-35 must be greater than 0");
+        Integer numberOfMoreEmployees = null;
+        if ("YES".equalsIgnoreCase(didHireMoreEmployees)){
+            numberOfMoreEmployees = DataValidator.validateTemplateIntegerValue(MentorShipConstants.NEW_EMPLOYEES_18_35_COL, row, "number of new employees", rowErrorMap, true);
+            if ((null == numberOfMoreEmployees || numberOfMoreEmployees < 1) && null == rowErrorMap.get(row)){
+                rowErrorMap.put(row, "New hires 18-35 must be greater than 0");
+            }
         }
+
         final var didRevenueIncrease = ImportHandlerUtils.readAsString(MentorShipConstants.DID_TRAINING_CONTRIBUTE_TO_REVENUE_COL, row);
-        final var revenueIncreaseDouble = DataValidator.validateTemplateDoubleValue(MentorShipConstants.REVENUE_INCREASE_PERCENT_COL, row, rowErrorMap);
-        if ((null == revenueIncreaseDouble || revenueIncreaseDouble < 1) && "YES".equalsIgnoreCase(didRevenueIncrease) && null == rowErrorMap.get(row)){
-            rowErrorMap.put(row, "Revenue increase must be greater than 0");
+        Double revenueIncreaseDouble = null;
+        if ("YES".equalsIgnoreCase(didRevenueIncrease)){
+            revenueIncreaseDouble = DataValidator.validateTemplateDoubleValue(MentorShipConstants.REVENUE_INCREASE_PERCENT_COL, row, "revenue increase", rowErrorMap, true);
+            if ((null == revenueIncreaseDouble || revenueIncreaseDouble < 1) &&  null == rowErrorMap.get(row)){
+                rowErrorMap.put(row, "Revenue increase must be greater than 0");
+            }
         }
+
         final var revenueIncrease = null == revenueIncreaseDouble ? BigDecimal.ZERO : BigDecimal.valueOf(revenueIncreaseDouble);
 
         var usefulTopics = ImportHandlerUtils.readAsString(MentorShipConstants.USEFUL_TRAINING_TOPICS_COL, row);
@@ -186,7 +194,7 @@ public class MentorshipImportHandler implements ImportHandler {
         }
         var gender = ImportHandlerUtils.readAsString(MentorShipConstants.MENTEE_GENDER_COL, row);
         gender = ParticipantValidator.validateGender(gender, row, rowErrorMap);
-        var age = DataValidator.validateTemplateIntegerValue(MentorShipConstants.MENTEE_AGE_COL, row, rowErrorMap);
+        var age = DataValidator.validateTemplateIntegerValue(MentorShipConstants.MENTEE_AGE_COL, row, "age", rowErrorMap, false);
         age = ParticipantValidator.validateParticipantAge(age, row, rowErrorMap);
         final var personWithDisability = ImportHandlerUtils.readAsString(MentorShipConstants.IS_MENTEE_DISABLED, row);
         ParticipantValidator.validatePersonWithDisability(personWithDisability, row, rowErrorMap);
@@ -207,9 +215,9 @@ public class MentorshipImportHandler implements ImportHandler {
             rowErrorMap.put(row, "Business Location SubCounty Is Required !!");
         }
 
-        final var businessLocationDoubleLatitude = DataValidator.validateTemplateDoubleValue(MentorShipConstants.GEO_LOCATION_LATITUDE, row, rowErrorMap);
+        final var businessLocationDoubleLatitude = DataValidator.validateTemplateDoubleValue(MentorShipConstants.GEO_LOCATION_LATITUDE, row, "location latitude", rowErrorMap, false);
         final var businessLocationLatitude = Objects.nonNull(businessLocationDoubleLatitude) ? BigDecimal.valueOf(businessLocationDoubleLatitude) : null;
-        final var businessLocationDoubleLongitude = DataValidator.validateTemplateDoubleValue(MentorShipConstants.GEO_LOCATION_LONGITUDE, row, rowErrorMap);
+        final var businessLocationDoubleLongitude = DataValidator.validateTemplateDoubleValue(MentorShipConstants.GEO_LOCATION_LONGITUDE, row, "location longitude", rowErrorMap, Objects.nonNull(businessLocationDoubleLatitude));
         final var businessLocationLongitude = Objects.nonNull(businessLocationDoubleLongitude) ? BigDecimal.valueOf(businessLocationDoubleLongitude) : null;
 
         var industrySector = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_CATEGORY_COL, row);
