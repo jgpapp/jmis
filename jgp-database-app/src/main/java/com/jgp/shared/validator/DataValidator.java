@@ -2,6 +2,7 @@ package com.jgp.shared.validator;
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
+import com.jgp.infrastructure.bulkimport.data.MonitoringConstants;
 import com.jgp.infrastructure.bulkimport.importhandler.ImportHandlerUtils;
 import com.jgp.monitoring.dto.OutComeMonitoringRequestDto;
 import com.jgp.monitoring.dto.OutComeMonitoringResponseDto;
@@ -29,22 +30,37 @@ public class DataValidator {
     private DataValidator() {
     }
 
-    public static Double validateTemplateDoubleValue(int column, Row row, Map<Row, String> rowErrorMap) {
+    public static Double validateTemplateDoubleValue(int column, Row row, String columnName, Map<Row, String> rowErrorMap, boolean isRequired) {
         try {
+            final var valAsString = ImportHandlerUtils.readAsString(column, row);
+            if (null == valAsString || valAsString.isBlank()) {
+                if (isRequired){
+                    rowErrorMap.put(row, String.format("%s is required field !!", WordUtils.capitalizeFully(columnName)));
+                }
+                return null;
+            }
+
             return ImportHandlerUtils.readAsDouble(column, row);
         } catch (Exception e) {
-            log.error("Invalid value for one colum", e);
-            rowErrorMap.put(row, "Invalid Value for one/more columns that should be a number !!");
+            log.error("Invalid value for one colum: {}", WordUtils.capitalizeFully(columnName), e);
+            rowErrorMap.put(row, String.format("Invalid Value for %s that should be a number !!", WordUtils.capitalizeFully(columnName)));
         }
         return null;
     }
 
-    public static Integer validateTemplateIntegerValue(int column, Row row, Map<Row, String> rowErrorMap) {
+    public static Integer validateTemplateIntegerValue(int column, Row row, String columnName, Map<Row, String> rowErrorMap, boolean isRequired) {
         try {
+            final var valAsString = ImportHandlerUtils.readAsString(column, row);
+            if (null == valAsString || valAsString.isBlank()) {
+                if (isRequired){
+                    rowErrorMap.put(row, String.format("%s is required field !", WordUtils.capitalizeFully(columnName)));
+                }
+                return null;
+            }
             return ImportHandlerUtils.readAsInt(column, row);
         } catch (Exception e) {
-            log.error("Invalid value for one colum", e);
-            rowErrorMap.put(row, "Invalid Value for one/more columns that should be a number !!");
+            log.error("Invalid value for one colum: {}", WordUtils.capitalizeFully(columnName), e);
+            rowErrorMap.put(row, String.format("Invalid Value for %s that should be a number !!", WordUtils.capitalizeFully(columnName)));
         }
         return null;
     }

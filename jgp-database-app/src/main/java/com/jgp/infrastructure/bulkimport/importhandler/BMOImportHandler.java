@@ -156,7 +156,7 @@ public class BMOImportHandler implements ImportHandler {
         final var alternativePhoneNumber = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_ALTERNATIVE_PHONE_NUMBER_COL, row);
         var gender = ImportHandlerUtils.readAsString(BMOConstants.GENDER_COL, row);
         gender = ParticipantValidator.validateGender(gender, row, rowErrorMap);
-        var age = DataValidator.validateTemplateIntegerValue(BMOConstants.AGE_COL, row, rowErrorMap);
+        var age = DataValidator.validateTemplateIntegerValue(BMOConstants.AGE_COL, row, "Age", rowErrorMap, false);
         age = ParticipantValidator.validateParticipantAge(age, row, rowErrorMap);
         var locationCounty = DataValidator.validateCountyName(BMOConstants.BUSINESS_LOCATION_COL, row, rowErrorMap);
         final var businessLocationSubCounty = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_SUB_COUNTY_LOCATION_COL, row);
@@ -164,17 +164,17 @@ public class BMOImportHandler implements ImportHandler {
         var businessSegment = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_SEGMENT_COL, row);
         businessSegment = TAValidator.validateBusinessSegment(businessSegment, row, rowErrorMap);
         final var registrationNumber = ImportHandlerUtils.readAsString(BMOConstants.BUSINESS_REGISTRATION_NUMBER_COL, row);
-        final var bestMonthlyRevenueD = DataValidator.validateTemplateDoubleValue(BMOConstants.BEST_MONTH_MONTHLY_REVENUE_COL, row, rowErrorMap);
+        final var bestMonthlyRevenueD = DataValidator.validateTemplateDoubleValue(BMOConstants.BEST_MONTH_MONTHLY_REVENUE_COL, row, "Best monthly revenue", rowErrorMap, true);
         final var bestMonthlyRevenue = Objects.nonNull(bestMonthlyRevenueD) ? BigDecimal.valueOf(bestMonthlyRevenueD) : null;
-        final var worstMonthlyRevenueD = DataValidator.validateTemplateDoubleValue(BMOConstants.WORST_MONTH_MONTHLY_REVENUE_COL, row, rowErrorMap);
+        final var worstMonthlyRevenueD = DataValidator.validateTemplateDoubleValue(BMOConstants.WORST_MONTH_MONTHLY_REVENUE_COL, row, "worst monthly revenue", rowErrorMap, true);
         final var worstMonthlyRevenue = Objects.nonNull(worstMonthlyRevenueD) ? BigDecimal.valueOf(worstMonthlyRevenueD) : null;
-        final var totalRegularEmployees = DataValidator.validateTemplateIntegerValue(BMOConstants.TOTAL_REGULAR_EMPLOYEES_COL, row, rowErrorMap);
+        final var totalRegularEmployees = DataValidator.validateTemplateIntegerValue(BMOConstants.TOTAL_REGULAR_EMPLOYEES_COL, row, "total regular employees", rowErrorMap, true);
         if ((null == totalRegularEmployees || totalRegularEmployees < 1) && null == rowErrorMap.get(row)){
             rowErrorMap.put(row, "Regular Employees Must Be Greater Than 0 !!");
         }
-        final var youthRegularEmployees = DataValidator.validateTemplateIntegerValue(BMOConstants.YOUTH_REGULAR_EMPLOYEES_COL, row, rowErrorMap);
-        final var totalCasualEmployees = DataValidator.validateTemplateIntegerValue(BMOConstants.TOTAL_CASUAL_EMPLOYEES_COL, row, rowErrorMap);
-        final var youthCasualEmployees = DataValidator.validateTemplateIntegerValue(BMOConstants.YOUTH_CASUAL_EMPLOYEES_COL, row, rowErrorMap);
+        final var youthRegularEmployees = DataValidator.validateTemplateIntegerValue(BMOConstants.YOUTH_REGULAR_EMPLOYEES_COL, row, "youth regular employees", rowErrorMap, false);
+        final var totalCasualEmployees = DataValidator.validateTemplateIntegerValue(BMOConstants.TOTAL_CASUAL_EMPLOYEES_COL, row, "total casual employees", rowErrorMap, false);
+        final var youthCasualEmployees = DataValidator.validateTemplateIntegerValue(BMOConstants.YOUTH_CASUAL_EMPLOYEES_COL, row, "youth casual employees", rowErrorMap, false);
         var sampleRecordsKept = ImportHandlerUtils.readAsString(BMOConstants.SAMPLE_RECORDS_KEPT_COL, row);
         sampleRecordsKept = null == sampleRecordsKept ? null : TAValidator.validateSampleRecords(sampleRecordsKept, row, rowErrorMap);
         final var personWithDisability = ImportHandlerUtils.readAsString(BMOConstants.PERSON_WITH_DISABILITY_COL, row);
