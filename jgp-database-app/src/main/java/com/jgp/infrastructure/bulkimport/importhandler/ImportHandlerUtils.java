@@ -77,42 +77,46 @@ public final class ImportHandlerUtils {
 
     public static String readAsString(int colIndex, Row row) {
 
-        Cell c = row.getCell(colIndex);
-        if (c == null || c.getCellType() == CellType.BLANK) {
-            return null;
-        }
-        FormulaEvaluator eval = row.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator();
-        if (c.getCellType() == CellType.FORMULA) {
-            if (eval != null) {
-                CellValue val = null;
-                try {
-                    val = eval.evaluate(c);
-                } catch (NullPointerException npe) {
-                    return null;
-                }
+        try {
+            Cell c = row.getCell(colIndex);
+            if (c == null || c.getCellType() == CellType.BLANK) {
+                return null;
+            }
+            FormulaEvaluator eval = row.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator();
+            if (c.getCellType() == CellType.FORMULA) {
+                if (eval != null) {
+                    CellValue val = null;
+                    try {
+                        val = eval.evaluate(c);
+                    } catch (NullPointerException npe) {
+                        return null;
+                    }
 
-                String res = trimEmptyDecimalPortion(val.getStringValue());
-                if (res != null) {
-                    if (!res.isEmpty()) {
-                        return res.trim();
+                    String res = trimEmptyDecimalPortion(val.getStringValue());
+                    if (res != null) {
+                        if (!res.isEmpty()) {
+                            return res.trim();
+                        } else {
+                            return null;
+                        }
                     } else {
                         return null;
                     }
                 } else {
                     return null;
                 }
+            } else if (c.getCellType() == CellType.STRING) {
+                String res = trimEmptyDecimalPortion(c.getStringCellValue().trim());
+                return null == res ? null : res.trim();
+
+            } else if (c.getCellType() == CellType.NUMERIC) {
+                return ((Double) row.getCell(colIndex).getNumericCellValue()).longValue() + "";
+            } else if (c.getCellType() == CellType.BOOLEAN) {
+                return c.getBooleanCellValue() + "";
             } else {
                 return null;
             }
-        } else if (c.getCellType() == CellType.STRING) {
-            String res = trimEmptyDecimalPortion(c.getStringCellValue().trim());
-            return null == res ? null : res.trim();
-
-        } else if (c.getCellType() == CellType.NUMERIC) {
-            return ((Double) row.getCell(colIndex).getNumericCellValue()).longValue() + "";
-        } else if (c.getCellType() == CellType.BOOLEAN) {
-            return c.getBooleanCellValue() + "";
-        } else {
+        } catch (Exception _) {
             return null;
         }
     }
