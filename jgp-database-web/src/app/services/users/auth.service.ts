@@ -25,7 +25,7 @@ export class AuthService {
   FORCE_PASS_CHANGE: string = 'force_change_password';
   private loggedIn = new BehaviorSubject<boolean>(this.hasTokens());
   redirectUrl: string | null = null;
-  isLoggingOut = false;
+  public isLoggingOut: boolean = false;
 
   constructor(private httpClient: HttpClient, private router: Router, private jwtHelper: JwtHelperService) { 
     this.refreshTokenIfNeeded();
@@ -184,14 +184,22 @@ export class AuthService {
 
 
   doLogout(): void {
-    if(this.isLoggingOut) {
+    if (this.isLoggingOut) {
       return; // Prevent multiple logout calls
     }
     this.isLoggingOut = true;
-    localStorage.clear();
+    // Remove only authentication-related keys to avoid affecting other app data
+    localStorage.removeItem(this.ACCESS_TOKEN_KEY);
+    localStorage.removeItem(this.REFRESH_TOKEN_KEY);
+    localStorage.removeItem(this.CURRENT_USER_CREDENTIALS);
+    localStorage.removeItem(this.USER_FULL_NAME);
+    localStorage.removeItem(this.USER_ROLES);
+    localStorage.removeItem(this.USER_PERMISSIONS);
+    localStorage.removeItem(this.USER_EMAIL);
     this.loggedIn.next(false);
-    this.router.navigateByUrl('/login');
-    this.isLoggingOut = false;
+    this.router.navigateByUrl('/login').finally(() => {
+      this.isLoggingOut = false;
+    });
   }
 
   currentUser(): CurrentUserCredentials | null {
