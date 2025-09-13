@@ -62,9 +62,9 @@ public class DashboardServiceImpl implements DashboardService {
     private static final String TRAINING_PARTNER_PARAM = "trainingPartner";
     private static final String DATA_VALUE_PARAM = "dataValue";
     private static final String DATA_PERCENTAGE_VALUE_PARAM = "percentage";
-    private static final String LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM = "WHERE lt.transaction_date between :fromDate and :toDate  and l.data_is_approved = true and lt.is_approved = true ";
-    private static final String BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM = "WHERE bpd.date_partner_recorded between :fromDate and :toDate and bpd.data_is_approved = true ";
-    private static final String MENTORSHIP_WHERE_CLAUSE_BY_MENTORSHIP_DATE_PARAM = "WHERE m.mentor_ship_date between :fromDate and :toDate and m.is_approved = true ";
+    private static final String LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM = "WHERE lt.transaction_date between :fromDate and :toDate  and l.data_is_approved = true and lt.is_approved = true and l.is_deleted = false and lt.is_deleted = false ";
+    private static final String BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM = "WHERE bpd.date_partner_recorded between :fromDate and :toDate and bpd.data_is_approved = true and bpd.is_deleted = false ";
+    private static final String MENTORSHIP_WHERE_CLAUSE_BY_MENTORSHIP_DATE_PARAM = "WHERE m.mentor_ship_date between :fromDate and :toDate and m.is_approved = true and m.is_deleted = false ";
     private static final String LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and l.partner_id = :partnerId ";
     private static final String BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and bpd.partner_id = :partnerId ";
     private static final String MENTORSHIP_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and m.partner_id = :partnerId ";
@@ -620,7 +620,7 @@ public class DashboardServiceImpl implements DashboardService {
             fromDate = CommonUtil.getDefaultQueryDates().getLeft();
             toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
-        var whereClause = "WHERE mon.survey_date between :fromDate and :toDate  and mon.is_approved = true ";
+        var whereClause = "WHERE mon.survey_date between :fromDate and :toDate  and mon.is_approved = true and mon.is_deleted = false ";
         var parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
         if (Objects.nonNull(searchCriteria.partner())){
@@ -805,9 +805,9 @@ public class DashboardServiceImpl implements DashboardService {
         }
         if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
             parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
-            whereClause = String.format("%s%s  and l.data_is_approved = true and lt.is_approved = true", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
         }
-        whereClause = String.format("%s  and l.data_is_approved = true and lt.is_approved = true", whereClause);
+        whereClause = String.format("%s  and l.data_is_approved = true and lt.is_approved = true and l.is_deleted = false and lt.is_deleted = false", whereClause);
         var sqlQuery = String.format(SeriesDataPointMapper.ACCESSED_AMOUNT_BY_PARTNER_BY_YEAR_SCHEMA, whereClause);
 
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
@@ -1018,7 +1018,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public void updateAnalyticsData(AnalyticsUpdateRequestDto analyticsUpdateRequestDto) {
-        var partnerIds = Objects.nonNull(analyticsUpdateRequestDto.partnerId()) ? Set.of(analyticsUpdateRequestDto.partnerId()) : this.partnerRepository.findAll().stream().map(Partner::getId).collect(Collectors.toSet());
+        var partnerIds = Objects.nonNull(analyticsUpdateRequestDto.partnerId()) ? Set.of(analyticsUpdateRequestDto.partnerId()) : this.partnerRepository.findByIsDeletedFalse().stream().map(Partner::getId).collect(Collectors.toSet());
         final var dataDates = Set.of(analyticsUpdateRequestDto.fromDate(), analyticsUpdateRequestDto.toDate());
         this.applicationContext.publishEvent(new DataApprovedEvent(partnerIds, dataDates));
     }

@@ -68,7 +68,7 @@ export class GlobalService {
   }
 
   confirmDialog(dialog: MatDialog, message: string): string {
-    const dialogData = new ConfirmDialogModel("Confirm Action", message);
+    const dialogData = new ConfirmDialogModel("Confirm Action", message, '');
     const dialogRef = dialog.open(ConfirmDialogComponent, {
       maxWidth: "400px",
       data: dialogData

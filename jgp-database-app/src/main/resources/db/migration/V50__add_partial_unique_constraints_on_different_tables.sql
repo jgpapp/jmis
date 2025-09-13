@@ -1,0 +1,14 @@
+ALTER TABLE participants DROP CONSTRAINT IF EXISTS client_unique;
+CREATE UNIQUE INDEX client_unique ON participants (jgp_id) WHERE is_deleted = false;
+ALTER TABLE loans DROP CONSTRAINT unique_loan;
+CREATE UNIQUE INDEX unique_loan ON loans (partner_id, participant_id, date_disbursed, loan_number) WHERE is_deleted = false;
+ALTER TABLE bmo_participants_data DROP CONSTRAINT unique_bmo_participant_data;
+CREATE UNIQUE INDEX unique_bmo_participant_data ON bmo_participants_data (partner_id, participant_id, date_partner_recorded) WHERE is_deleted = false;
+ALTER TABLE data_summary DROP CONSTRAINT unique_county_summary;
+CREATE UNIQUE INDEX unique_county_summary ON data_summary (partner_id, gender_category, data_year, data_month) WHERE is_deleted = false;
+ALTER TABLE partners DROP CONSTRAINT IF EXISTS name_unique;
+CREATE UNIQUE INDEX name_unique ON partners (partner_name) WHERE is_deleted = false;
+ALTER TABLE user_roles DROP CONSTRAINT IF EXISTS UNIQUE_ROLE;
+CREATE UNIQUE INDEX UNIQUE_ROLE ON user_roles (role_name) WHERE is_deleted = false;
+ALTER TABLE users DROP CONSTRAINT IF EXISTS email_unique;
+CREATE UNIQUE INDEX email_unique ON users (email_address) WHERE is_deleted = false;

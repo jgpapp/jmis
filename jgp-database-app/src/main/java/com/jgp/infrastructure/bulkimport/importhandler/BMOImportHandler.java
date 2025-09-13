@@ -6,6 +6,7 @@ import com.jgp.bmo.domain.BMOParticipantData;
 import com.jgp.bmo.service.BMOClientDataService;
 import com.jgp.infrastructure.bulkimport.exception.InvalidDataException;
 import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
+import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.dto.ParticipantDto;
 import com.jgp.participant.service.ParticipantService;
@@ -54,6 +55,7 @@ public class BMOImportHandler implements ImportHandler {
     private Map<Row, String> rowErrorMap;
     private String documentImportProgressUUId;
     private Boolean updateParticipantInfo;
+    private Document document;
 
     @Override
     public Count process(BulkImportEvent bulkImportEvent) {
@@ -63,6 +65,7 @@ public class BMOImportHandler implements ImportHandler {
         this.rowErrorMap = new HashMap<>();
         this.documentImportProgressUUId = bulkImportEvent.importProgressUUID();
         this.updateParticipantInfo = bulkImportEvent.updateParticipantInfo();
+        this.document = bulkImportEvent.document();
         readExcelFile();
         return importEntity();
     }
@@ -127,7 +130,7 @@ public class BMOImportHandler implements ImportHandler {
                 0, isRecommendedForFinance, pipelineDecisionDate,
                 referredFIBusiness, dateRecordedByPartner, LocalDate.now(ZoneId.systemDefault()),
                 taNeeds != null ? Arrays.stream(taNeeds.split(",")).map(String::trim).collect(Collectors.joining(",")) : null,
-                row.getRowNum(), trainingPartner, taDeliveryMode, otherTaNeeds, taType, userService.currentUser(), rowErrorMap.get(row));
+                row.getRowNum(), trainingPartner, taDeliveryMode, otherTaNeeds, taType, userService.currentUser(), this.document, rowErrorMap.get(row));
 
         if (null == rowErrorMap.get(row)){
             TAValidator.validateTAData(taData, row, rowErrorMap);

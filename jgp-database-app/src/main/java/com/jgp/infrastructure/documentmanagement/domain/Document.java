@@ -1,12 +1,14 @@
 
 package com.jgp.infrastructure.documentmanagement.domain;
 
+import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.documentmanagement.command.DocumentCommand;
 import com.jgp.shared.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -40,15 +42,19 @@ public class Document extends BaseEntity {
     @Column(name = "location", length = 500)
     private String location;
 
+    @Column(name = "import_entity_type")
+    private GlobalEntityType globalEntityType;
+
+
     public Document() {}
 
     public static Document createNew(final String parentEntityType, final Long parentEntityId, final String name, final String fileName,
-            final Long size, final String type, final String description, final String location) {
-        return new Document(parentEntityType, parentEntityId, name, fileName, size, type, description, location);
+            final Long size, final String type, final String description, final String location, final GlobalEntityType globalEntityType) {
+        return new Document(parentEntityType, parentEntityId, name, fileName, size, type, description, location, globalEntityType);
     }
 
     private Document(final String parentEntityType, final Long parentEntityId, final String name, final String fileName, final Long size,
-            final String type, final String description, final String location) {
+            final String type, final String description, final String location, GlobalEntityType globalEntityType) {
         this.parentEntityType = StringUtils.defaultIfEmpty(parentEntityType, null);
         this.parentEntityId = parentEntityId;
         this.name = StringUtils.defaultIfEmpty(name, null);
@@ -57,6 +63,7 @@ public class Document extends BaseEntity {
         this.type = StringUtils.defaultIfEmpty(type, null);
         this.description = StringUtils.defaultIfEmpty(description, null);
         this.location = StringUtils.defaultIfEmpty(location, null);
+        this.globalEntityType = globalEntityType;
     }
 
     public void update(final DocumentCommand command) {

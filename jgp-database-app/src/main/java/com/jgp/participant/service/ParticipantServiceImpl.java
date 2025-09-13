@@ -53,6 +53,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Transactional
     public void updateParticipant(Long participantId, ParticipantDto participantDto) {
         var participant =  this.participantRepository.findById(participantId)
+                .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
                 .orElseThrow(() -> new ParticipantNotFoundException(participantId));
         participant.updateParticipant(participantDto);
         this.participantRepository.save(participant);
@@ -66,6 +67,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Override
     public ParticipantResponseDto findParticipantById(Long participantId, boolean includeAccounts) {
         var participant =  this.participantRepository.findById(participantId)
+                .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
                 .map(this.participantMapper::toDto)
                 .orElseThrow(() -> new ParticipantNotFoundException(participantId));
 
@@ -85,7 +87,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Override
     public Page<Participant> availableParticipants(String searchText, Pageable pageable) {
         final var qParticipant = QParticipant.participant;
-        var isActive = qParticipant.isActive.eq(true);
+        var isActive = qParticipant.isActive.eq(true).and(qParticipant.isDeleted.isFalse());
         if (null != searchText) {
             var partnerNamePredicate = qParticipant.participantName.containsIgnoreCase(searchText);
             var businessNamePredicate = qParticipant.businessName.containsIgnoreCase(searchText);

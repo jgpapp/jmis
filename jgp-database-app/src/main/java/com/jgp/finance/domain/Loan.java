@@ -1,6 +1,7 @@
 package com.jgp.finance.domain;
 
 import com.jgp.authentication.domain.AppUser;
+import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.participant.domain.Participant;
 import com.jgp.patner.domain.Partner;
 import com.jgp.shared.domain.BaseEntity;
@@ -112,6 +113,10 @@ public class Loan extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "loan", orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<LoanTransaction> loanTransactions = new HashSet<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "upload_doc_id")
+    private Document document;
+
     private transient Integer rowIndex;
 
     public Loan() {
@@ -124,7 +129,7 @@ public class Loan extends BaseEntity {
                 Integer loanDuration, BigDecimal loanOutStandingAmount,
                 LocalDate dateRecordedByPartner, String uniqueValues,
                 LocalDate dateAddedToDB, BigDecimal loanAmountRepaid,
-                String loanerType, String loanProduct, AppUser createdBy, Integer rowIndex) {
+                String loanerType, String loanProduct, AppUser createdBy, Document document, Integer rowIndex) {
         this.partner = partner;
         this.participant = participant;
         this.loanNumber = loanNumber;
@@ -145,18 +150,13 @@ public class Loan extends BaseEntity {
         this.loanProduct = loanProduct;
         this.isDataApprovedByPartner = false;
         this.setCreatedBy(createdBy);
+        this.document = document;
     }
 
     public void addLoanTransaction(LoanTransaction loanTransaction){
         if (Objects.nonNull(loanTransaction)) {
             loanTransaction.setLoan(this);
             this.loanTransactions.add(loanTransaction);
-        }
-    }
-
-    public void removeLoanTransaction(final LoanTransaction loanTransaction){
-        if (Objects.nonNull(loanTransaction)) {
-            this.loanTransactions.removeIf(lt -> lt.getId().equals(loanTransaction.getId()));
         }
     }
 

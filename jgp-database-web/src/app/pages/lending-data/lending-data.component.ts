@@ -101,14 +101,14 @@ export class LendingDataComponent implements OnDestroy, OnInit {
 
 
   approveLoansData(transactionsIds: number[]): void {
-    const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to approve loans data?`);
+    const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to approve loans data?`, '');
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       maxWidth: "400px",
       data: dialogData
     });
 
     dialogRef.afterClosed().subscribe(dialogResult => {
-      if(dialogResult){
+      if(dialogResult > 0){ // 0 means dialog was dismissed
         this.subs.add = this.loanService.approveLoanTransactions(transactionsIds)
           .subscribe({
             next: (response) => {
@@ -130,14 +130,14 @@ export class LendingDataComponent implements OnDestroy, OnInit {
   }
 
   rejectLoansData(transactionsIds: number[]): void {
-    const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to reject & remove loans data?`);
+    const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to reject & remove loans data?`, '');
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       maxWidth: "400px",
       data: dialogData
     });
 
     dialogRef.afterClosed().subscribe(dialogResult => {
-      if(dialogResult){
+      if(dialogResult > 0){ // 0 means dialog was dismissed
         this.subs.add = this.loanService.rejectLoanTransactions(transactionsIds)
           .subscribe({
             next: (response) => {
