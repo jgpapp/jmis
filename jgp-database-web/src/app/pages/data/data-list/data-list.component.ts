@@ -93,14 +93,14 @@ export class DataListComponent implements OnDestroy{
   }
 
   approveTAData(bmoIds: number[]): void {
-    const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to approve TA data?`);
+    const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to approve TA data?`, '');
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       maxWidth: "400px",
       data: dialogData
     });
 
     dialogRef.afterClosed().subscribe(dialogResult => {
-      if(dialogResult){
+      if(dialogResult > 0){ // 0 means dialog was dismissed
         this.subs.add = this.bmoClientDataService.approveBMOClientData(bmoIds)
           .subscribe({
             next: (response) => {
@@ -122,14 +122,14 @@ export class DataListComponent implements OnDestroy{
   }
 
   rejectTAData(bmoIds: number[]): void {
-    const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to reject & delete TA data?`);
+    const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to reject & delete TA data?`, '');
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       maxWidth: "400px",
       data: dialogData
     });
 
     dialogRef.afterClosed().subscribe(dialogResult => {
-      if(dialogResult){
+      if(dialogResult > 0){ // 0 means dialog was dismissed
         this.subs.add = this.bmoClientDataService.rejectBMOClientData(bmoIds)
           .subscribe({
             next: (response) => {

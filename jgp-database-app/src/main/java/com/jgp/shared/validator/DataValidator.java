@@ -39,6 +39,7 @@ public class DataValidator {
                 }
                 return null;
             }
+            ImportHandlerUtils.validateCellDoesNotContainFormular(row.getCell(column), rowErrorMap);
 
             return ImportHandlerUtils.readAsDouble(column, row);
         } catch (Exception e) {

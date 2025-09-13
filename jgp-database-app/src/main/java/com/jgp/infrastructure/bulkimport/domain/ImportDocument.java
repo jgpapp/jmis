@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -51,6 +52,7 @@ public class ImportDocument extends BaseEntity {
 
     @Column(name = "failure_count")
     private Integer failureCount;
+
 
     protected ImportDocument() {
 

@@ -19,9 +19,9 @@ public interface BulkImportWorkbookService {
 
     Long importWorkbook(ImportRequestDto importRequestDto);
 
-    void importFileToDirectory(String entityType, ResourceType resourceType, MultipartFile fileDetail);
+    void importFileToDirectory(GlobalEntityType entityType, ResourceType resourceType, MultipartFile fileDetail);
 
-    void deleteFileFromDbAndDirectory(@NotNull Long importDocumentId);
+    void deleteFileFromDbAndDirectory(@NotNull Long importDocumentId, final boolean deleteAssociatedData);
 
     Collection<ImportData> getImports(GlobalEntityType type);
 

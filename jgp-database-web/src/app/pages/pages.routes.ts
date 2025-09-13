@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { PagesComponent } from './pages.component';
 import { AuthGuard } from '../util/AuthGuard';
-import { DataUploaderComponent } from './data/data-uploader/data-uploader.component';
+import { OnlineUsersComponent } from './users/online-users/online-users.component';
 
 export const routes: Routes = [
   {
@@ -94,6 +94,11 @@ export const routes: Routes = [
         path: 'system-resources',
         loadComponent: () => import('./system-resources/system-resources.component').then(c => c.SystemResourcesComponent),
         data: { breadcrumb: 'System Resources' }
+      },
+      {
+        path: 'online-users',
+        component: OnlineUsersComponent,
+        data: { breadcrumb: 'Online Users' }
       },
       {
         path: 'ui',

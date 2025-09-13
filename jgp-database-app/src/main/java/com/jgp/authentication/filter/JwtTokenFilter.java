@@ -1,5 +1,6 @@
 package com.jgp.authentication.filter;
 
+import com.jgp.authentication.service.ActiveUserService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,6 +26,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final UserDetailsService currentUserDetails;
     private final JwtTokenProvider jwtTokenProvider;
+    private final ActiveUserService activeUserService;
+    private static final long TWO_MINUTES = 120_000L; //2 * 60 * 1000; // 120_000
+
 
 
     @Override
@@ -51,6 +55,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         final var authentication = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());
+
+        if (authentication.isAuthenticated() && !("anonymousUser").equals(authentication.getPrincipal())) {
+            String username = authentication.getName();
+            activeUserService.userActivity(username);
+            activeUserService.removeExpiredUsers(TWO_MINUTES);
+        }
 
         authentication.setDetails(
                 new WebAuthenticationDetailsSource().buildDetails(request)

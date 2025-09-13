@@ -102,14 +102,14 @@ export class OutcomeMonitoringComponent implements OnDestroy, OnInit {
     
     
       approvedMonitoringData(monitoringIds: number[]): void {
-        const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to approve monitorng data?`);
+        const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to approve monitorng data?`, '');
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {
           maxWidth: "400px",
           data: dialogData
         });
     
         dialogRef.afterClosed().subscribe(dialogResult => {
-          if(dialogResult){
+          if(dialogResult > 0){ // 0 means dialog was dismissed
             this.subs.add = this.monitoringService.approvedMonitoringData(monitoringIds)
               .subscribe({
                 next: (response) => {
@@ -131,14 +131,14 @@ export class OutcomeMonitoringComponent implements OnDestroy, OnInit {
       }
     
       rejectMonitoringData(monitoringIds: number[]): void {
-        const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to reject & remove monitoring data?`);
+        const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to reject & remove monitoring data?`, '');
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {
           maxWidth: "400px",
           data: dialogData
         });
     
         dialogRef.afterClosed().subscribe(dialogResult => {
-          if(dialogResult){
+          if(dialogResult > 0){ // 0 means dialog was dismissed
             this.subs.add = this.monitoringService.rejectMonitoringData(monitoringIds)
               .subscribe({
                 next: (response) => {

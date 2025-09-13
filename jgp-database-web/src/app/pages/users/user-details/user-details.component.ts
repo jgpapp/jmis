@@ -49,14 +49,14 @@ export class UserDetailsComponent implements OnDestroy, OnInit{
 
 
   resetUserPassword(userId: number): void {
-    const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to reset user password?`);
+    const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to reset user password?`, '');
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       maxWidth: "400px",
       data: dialogData
     });
 
     dialogRef.afterClosed().subscribe(dialogResult => {
-      if(dialogResult){
+      if(dialogResult > 0){ // 0 means dialog was dismissed
         this.subs.add = this.userService.resetUserPassword(userId)
           .subscribe({
             next: (response) => {
@@ -70,14 +70,14 @@ export class UserDetailsComponent implements OnDestroy, OnInit{
 
  
   lockOrUnlockUser(selectedUser: any): void {
-    const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to update user?`);
+    const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to update user?`, '');
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       maxWidth: "400px",
       data: dialogData
     });
 
     dialogRef.afterClosed().subscribe(dialogResult => {
-      if(dialogResult){
+      if(dialogResult > 0){ // 0 means dialog was dismissed
         this.subs.add = this.userService.lockOrUnlockUser(selectedUser)
           .subscribe({
             next: (response) => {

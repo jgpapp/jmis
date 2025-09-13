@@ -25,6 +25,7 @@ public class OutComeMonitoringPredicateBuilder {
 
         List<Predicate> predicateList = new ArrayList<>();
 
+        predicateList.add(qOutComeMonitoring.isDeleted.isFalse());
         if (null != searchCriteria.fromDate() && null != searchCriteria.toDate()) {
             predicateList.add(qOutComeMonitoring.surveyDate.between(searchCriteria.fromDate(), searchCriteria.toDate()));
         }

@@ -1,6 +1,7 @@
 package com.jgp.shared.domain;
 
 import com.jgp.authentication.domain.AppUser;
+import jakarta.persistence.Column;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -38,6 +39,9 @@ public class BaseEntity implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "last_modified_by_id")
     private AppUser lastModifiedBy;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted = false;
 
     @PrePersist
     public void setDateCreated() {

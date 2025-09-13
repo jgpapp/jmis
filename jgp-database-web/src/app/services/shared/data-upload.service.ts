@@ -75,8 +75,8 @@ export class DataUploadService {
             });
       }
 
-      deleteResourceFile(importId: number): Observable<any> {
-        return this.httpClient.delete(`/imports/delete-resource-file/${importId}`);
+      deleteResourceFile(importId: number, deleteAssociatedData: Boolean = false): Observable<any> {
+        return this.httpClient.delete(`/imports/delete-resource-file/${importId}?delete-associated-data=${deleteAssociatedData}`);
   }
 
 

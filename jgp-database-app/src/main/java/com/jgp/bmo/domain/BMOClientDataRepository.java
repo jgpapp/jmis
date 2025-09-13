@@ -14,13 +14,13 @@ import java.util.List;
 
 @Repository
 public interface BMOClientDataRepository extends JpaRepository<BMOParticipantData, Long>, JpaSpecificationExecutor<BMOParticipantData>, QuerydslPredicateExecutor<BMOParticipantData> {
-    @Query("select b from BMOParticipantData b where b.participant.id = ?1")
-    List<BMOParticipantData> findByParticipantId(@NonNull Long id);
-
 
     @Transactional
     @Modifying
-    @Query("delete from BMOParticipantData b where b.id in ?1")
+    @Query(value = "update bmo_participants_data b set is_deleted = true where b.id in ?1", nativeQuery = true)
     void deleteTADataByIds(@NonNull Collection<Long> ids);
+
+    List<BMOParticipantData> findByDocumentIdAndIsDeleted(@NonNull Long documentId, @NonNull Boolean isDeleted);
+
 
 }

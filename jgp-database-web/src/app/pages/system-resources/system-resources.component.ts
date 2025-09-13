@@ -151,14 +151,14 @@ export class SystemResourcesComponent {
 
 
   deleteResourceFile(importId: number): void {
-      const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to delete resource?`);
+      const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to delete resource?`, '');
       const dialogRef = this.dialog.open(ConfirmDialogComponent, {
         maxWidth: "400px",
         data: dialogData
       });
   
       dialogRef.afterClosed().subscribe(dialogResult => {
-        if(dialogResult){
+        if(dialogResult > 0){ // 0 means dialog was dismissed
           this.subs.add = this.dataUploadService.deleteResourceFile(importId)
           .subscribe({
             next: (response) => {

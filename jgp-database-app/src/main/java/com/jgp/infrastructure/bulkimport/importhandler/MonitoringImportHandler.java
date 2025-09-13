@@ -8,6 +8,7 @@ import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstan
 import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
 import com.jgp.infrastructure.bulkimport.exception.InvalidDataException;
 import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
+import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.monitoring.domain.OutComeMonitoring;
 import com.jgp.monitoring.dto.OutComeMonitoringRequestDto;
 import com.jgp.monitoring.service.OutComeMonitoringService;
@@ -41,6 +42,7 @@ public class MonitoringImportHandler implements ImportHandler {
     private Map<Row, String> rowErrorMap;
     private String documentImportProgressUUId;
     private List<String> statuses;
+    private Document document;
 
     @Override
     public void updateImportProgress(String importId, boolean updateTotal, int total) {
@@ -62,6 +64,7 @@ public class MonitoringImportHandler implements ImportHandler {
         this.rowErrorMap = new HashMap<>();
         statuses = new ArrayList<>();
         this.documentImportProgressUUId = bulkImportEvent.importProgressUUID();
+        this.document = bulkImportEvent.document();
         readExcelFile();
         return importEntity();
     }
@@ -163,7 +166,7 @@ public class MonitoringImportHandler implements ImportHandler {
         if (null == rowErrorMap.get(row)){
             DataValidator.validateMonitoringData(monitoringDto, row, rowErrorMap);
         }
-        var monitoring = new OutComeMonitoring(monitoringDto, participant, row.getRowNum());
+        var monitoring = new OutComeMonitoring(monitoringDto, participant, this.document, row.getRowNum());
         monitoring.setCreatedBy(userService.currentUser());
         statuses.add(status);
         return monitoring;
