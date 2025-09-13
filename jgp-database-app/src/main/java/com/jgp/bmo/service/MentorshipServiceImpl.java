@@ -56,7 +56,7 @@ public class MentorshipServiceImpl implements MentorshipService {
 
     @Override
     public void approvedMentorShipData(List<Long> dataIds, Boolean approval) {
-        var mentorshipData = this.mentorshipRepository.findAllById(dataIds);
+        var mentorshipData = this.mentorshipRepository.findAllById(dataIds).stream().filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).toList();
         var currentUser = this.platformSecurityContext.getAuthenticatedUserIfPresent();
         var currentUserPartner = Objects.nonNull(currentUser) ? currentUser.getPartner() : null;
         if (dataIds.isEmpty() && Objects.nonNull(currentUserPartner)) {
@@ -83,14 +83,38 @@ public class MentorshipServiceImpl implements MentorshipService {
                 this.applicationContext.publishEvent(new DataApprovedEvent(Set.of(currentUserPartner.getId()), dataDates));
             }
         }else {
-            rejectAndDeleteBMOParticipantsData(mentorshipData);
+            rejectAndDeleteMentorshipData(mentorshipData);
         }
     }
 
-    private void rejectAndDeleteBMOParticipantsData(List<Mentorship> mentorships){
-        final var mentorshipIds = mentorships.stream()
-                .map(Mentorship::getId).toList();
-        this.mentorshipRepository.deleteMentorshipDataByIds(mentorshipIds);
+    private void rejectAndDeleteMentorshipData(List<Mentorship> mentorships){
+        int count = 0;
+        var mentorshipsToDelete = new ArrayList<Mentorship>();
+        for (Mentorship mentorship : mentorships) {
+            mentorshipsToDelete.add(mentorship);
+            count++;
+            if (count % 50 == 0) { // Flush and clear the session every 50 entities
+                deleteSelectedRecords(mentorshipsToDelete);
+                count = 0;
+                mentorshipsToDelete = new ArrayList<>();
+            }
+
+        }
+        deleteSelectedRecords(mentorshipsToDelete);
+
+    }
+
+
+    private void deleteSelectedRecords(List<Mentorship> mentorshipsToDelete) {
+        if (mentorshipsToDelete.isEmpty()) {
+            return;
+        }
+        this.mentorshipRepository.deleteMentorshipDataByIds(mentorshipsToDelete.stream().map(Mentorship::getId).toList());
+        final var participantsToDeleteIds = mentorshipsToDelete.stream().map(Mentorship::getParticipant)
+                .filter(pt -> Boolean.FALSE.equals(pt.getIsActive()))
+                .map(Participant::getId).toList();
+
+        this.participantRepository.deleteParticipantsByIds(participantsToDeleteIds);
     }
 
     @Override
@@ -101,6 +125,11 @@ public class MentorshipServiceImpl implements MentorshipService {
 
     @Override
     public MentorshipResponseDto findMentorshipDataById(Long mentorshipId) {
-        return this.mentorshipRepository.findById(mentorshipId).map(this.mentorshipMapper::toDto).orElseThrow(() -> new RuntimeException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
+        return this.mentorshipRepository.findById(mentorshipId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).map(this.mentorshipMapper::toDto).orElseThrow(() -> new RuntimeException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
+    }
+
+    @Override
+    public List<Mentorship> findByDocumentId(Long documentId, Boolean isDeleted) {
+        return this.mentorshipRepository.findByDocumentIdAndIsDeleted(documentId, isDeleted);
     }
 }

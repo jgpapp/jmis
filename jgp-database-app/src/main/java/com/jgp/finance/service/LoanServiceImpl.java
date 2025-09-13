@@ -52,7 +52,7 @@ public class LoanServiceImpl implements LoanService {
     @Transactional
     @Override
     public void createOrUpdateLoan(Loan loan) {
-        final var existingLoanOptional = null != loan.getLoanNumber() ? this.loanRepository.findByParticipantAndLoanNumber(loan.getParticipant(), loan.getLoanNumber()) : Optional.<Loan>empty();
+        final var existingLoanOptional = null != loan.getLoanNumber() ? this.loanRepository.findByParticipantAndLoanNumber(loan.getParticipant(), loan.getLoanNumber()).filter(l -> Boolean.FALSE.equals(l.getIsDeleted())) : Optional.<Loan>empty();
         if (existingLoanOptional.isPresent()){
             var existingLoan = existingLoanOptional.get();
             var loanTransaction = loan.getLoanTransactions().stream().findFirst().orElse(null);
@@ -69,7 +69,7 @@ public class LoanServiceImpl implements LoanService {
     @Transactional
     @Override
     public void approvedTransactionsLoans(List<Long> transactionsIds, Boolean approval) {
-        var loanTransactions = this.loanTransactionRepository.findAllById(transactionsIds);
+        var loanTransactions = this.loanTransactionRepository.findAllById(transactionsIds).stream().filter(l -> Boolean.FALSE.equals(l.getIsDeleted())).toList();
         var currentUser = this.platformSecurityContext.getAuthenticatedUserIfPresent();
         var currentUserPartner = Objects.nonNull(currentUser) ? currentUser.getPartner() : null;
         if (transactionsIds.isEmpty() && Objects.nonNull(currentUserPartner)) {
@@ -116,9 +116,30 @@ public class LoanServiceImpl implements LoanService {
     }
 
     private void rejectAndDeleteTransactions(List<LoanTransaction> transactions){
-        final var loanTransactionsIds = transactions.stream().map(LoanTransaction::getId).toList();
-        final var loansIds = transactions.stream().map(lt -> lt.getLoan().getId()).toList();
-        final var participantsIds = transactions.stream().map(lt -> lt.getLoan().getParticipant().getId()).toList();
+        int count = 0;
+        var loanTransactionsToDelete = new ArrayList<LoanTransaction>();
+        for (LoanTransaction loanTransaction : transactions) {
+            loanTransactionsToDelete.add(loanTransaction);
+            count++;
+            if (count % 50 == 0) { // Flush and clear the session every 50 entities
+                deleteSelectedRecords(loanTransactionsToDelete);
+                count = 0;
+                loanTransactionsToDelete = new ArrayList<>();
+            }
+
+        }
+        deleteSelectedRecords(loanTransactionsToDelete);
+
+    }
+
+
+    private void deleteSelectedRecords(List<LoanTransaction> loanTransactionsToDelete) {
+        if (loanTransactionsToDelete.isEmpty()) {
+            return;
+        }
+        final var loanTransactionsIds = loanTransactionsToDelete.stream().map(LoanTransaction::getId).toList();
+        final var loansIds = loanTransactionsToDelete.stream().map(lt -> lt.getLoan().getId()).toList();
+        final var participantsIds = loanTransactionsToDelete.stream().map(lt -> lt.getLoan().getParticipant().getId()).toList();
         this.loanTransactionRepository.deleteLoanTransactionsByIds(loanTransactionsIds);
         this.loanRepository.deleteLoansByIds(loansIds);
         this.participantRepository.deleteParticipantsByIds(participantsIds);
@@ -132,7 +153,7 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     public LoanDto findLoanById(Long loanId) {
-        return this.loanRepository.findById(loanId).map(this.loanMapper::toDto).orElseThrow(() -> new RuntimeException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
+        return this.loanRepository.findById(loanId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).map(this.loanMapper::toDto).orElseThrow(() -> new RuntimeException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
 
     }
 
@@ -140,7 +161,7 @@ public class LoanServiceImpl implements LoanService {
     public Page<LoanTransactionResponseDto> getAvailableLoanTransactions(Long partnerId, Long loanId, Boolean isApproved, Pageable pageable) {
         Page<LoanTransaction> transactions;
         if (Objects.nonNull(loanId)){
-            final var loan = this.loanRepository.findById(loanId).orElseThrow(() -> new ResourceNotFound(HttpStatus.NOT_FOUND));
+            final var loan = this.loanRepository.findById(loanId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).orElseThrow(() -> new ResourceNotFound(HttpStatus.NOT_FOUND));
             final var txns = loan.getLoanTransactions().stream().toList();
             transactions = new PageImpl<>(txns, pageable, txns.size());
         }else {

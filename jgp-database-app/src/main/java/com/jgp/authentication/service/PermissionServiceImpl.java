@@ -25,13 +25,6 @@ public class PermissionServiceImpl implements PermissionService {
         return this.jdbcTemplate.query(sql, permissionDtoRowMapper);
     }
 
-    @Override
-    public Collection<PermissionDto> retrieveAllRolePermissions(Long roleId) {
-        final var permissionDtoRowMapper = new PermissionDtoMapper();
-        final String sql = permissionDtoRowMapper.rolePermissionSchema();
-        return this.jdbcTemplate.query(sql, permissionDtoRowMapper, roleId);
-    }
-
     private static final class PermissionDtoMapper implements RowMapper<PermissionDto> {
 
         @Override
@@ -47,13 +40,7 @@ public class PermissionServiceImpl implements PermissionService {
 
         public String permissionSchema() {
             return "select p.code, p.entity_name as entityName, p.action_name as actionName, true as selected"
-                    + " from permission p order by coalesce(entity_name, ''), p.code";
-        }
-
-        public String rolePermissionSchema() {
-            return "select p.code, p.entity_name as entityName, p.action_name as actionName, rp.role_id IS NOT NULL as selected "
-                    + " from permission p left join role_permission rp on rp.permission_id = p.id and rp.role_id = ? "
-                    + " order by COALESCE(entity_name, ''), p.code";
+                    + " from permission p where p.is_deleted = false order by coalesce(entity_name, ''), p.code";
         }
     }
 }

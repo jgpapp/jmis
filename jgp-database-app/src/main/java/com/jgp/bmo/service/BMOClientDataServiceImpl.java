@@ -48,7 +48,7 @@ public class BMOClientDataServiceImpl implements BMOClientDataService {
     @Transactional
     @Override
     public void approvedBMOParticipantsData(List<Long> dataIds, Boolean approval) {
-        var bmoData = this.bmoDataRepository.findAllById(dataIds);
+        var bmoData = this.bmoDataRepository.findAllById(dataIds).stream().filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).toList();
         var currentUser = this.platformSecurityContext.getAuthenticatedUserIfPresent();
         var currentUserPartner = Objects.nonNull(currentUser) ? currentUser.getPartner() : null;
         if (dataIds.isEmpty() && Objects.nonNull(currentUserPartner)) {
@@ -84,15 +84,33 @@ public class BMOClientDataServiceImpl implements BMOClientDataService {
     }
 
     private void rejectAndDeleteBMOParticipantsData(List<BMOParticipantData> bmoParticipantDataList){
-        final var bmoIds = bmoParticipantDataList.stream()
-                .map(BMOParticipantData::getId).toList();
-        this.bmoDataRepository.deleteTADataByIds(bmoIds);
-        final var participantsToDeleteIds = bmoParticipantDataList.stream().map(BMOParticipantData::getParticipant)
+        int count = 0;
+        var bmoToDelete = new ArrayList<BMOParticipantData>();
+        for (BMOParticipantData bmo : bmoParticipantDataList) {
+            bmoToDelete.add(bmo);
+            count++;
+            if (count % 50 == 0) { // Flush and clear the session every 50 entities
+                deleteSelectedRecords(bmoToDelete);
+                count = 0;
+                bmoToDelete = new ArrayList<>();
+            }
+
+        }
+        deleteSelectedRecords(bmoToDelete);
+
+    }
+
+
+    private void deleteSelectedRecords(ArrayList<BMOParticipantData> bmoToDelete) {
+        if (bmoToDelete.isEmpty()) {
+            return;
+        }
+        this.bmoDataRepository.deleteTADataByIds(bmoToDelete.stream().map(BMOParticipantData::getId).toList());
+        final var participantsToDeleteIds = bmoToDelete.stream().map(BMOParticipantData::getParticipant)
                 .filter(pt -> Boolean.FALSE.equals(pt.getIsActive()))
                 .map(Participant::getId).toList();
 
         this.participantRepository.deleteParticipantsByIds(participantsToDeleteIds);
-
     }
 
     @Override
@@ -103,6 +121,11 @@ public class BMOClientDataServiceImpl implements BMOClientDataService {
 
     @Override
     public BMOClientDto findBMODataById(Long bmoId) {
-        return this.bmoDataRepository.findById(bmoId).map(this.bmoClientMapper::toDto).orElseThrow(() -> new RuntimeException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
+        return this.bmoDataRepository.findById(bmoId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).map(this.bmoClientMapper::toDto).orElseThrow(() -> new RuntimeException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
+    }
+
+    @Override
+    public List<BMOParticipantData> findByDocumentId(Long documentId, Boolean isDeleted) {
+        return bmoDataRepository.findByDocumentIdAndIsDeleted(documentId, isDeleted);
     }
 }

@@ -36,7 +36,7 @@ echo "Remote Backup Destination: ${REMOTE_HOST}:${REMOTE_BACKUP_DIR}"
 # Otherwise, rely on .pgpass file or trust authentication for local pg_dump.
 echo "Creating compressed backup locally: $LOCAL_BACKUP_PATH"
 if [ -n "$PG_PASSWORD" ]; then
-    PGPASSWORD="$PG_PASSWORD" pg_dump -Fc -p "$PG_PORT" -U "$PG_USER" "$DB_NAME" | gzip > "$LOCAL_BACKUP_PATH"
+    export PGPASSWORD="$PG_PASSWORD" && pg_dump -Fc -p "$PG_PORT" -U "$PG_USER" "$DB_NAME" | gzip > "$LOCAL_BACKUP_PATH"
 else
     pg_dump -Fc -p "$PG_PORT" -U "$PG_USER" "$DB_NAME" | gzip > "$LOCAL_BACKUP_PATH"
 fi

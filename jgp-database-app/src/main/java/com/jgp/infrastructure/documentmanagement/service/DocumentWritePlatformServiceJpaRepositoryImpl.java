@@ -1,6 +1,7 @@
 
 package com.jgp.infrastructure.documentmanagement.service;
 
+import com.jgp.infrastructure.bulkimport.data.DocumentDto;
 import com.jgp.infrastructure.core.domain.Base64EncodedFile;
 import com.jgp.infrastructure.documentmanagement.command.DocumentCommand;
 import com.jgp.infrastructure.documentmanagement.contentrepository.ContentRepository;
@@ -45,7 +46,7 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
 
             final Document document = Document.createNew(documentCommand.getParentEntityType(), documentCommand.getParentEntityId(),
                     documentCommand.getName(), documentCommand.getFileName(), documentCommand.getSize(), documentCommand.getType(),
-                    documentCommand.getDescription(), fileLocation);
+                    documentCommand.getDescription(), fileLocation, documentCommand.getGlobalEntityType());
 
             this.documentRepository.saveAndFlush(document);
 
@@ -58,46 +59,12 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
 
     @Transactional
     @Override
-    public Long createInternalDocument(final String entityType, final Long entityId, final Long fileSize, final InputStream inputStream,
-            final String mimeType, final String name, final String description, final String fileName) {
+    public Long createInternalDocument(DocumentDto documentData) {
 
-        final DocumentCommand documentCommand = new DocumentCommand(null, null, entityType, entityId, name, fileName, fileSize, mimeType,
-                description, null);
+        final DocumentCommand documentCommand = new DocumentCommand(null, null, documentData.entityType(), documentData.entityId(), documentData.name(), documentData.fileName(), documentData.fileSize(), documentData.mimeType(),
+                documentData.description(), null, documentData.importEntityType());
 
-        return createDocument(documentCommand, inputStream);
-
-    }
-
-    @Override
-    public Long createDocument(Base64EncodedFile base64EncodedFile, String entityType, Long entityId, String name, String fileName,
-                               String docType) {
-        checkValidityOfEntityType(entityType);
-        try {
-
-            final ContentRepository contentRepository = this.contentRepositoryFactory.getRepository();
-
-            final String fileLocation = contentRepository.saveFile(base64EncodedFile, entityId, fileName, entityType);
-
-            final Document document = Document.createNew(entityType, entityId, name, fileName, base64EncodedFile.size(), docType,
-                    fileName, fileLocation);
-
-            this.documentRepository.save(document);
-
-            return document.getId();
-        } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-            log.error("Error occurred:", dve);
-            throw new ContentManagementException(DOCUMENT_ERROR_MESSAGE_CODE, DOCUMENT_ERROR_MESSAGE, dve);
-        }
-    }
-
-    @Override
-    @Transactional
-    public Long updateDocument(Base64EncodedFile base64EncodedFile, DocumentCommand documentCommand) {
-        final var updatedDocument = updateDocument(documentCommand, null, base64EncodedFile);
-        if (updatedDocument.getId() != null) {
-            return updatedDocument.getId();
-        }
-        return null;
+        return createDocument(documentCommand, documentData.inputStream());
     }
 
     @Override
@@ -112,6 +79,7 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
 
             String oldLocation = null;
             final Document documentForUpdate = this.documentRepository.findById(documentCommand.getId())
+                    .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
                     .orElseThrow(() -> new DocumentNotFoundException(documentCommand.getParentEntityType(),
                             documentCommand.getParentEntityId(), documentCommand.getId()));
 
@@ -150,6 +118,7 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
 
         validateParentEntityType(documentCommand);
         final Document document = this.documentRepository.findById(documentCommand.getId())
+                .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
                 .orElseThrow(() -> new DocumentNotFoundException(documentCommand.getParentEntityType(), documentCommand.getParentEntityId(),
                         documentCommand.getId()));
         this.documentRepository.delete(document);

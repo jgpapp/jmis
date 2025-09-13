@@ -37,8 +37,8 @@ public class DataSummaryServiceImpl implements DataSummaryService {
     private static final String PARTNER_ID_PARAM = "partnerId";
     private static final String FROM_DATE_PARAM = "fromDate";
     private static final String TO_DATE_PARAM = "toDate";
-    private static final String LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM = "WHERE l.date_disbursed between :fromDate and :toDate  and l.data_is_approved = true ";
-    private static final String BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM = "WHERE bpd.date_partner_recorded between :fromDate and :toDate and bpd.data_is_approved = true ";
+    private static final String LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM = "WHERE l.date_disbursed between :fromDate and :toDate  and l.data_is_approved = true and lt.is_deleted = false and l.is_deleted = false ";
+    private static final String BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM = "WHERE bpd.date_partner_recorded between :fromDate and :toDate and bpd.data_is_approved = true and bpd.is_deleted = false ";
     private static final String LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and l.partner_id = :partnerId ";
     private static final String BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and bpd.partner_id = :partnerId ";
     private static final BigDecimal ZERO = BigDecimal.ZERO;
@@ -80,7 +80,7 @@ public class DataSummaryServiceImpl implements DataSummaryService {
         }
 
         List<DataSummary> dataSummaries = new ArrayList<>();
-        var partner = this.partnerRepository.findById(partnerId).orElse(null);
+        var partner = this.partnerRepository.findById(partnerId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).orElse(null);
         for (DataSummaryDto dto: countySummaries){
             this.countySummaryRepository.deleteDataSummary(partnerId, dto.dataYear(), dto.dataMonth());
             if (Objects.nonNull(partner) && (0 < dto.businessesTrained() || 0 < dto.businessesLoaned() || ZERO.compareTo(dto.amountDisbursed()) < 0 || ZERO.compareTo(dto.outStandingAmount()) < 0)) {

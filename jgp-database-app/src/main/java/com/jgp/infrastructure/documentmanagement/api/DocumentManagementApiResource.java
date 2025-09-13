@@ -63,7 +63,7 @@ public class DocumentManagementApiResource {
             @PathVariable("documentId") final Long documentId) {
 
         final DocumentCommand documentCommand = new DocumentCommand(null, documentId, entityType, entityId, null, null, null, null, null,
-                null);
+                null, null);
 
         this.documentWritePlatformService.deleteDocument(documentCommand);
 

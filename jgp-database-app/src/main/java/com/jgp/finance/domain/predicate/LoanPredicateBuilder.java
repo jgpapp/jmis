@@ -25,6 +25,8 @@ public class LoanPredicateBuilder {
 
         List<Predicate> predicateList = new ArrayList<>();
 
+        predicateList.add(qLoan.isDeleted.isFalse());
+
         if (null != searchCriteria.status()) {
             predicateList.add(qLoan.loanStatus.eq(searchCriteria.status()));
         }

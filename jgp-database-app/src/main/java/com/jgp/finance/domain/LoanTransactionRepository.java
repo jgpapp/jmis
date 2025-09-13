@@ -16,19 +16,19 @@ import java.util.List;
 @Repository
 public interface LoanTransactionRepository extends JpaRepository<LoanTransaction, Long>, JpaSpecificationExecutor<LoanTransaction>, QuerydslPredicateExecutor<LoanTransaction> {
 
-    @Query("select l from LoanTransaction l where l.loan.id = ?1 and l.isApproved = ?2")
+    @Query("select l from LoanTransaction l where l.loan.id = ?1 and l.isApproved = ?2 and l.isDeleted = false")
     Page<LoanTransaction> findTransactionsByLoan(@NonNull Long loanId, @NonNull boolean isApproved, Pageable pageable);
 
-    Page<LoanTransaction> findByLoan_IdAndIsApproved(@NonNull Long id, @NonNull boolean isApproved, Pageable pageable);
 
-
-    @Query("select l from LoanTransaction l where l.loan.partner.id = ?1 and l.isApproved = ?2")
+    @Query("select l from LoanTransaction l where l.loan.partner.id = ?1 and l.isApproved = ?2 and l.isDeleted = false")
     Page<LoanTransaction> getLoanTransactions(@NonNull Long id, @NonNull boolean isApproved, Pageable pageable);
 
     @Transactional
     @Modifying
-    @Query("delete from LoanTransaction l where l.id in ?1")
+    @Query(value = "update loan_transactions lt set is_deleted = true where lt.id in ?1", nativeQuery = true)
     void deleteLoanTransactionsByIds(@NonNull List<Long> ids);
+
+    List<LoanTransaction> findByLoanDocumentIdAndIsDeleted(@NonNull Long loanImportDocId, @NonNull Boolean isDeleted);
 
 
 }

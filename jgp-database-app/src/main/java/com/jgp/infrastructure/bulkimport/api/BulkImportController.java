@@ -100,14 +100,14 @@ public class BulkImportController {
         if (fileDetail.isEmpty()) {
             return new ResponseEntity<>(new ApiResponseDto(false, CommonUtil.NO_FILE_TO_UPLOAD), HttpStatus.BAD_REQUEST);
         }
-        bulkImportWorkbookService.importFileToDirectory(GlobalEntityType.RESOURCES_IMPORT.name(), resourceType, fileDetail);
+        bulkImportWorkbookService.importFileToDirectory(GlobalEntityType.RESOURCES_IMPORT, resourceType, fileDetail);
 
         return new ResponseEntity<>(new ApiResponseDto(true, "Document successfully uploaded !!"), HttpStatus.CREATED);
     }
 
     @DeleteMapping("delete-resource-file/{import-id}")
-    public ResponseEntity<ApiResponseDto> deleteResourceFile( @PathVariable("import-id") Long importId) {
-        bulkImportWorkbookService.deleteFileFromDbAndDirectory(importId);
+    public ResponseEntity<ApiResponseDto> deleteResourceFile( @PathVariable("import-id") Long importId, @RequestParam(name = "delete-associated-data") Boolean deleteAssociatedData) {
+        bulkImportWorkbookService.deleteFileFromDbAndDirectory(importId, deleteAssociatedData);
         return new ResponseEntity<>(new ApiResponseDto(true, "Document successfully deleted !!"), HttpStatus.NO_CONTENT);
     }
 }

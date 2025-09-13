@@ -2,6 +2,7 @@ package com.jgp.bmo.domain;
 
 import com.jgp.authentication.domain.AppUser;
 import com.jgp.bmo.dto.MentorshipRequestDto;
+import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.participant.domain.Participant;
 import com.jgp.patner.domain.Partner;
 import com.jgp.shared.domain.BaseEntity;
@@ -86,12 +87,16 @@ public class Mentorship extends BaseEntity {
     @Column(name = "date_approved")
     private LocalDate dateApproved;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "upload_doc_id")
+    private Document document;
+
     private transient Integer rowIndex;
 
     public Mentorship() {
     }
 
-    public Mentorship(Partner partner, Participant participant, Integer rowIndex, AppUser createdBy, MentorshipRequestDto dto) {
+    public Mentorship(Partner partner, Participant participant, Document document, Integer rowIndex, AppUser createdBy, MentorshipRequestDto dto) {
         this.partner = partner;
         this.participant = participant;
         this.rowIndex = rowIndex;
@@ -111,6 +116,7 @@ public class Mentorship extends BaseEntity {
         this.identifiedBusinessGaps = dto.identifiedBusinessGaps();
         this.agreedActionForGapOne = dto.agreedActionForGapOne();
         this.additionalNeededSupport = dto.additionalNeededSupport();
+        this.document = document;
     }
 
     public void approveData(Boolean approval, AppUser user){

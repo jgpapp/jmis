@@ -2,6 +2,7 @@ package com.jgp.bmo.domain;
 
 
 import com.jgp.authentication.domain.AppUser;
+import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.participant.domain.Participant;
 import com.jgp.patner.domain.Partner;
 import com.jgp.shared.domain.BaseEntity;
@@ -93,6 +94,10 @@ public class BMOParticipantData extends BaseEntity {
     @Column(name = "date_approved")
     private LocalDate dateApproved;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "upload_doc_id")
+    private Document document;
+
     private transient Integer rowIndex;
 
     private transient String rowErrorMessage;
@@ -105,7 +110,7 @@ public class BMOParticipantData extends BaseEntity {
                               Boolean isRecommendedForFinance, LocalDate decisionDate, String fiBusinessReferred,
                               LocalDate dateRecordedByPartner, LocalDate dateRecordedToJGPDB,
                               String taNeeds, Integer rowIndex, String trainingPartner, String taDeliveryMode,
-                              String otherTaNeeds, String taType, AppUser createdBy, String rowErrorMessage) {
+                              String otherTaNeeds, String taType, AppUser createdBy, Document document, String rowErrorMessage) {
         this.partner = partner;
         this.participant = participant;
         this.dateFormSubmitted = dateFormSubmitted;
@@ -126,6 +131,7 @@ public class BMOParticipantData extends BaseEntity {
         this.taType = taType;
         this.rowErrorMessage = rowErrorMessage;
         this.setCreatedBy(createdBy);
+        this.document = document;
     }
 
     public void approveData(Boolean approval, AppUser user){

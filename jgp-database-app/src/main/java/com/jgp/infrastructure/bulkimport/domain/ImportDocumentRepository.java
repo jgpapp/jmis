@@ -8,8 +8,10 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.lang.NonNull;
 
 public interface ImportDocumentRepository extends JpaRepository<ImportDocument, Long>, JpaSpecificationExecutor<ImportDocument> {
-    Page<ImportDocument> findByPartnerIdAndEntityType(@NonNull Long partnerId, @NonNull Integer entityType, Pageable pageable);
-    Page<ImportDocument> findByEntityType(@NonNull Integer entityType, Pageable pageable);
+
+    Page<ImportDocument> findByPartnerIdAndEntityTypeAndIsDeletedFalse(@NonNull Long id, @NonNull Integer entityType, Pageable pageable);
+
+    Page<ImportDocument> findByEntityTypeAndIsDeletedFalse(@NonNull Integer entityType, Pageable pageable);
 
     // no added behaviour
 

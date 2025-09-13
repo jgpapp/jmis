@@ -237,15 +237,15 @@ export class DataUploaderComponent implements OnDestroy {
   }
 
   deleteImportedTemplateFile(importId: number): void {
-        const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to delete Imported Template?`);
+        const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to continue?`, 'Yes, Delete Template plus all associated data', 'No', 'Yes, But Only The Template', true);
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {
           maxWidth: "400px",
           data: dialogData
         });
     
         dialogRef.afterClosed().subscribe(dialogResult => {
-          if(dialogResult){
-          this.subs.add = this.dataUploadService.deleteResourceFile(importId)
+          if(dialogResult > 0){ // 0 means dialog was dismissed
+          this.subs.add = this.dataUploadService.deleteResourceFile(importId, dialogResult === 2) // 2 means delete associated data too
           .subscribe({
             next: (response) => {
                 this.gs.openSnackBar('Imported Template successfully deleted!!', 'X');

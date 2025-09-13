@@ -20,4 +20,6 @@ public interface MentorshipService {
     Page<MentorshipResponseDto> getMentorshipDataRecords(MentorshipSearchCriteria searchCriteria, Pageable pageable);
 
     MentorshipResponseDto findMentorshipDataById(Long mentorshipId);
+
+    List<Mentorship> findByDocumentId(Long documentId, Boolean isDeleted);
 }
