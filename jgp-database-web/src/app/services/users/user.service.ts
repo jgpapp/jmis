@@ -14,6 +14,10 @@ export class UserService {
     return this.httpClient.get(`/users`);
   }
 
+  getOnlineUsersCount(): Observable<any> {
+    return this.httpClient.get(`/actuator/metrics/app.active.users`);
+  }
+
   createUser(user: User): Observable<any> {
     return this.httpClient.post(`/users`, JSON.stringify(user));
   }
