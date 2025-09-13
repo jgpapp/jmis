@@ -54,7 +54,7 @@ public class BulkImportEventListener {
         } catch (JsonProcessingException | ExecutionException e) {
             log.error("Problem Updating Progress: {}", e.getMessage());
         }
-        final ImportDocument importDocument = this.importRepository.findById(bulkImportEvent.importId()).orElseThrow();
+        final ImportDocument importDocument = this.importRepository.findById(bulkImportEvent.importId()).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).orElseThrow();
         final GlobalEntityType entityType = GlobalEntityType.fromInt(importDocument.getEntityType());
         ImportHandler importHandler = switch (entityType) {
             case GlobalEntityType.TA_IMPORT_TEMPLATE -> this.applicationContext.getBean("BMOImportHandler", ImportHandler.class);
@@ -82,7 +82,7 @@ public class BulkImportEventListener {
         Document document = importDocument.getDocument();
 
         DocumentCommand documentCommand = new DocumentCommand(modifiedParams, document.getId(), entityType.name(), null, document.getName(),
-                document.getFileName(), document.getSize(), URLConnection.guessContentTypeFromName(document.getFileName()), null, null);
+                document.getFileName(), document.getSize(), URLConnection.guessContentTypeFromName(document.getFileName()), null, null, entityType);
 
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {

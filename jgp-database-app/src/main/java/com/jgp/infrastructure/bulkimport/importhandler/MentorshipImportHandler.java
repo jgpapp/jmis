@@ -11,6 +11,7 @@ import com.jgp.infrastructure.bulkimport.data.Count;
 import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
 import com.jgp.infrastructure.bulkimport.exception.InvalidDataException;
 import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
+import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.participant.dto.ParticipantDto;
 import com.jgp.participant.service.ParticipantService;
 import com.jgp.shared.validator.DataValidator;
@@ -47,6 +48,7 @@ public class MentorshipImportHandler implements ImportHandler {
     private Map<Long, ParticipantDto> participantDtoMap;
     private String documentImportProgressUUId;
     private Boolean updateParticipantInfo;
+    private Document document;
     private static final String OTHER = "OTHER";
 
 
@@ -59,6 +61,7 @@ public class MentorshipImportHandler implements ImportHandler {
         this.participantDtoMap = new HashMap<>();
         this.documentImportProgressUUId = bulkImportEvent.importProgressUUID();
         this.updateParticipantInfo = bulkImportEvent.updateParticipantInfo();
+        this.document = bulkImportEvent.document();
         readExcelFile();
         return importEntity();
     }
@@ -177,7 +180,7 @@ public class MentorshipImportHandler implements ImportHandler {
 
 
         return new Mentorship(Objects.nonNull(userService.currentUser()) ? userService.currentUser().getPartner() : null,
-                participant, row.getRowNum(), userService.currentUser(), mentorShipData);
+                participant, this.document, row.getRowNum(), userService.currentUser(), mentorShipData);
     }
 
     private ParticipantDto getParticipantDto(Row row){

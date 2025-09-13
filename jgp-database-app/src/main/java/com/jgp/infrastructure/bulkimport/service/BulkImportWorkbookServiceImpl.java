@@ -2,6 +2,7 @@
 package com.jgp.infrastructure.bulkimport.service;
 
 import com.jgp.authentication.service.PlatformSecurityContext;
+import com.jgp.infrastructure.bulkimport.data.DocumentDto;
 import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.bulkimport.data.ImportData;
 import com.jgp.infrastructure.bulkimport.data.ImportRequestDto;
@@ -10,6 +11,8 @@ import com.jgp.infrastructure.bulkimport.data.ResourceType;
 import com.jgp.infrastructure.bulkimport.domain.ImportDocument;
 import com.jgp.infrastructure.bulkimport.domain.ImportDocumentRepository;
 import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
+import com.jgp.infrastructure.bulkimport.event.DataImportDocumentDeletedEvent;
+import com.jgp.infrastructure.bulkimport.event.DataUploadedEvent;
 import com.jgp.infrastructure.bulkimport.importhandler.ImportHandlerUtils;
 import com.jgp.infrastructure.core.domain.JdbcSupport;
 import com.jgp.infrastructure.documentmanagement.contentrepository.ContentRepository;
@@ -111,7 +114,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     }
 
     @Override
-    public void importFileToDirectory(String entityType, ResourceType resourceType, MultipartFile fileDetail) {
+    public void importFileToDirectory(GlobalEntityType entityType, ResourceType resourceType, MultipartFile fileDetail) {
         final var fileName = fileDetail.getOriginalFilename();
 
         final var baos = new ByteArrayOutputStream();
@@ -123,11 +126,13 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
         final byte[] bytes = baos.toByteArray();
         final BufferedInputStream inputStream = new BufferedInputStream(new ByteArrayInputStream(bytes));
 
-        final Long documentId = this.documentWritePlatformService.createInternalDocument(
+        final Long documentId = this.documentWritePlatformService.createInternalDocument(new DocumentDto( entityType,
                 DocumentWritePlatformServiceJpaRepositoryImpl.DocumentManagementEntity.IMPORT.name(),
                 this.securityContext.getAuthenticatedUserIfPresent().getId(), null, inputStream,
-                URLConnection.guessContentTypeFromName(fileName), fileName, null, fileName);
-        final Document document = this.documentRepository.findById(documentId).orElse(null);
+                URLConnection.guessContentTypeFromName(fileName), fileName, null, fileName));
+        final Document document = this.documentRepository.findById(documentId)
+                .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
+                .orElse(null);
 
         final ImportDocument importDocument = ImportDocument.instance(document, LocalDateTime.now(ZoneId.systemDefault()), GlobalEntityType.RESOURCES_IMPORT.getValue(),
                 0, this.securityContext.getAuthenticatedUserIfPresent().getPartner());
@@ -135,17 +140,21 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     }
 
     @Override
-    public void deleteFileFromDbAndDirectory(Long importDocumentId) {
-        final var importDoc = this.importDocumentRepository.findById(importDocumentId).orElse(null);
+    public void deleteFileFromDbAndDirectory(Long importDocumentId, final boolean deleteAssociatedData) {
+        final var importDoc = this.importDocumentRepository.findById(importDocumentId)
+                .filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).orElse(null);
         final var doc = Objects.nonNull(importDoc) ? importDoc.getDocument() : null;
         if (Objects.nonNull(importDoc)){
-            this.importDocumentRepository.deleteById(importDoc.getId());
+            importDoc.setIsDeleted(true);
+            this.importDocumentRepository.save(importDoc);
         }
         if (Objects.nonNull(doc) && null != doc.getLocation()) {
             this.contentRepository.deleteFile(doc.getLocation());
-            this.documentRepository.deleteById(doc.getId());
+            doc.setIsDeleted(true);
+            this.documentRepository.save(doc);
         }
 
+        this.applicationContext.publishEvent(new DataImportDocumentDeletedEvent(doc, deleteAssociatedData));
 
     }
 
@@ -154,11 +163,11 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
 
         final String fileName = dto.fileDetail().getOriginalFilename();
 
-        final Long documentId = this.documentWritePlatformService.createInternalDocument(
+        final Long documentId = this.documentWritePlatformService.createInternalDocument(new DocumentDto( dto.entityType(),
                 DocumentWritePlatformServiceJpaRepositoryImpl.DocumentManagementEntity.IMPORT.name(),
                 this.securityContext.getAuthenticatedUserIfPresent().getId(), null, dto.clonedInputStreamWorkbook(),
-                URLConnection.guessContentTypeFromName(fileName), fileName, null, fileName);
-        final Document document = this.documentRepository.findById(documentId).orElse(null);
+                URLConnection.guessContentTypeFromName(fileName), fileName, null, fileName));
+        final Document document = this.documentRepository.findById(documentId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).orElse(null);
 
         try(Workbook workbook = dto.workbook()) {
             final ImportDocument importDocument = ImportDocument.instance(document, LocalDateTime.now(ZoneId.systemDefault()), dto.entityType().getValue(),
@@ -167,7 +176,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
 
             final var importDocumentId = importDocument.getId();
             final var appDocumentURL = null == dto.appDomainForNotification() ? "localhost" : dto.appDomainForNotification().concat(importDocumentId.toString()).concat("/").concat(dto.entityType().name());
-            BulkImportEvent event = new BulkImportEvent(workbook, dto.entityType().name(), importDocument.getId(), dto.importProgressUUID(), "YES".equalsIgnoreCase(dto.updateParticipantInfo()), appDocumentURL);
+            BulkImportEvent event = new BulkImportEvent(workbook, document, dto.entityType(), importDocument.getId(), dto.importProgressUUID(), "YES".equalsIgnoreCase(dto.updateParticipantInfo()), appDocumentURL);
             applicationContext.publishEvent(event);
             return importDocumentId;
         } catch (IOException e) {
@@ -189,16 +198,16 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     public Page<ImportData> getImports(GlobalEntityType type, Long partnerId, Pageable pageable) {
         Page<ImportDocument> imports;
         if (Objects.nonNull(partnerId)){
-            imports = this.importDocumentRepository.findByPartnerIdAndEntityType(partnerId, type.getValue(), pageable);
+            imports = this.importDocumentRepository.findByPartnerIdAndEntityTypeAndIsDeletedFalse(partnerId, type.getValue(), pageable);
         }else {
-            imports = this.importDocumentRepository.findByEntityType(type.getValue(), pageable);
+            imports = this.importDocumentRepository.findByEntityTypeAndIsDeletedFalse(type.getValue(), pageable);
         }
         return new PageImpl<>(this.importDocumentMapper.toDto(imports.getContent()), pageable, imports.getTotalElements());
     }
 
     @Override
     public Page<ImportData> getImportById(Long importDocumentId) {
-        final var importDoc = this.importDocumentRepository.findById(importDocumentId).orElse(null);
+        final var importDoc = this.importDocumentRepository.findById(importDocumentId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).orElse(null);
         return Objects.nonNull(importDoc) ? new PageImpl<>(List.of(this.importDocumentMapper.toDto(importDoc))) : null;
     }
 
@@ -208,7 +217,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
             return "i.id as id, i.document_id as documentId, d.doc_name as name, i.import_time as importTime, i.end_time as endTime, " +
                     "i.completed as completed, i.total_records as totalRecords, i.success_count as successCount, " +
                     "i.failure_count as failureCount, i.created_by_id as createdBy " +
-                    "from import_document i inner join jgp_document d on i.document_id=d.id " + "where i.entity_type= ? ";
+                    "from import_document i inner join jgp_document d on i.document_id=d.id " + "where i.entity_type= ? and i.is_deleted=false ";
         }
 
         @Override
@@ -309,7 +318,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
 
     private static final class ImportTemplateLocationMapper implements RowMapper<DocumentData> {
 
-        public static final String IMPORT_DOCUMENT_SCHEMA = "d.location,d.file_name,d.type from import_document i inner join jgp_document d on i.document_id=d.id where d.id= ? ";
+        public static final String IMPORT_DOCUMENT_SCHEMA = "d.location,d.file_name,d.type from import_document i inner join jgp_document d on i.document_id=d.id where d.id= ? and i.is_deleted=false ";
 
         @Override
         public DocumentData mapRow(ResultSet rs, @SuppressWarnings("unused") int rowNum) throws SQLException {

@@ -1,6 +1,7 @@
 
 package com.jgp.infrastructure.documentmanagement.command;
 
+import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,9 +23,10 @@ public class DocumentCommand {
     private String location;
 
     private final Set<String> modifiedParameters;
+    private final GlobalEntityType globalEntityType;
 
     public DocumentCommand(final Set<String> modifiedParameters, final Long id, final String parentEntityType, final Long parentEntityId,
-            final String name, final String fileName, final Long size, final String type, final String description, final String location) {
+                           final String name, final String fileName, final Long size, final String type, final String description, final String location, GlobalEntityType globalEntityType) {
         this.modifiedParameters = modifiedParameters;
         this.id = id;
         this.parentEntityType = parentEntityType;
@@ -35,6 +37,7 @@ public class DocumentCommand {
         this.type = type;
         this.description = description;
         this.location = location;
+        this.globalEntityType = globalEntityType;
     }
 
     public boolean isNameChanged() {

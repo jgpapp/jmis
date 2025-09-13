@@ -25,6 +25,8 @@ public class MentorshipPredicateBuilder {
 
         List<Predicate> predicateList = new ArrayList<>();
 
+        predicateList.add(qMentorship.isDeleted.isFalse());
+
         if (null != searchCriteria.participantId()) {
             predicateList.add(qMentorship.participant.id.eq(searchCriteria.participantId()));
         }

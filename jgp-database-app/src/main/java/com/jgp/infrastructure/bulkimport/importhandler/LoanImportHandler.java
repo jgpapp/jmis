@@ -11,6 +11,7 @@ import com.jgp.infrastructure.bulkimport.data.Count;
 import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
 import com.jgp.infrastructure.bulkimport.exception.InvalidDataException;
 import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
+import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.dto.ParticipantDto;
 import com.jgp.participant.service.ParticipantService;
@@ -54,6 +55,7 @@ public class LoanImportHandler implements ImportHandler {
     private Map<Row, String> rowErrorMap;
     private String documentImportProgressUUId;
     private Boolean updateParticipantInfo;
+    private Document document;
 
     @Override
     public Count process(BulkImportEvent bulkImportEvent) {
@@ -63,6 +65,7 @@ public class LoanImportHandler implements ImportHandler {
         this.rowErrorMap = new HashMap<>();
         this.documentImportProgressUUId = bulkImportEvent.importProgressUUID();
         this.updateParticipantInfo = bulkImportEvent.updateParticipantInfo();
+        this.document = bulkImportEvent.document();
         readExcelFile();
         return importEntity();
     }
@@ -139,7 +142,7 @@ public class LoanImportHandler implements ImportHandler {
         var loanData = new Loan(Objects.nonNull(userService.currentUser()) ? userService.currentUser().getPartner() : null,
                 null, loanIdentifier, pipeLineSource, loanQualityEnum, Loan.LoanStatus.APPROVED, applicationDate, dateDisbursed, loanAmount,
                 loanDuration, outStandingAmount, LocalDate.now(ZoneId.systemDefault()), null, recordedToJGPDBOnDate,
-                loanAmountRepaid, loanerType, loanProduct, userService.currentUser(), row.getRowNum());
+                loanAmountRepaid, loanerType, loanProduct, userService.currentUser(), this.document, row.getRowNum());
         final var transactionAmount = tranchAmount.compareTo(BigDecimal.ZERO) <= 0 ? loanAmount : tranchAmount;
         if (null == rowErrorMap.get(row) && transactionAmount.compareTo(BigDecimal.ZERO) < 1){
             rowErrorMap.put(row, "Loan Amount and Tranch Amount can not be both 0!!");

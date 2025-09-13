@@ -53,6 +53,7 @@ public class UserServiceImpl implements UserService{
             Partner partner = null;
             if (Objects.nonNull(userDto.partnerId()) && !Objects.equals(0L, userDto.partnerId())) {
                 partner = this.partnerRepository.findById(userDto.partnerId())
+                        .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
                         .orElseThrow(() -> new PartnerNotFoundException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
             }
             var user = this.userRepository.save(AppUser.createUser(partner, userDto, passwordEncoder));
@@ -69,10 +70,12 @@ public class UserServiceImpl implements UserService{
     @Override
     public void updateUser(Long userId, UserDtoV2 userDto) {
         var currentUser = this.userRepository.findById(userId)
+                .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
                 .orElseThrow(() -> new UserNotFoundException(NO_USER_FOUND_WITH_ID));
         Partner partner = null;
         if (Objects.nonNull(userDto.partnerId()) && !Objects.equals(0L, userDto.partnerId())) {
             partner = this.partnerRepository.findById(userDto.partnerId())
+                    .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
                     .orElseThrow(() -> new PartnerNotFoundException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
         }
         try {
@@ -124,6 +127,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public void resetUserPassword(Long userId) {
         var user = this.userRepository.findById(userId)
+                .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
                 .orElseThrow(() -> new UserNotFoundException(NO_USER_FOUND_WITH_ID));
         user.setPassword(this.passwordEncoder.encode(user.getUsername()));
         user.setForceChangePass(true);
@@ -133,13 +137,14 @@ public class UserServiceImpl implements UserService{
     @Override
     public UserDtoV2 findUserById(Long userId) {
         return this.userRepository.findById(userId)
+                .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
                 .map(AppUser::toDto)
                 .orElseThrow(() -> new UserNotFoundException(NO_USER_FOUND_WITH_ID));
     }
 
     @Override
     public AppUser findUserByUsername(String userName) {
-        return this.userRepository.findByUsername(userName).orElse(null);
+        return this.userRepository.findByUsernameAndIsDeletedFalse(userName).orElse(null);
     }
 
 
@@ -182,7 +187,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public List<UserDtoV2> getAllUsers() {
-        return this.userRepository.findAll().stream().map(AppUser::toDto).toList();
+        return this.userRepository.findByIsDeletedFalse().stream().map(AppUser::toDto).toList();
     }
 
     @Override
@@ -203,6 +208,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public void updateUserRoles(Long userId, List<String> roleNames) {
         final var user =  this.userRepository.findById(userId)
+                .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
                 .orElseThrow(() -> new UserNotFoundException(NO_USER_FOUND_WITH_ID));
         user.updateRoles(new HashSet<>(this.roleService.retrieveRolesByNames(roleNames)));
         this.userRepository.save(user);
@@ -212,6 +218,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public void changeUserStatus(Long userId, boolean status) {
         final var user =  this.userRepository.findById(userId)
+                .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
                 .orElseThrow(() -> new UserNotFoundException(NO_USER_FOUND_WITH_ID));
         user.changeUserStatus(status);
         this.userRepository.save(user);

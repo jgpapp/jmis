@@ -13,8 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class PartnerServiceImpl implements PartnerService {
@@ -37,6 +35,7 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     public void updatePartner(Long userId, PartnerDto partnerDto) {
         var currentPartner = this.partnerRepository.findById(userId)
+                .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
                 .orElseThrow(() -> new PartnerNotFoundException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
         try {
             currentPartner.updatePartner(partnerDto);
@@ -50,13 +49,14 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     public PartnerDto findPartnerById(Long userId) {
         return this.partnerRepository.findById(userId)
+                .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
                 .map(p -> new PartnerDto(p.getId(), p.getPartnerName(), p.getType().getName(), p.getType().name()))
                 .orElseThrow(() -> new PartnerNotFoundException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
     }
 
     @Override
     public Page<PartnerDto> getAllPartners(Pageable pageable) {
-        return new PageImpl<>(this.partnerRepository.findAll(pageable).stream().map(p -> new PartnerDto(p.getId(), p.getPartnerName(), p.getType().getName(), p.getType().name())).toList(), pageable, this.partnerRepository.findAll().size());
+        return new PageImpl<>(this.partnerRepository.findAll(pageable).stream().filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).map(p -> new PartnerDto(p.getId(), p.getPartnerName(), p.getType().getName(), p.getType().name())).toList(), pageable, this.partnerRepository.findAll().size());
     }
 
 }

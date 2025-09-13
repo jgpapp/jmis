@@ -1,6 +1,5 @@
 package com.jgp.authentication.domain;
 
-import jakarta.annotation.Nonnull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -15,10 +14,13 @@ import java.util.Optional;
 public interface AppUserRepository extends JpaRepository<AppUser, Long>, JpaSpecificationExecutor<AppUser>, PlatformUserRepository,
         QuerydslPredicateExecutor<AppUser> {
 
-    Optional<AppUser> findByUsername(@Nonnull String username);
+    Optional<AppUser> findByUsernameAndIsDeletedFalse(@NonNull String username);
 
-    @Query("select a from AppUser a where a.partner.id = ?1")
+
+    @Query("select a from AppUser a where a.partner.id = ?1 and a.isDeleted = false ")
     List<AppUser> findUsersByPartnerId(@NonNull Long id);
+
+    List<AppUser> findByIsDeletedFalse();
 
 
 }

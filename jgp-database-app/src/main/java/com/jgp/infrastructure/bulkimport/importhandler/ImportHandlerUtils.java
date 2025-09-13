@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
@@ -296,6 +297,13 @@ public final class ImportHandlerUtils {
             return re.getMessage();
         } else {
             return re.getClass().getCanonicalName();
+        }
+    }
+
+    public static void validateCellDoesNotContainFormular(Cell cell, Map<Row, String> rowErrorMap) {
+        if (CellType.FORMULA == cell.getCellType()) {
+            Row row = cell.getRow();
+            rowErrorMap.put(row, String.format("Cell %s contains a formula. Please remove the formula and try again.", new CellReference(cell).formatAsString()));
         }
     }
 

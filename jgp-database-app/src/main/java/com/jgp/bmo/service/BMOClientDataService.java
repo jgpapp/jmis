@@ -18,4 +18,6 @@ public interface BMOClientDataService {
 
     BMOClientDto findBMODataById(Long bmoId);
 
+    List<BMOParticipantData> findByDocumentId(Long documentId, Boolean isDeleted);
+
 }

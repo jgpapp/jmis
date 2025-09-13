@@ -7,6 +7,4 @@ import java.util.Collection;
 public interface PermissionService {
 
     Collection<PermissionDto> retrieveAllPermissions();
-
-    Collection<PermissionDto> retrieveAllRolePermissions(Long roleId);
 }

@@ -18,10 +18,12 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     @Transactional
     @Modifying
     @Query(value = """
-            delete from participants p\s
-            where not exists (select 1 from bmo_participants_data bpd where bpd.participant_id = p.id)\s
-            and not exists (select 1 from loans l where l.participant_id = p.id)\s
-            and p.id in ?1""", nativeQuery = true)
+            update participants p set is_deleted = true\s
+            where p.id in ?1 and not exists (select 1 from bmo_participants_data bpd where bpd.participant_id = p.id and bpd.is_deleted = false)\s
+            and not exists (select 1 from loans l where l.participant_id = p.id and l.is_deleted = false)\s
+            and not exists (select 1 from mentor_ships m where m.participant_id = p.id and m.is_deleted = false)\s
+            and not exists (select 1 from outcome_monitoring om where om.participant_id = p.id and om.is_deleted = false)\s
+            """, nativeQuery = true)
     void deleteParticipantsByIds(@NonNull List<Long> participantIds);
 
 

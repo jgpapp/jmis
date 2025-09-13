@@ -102,14 +102,14 @@ export class MentorShipComponent implements OnDestroy, OnInit {
     
     
       approvedMentorShipData(mentorshipIds: number[]): void {
-        const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to approve mentorship data?`);
+        const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to approve mentorship data?`, '');
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {
           maxWidth: "400px",
           data: dialogData
         });
     
         dialogRef.afterClosed().subscribe(dialogResult => {
-          if(dialogResult){
+          if(dialogResult > 0){ // 0 means dialog was dismissed
             this.subs.add = this.mentorshipService.approvedMentorShipData(mentorshipIds)
               .subscribe({
                 next: (response) => {
@@ -131,14 +131,14 @@ export class MentorShipComponent implements OnDestroy, OnInit {
       }
     
       rejectMentorShipData(mentorshipIds: number[]): void {
-        const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to reject & remove mentorship data?`);
+        const dialogData = new ConfirmDialogModel("Confirm", `Are you sure you want to reject & remove mentorship data?`, '');
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {
           maxWidth: "400px",
           data: dialogData
         });
     
         dialogRef.afterClosed().subscribe(dialogResult => {
-          if(dialogResult){
+          if(dialogResult > 0){ // 0 means dialog was dismissed
             this.subs.add = this.mentorshipService.rejectMentorShipData(mentorshipIds)
               .subscribe({
                 next: (response) => {

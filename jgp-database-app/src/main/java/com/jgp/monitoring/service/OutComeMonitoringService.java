@@ -5,6 +5,7 @@ import com.jgp.monitoring.domain.predicate.OutComeMonitoringSearchCriteria;
 import com.jgp.monitoring.dto.OutComeMonitoringResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 
@@ -38,5 +39,12 @@ public interface OutComeMonitoringService {
      * @return a paginated list of OutComeMonitoring records matching the search criteria
      */
     Page<OutComeMonitoringResponseDto> getOutComeMonitoringDataRecords(OutComeMonitoringSearchCriteria searchCriteria, Pageable pageable);
+
+    /**
+     * Deletes OutComeMonitoring records associated with a specific document ID.
+     *
+     * @param documentId the ID of the document whose associated OutComeMonitoring records should be deleted
+     */
+    List<OutComeMonitoring> findByDocumentId(Long documentId, Boolean isDeleted);
 }
 

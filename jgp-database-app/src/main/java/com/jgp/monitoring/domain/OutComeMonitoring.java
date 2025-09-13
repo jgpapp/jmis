@@ -1,6 +1,7 @@
 package com.jgp.monitoring.domain;
 
 import com.jgp.authentication.domain.AppUser;
+import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.monitoring.dto.OutComeMonitoringRequestDto;
 import com.jgp.participant.domain.Participant;
 import com.jgp.shared.domain.BaseEntity;
@@ -254,12 +255,16 @@ public class OutComeMonitoring extends BaseEntity {
     @Column(name = "date_approved")
     private LocalDate dateApproved;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "upload_doc_id")
+    private Document document;
+
     private transient Integer rowIndex;
 
     public OutComeMonitoring() {
         // Default constructor
     }
-    public OutComeMonitoring(OutComeMonitoringRequestDto dto, Participant participant, Integer rowIndex) {
+    public OutComeMonitoring(OutComeMonitoringRequestDto dto, Participant participant, Document document, Integer rowIndex) {
         this.surveyDate = dto.surveyDate();
         this.surveyLanguage = dto.surveyLanguage();
         this.consented = "Yes".equalsIgnoreCase(dto.consented());
@@ -333,6 +338,7 @@ public class OutComeMonitoring extends BaseEntity {
         this.businessOpportunities = dto.businessOpportunities();
         this.marketChallenges = dto.marketChallenges();
         this.rowIndex = rowIndex;
+        this.document = document;
     }
 
     public void approveData(Boolean approval, AppUser user){

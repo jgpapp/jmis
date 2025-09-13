@@ -25,6 +25,8 @@ public class BMOPredicateBuilder {
 
         List<Predicate> predicateList = new ArrayList<>();
 
+        predicateList.add(qbmoParticipantData.isDeleted.isFalse());
+
         if (null != searchCriteria.participantId()) {
             predicateList.add(qbmoParticipantData.participant.id.eq(searchCriteria.participantId()));
         }
