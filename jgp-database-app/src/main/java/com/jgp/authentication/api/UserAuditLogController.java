@@ -1,6 +1,7 @@
 package com.jgp.authentication.api;
 
 import com.jgp.authentication.domain.UserAuditLog;
+import com.jgp.authentication.domain.UserAuditOperationConstants;
 import com.jgp.authentication.dto.UserAuditLogSearchCriteria;
 import com.jgp.authentication.service.UserAuditLogService;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,12 @@ public class UserAuditLogController {
                 PageRequest.of(pageNumber, pageSize, Sort.by("logTime").descending());
         return new ResponseEntity<>(this.userAuditLogService.findAvailableUserAuditLogs(new UserAuditLogSearchCriteria(userName, action, fromDate, toDate), sortedByLogTime), HttpStatus.OK);
     }
+
+    @GetMapping("/auditable-operations")
+    public ResponseEntity<String> findAvailableUserAuditOperations() {
+        return new ResponseEntity<>(UserAuditOperationConstants.getOperationsJsonList(), HttpStatus.OK);
+    }
+
 
     /**
      * Endpoint to manually log an Excel upload activity.

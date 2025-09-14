@@ -73,6 +73,7 @@ export class UserAuditLogsComponent {
     public dataSource: any;
   
     userLogs: any
+    auditableOperations: any[]
     pageSize = 10;
     pageIndex = 0;
     totalItems = 0;
@@ -108,7 +109,16 @@ export class UserAuditLogsComponent {
             },
             error: (error) => { }
           });
-      }
+    }
+
+    getUserAuditableOperations() {
+        this.subs.add = this.userService.getUserAuditableOperations().subscribe({
+            next: (response) => {
+                this.auditableOperations = response;
+            },
+            error: (error) => { }
+        });
+    }
 
       refresh() {
         this.getUserAuditLogs();
@@ -123,6 +133,7 @@ export class UserAuditLogsComponent {
     
       ngOnInit(): void {
         this.getUserAuditLogs();
+        this.getUserAuditableOperations();
       }
     
       ngOnDestroy(): void {

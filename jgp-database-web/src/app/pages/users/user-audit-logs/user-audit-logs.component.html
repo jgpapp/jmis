@@ -27,8 +27,9 @@
                 <mat-label>Select Action</mat-label>
                 <mat-select formControlName="action">
                     <mat-option value="">All</mat-option>
-                    <mat-option value="CREATE_ROLE">Create Role</mat-option>
-                    <mat-option value="UPDATE_ROLE">Update Role</mat-option>
+                    @for (operation of auditableOperations; track operation) {
+                        <mat-option [value]="operation.value">{{operation.display}}</mat-option>
+                      }
                 </mat-select>
         </mat-form-field>
         <mat-form-field appearance="outline" fxFlex="100" [fxFlex.xl]="22" [fxFlex.lg]="22" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">

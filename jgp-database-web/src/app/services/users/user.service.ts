@@ -61,4 +61,8 @@ export class UserService {
           }
         return this.httpClient.get(`/user-audit-logs`, { params });
       }
+
+  getUserAuditableOperations(): Observable<any> {
+    return this.httpClient.get(`/user-audit-logs/auditable-operations`);
+  }
 }
