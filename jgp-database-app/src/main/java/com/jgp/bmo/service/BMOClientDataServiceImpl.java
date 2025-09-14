@@ -1,5 +1,6 @@
 package com.jgp.bmo.service;
 
+import com.jgp.authentication.aop.AuditTrail;
 import com.jgp.authentication.service.PlatformSecurityContext;
 import com.jgp.bmo.domain.BMOParticipantData;
 import com.jgp.bmo.domain.BMOClientDataRepository;

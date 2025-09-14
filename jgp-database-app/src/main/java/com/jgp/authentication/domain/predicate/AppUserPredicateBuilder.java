@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Predicate builder related to application users operations
  *
- * @author amy.muhimpundu
+ * @author simiyu
  */
 @Component
 public class AppUserPredicateBuilder {
@@ -30,6 +30,7 @@ public class AppUserPredicateBuilder {
         BooleanBuilder builder = new BooleanBuilder();
 
         List<Predicate> predicateList = new ArrayList<>();
+        predicateList.add(qAppUser.isDeleted.isFalse());
 
         predicateList.add(qAppUser.isActive.eq(true));
 
@@ -45,9 +46,7 @@ public class AppUserPredicateBuilder {
             predicateList.add(qAppUser.partner.id.eq(searchCriteria.partnerId()));
         }
 
-        if (!predicateList.isEmpty()) {
-            builder.orAllOf(predicateList.toArray(new Predicate[0]));
-        }
+        builder.orAllOf(predicateList.toArray(new Predicate[0]));
 
         return builder;
     }

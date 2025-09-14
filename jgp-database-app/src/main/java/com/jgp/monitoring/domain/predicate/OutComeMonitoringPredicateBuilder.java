@@ -57,9 +57,7 @@ public class OutComeMonitoringPredicateBuilder {
             predicateList.add(qOutComeMonitoring.participant.id.eq(searchCriteria.participantId()));
         }
 
-        if (!predicateList.isEmpty()) {
-            builder.orAllOf(predicateList.toArray(new Predicate[0]));
-        }
+        builder.orAllOf(predicateList.toArray(new Predicate[0]));
 
         return builder;
     }

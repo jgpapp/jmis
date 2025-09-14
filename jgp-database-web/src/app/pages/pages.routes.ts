@@ -101,6 +101,11 @@ export const routes: Routes = [
         data: { breadcrumb: 'Online Users' }
       },
       {
+        path: 'user-activity-logs',
+        loadComponent: () => import('./users/user-audit-logs/user-audit-logs.component').then(c => c.UserAuditLogsComponent),
+        data: { breadcrumb: 'User Activity Logs' }
+      },
+      {
         path: 'ui',
         loadChildren: () => import('./ui/ui.routes').then(p => p.routes),
         data: { breadcrumb: 'UI' }

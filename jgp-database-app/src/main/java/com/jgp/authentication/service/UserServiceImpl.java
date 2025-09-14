@@ -1,8 +1,10 @@
 package com.jgp.authentication.service;
 
 
+import com.jgp.authentication.aop.AuditTrail;
 import com.jgp.authentication.domain.AppUser;
 import com.jgp.authentication.domain.AppUserRepository;
+import com.jgp.authentication.domain.UserAuditOperationConstants;
 import com.jgp.authentication.dto.*;
 import com.jgp.authentication.exception.UserNotFoundException;
 import com.jgp.authentication.filter.JwtTokenProvider;
@@ -46,9 +48,10 @@ public class UserServiceImpl implements UserService{
     private static final String NO_USER_FOUND_WITH_ID = "No user found with Id";
 
 
+    @AuditTrail(operation = UserAuditOperationConstants.CREATE_USER)
     @Transactional
     @Override
-    public void createUser(UserDtoV2 userDto) {
+    public AppUser createUser(UserDtoV2 userDto) {
         try {
             Partner partner = null;
             if (Objects.nonNull(userDto.partnerId()) && !Objects.equals(0L, userDto.partnerId())) {
@@ -60,12 +63,14 @@ public class UserServiceImpl implements UserService{
             if (!userDto.userRoles().isEmpty()){
                 this.updateUserRoles(user.getId(), new ArrayList<>(userDto.userRoles()));
             }
+            return user;
         }catch (Exception e){
             throw new IllegalArgumentException(e);
         }
 
     }
 
+    @AuditTrail(operation = UserAuditOperationConstants.UPDATE_USER, bodyIndex = 1, entityIdIndex = 0)
     @Transactional
     @Override
     public void updateUser(Long userId, UserDtoV2 userDto) {

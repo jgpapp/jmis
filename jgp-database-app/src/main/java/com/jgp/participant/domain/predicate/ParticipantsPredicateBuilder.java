@@ -23,6 +23,7 @@ public class ParticipantsPredicateBuilder {
         BooleanBuilder builder = new BooleanBuilder();
 
         List<Predicate> predicateList = new ArrayList<>();
+        predicateList.add(qParticipant.isDeleted.isFalse());
         if (null != searchText) {
             var businessNamePredicate = qParticipant.businessName.likeIgnoreCase("%"+searchText+"%s");
             var jgpPredicate = qParticipant.jgpId.likeIgnoreCase("%"+searchText+"%s");
@@ -30,9 +31,7 @@ public class ParticipantsPredicateBuilder {
             predicateList.add(businessNamePredicate.or(jgpPredicate).or(phoneNumberPredicate));
         }
 
-        if (!predicateList.isEmpty()) {
-            builder.orAllOf(predicateList.toArray(new Predicate[0]));
-        }
+        builder.orAllOf(predicateList.toArray(new Predicate[0]));
 
         return builder;
     }

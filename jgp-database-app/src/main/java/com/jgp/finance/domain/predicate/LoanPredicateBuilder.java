@@ -43,9 +43,7 @@ public class LoanPredicateBuilder {
             predicateList.add(qLoan.isDataApprovedByPartner.eq(searchCriteria.approvedByPartner()));
         }
 
-        if (!predicateList.isEmpty()) {
-            builder.orAllOf(predicateList.toArray(new Predicate[0]));
-        }
+        builder.orAllOf(predicateList.toArray(new Predicate[0]));
 
         return builder;
     }

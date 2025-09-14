@@ -1,5 +1,7 @@
 package com.jgp.participant.service;
 
+import com.jgp.authentication.aop.AuditTrail;
+import com.jgp.authentication.domain.UserAuditOperationConstants;
 import com.jgp.bmo.dto.BMOParticipantSearchCriteria;
 import com.jgp.bmo.dto.MentorshipSearchCriteria;
 import com.jgp.bmo.service.BMOClientDataService;
@@ -37,18 +39,14 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final MentorshipService mentorshipService;
     private final OutComeMonitoringService outComeMonitoringService;
 
-    @Transactional
-    @Override
-    public void saveParticipant(Participant participant) {
-        this.participantRepository.save(participant);
-    }
-
+    @AuditTrail(operation = UserAuditOperationConstants.CREATE_PARTICIPANT)
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Participant createParticipant(ParticipantDto participantDto) {
         return this.participantRepository.save(new Participant(participantDto));
     }
 
+    @AuditTrail(operation = UserAuditOperationConstants.UPDATE_PARTICIPANT, bodyIndex = 1, entityIdIndex = 0)
     @Override
     @Transactional
     public void updateParticipant(Long participantId, ParticipantDto participantDto) {

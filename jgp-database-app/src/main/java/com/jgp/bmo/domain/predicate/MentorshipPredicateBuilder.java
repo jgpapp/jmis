@@ -39,9 +39,7 @@ public class MentorshipPredicateBuilder {
             predicateList.add(qMentorship.isDataApproved.eq(searchCriteria.approvedByPartner()));
         }
 
-        if (!predicateList.isEmpty()) {
-            builder.orAllOf(predicateList.toArray(new Predicate[0]));
-        }
+        builder.orAllOf(predicateList.toArray(new Predicate[0]));
 
         return builder;
     }
