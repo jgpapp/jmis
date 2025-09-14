@@ -18,7 +18,8 @@ export const verticalMenuItems = [
     new Menu(15, 'Online Users', '/online-users', null, 'engineering', null, false, 12),
     new Menu(16, 'User Activity Logs', '/user-activity-logs', null, 'engineering', null, false, 12),
     new Menu(17, 'Administration', null, null, 'engineering', null, true, 0),
-    new Menu(18, 'System Resources', '/system-resources', null, 'engineering', null, false, 17),
+    new Menu(18, 'System Resources', '/system-resources', null, 'engineering', null, false, 17)
+  
     /*new Menu(5, 'Cards', '/ui/cards', null, 'card_membership', null, false, 3),
     new Menu(6, 'Lists', '/ui/lists', null, 'list', null, false, 3),
     new Menu(7, 'Grids', '/ui/grids', null, 'grid_on', null, false, 3),
@@ -97,7 +98,7 @@ export const horizontalMenuItems = [
     new Menu(15, 'Online Users', '/online-users', null, 'engineering', null, false, 12),
     new Menu(16, 'User Activity Logs', '/user-activity-logs', null, 'engineering', null, false, 12),
     new Menu(17, 'Administration', null, null, 'engineering', null, true, 0),
-    new Menu(18, 'System Resources', '/system-resources', null, 'engineering', null, false, 17),
+    new Menu(18, 'System Resources', '/system-resources', null, 'engineering', null, false, 17)
     
     /*new Menu(5, 'Cards', '/ui/cards', null, 'card_membership', null, false, 3),
     new Menu(6, 'Lists', '/ui/lists', null, 'list', null, false, 3),
