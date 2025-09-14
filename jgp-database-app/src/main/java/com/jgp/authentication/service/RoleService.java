@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface RoleService {
 
-    void createRole(RoleDto roleDto);
+    Role createRole(RoleDto roleDto);
 
     void updateRole(Long roleId, RoleDto roleDto);
 

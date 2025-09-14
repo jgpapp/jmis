@@ -1,6 +1,8 @@
 package com.jgp.patner.service;
 
 
+import com.jgp.authentication.aop.AuditTrail;
+import com.jgp.authentication.domain.UserAuditOperationConstants;
 import com.jgp.patner.domain.Partner;
 import com.jgp.patner.domain.PartnerRepository;
 import com.jgp.patner.dto.PartnerDto;
@@ -20,21 +22,23 @@ public class PartnerServiceImpl implements PartnerService {
     private final PartnerRepository partnerRepository;
 
 
+    @AuditTrail(operation = UserAuditOperationConstants.CREATE_PARTNER)
     @Transactional
     @Override
-    public void createPartner(PartnerDto partnerDto) {
+    public Partner createPartner(PartnerDto partnerDto) {
         try {
-            this.partnerRepository.save(Partner.createPartner(partnerDto));
+            return this.partnerRepository.save(Partner.createPartner(partnerDto));
         }catch (Exception e){
             throw new IllegalArgumentException(e);
         }
 
     }
 
+    @AuditTrail(operation = UserAuditOperationConstants.UPDATE_PARTNER, bodyIndex = 1, entityIdIndex = 0)
     @Transactional
     @Override
-    public void updatePartner(Long userId, PartnerDto partnerDto) {
-        var currentPartner = this.partnerRepository.findById(userId)
+    public void updatePartner(Long partnerId, PartnerDto partnerDto) {
+        var currentPartner = this.partnerRepository.findById(partnerId)
                 .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
                 .orElseThrow(() -> new PartnerNotFoundException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
         try {
