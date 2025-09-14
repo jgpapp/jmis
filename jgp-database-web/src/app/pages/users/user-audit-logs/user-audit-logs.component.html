@@ -1,0 +1,84 @@
+@if(authService.hasPermission('USER_ACTIVITY_LOG_READ')){
+<app-content-header 
+    [icon]="'supervisor_account'" 
+    [title]="'User Audit Logs'" 
+    [desc]="'View information about System User Activity Logs.'"
+    [hideBreadcrumb]="false"
+    [hasBgImage]="true" 
+    [class]="'pb-5'"></app-content-header>
+
+<div fxLayout="column" class="p-2">
+    <form [formGroup]="userLogsFilterForm" fxLayout="row wrap" fxLayoutAlign="center center">
+       <mat-form-field appearance="outline" fxFlex="100" [fxFlex.xl]="22" [fxFlex.lg]="22" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
+            <mat-label>From Date</mat-label>
+            <input matInput [matDatepicker]="fromPicker" formControlName="fromDate">
+            <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+            <mat-datepicker #fromPicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" fxFlex="100" [fxFlex.xl]="22" [fxFlex.lg]="22" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
+            <mat-label>To Date</mat-label>
+            <input matInput [matDatepicker]="toPicker" formControlName="toDate">
+            <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+            <mat-datepicker #toPicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" fxFlex="100" [fxFlex.xl]="22" [fxFlex.lg]="22" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
+                <mat-label>Select Action</mat-label>
+                <mat-select formControlName="action">
+                    <mat-option value="">All</mat-option>
+                    <mat-option value="CREATE_ROLE">Create Role</mat-option>
+                    <mat-option value="UPDATE_ROLE">Update Role</mat-option>
+                </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" fxFlex="100" [fxFlex.xl]="22" [fxFlex.lg]="22" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
+                <mat-label>User Email</mat-label>
+                <input matInput formControlName="userName" autocomplete="off">
+        </mat-form-field>
+
+        <div fxFlex="10" class="px-2">
+                <button mat-raised-button color="primary" (click)="refresh()">Refresh</button>
+        </div>
+
+    </form>
+    <div class="p-2">
+        <mat-table #table [dataSource]="dataSource" class="mat-elevation-z8">
+            <ng-container matColumnDef="logTime">
+                <mat-header-cell *matHeaderCellDef> Log Time </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.logTime}} </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="username">
+                <mat-header-cell *matHeaderCellDef> Username/Email </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.username}} </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="action">
+                <mat-header-cell *matHeaderCellDef> User Action </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.action}} </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="resourceId">
+                <mat-header-cell *matHeaderCellDef> Resource Database Primary Key/Id </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.resourceId}} </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="details">
+                <mat-header-cell *matHeaderCellDef> Change Details </mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                    <pre style="white-space: pre-wrap; word-break: break-word;">{{ element.details }}</pre>
+                </mat-cell>
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        </mat-table>
+        <mat-paginator 
+        #paginator 
+        [length]="totalItems" 
+        [pageSize]="pageSize" 
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="[5, 10, 20, 50, 100]" 
+        (page)="onPageChange($event)"
+        />
+    </div>
+</div>
+}
+@else {
+    <app-no-permission />
+}

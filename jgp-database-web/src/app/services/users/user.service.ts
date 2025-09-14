@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User } from '../../common/models/user.model';
@@ -42,4 +42,23 @@ export class UserService {
   getUserById(userId: number | string | null): Observable<any> {
     return this.httpClient.get(`/users/${userId}`);
   }
+
+  getUserAuditLogs(userName: string | undefined, action: string | undefined, fromDate: any, toDate: any, page: number, size: number): Observable<any> {
+        let params = new HttpParams()
+        .set('pageNumber', page.toString())
+        .set('pageSize', size.toString());
+        if(userName){
+            params = params.set('user-name', userName.toString());
+          }
+          if(action){
+            params = params.set('action', action.toString());
+          }
+          if(fromDate){
+            params = params.set('from-date', fromDate.format("YYYY-MM-DD") + 'T00:00:00');
+          }
+          if(toDate){
+            params = params.set('to-date', toDate.format("YYYY-MM-DD") + 'T23:59:59');
+          }
+        return this.httpClient.get(`/user-audit-logs`, { params });
+      }
 }

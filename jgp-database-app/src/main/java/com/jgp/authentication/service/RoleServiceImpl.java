@@ -1,9 +1,11 @@
 package com.jgp.authentication.service;
 
+import com.jgp.authentication.aop.AuditTrail;
 import com.jgp.authentication.domain.Permission;
 import com.jgp.authentication.domain.PermissionRepository;
 import com.jgp.authentication.domain.Role;
 import com.jgp.authentication.domain.RoleRepository;
+import com.jgp.authentication.domain.UserAuditOperationConstants;
 import com.jgp.authentication.dto.PermissionDto;
 import com.jgp.authentication.dto.RoleDto;
 import com.jgp.authentication.exception.RoleNotFoundException;
@@ -36,15 +38,18 @@ public class RoleServiceImpl implements RoleService {
     private final PermissionMapper permissionMapper;
     private final JdbcTemplate jdbcTemplate;
 
+    @AuditTrail(operation = UserAuditOperationConstants.CREATE_ROLE)
     @Override
     @Transactional
-    public void createRole(RoleDto roleDto) {
+    public Role createRole(RoleDto roleDto) {
         var role = this.roleRepository.save(Role.createRole(roleDto));
         if (!roleDto.permissions().isEmpty()){
             this.updateRolePermissions(role.getId(), new ArrayList<>(roleDto.permissions()));
         }
+        return role;
     }
 
+    @AuditTrail(operation = UserAuditOperationConstants.UPDATE_ROLE, bodyIndex = 1, entityIdIndex = 0)
     @Override
     @Transactional
     public void updateRole(Long roleId, RoleDto roleDto) {
@@ -56,6 +61,7 @@ public class RoleServiceImpl implements RoleService {
         this.roleRepository.save(role);
     }
 
+    @AuditTrail(operation = UserAuditOperationConstants.UPDATE_ROLE_PERMISSIONS, bodyIndex = 1, entityIdIndex = 0)
     @Override
     @Transactional
     public void updateRolePermissions(Long roleId, List<String> permissionCodes) {
@@ -65,6 +71,7 @@ public class RoleServiceImpl implements RoleService {
         this.roleRepository.save(role);
     }
 
+    @AuditTrail(operation = UserAuditOperationConstants.DELETE_ROLE, entityIdIndex = 0)
     @Override
     @Transactional
     public void deleteRole(Long roleId) {
