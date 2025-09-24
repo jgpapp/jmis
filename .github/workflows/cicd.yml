@@ -30,7 +30,7 @@ jobs:
           docker compose --env-file env/.env down
           docker rmi jmis-jgp_app_ui
           docker rmi jmis-jgp_app
-          docker compose --env-file env/.env up --build --build-arg GITHUB_TOKEN=$GITHUB_TOKEN -d
+          docker compose --env-file env/.env up --build -d
 
           # Optional: Clean up old Docker images to save space
           docker image prune -f
