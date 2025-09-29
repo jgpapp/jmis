@@ -16,27 +16,26 @@ import { ContactUsComponent } from './contact-us/contact-us.component';
 import { RouterModule } from '@angular/router';
 
 @Component({
-  selector: 'app-landing',
-  standalone: true,
-  imports: [
-    RouterModule,
-    FlexLayoutModule,
-    MatToolbarModule,
-    MatSidenavModule,
-    MatButtonModule,
-    MatIconModule,
-    ContentHeaderComponent,
-    FeaturesComponent,
-    OurWorksComponent,
-    OurServicesComponent,
-    TestimonialsComponent,
-    PricingComponent,
-    ContactUsComponent
-  ],
-  templateUrl: './landing.component.html',
-  styleUrl: './landing.component.scss',
-  encapsulation: ViewEncapsulation.None,
-  providers: [LandingService]
+    selector: 'app-landing',
+    imports: [
+        RouterModule,
+        FlexLayoutModule,
+        MatToolbarModule,
+        MatSidenavModule,
+        MatButtonModule,
+        MatIconModule,
+        ContentHeaderComponent,
+        FeaturesComponent,
+        OurWorksComponent,
+        OurServicesComponent,
+        TestimonialsComponent,
+        PricingComponent,
+        ContactUsComponent
+    ],
+    templateUrl: './landing.component.html',
+    styleUrl: './landing.component.scss',
+    encapsulation: ViewEncapsulation.None,
+    providers: [LandingService]
 })
 export class LandingComponent {
   public menuItems: any;  

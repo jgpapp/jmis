@@ -41,17 +41,16 @@ interface PerformanceSummaryFlatNode {
 
 
 @Component({
-  selector: 'app-performance-summary',
-  standalone: true,
-  imports: [
-    MatTableModule,
-    MatIconModule,
-    FlexLayoutModule,
-    MatCardModule,
-    CommonModule
-  ],
-  templateUrl: './performance-summary.component.html',
-  styleUrl: './performance-summary.component.scss'
+    selector: 'app-performance-summary',
+    imports: [
+        MatTableModule,
+        MatIconModule,
+        FlexLayoutModule,
+        MatCardModule,
+        CommonModule
+    ],
+    templateUrl: './performance-summary.component.html',
+    styleUrl: './performance-summary.component.scss'
 })
 export class PerformanceSummaryComponent implements OnInit {
 

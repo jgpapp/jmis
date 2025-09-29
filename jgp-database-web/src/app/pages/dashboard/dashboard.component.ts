@@ -26,29 +26,28 @@ import { AnalyticsComponent } from './analytics/analytics.component';
 import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-dashboard',
-  standalone: true,
-  imports: [
-    MatTableModule,
-    MatPaginatorModule,
-    ContentHeaderComponent,
-    FlexLayoutModule,
-    MatCardModule,
-    MatProgressBarModule,
-    TilesComponent,
-    InfoCardsComponent,
-    NoPermissionComponent,
-    DashboardFiltersComponent,
-    MatButtonModule,
-    MatIconModule,
-    MatButtonToggleModule,
-    FormsModule,
-    PerformanceSummaryComponent,
-    MonitoringDashboardComponent,
-    AnalyticsComponent
-],
-  templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.scss'
+    selector: 'app-dashboard',
+    imports: [
+        MatTableModule,
+        MatPaginatorModule,
+        ContentHeaderComponent,
+        FlexLayoutModule,
+        MatCardModule,
+        MatProgressBarModule,
+        TilesComponent,
+        InfoCardsComponent,
+        NoPermissionComponent,
+        DashboardFiltersComponent,
+        MatButtonModule,
+        MatIconModule,
+        MatButtonToggleModule,
+        FormsModule,
+        PerformanceSummaryComponent,
+        MonitoringDashboardComponent,
+        AnalyticsComponent
+    ],
+    templateUrl: './dashboard.component.html',
+    styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
 

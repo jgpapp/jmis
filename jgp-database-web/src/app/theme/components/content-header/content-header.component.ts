@@ -4,15 +4,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
 
 @Component({
-  selector: 'app-content-header',
-  standalone: true,
-  imports: [
-    NgClass,
-    MatIconModule,
-    BreadcrumbComponent
-  ],
-  templateUrl: './content-header.component.html',
-  styleUrl: './content-header.component.scss'
+    selector: 'app-content-header',
+    imports: [
+        NgClass,
+        MatIconModule,
+        BreadcrumbComponent
+    ],
+    templateUrl: './content-header.component.html',
+    styleUrl: './content-header.component.scss'
 })
 export class ContentHeaderComponent {
   @Input('icon') icon: any;

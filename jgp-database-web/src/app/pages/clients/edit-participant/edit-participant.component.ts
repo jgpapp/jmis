@@ -21,27 +21,26 @@ import { DashboardService } from '@services/dashboard/dashboard.service';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-edit-participant',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    FlexLayoutModule,
-    MatTabsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatRadioModule,
-    MatDialogModule,
-    MatButtonModule,
-    MatSelectModule,
-    MatOptionModule,
-    ContentHeaderComponent,
-    MatCardModule
-  ],
-  templateUrl: './edit-participant.component.html',
-  styleUrl: './edit-participant.component.scss'
+    selector: 'app-edit-participant',
+    imports: [
+        ReactiveFormsModule,
+        FlexLayoutModule,
+        MatTabsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatIconModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatRadioModule,
+        MatDialogModule,
+        MatButtonModule,
+        MatSelectModule,
+        MatOptionModule,
+        ContentHeaderComponent,
+        MatCardModule
+    ],
+    templateUrl: './edit-participant.component.html',
+    styleUrl: './edit-participant.component.scss'
 })
 export class EditParticipantComponent implements OnInit {
 

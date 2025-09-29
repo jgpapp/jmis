@@ -5,17 +5,16 @@ import { TablesService, Element } from '@services/tables.service';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-filtering',
-  standalone: true,
-  imports: [
-    MatTableModule,
-    MatInputModule,
-    ContentHeaderComponent   
-  ],
-  templateUrl: './filtering.component.html',
-  providers: [
-    TablesService
-  ]
+    selector: 'app-filtering',
+    imports: [
+        MatTableModule,
+        MatInputModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './filtering.component.html',
+    providers: [
+        TablesService
+    ]
 })
 export class FilteringComponent {
   public displayedColumns = ['position', 'name', 'weight', 'symbol'];

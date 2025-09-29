@@ -6,16 +6,15 @@ import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-lists',
-  standalone: true,
-  imports: [
-    ContentHeaderComponent,
-    FlexLayoutModule,
-    MatCardModule,
-    MatListModule,
-    MatIconModule
-  ],
-  templateUrl: './lists.component.html'
+    selector: 'app-lists',
+    imports: [
+        ContentHeaderComponent,
+        FlexLayoutModule,
+        MatCardModule,
+        MatListModule,
+        MatIconModule
+    ],
+    templateUrl: './lists.component.html'
 })
 export class ListsComponent {
   typesOfShoes: string[] = ['Boots', 'Clogs', 'Loafers', 'Moccasins', 'Sneakers'];

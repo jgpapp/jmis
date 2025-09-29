@@ -13,18 +13,17 @@ import { CountySummaryDto } from '../dto/county-summary-dto';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-info-cards',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatCardModule,
-    MatIconModule,
-    NgxChartsModule,
-    PieChartComponent,
-    MatDialogModule
-],
-  templateUrl: './info-cards.component.html',
-  styleUrl: './info-cards.component.scss'
+    selector: 'app-info-cards',
+    imports: [
+        FlexLayoutModule,
+        MatCardModule,
+        MatIconModule,
+        NgxChartsModule,
+        PieChartComponent,
+        MatDialogModule
+    ],
+    templateUrl: './info-cards.component.html',
+    styleUrl: './info-cards.component.scss'
 })
 export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, OnDestroy {
   @Input('dashBoardFilters') dashBoardFilters: any;

@@ -8,18 +8,17 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-slide-toggle',
-  standalone: true,
-  imports: [
-    FormsModule,
-    MatCardModule,
-    MatRadioModule,
-    MatDividerModule,
-    MatSlideToggleModule,
-    MatCheckboxModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './slide-toggle.component.html'
+    selector: 'app-slide-toggle',
+    imports: [
+        FormsModule,
+        MatCardModule,
+        MatRadioModule,
+        MatDividerModule,
+        MatSlideToggleModule,
+        MatCheckboxModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './slide-toggle.component.html'
 })
 export class SlideToggleComponent {
   color = 'accent';

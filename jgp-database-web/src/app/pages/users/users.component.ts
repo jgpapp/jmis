@@ -27,32 +27,31 @@ import { Subject, takeUntil } from 'rxjs';
 import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-users',
-  standalone: true,
-  imports: [
-    FormsModule,
-    FlexLayoutModule,
-    MatButtonModule,
-    MatButtonToggleModule,
-    MatIconModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatProgressSpinnerModule,
-    MatMenuModule,
-    MatSlideToggleModule,
-    MatCardModule,
-    MatDividerModule,
-    NgxPaginationModule,
-    PipesModule,
-    ContentHeaderComponent,
-    NgClass,
-    RouterModule,
-    NoPermissionComponent,
-    HasPermissionDirective
-  ],
-  templateUrl: './users.component.html',
-  styleUrl: './users.component.scss',
-  encapsulation: ViewEncapsulation.None
+    selector: 'app-users',
+    imports: [
+        FormsModule,
+        FlexLayoutModule,
+        MatButtonModule,
+        MatButtonToggleModule,
+        MatIconModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatProgressSpinnerModule,
+        MatMenuModule,
+        MatSlideToggleModule,
+        MatCardModule,
+        MatDividerModule,
+        NgxPaginationModule,
+        PipesModule,
+        ContentHeaderComponent,
+        NgClass,
+        RouterModule,
+        NoPermissionComponent,
+        HasPermissionDirective
+    ],
+    templateUrl: './users.component.html',
+    styleUrl: './users.component.scss',
+    encapsulation: ViewEncapsulation.None
 })
 export class UsersComponent implements OnInit, OnDestroy {
   public users: User[] | null;

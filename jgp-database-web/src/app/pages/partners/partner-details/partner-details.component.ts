@@ -13,22 +13,21 @@ import { MatDividerModule } from '@angular/material/divider';
 import { HasPermissionDirective } from '../../../directives/has-permission.directive';
 
 @Component({
-  selector: 'app-partner-details',
-  standalone: true,
-  imports: [
-    MatCardModule,
-    ContentHeaderComponent,
-    FlexLayoutModule,
-    MatButtonModule,
-    MatIconModule,
-    MatFormFieldModule,
-    AsyncPipe,
-    MatDividerModule,
-    RouterModule,
-    HasPermissionDirective
-  ],
-  templateUrl: './partner-details.component.html',
-  styleUrl: './partner-details.component.scss'
+    selector: 'app-partner-details',
+    imports: [
+        MatCardModule,
+        ContentHeaderComponent,
+        FlexLayoutModule,
+        MatButtonModule,
+        MatIconModule,
+        MatFormFieldModule,
+        AsyncPipe,
+        MatDividerModule,
+        RouterModule,
+        HasPermissionDirective
+    ],
+    templateUrl: './partner-details.component.html',
+    styleUrl: './partner-details.component.scss'
 })
 export class PartnerDetailsComponent {
 

@@ -8,18 +8,17 @@ import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-tooltip',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatTooltipModule,
-    FormsModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './tooltip.component.html'
+    selector: 'app-tooltip',
+    imports: [
+        FlexLayoutModule,
+        MatCardModule,
+        MatFormFieldModule,
+        MatSelectModule,
+        MatTooltipModule,
+        FormsModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './tooltip.component.html'
 })
 export class TooltipComponent {
   public position: TooltipPosition = 'before';

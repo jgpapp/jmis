@@ -13,22 +13,21 @@ import { MatDividerModule } from '@angular/material/divider';
 import { HasPermissionDirective } from '../../../directives/has-permission.directive';
 
 @Component({
-  selector: 'app-user-role-details',
-  standalone: true,
-  imports: [
-    MatCardModule,
-    ContentHeaderComponent,
-    FlexLayoutModule,
-    MatButtonModule,
-    MatIconModule,
-    MatFormFieldModule,
-    AsyncPipe,
-    MatDividerModule,
-    RouterModule,
-    HasPermissionDirective
-  ],
-  templateUrl: './user-role-details.component.html',
-  styleUrl: './user-role-details.component.scss'
+    selector: 'app-user-role-details',
+    imports: [
+        MatCardModule,
+        ContentHeaderComponent,
+        FlexLayoutModule,
+        MatButtonModule,
+        MatIconModule,
+        MatFormFieldModule,
+        AsyncPipe,
+        MatDividerModule,
+        RouterModule,
+        HasPermissionDirective
+    ],
+    templateUrl: './user-role-details.component.html',
+    styleUrl: './user-role-details.component.scss'
 })
 export class UserRoleDetailsComponent implements OnInit {
 

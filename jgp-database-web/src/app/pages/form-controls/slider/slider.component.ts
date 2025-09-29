@@ -8,19 +8,18 @@ import { MatSliderModule } from '@angular/material/slider';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-slider',
-  standalone: true,
-  imports: [
-    FormsModule,
-    MatCardModule,
-    MatInputModule,
-    MatCheckboxModule,
-    MatSliderModule,
-    MatDividerModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './slider.component.html',
-  styleUrl: './slider.component.scss'
+    selector: 'app-slider',
+    imports: [
+        FormsModule,
+        MatCardModule,
+        MatInputModule,
+        MatCheckboxModule,
+        MatSliderModule,
+        MatDividerModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './slider.component.html',
+    styleUrl: './slider.component.scss'
 })
 export class SliderComponent {
   disabled = false;

@@ -15,24 +15,23 @@ import { HasPermissionDirective } from '../../../directives/has-permission.direc
 import { DashboardService } from '@services/dashboard/dashboard.service';
 
 @Component({
-  selector: 'app-client-details',
-  standalone: true,
-  imports: [
-    MatCardModule,
-    ContentHeaderComponent,
-    FlexLayoutModule,
-    MatButtonModule,
-    MatIconModule,
-    MatFormFieldModule,
-    AsyncPipe,
-    MatDividerModule,
-    RouterModule,
-    MatTableModule,
-    MatPaginatorModule,
-    HasPermissionDirective
-  ],
-  templateUrl: './client-details.component.html',
-  styleUrl: './client-details.component.scss'
+    selector: 'app-client-details',
+    imports: [
+        MatCardModule,
+        ContentHeaderComponent,
+        FlexLayoutModule,
+        MatButtonModule,
+        MatIconModule,
+        MatFormFieldModule,
+        AsyncPipe,
+        MatDividerModule,
+        RouterModule,
+        MatTableModule,
+        MatPaginatorModule,
+        HasPermissionDirective
+    ],
+    templateUrl: './client-details.component.html',
+    styleUrl: './client-details.component.scss'
 })
 export class ClientDetailsComponent {
 

@@ -16,20 +16,19 @@ import { Subject, takeUntil } from 'rxjs';
 import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [
-    RouterModule,
-    FlexLayoutModule,
-    MatSidenavModule,
-    ReactiveFormsModule,
-    MatButtonModule,
-    MatIconModule,
-    MatInputModule,
-    MatSlideToggleModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './login.component.html'
+    selector: 'app-login',
+    imports: [
+        RouterModule,
+        FlexLayoutModule,
+        MatSidenavModule,
+        ReactiveFormsModule,
+        MatButtonModule,
+        MatIconModule,
+        MatInputModule,
+        MatSlideToggleModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './login.component.html'
 })
 export class LoginComponent implements OnDestroy {
   public settings: Settings;

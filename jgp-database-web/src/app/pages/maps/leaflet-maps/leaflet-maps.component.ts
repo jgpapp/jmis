@@ -3,10 +3,9 @@ import "leaflet-map";
 declare var L: any;
 
 @Component({
-  selector: 'app-leaflet-maps',
-  standalone: true,
-  imports: [],
-  templateUrl: './leaflet-maps.component.html'
+    selector: 'app-leaflet-maps',
+    imports: [],
+    templateUrl: './leaflet-maps.component.html'
 })
 export class LeafletMapsComponent {
 

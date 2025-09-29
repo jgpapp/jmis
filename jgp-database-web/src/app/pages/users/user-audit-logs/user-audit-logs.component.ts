@@ -34,36 +34,35 @@ export const MY_FORMATS = {
 };
 
 @Component({
-  selector: 'app-user-audit-logs',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatTableModule,
-    MatPaginatorModule,
-    ContentHeaderComponent,
-    RouterModule,
-    NoPermissionComponent,
-    MatFormFieldModule,
-    MatInputModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatDatepickerModule,
-    MatButtonModule,
-    MatOptionModule,
-    MatSelectModule,
-    MatIconModule
-  ],
-  providers: [
-    DatePipe,
-    {
-      provide: DateAdapter,
-      useClass: MomentDateAdapter,
-      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS]
-    },
-    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS }
-  ], 
-  templateUrl: './user-audit-logs.component.html',
-  styleUrl: './user-audit-logs.component.scss'
+    selector: 'app-user-audit-logs',
+    imports: [
+        FlexLayoutModule,
+        MatTableModule,
+        MatPaginatorModule,
+        ContentHeaderComponent,
+        RouterModule,
+        NoPermissionComponent,
+        MatFormFieldModule,
+        MatInputModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatDatepickerModule,
+        MatButtonModule,
+        MatOptionModule,
+        MatSelectModule,
+        MatIconModule
+    ],
+    providers: [
+        DatePipe,
+        {
+            provide: DateAdapter,
+            useClass: MomentDateAdapter,
+            deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS]
+        },
+        { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS }
+    ],
+    templateUrl: './user-audit-logs.component.html',
+    styleUrl: './user-audit-logs.component.scss'
 })
 export class UserAuditLogsComponent {
 

@@ -6,17 +6,16 @@ import { MatIconModule } from '@angular/material/icon';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 
 @Component({
-  selector: 'app-projects',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatDividerModule
-  ],
-  templateUrl: './projects.component.html',
-  styleUrl: './projects.component.scss'
+    selector: 'app-projects',
+    imports: [
+        FlexLayoutModule,
+        MatCardModule,
+        MatButtonModule,
+        MatIconModule,
+        MatDividerModule
+    ],
+    templateUrl: './projects.component.html',
+    styleUrl: './projects.component.scss'
 })
 export class ProjectsComponent {
   public projects = [

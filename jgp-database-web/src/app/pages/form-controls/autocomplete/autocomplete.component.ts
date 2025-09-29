@@ -9,18 +9,17 @@ import { Observable, map, startWith } from 'rxjs';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-autocomplete',
-  standalone: true,
-  imports: [
-    AsyncPipe,
-    ReactiveFormsModule,
-    FlexLayoutModule,
-    MatCardModule,
-    MatInputModule,
-    MatAutocompleteModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './autocomplete.component.html'
+    selector: 'app-autocomplete',
+    imports: [
+        AsyncPipe,
+        ReactiveFormsModule,
+        FlexLayoutModule,
+        MatCardModule,
+        MatInputModule,
+        MatAutocompleteModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './autocomplete.component.html'
 })
 export class AutocompleteComponent {
   myControl: FormControl = new FormControl();

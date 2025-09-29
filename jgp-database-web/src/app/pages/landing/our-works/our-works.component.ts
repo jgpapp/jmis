@@ -17,24 +17,23 @@ import { LandingService } from '@services/landing.service';
 import { Settings, SettingsService } from '@services/settings.service';
 
 @Component({
-  selector: 'app-our-works',
-  standalone: true,
-  imports: [
-    NguCarousel,
-    NguTileComponent,
-    NguCarousel,
-    NguCarouselDefDirective,
-    NguCarouselNextDirective,
-    NguCarouselPrevDirective,
-    NguItemComponent,
-    FlexLayoutModule,
-    MatCardModule,
-    MatIconModule,
-    MatButtonModule,
-    MatDividerModule
-  ],
-  templateUrl: './our-works.component.html',
-  providers: [LandingService]
+    selector: 'app-our-works',
+    imports: [
+        NguCarousel,
+        NguTileComponent,
+        NguCarousel,
+        NguCarouselDefDirective,
+        NguCarouselNextDirective,
+        NguCarouselPrevDirective,
+        NguItemComponent,
+        FlexLayoutModule,
+        MatCardModule,
+        MatIconModule,
+        MatButtonModule,
+        MatDividerModule
+    ],
+    templateUrl: './our-works.component.html',
+    providers: [LandingService]
 })
 export class OurWorksComponent implements OnInit {
   public works: any;

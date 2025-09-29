@@ -17,24 +17,23 @@ import { LoanService } from '@services/data-management/loan.service';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-loan-details',
-  standalone: true,
-  imports: [
-    MatCardModule,
-    ContentHeaderComponent,
-    FlexLayoutModule,
-    MatButtonModule,
-    MatIconModule,
-    MatFormFieldModule,
-    AsyncPipe,
-    MatDividerModule,
-    RouterModule,
-    MatTableModule,
-    MatPaginatorModule,
-    HasPermissionDirective
-  ],
-  templateUrl: './loan-details.component.html',
-  styleUrl: './loan-details.component.scss'
+    selector: 'app-loan-details',
+    imports: [
+        MatCardModule,
+        ContentHeaderComponent,
+        FlexLayoutModule,
+        MatButtonModule,
+        MatIconModule,
+        MatFormFieldModule,
+        AsyncPipe,
+        MatDividerModule,
+        RouterModule,
+        MatTableModule,
+        MatPaginatorModule,
+        HasPermissionDirective
+    ],
+    templateUrl: './loan-details.component.html',
+    styleUrl: './loan-details.component.scss'
 })
 export class LoanDetailsComponent {
 

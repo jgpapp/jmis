@@ -7,15 +7,14 @@ import { MenuService } from '@services/menu.service';
 import { Settings, SettingsService } from '@services/settings.service';
 
 @Component({
-  selector: 'app-breadcrumb',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatIconModule,
-    RouterModule
-  ],
-  templateUrl: './breadcrumb.component.html',
-  styleUrl: './breadcrumb.component.scss'
+    selector: 'app-breadcrumb',
+    imports: [
+        FlexLayoutModule,
+        MatIconModule,
+        RouterModule
+    ],
+    templateUrl: './breadcrumb.component.html',
+    styleUrl: './breadcrumb.component.scss'
 })
 export class BreadcrumbComponent {
   public pageTitle: string;

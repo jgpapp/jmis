@@ -25,28 +25,27 @@ import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-conta
 
 
 @Component({
-  selector: 'app-create-user',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    ContentHeaderComponent,
-    FlexLayoutModule,
-    MatTabsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatRadioModule,
-    MatDialogModule,
-    MatButtonModule,
-    MatSelectModule,
-    MatOptionModule,
-    MatCardModule,
-    MatStepperModule
-  ],
-  templateUrl: './create-user.component.html',
-  styleUrl: './create-user.component.scss'
+    selector: 'app-create-user',
+    imports: [
+        ReactiveFormsModule,
+        ContentHeaderComponent,
+        FlexLayoutModule,
+        MatTabsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatIconModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatRadioModule,
+        MatDialogModule,
+        MatButtonModule,
+        MatSelectModule,
+        MatOptionModule,
+        MatCardModule,
+        MatStepperModule
+    ],
+    templateUrl: './create-user.component.html',
+    styleUrl: './create-user.component.scss'
 })
 export class CreateUserComponent implements OnDestroy {
 

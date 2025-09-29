@@ -24,27 +24,26 @@ import { User } from '../../../common/models/user.model';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-edit-user',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    FlexLayoutModule,
-    MatTabsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatRadioModule,
-    MatDialogModule,
-    MatButtonModule,
-    MatSelectModule,
-    MatOptionModule,
-    ContentHeaderComponent,
-    MatCardModule
-  ],
-  templateUrl: './edit-user.component.html',
-  styleUrl: './edit-user.component.scss'
+    selector: 'app-edit-user',
+    imports: [
+        ReactiveFormsModule,
+        FlexLayoutModule,
+        MatTabsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatIconModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatRadioModule,
+        MatDialogModule,
+        MatButtonModule,
+        MatSelectModule,
+        MatOptionModule,
+        ContentHeaderComponent,
+        MatCardModule
+    ],
+    templateUrl: './edit-user.component.html',
+    styleUrl: './edit-user.component.scss'
 })
 export class EditUserComponent implements OnDestroy{
 

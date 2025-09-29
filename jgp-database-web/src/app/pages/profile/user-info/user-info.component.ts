@@ -8,18 +8,17 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 
 @Component({
-  selector: 'app-user-info',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    FlexLayoutModule,
-    MatCardModule,
-    MatButtonModule,
-    MatInputModule,
-    MatSelectModule
-  ],
-  templateUrl: './user-info.component.html',
-  styleUrl: './user-info.component.scss'
+    selector: 'app-user-info',
+    imports: [
+        ReactiveFormsModule,
+        FlexLayoutModule,
+        MatCardModule,
+        MatButtonModule,
+        MatInputModule,
+        MatSelectModule
+    ],
+    templateUrl: './user-info.component.html',
+    styleUrl: './user-info.component.scss'
 })
 export class UserInfoComponent implements OnInit {
   public personalForm: FormGroup;

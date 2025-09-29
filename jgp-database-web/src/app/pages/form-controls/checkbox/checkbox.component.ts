@@ -7,17 +7,16 @@ import { MatRadioModule } from '@angular/material/radio';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-checkbox',
-  standalone: true,
-  imports: [
-    FormsModule,
-    MatCardModule,
-    MatCheckboxModule,
-    MatRadioModule,
-    MatDividerModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './checkbox.component.html'
+    selector: 'app-checkbox',
+    imports: [
+        FormsModule,
+        MatCardModule,
+        MatCheckboxModule,
+        MatRadioModule,
+        MatDividerModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './checkbox.component.html'
 })
 export class CheckboxComponent {
   checked = false;

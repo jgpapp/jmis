@@ -5,17 +5,16 @@ import { TablesService, Element } from '@services/tables.service';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-sorting',
-  standalone: true,
-  imports: [
-    MatTableModule,
-    MatSortModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './sorting.component.html',
-  providers: [
-    TablesService
-  ]
+    selector: 'app-sorting',
+    imports: [
+        MatTableModule,
+        MatSortModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './sorting.component.html',
+    providers: [
+        TablesService
+    ]
 })
 export class SortingComponent {
   @ViewChild(MatSort) sort: MatSort;

@@ -7,16 +7,15 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-snackbar',
-  standalone: true,
-  imports: [
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './snackbar.component.html'
+    selector: 'app-snackbar',
+    imports: [
+        MatCardModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatButtonModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './snackbar.component.html'
 })
 export class SnackbarComponent {
   snackBar = inject(MatSnackBar);

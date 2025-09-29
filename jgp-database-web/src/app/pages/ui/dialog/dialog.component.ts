@@ -9,18 +9,17 @@ import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-dialog',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatCardModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    FormsModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './dialog.component.html'
+    selector: 'app-dialog',
+    imports: [
+        FlexLayoutModule,
+        MatCardModule,
+        MatButtonModule,
+        MatFormFieldModule,
+        MatInputModule,
+        FormsModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './dialog.component.html'
 })
 export class DialogComponent {
   animal: string;
@@ -63,19 +62,18 @@ export interface DialogData {
 }
 
 @Component({
-  selector: 'dialog-overview-example-dialog',
-  templateUrl: 'dialog-overview-example-dialog.html',
-  standalone: true,
-  imports: [
-    MatFormFieldModule,
-    MatInputModule,
-    FormsModule,
-    MatButtonModule,
-    MatDialogTitle,
-    MatDialogContent,
-    MatDialogActions,
-    MatDialogClose,
-  ],
+    selector: 'dialog-overview-example-dialog',
+    templateUrl: 'dialog-overview-example-dialog.html',
+    imports: [
+        MatFormFieldModule,
+        MatInputModule,
+        FormsModule,
+        MatButtonModule,
+        MatDialogTitle,
+        MatDialogContent,
+        MatDialogActions,
+        MatDialogClose,
+    ]
 })
 export class DialogOverviewExampleDialog {
   constructor(public dialogRef: MatDialogRef<DialogOverviewExampleDialog>,
@@ -88,16 +86,15 @@ export class DialogOverviewExampleDialog {
 
 
 @Component({
-  selector: 'dialog-animations-example-dialog',
-  templateUrl: 'dialog-animations-example-dialog.html',
-  standalone: true,
-  imports: [
-    MatButtonModule, 
-    MatDialogActions, 
-    MatDialogClose, 
-    MatDialogTitle, 
-    MatDialogContent
-  ],
+    selector: 'dialog-animations-example-dialog',
+    templateUrl: 'dialog-animations-example-dialog.html',
+    imports: [
+        MatButtonModule,
+        MatDialogActions,
+        MatDialogClose,
+        MatDialogTitle,
+        MatDialogContent
+    ]
 })
 export class DialogAnimationsExampleDialog {
   constructor(public dialogRef: MatDialogRef<DialogAnimationsExampleDialog>) {}
@@ -106,12 +103,11 @@ export class DialogAnimationsExampleDialog {
 
 
 @Component({
-  selector: 'dialog-content-example-dialog',
-  templateUrl: 'dialog-content-example-dialog.html',
-  standalone: true,
-  imports: [
-    MatDialogModule, 
-    MatButtonModule
-  ],
+    selector: 'dialog-content-example-dialog',
+    templateUrl: 'dialog-content-example-dialog.html',
+    imports: [
+        MatDialogModule,
+        MatButtonModule
+    ]
 })
 export class DialogContentExampleDialog {}

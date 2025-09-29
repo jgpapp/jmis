@@ -22,23 +22,22 @@ import { MonitoringServiceService } from '@services/monitoring.service.service';
 import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-outcome-monitoring',
-  standalone: true,
-  imports: [
-    ContentHeaderComponent,
-    FlexLayoutModule,
-    MatCardModule,
-    MatButtonModule,
-    MatButtonToggleModule,
-    MatIconModule,
-    MatTableModule,
-    MatPaginatorModule,
-    NoPermissionComponent,
-    MatCheckboxModule,
-    HasPermissionDirective
-  ],
-  templateUrl: './outcome-monitoring.component.html',
-  styleUrl: './outcome-monitoring.component.scss'
+    selector: 'app-outcome-monitoring',
+    imports: [
+        ContentHeaderComponent,
+        FlexLayoutModule,
+        MatCardModule,
+        MatButtonModule,
+        MatButtonToggleModule,
+        MatIconModule,
+        MatTableModule,
+        MatPaginatorModule,
+        NoPermissionComponent,
+        MatCheckboxModule,
+        HasPermissionDirective
+    ],
+    templateUrl: './outcome-monitoring.component.html',
+    styleUrl: './outcome-monitoring.component.scss'
 })
 export class OutcomeMonitoringComponent implements OnDestroy, OnInit {
 

@@ -25,32 +25,31 @@ import { UserMenuComponent } from '../theme/components/user-menu/user-menu.compo
 import { TopInfoContentComponent } from '../theme/components/top-info-content/top-info-content.component';
 
 @Component({
-  selector: 'app-pages',
-  standalone: true,
-  imports: [
-    RouterOutlet,
-    FormsModule,
-    FlexLayoutModule,
-    NgScrollbarModule,
-    MatSidenavModule,
-    MatToolbarModule,
-    MatIconModule,
-    MatButtonModule,
-    MatSlideToggleModule,
-    MatRadioModule,
-    SidenavComponent,
-    HorizontalMenuComponent,
-    FullScreenComponent,
-    FlagsMenuComponent,
-    FavoritesComponent,
-    ApplicationsComponent,
-    MessagesComponent,
-    UserMenuComponent,
-    TopInfoContentComponent
-  ],
-  templateUrl: './pages.component.html',
-  styleUrl: './pages.component.scss',
-  animations: [ rotate ]
+    selector: 'app-pages',
+    imports: [
+        RouterOutlet,
+        FormsModule,
+        FlexLayoutModule,
+        NgScrollbarModule,
+        MatSidenavModule,
+        MatToolbarModule,
+        MatIconModule,
+        MatButtonModule,
+        MatSlideToggleModule,
+        MatRadioModule,
+        SidenavComponent,
+        HorizontalMenuComponent,
+        FullScreenComponent,
+        FlagsMenuComponent,
+        FavoritesComponent,
+        ApplicationsComponent,
+        MessagesComponent,
+        UserMenuComponent,
+        TopInfoContentComponent
+    ],
+    templateUrl: './pages.component.html',
+    styleUrl: './pages.component.scss',
+    animations: [rotate]
 })
 export class PagesComponent implements OnInit {
   @ViewChild('sidenav') sidenav: any;
