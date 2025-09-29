@@ -19,22 +19,21 @@ import { UserService } from '@services/users/user.service';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-user-details',
-  standalone: true,
-  imports: [
-    MatCardModule,
-    ContentHeaderComponent,
-    FlexLayoutModule,
-    MatButtonModule,
-    MatIconModule,
-    MatFormFieldModule,
-    AsyncPipe,
-    MatDividerModule,
-    RouterModule,
-    HasPermissionDirective
-  ],
-  templateUrl: './user-details.component.html',
-  styleUrl: './user-details.component.scss'
+    selector: 'app-user-details',
+    imports: [
+        MatCardModule,
+        ContentHeaderComponent,
+        FlexLayoutModule,
+        MatButtonModule,
+        MatIconModule,
+        MatFormFieldModule,
+        AsyncPipe,
+        MatDividerModule,
+        RouterModule,
+        HasPermissionDirective
+    ],
+    templateUrl: './user-details.component.html',
+    styleUrl: './user-details.component.scss'
 })
 export class UserDetailsComponent implements OnDestroy, OnInit{
 

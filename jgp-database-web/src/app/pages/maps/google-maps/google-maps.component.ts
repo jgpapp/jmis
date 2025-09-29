@@ -3,12 +3,11 @@ import { Settings, SettingsService } from '@services/settings.service';
 import { GoogleMapsModule } from '@angular/google-maps';
 
 @Component({
-  selector: 'app-google-maps',
-  standalone: true,
-  imports: [
-    GoogleMapsModule
-  ],
-  templateUrl: './google-maps.component.html'
+    selector: 'app-google-maps',
+    imports: [
+        GoogleMapsModule
+    ],
+    templateUrl: './google-maps.component.html'
 })
 export class GoogleMapsComponent {
   settings: Settings; 

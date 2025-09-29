@@ -17,23 +17,21 @@ import { GlobalService } from '@services/shared/global.service';
 import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-clients',
-  standalone: true,
-  imports: [
-    MatTableModule,
-    MatPaginatorModule,
-    ContentHeaderComponent,
-    RouterModule,
-    NoPermissionComponent,
-    MatFormFieldModule,
-    MatInputModule,
-    FormsModule,
-    MatButtonModule,
-    MatIconModule
-  ],
-  templateUrl: './clients.component.html',
-  styleUrl: './clients.component.scss'
- 
+    selector: 'app-clients',
+    imports: [
+        MatTableModule,
+        MatPaginatorModule,
+        ContentHeaderComponent,
+        RouterModule,
+        NoPermissionComponent,
+        MatFormFieldModule,
+        MatInputModule,
+        FormsModule,
+        MatButtonModule,
+        MatIconModule
+    ],
+    templateUrl: './clients.component.html',
+    styleUrl: './clients.component.scss'
 })
 export class ClientsComponent implements OnInit, OnDestroy{
 

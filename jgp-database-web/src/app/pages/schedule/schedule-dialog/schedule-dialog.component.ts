@@ -7,17 +7,16 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatInputModule } from '@angular/material/input';
 
 @Component({
-  selector: 'app-schedule-dialog',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    MatInputModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatDialogModule,
-    MatButtonModule
-  ],
-  templateUrl: './schedule-dialog.component.html'
+    selector: 'app-schedule-dialog',
+    imports: [
+        ReactiveFormsModule,
+        MatInputModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatDialogModule,
+        MatButtonModule
+    ],
+    templateUrl: './schedule-dialog.component.html'
 })
 export class ScheduleDialogComponent implements OnInit {
   public form: FormGroup;

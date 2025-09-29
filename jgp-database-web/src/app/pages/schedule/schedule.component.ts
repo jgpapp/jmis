@@ -30,24 +30,23 @@ const colors: any = {
 };
 
 @Component({
-  selector: 'app-schedule',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatCardModule,
-    MatToolbarModule,
-    MatButtonModule,
-    MatIconModule,
-    CalendarModule,
-    ContentHeaderComponent
-  ], 
-  templateUrl: './schedule.component.html',
-  styleUrls: ['./schedule.component.scss'],
-  encapsulation: ViewEncapsulation.None,
-  animations: [blockTransition],
-  host: {
-    '[@blockTransition]': ''
-  }
+    selector: 'app-schedule',
+    imports: [
+        FlexLayoutModule,
+        MatCardModule,
+        MatToolbarModule,
+        MatButtonModule,
+        MatIconModule,
+        CalendarModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './schedule.component.html',
+    styleUrls: ['./schedule.component.scss'],
+    encapsulation: ViewEncapsulation.None,
+    animations: [blockTransition],
+    host: {
+        '[@blockTransition]': ''
+    }
 })
 export class ScheduleComponent implements OnInit {
   view: CalendarView | "month" | "week" | "day" = 'month';

@@ -9,19 +9,18 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 
 @Component({
-  selector: 'app-contact-us',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    ReactiveFormsModule,
-    MatCardModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    GoogleMapsModule
-  ],
-  templateUrl: './contact-us.component.html',
-  styleUrl: './contact-us.component.scss'
+    selector: 'app-contact-us',
+    imports: [
+        FlexLayoutModule,
+        ReactiveFormsModule,
+        MatCardModule,
+        MatInputModule,
+        MatButtonModule,
+        MatIconModule,
+        GoogleMapsModule
+    ],
+    templateUrl: './contact-us.component.html',
+    styleUrl: './contact-us.component.scss'
 })
 export class ContactUsComponent implements OnInit {
   center: google.maps.LatLngLiteral = { lat: 45.421530, lng: -75.697193 };

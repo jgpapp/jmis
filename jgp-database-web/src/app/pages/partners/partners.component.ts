@@ -21,23 +21,22 @@ import { GlobalService } from '@services/shared/global.service';
 import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-partners',
-  standalone: true,
-  imports: [
-    MatTableModule,
-    MatPaginatorModule,
-    ContentHeaderComponent,
-    FlexLayoutModule,
-    MatButtonModule,
-    MatIconModule,
-    MatFormFieldModule,
-    RouterModule,
-    CommonModule,
-    NoPermissionComponent,
-    HasPermissionDirective
-  ],
-  templateUrl: './partners.component.html',
-  styleUrl: './partners.component.scss'
+    selector: 'app-partners',
+    imports: [
+        MatTableModule,
+        MatPaginatorModule,
+        ContentHeaderComponent,
+        FlexLayoutModule,
+        MatButtonModule,
+        MatIconModule,
+        MatFormFieldModule,
+        RouterModule,
+        CommonModule,
+        NoPermissionComponent,
+        HasPermissionDirective
+    ],
+    templateUrl: './partners.component.html',
+    styleUrl: './partners.component.scss'
 })
 export class PartnersComponent implements OnInit, OnDestroy{
   public searchText: string;

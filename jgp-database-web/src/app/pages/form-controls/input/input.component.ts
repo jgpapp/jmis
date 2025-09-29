@@ -9,19 +9,18 @@ import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-input',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    FormsModule,
-    FlexLayoutModule,
-    MatCardModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './input.component.html'
+    selector: 'app-input',
+    imports: [
+        ReactiveFormsModule,
+        FormsModule,
+        FlexLayoutModule,
+        MatCardModule,
+        MatInputModule,
+        MatButtonModule,
+        MatIconModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './input.component.html'
 })
 export class InputComponent {
   //Input with a custom ErrorStateMatcher

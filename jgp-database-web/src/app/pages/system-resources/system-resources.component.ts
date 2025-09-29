@@ -23,26 +23,25 @@ import { HasPermissionDirective } from '../../directives/has-permission.directiv
 import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-system-resources',
-  standalone: true,
-  imports: [
-    ContentHeaderComponent,
-    FlexLayoutModule,
-    MatButtonModule,
-    MatIconModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatTooltipModule,
-    MatProgressBarModule,
-    MatOptionModule,
-    MatSelectModule,
-    MatCardModule,
-    ReactiveFormsModule,
-    FileUploadComponent,
-    HasPermissionDirective
-],
-  templateUrl: './system-resources.component.html',
-  styleUrl: './system-resources.component.scss'
+    selector: 'app-system-resources',
+    imports: [
+        ContentHeaderComponent,
+        FlexLayoutModule,
+        MatButtonModule,
+        MatIconModule,
+        MatTableModule,
+        MatPaginatorModule,
+        MatTooltipModule,
+        MatProgressBarModule,
+        MatOptionModule,
+        MatSelectModule,
+        MatCardModule,
+        ReactiveFormsModule,
+        FileUploadComponent,
+        HasPermissionDirective
+    ],
+    templateUrl: './system-resources.component.html',
+    styleUrl: './system-resources.component.scss'
 })
 export class SystemResourcesComponent {
 

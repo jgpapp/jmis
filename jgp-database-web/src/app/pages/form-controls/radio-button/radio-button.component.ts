@@ -6,16 +6,15 @@ import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-radio-button',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatCardModule,
-    MatRadioModule,
-    FormsModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './radio-button.component.html'
+    selector: 'app-radio-button',
+    imports: [
+        FlexLayoutModule,
+        MatCardModule,
+        MatRadioModule,
+        FormsModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './radio-button.component.html'
 })
 export class RadioButtonComponent {
   favoriteSeason: string;

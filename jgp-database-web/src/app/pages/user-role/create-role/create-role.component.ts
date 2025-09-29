@@ -22,27 +22,26 @@ import { Subject, takeUntil } from 'rxjs';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-create-role',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    ContentHeaderComponent,
-    FlexLayoutModule,
-    MatTabsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatRadioModule,
-    MatDialogModule,
-    MatButtonModule,
-    MatSelectModule,
-    MatOptionModule,
-    MatCardModule
-  ],
-  templateUrl: './create-role.component.html',
-  styleUrl: './create-role.component.scss'
+    selector: 'app-create-role',
+    imports: [
+        ReactiveFormsModule,
+        ContentHeaderComponent,
+        FlexLayoutModule,
+        MatTabsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatIconModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatRadioModule,
+        MatDialogModule,
+        MatButtonModule,
+        MatSelectModule,
+        MatOptionModule,
+        MatCardModule
+    ],
+    templateUrl: './create-role.component.html',
+    styleUrl: './create-role.component.scss'
 })
 export class CreateRoleComponent implements OnDestroy{
 

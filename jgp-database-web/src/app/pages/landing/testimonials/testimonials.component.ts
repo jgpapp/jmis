@@ -16,24 +16,23 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-testimonials',
-  standalone: true,
-  imports: [
-    NguCarousel,
-    NguTileComponent,
-    NguCarousel,
-    NguCarouselDefDirective,
-    NguCarouselNextDirective,
-    NguCarouselPrevDirective,
-    NguItemComponent,
-    FlexLayoutModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule
-  ],
-  templateUrl: './testimonials.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [LandingService]
+    selector: 'app-testimonials',
+    imports: [
+        NguCarousel,
+        NguTileComponent,
+        NguCarousel,
+        NguCarouselDefDirective,
+        NguCarouselNextDirective,
+        NguCarouselPrevDirective,
+        NguItemComponent,
+        FlexLayoutModule,
+        MatCardModule,
+        MatButtonModule,
+        MatIconModule
+    ],
+    templateUrl: './testimonials.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [LandingService]
 })
 export class TestimonialsComponent implements OnInit {
   public testimonials: any[];

@@ -5,17 +5,16 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
-  selector: 'app-pie-chart',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatCardModule,
-    NgxChartsModule,
-    MatCheckboxModule
-  ],
-  templateUrl: './pie-chart.component.html',
-  styleUrl: './pie-chart.component.scss',
-  encapsulation: ViewEncapsulation.None
+    selector: 'app-pie-chart',
+    imports: [
+        FlexLayoutModule,
+        MatCardModule,
+        NgxChartsModule,
+        MatCheckboxModule
+    ],
+    templateUrl: './pie-chart.component.html',
+    styleUrl: './pie-chart.component.scss',
+    encapsulation: ViewEncapsulation.None
 })
 export class PieChartComponent {
 

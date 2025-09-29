@@ -20,27 +20,26 @@ import { Subject, takeUntil } from 'rxjs';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-create-partner',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    ContentHeaderComponent,
-    FlexLayoutModule,
-    MatTabsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatRadioModule,
-    MatDialogModule,
-    MatButtonModule,
-    MatSelectModule,
-    MatOptionModule,
-    MatCardModule
-  ],
-  templateUrl: './create-partner.component.html',
-  styleUrl: './create-partner.component.scss'
+    selector: 'app-create-partner',
+    imports: [
+        ReactiveFormsModule,
+        ContentHeaderComponent,
+        FlexLayoutModule,
+        MatTabsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatIconModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatRadioModule,
+        MatDialogModule,
+        MatButtonModule,
+        MatSelectModule,
+        MatOptionModule,
+        MatCardModule
+    ],
+    templateUrl: './create-partner.component.html',
+    styleUrl: './create-partner.component.scss'
 })
 export class CreatePartnerComponent implements OnDestroy{
 

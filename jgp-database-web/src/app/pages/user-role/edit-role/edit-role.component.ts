@@ -24,27 +24,26 @@ import { map, Subject, takeUntil } from 'rxjs';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-edit-role',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    FlexLayoutModule,
-    MatTabsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatRadioModule,
-    MatDialogModule,
-    MatButtonModule,
-    MatSelectModule,
-    MatOptionModule,
-    ContentHeaderComponent,
-    MatCardModule
-  ],
-  templateUrl: './edit-role.component.html',
-  styleUrl: './edit-role.component.scss'
+    selector: 'app-edit-role',
+    imports: [
+        ReactiveFormsModule,
+        FlexLayoutModule,
+        MatTabsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatIconModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatRadioModule,
+        MatDialogModule,
+        MatButtonModule,
+        MatSelectModule,
+        MatOptionModule,
+        ContentHeaderComponent,
+        MatCardModule
+    ],
+    templateUrl: './edit-role.component.html',
+    styleUrl: './edit-role.component.scss'
 })
 export class EditRoleComponent implements OnInit, OnDestroy {
 

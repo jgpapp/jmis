@@ -8,10 +8,9 @@ import { UserService } from '@services/users/user.service';
 import { AuthService } from '@services/users/auth.service';
 
 @Component({
-  selector: 'app-online-users',
-  standalone: true,
-  imports: [],
-  template: '',
+    selector: 'app-online-users',
+    imports: [],
+    template: ''
 })
 export class OnlineUsersComponent implements OnInit, OnDestroy {
 

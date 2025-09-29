@@ -14,21 +14,20 @@ import { MatInputModule } from '@angular/material/input';
  * Custom file upload component based on angular material.
  */
 @Component({
-  selector: 'jgp-file-upload',
-  standalone: true,
-  imports: [
-    MatTableModule,
-    MatPaginatorModule,
-    FlexLayoutModule,
-    MatButtonModule,
-    MatIconModule,
-    MatFormFieldModule,
-    MatInputModule,
-    RouterModule,
-    CommonModule
-  ],
-  templateUrl: './file-upload.component.html',
-  styleUrls: ['./file-upload.component.scss']
+    selector: 'jgp-file-upload',
+    imports: [
+        MatTableModule,
+        MatPaginatorModule,
+        FlexLayoutModule,
+        MatButtonModule,
+        MatIconModule,
+        MatFormFieldModule,
+        MatInputModule,
+        RouterModule,
+        CommonModule
+    ],
+    templateUrl: './file-upload.component.html',
+    styleUrls: ['./file-upload.component.scss']
 })
 export class FileUploadComponent {
 

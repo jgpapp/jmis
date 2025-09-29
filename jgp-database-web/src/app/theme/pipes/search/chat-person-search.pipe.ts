@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({ 
-  name: 'ChatPersonSearchPipe' 
+@Pipe({
+    name: 'ChatPersonSearchPipe',
+    standalone: false
 })
 export class ChatPersonSearchPipe implements PipeTransform {
   transform(value: any, args?: any): any {

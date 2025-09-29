@@ -19,32 +19,31 @@ import { PipesModule } from '../../theme/pipes/pipes.module';
 import { ContentHeaderComponent } from '../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-mailbox',
-  standalone: true,
-  imports: [
-    FormsModule,
-    ReactiveFormsModule,
-    FlexLayoutModule,
-    MatCardModule,
-    MatSidenavModule,
-    MatToolbarModule,
-    MatButtonModule,
-    MatIconModule,
-    MatMenuModule,
-    MatListModule,
-    MatDividerModule,
-    MatInputModule,
-    NgScrollbarModule,
-    QuillModule,
-    PipesModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './mailbox.component.html',
-  styleUrl: './mailbox.component.scss',
-  encapsulation: ViewEncapsulation.None,
-  providers: [
-    MailboxService
-  ]
+    selector: 'app-mailbox',
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        FlexLayoutModule,
+        MatCardModule,
+        MatSidenavModule,
+        MatToolbarModule,
+        MatButtonModule,
+        MatIconModule,
+        MatMenuModule,
+        MatListModule,
+        MatDividerModule,
+        MatInputModule,
+        NgScrollbarModule,
+        QuillModule,
+        PipesModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './mailbox.component.html',
+    styleUrl: './mailbox.component.scss',
+    encapsulation: ViewEncapsulation.None,
+    providers: [
+        MailboxService
+    ]
 })
 export class MailboxComponent implements OnInit {
   @ViewChild('sidenav') sidenav: any;

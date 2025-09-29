@@ -15,23 +15,22 @@ import { LandingService } from '@services/landing.service';
 import { Settings, SettingsService } from '@services/settings.service';
 
 @Component({
-  selector: 'app-our-services',
-  standalone: true,
-  imports: [
-    NguCarousel,
-    NguTileComponent,
-    NguCarousel,
-    NguCarouselDefDirective,
-    NguCarouselNextDirective,
-    NguCarouselPrevDirective,
-    FlexLayoutModule,
-    MatCardModule,
-    MatIconModule,
-    MatButtonModule
-  ],
-  templateUrl: './our-services.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [LandingService]
+    selector: 'app-our-services',
+    imports: [
+        NguCarousel,
+        NguTileComponent,
+        NguCarousel,
+        NguCarouselDefDirective,
+        NguCarouselNextDirective,
+        NguCarouselPrevDirective,
+        FlexLayoutModule,
+        MatCardModule,
+        MatIconModule,
+        MatButtonModule
+    ],
+    templateUrl: './our-services.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [LandingService]
 })
 export class OurServicesComponent implements OnInit {
   public services: any[];

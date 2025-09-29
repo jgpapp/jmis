@@ -9,20 +9,19 @@ import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from '@services/users/auth.service';
 
 @Component({
-  selector: 'app-user-menu',
-  standalone: true,
-  imports: [
-    RouterModule,
-    FlexLayoutModule,
-    MatButtonModule,
-    MatIconModule,
-    MatMenuModule,
-    MatToolbarModule,
-    MatDividerModule
-  ],
-  templateUrl: './user-menu.component.html',
-  styleUrls: ['./user-menu.component.scss'],
-  encapsulation: ViewEncapsulation.None,
+    selector: 'app-user-menu',
+    imports: [
+        RouterModule,
+        FlexLayoutModule,
+        MatButtonModule,
+        MatIconModule,
+        MatMenuModule,
+        MatToolbarModule,
+        MatDividerModule
+    ],
+    templateUrl: './user-menu.component.html',
+    styleUrls: ['./user-menu.component.scss'],
+    encapsulation: ViewEncapsulation.None
 })
 export class UserMenuComponent implements OnInit {
   public userImage = "img/users/default-user.jpg";

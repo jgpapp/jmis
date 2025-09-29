@@ -29,32 +29,31 @@ import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-conta
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-data-uploader',
-  standalone: true,
-  imports: [
-    ContentHeaderComponent,
-    FileUploadComponent,
-    MatButtonModule,
-    MatSelectModule,
-    MatCardModule,
-    ReactiveFormsModule,
-    FlexLayoutModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatButtonModule,
-    MatOptionModule,
-    NoPermissionComponent,
-    MatTableModule,
-    MatPaginatorModule,
-    MatTooltipModule,
-    MatProgressBarModule,
-    MatRadioModule,
-    FormsModule,
-    HasPermissionDirective
-],
-  templateUrl: './data-uploader.component.html',
-  styleUrl: './data-uploader.component.scss'
+    selector: 'app-data-uploader',
+    imports: [
+        ContentHeaderComponent,
+        FileUploadComponent,
+        MatButtonModule,
+        MatSelectModule,
+        MatCardModule,
+        ReactiveFormsModule,
+        FlexLayoutModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatIconModule,
+        MatButtonModule,
+        MatOptionModule,
+        NoPermissionComponent,
+        MatTableModule,
+        MatPaginatorModule,
+        MatTooltipModule,
+        MatProgressBarModule,
+        MatRadioModule,
+        FormsModule,
+        HasPermissionDirective
+    ],
+    templateUrl: './data-uploader.component.html',
+    styleUrl: './data-uploader.component.scss'
 })
 export class DataUploaderComponent implements OnDestroy {
 

@@ -6,15 +6,14 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-line',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatCardModule,
-    NgxChartsModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './line.component.html'
+    selector: 'app-line',
+    imports: [
+        FlexLayoutModule,
+        MatCardModule,
+        NgxChartsModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './line.component.html'
 })
 export class LineComponent {
   public single: any[];

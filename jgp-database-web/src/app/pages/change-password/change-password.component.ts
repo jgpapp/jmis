@@ -16,21 +16,20 @@ import { Subject, takeUntil } from 'rxjs';
 import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-change-password',
-  standalone: true,
-  imports: [
-    RouterModule,
-    FlexLayoutModule,
-    MatSidenavModule,
-    ReactiveFormsModule,
-    MatButtonModule,
-    MatIconModule,
-    MatInputModule,
-    MatSlideToggleModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './change-password.component.html',
-  styleUrl: './change-password.component.scss'
+    selector: 'app-change-password',
+    imports: [
+        RouterModule,
+        FlexLayoutModule,
+        MatSidenavModule,
+        ReactiveFormsModule,
+        MatButtonModule,
+        MatIconModule,
+        MatInputModule,
+        MatSlideToggleModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './change-password.component.html',
+    styleUrl: './change-password.component.scss'
 })
 export class ChangePasswordComponent implements OnDestroy {
 

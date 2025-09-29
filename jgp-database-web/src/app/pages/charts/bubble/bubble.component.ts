@@ -6,15 +6,14 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-bubble',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatCardModule,
-    NgxChartsModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './bubble.component.html'
+    selector: 'app-bubble',
+    imports: [
+        FlexLayoutModule,
+        MatCardModule,
+        NgxChartsModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './bubble.component.html'
 })
 export class BubbleComponent {
   public bubble: any[];

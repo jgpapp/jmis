@@ -5,15 +5,14 @@ import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { LandingService } from '@services/landing.service';
 
 @Component({
-  selector: 'app-features',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatCardModule,
-    MatIconModule
-  ],
-  templateUrl: './features.component.html',
-  providers: [LandingService]
+    selector: 'app-features',
+    imports: [
+        FlexLayoutModule,
+        MatCardModule,
+        MatIconModule
+    ],
+    templateUrl: './features.component.html',
+    providers: [LandingService]
 })
 export class FeaturesComponent implements OnInit {
   public features: any; 

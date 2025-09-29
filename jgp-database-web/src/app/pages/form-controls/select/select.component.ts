@@ -7,18 +7,17 @@ import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-select',
-  standalone: true,
-  imports: [
-    FormsModule,
-    ReactiveFormsModule,
-    FlexLayoutModule,
-    MatCardModule,
-    MatSelectModule,
-    MatInputModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './select.component.html'
+    selector: 'app-select',
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        FlexLayoutModule,
+        MatCardModule,
+        MatSelectModule,
+        MatInputModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './select.component.html'
 })
 export class SelectComponent {
   //Basic select

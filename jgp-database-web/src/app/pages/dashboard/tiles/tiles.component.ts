@@ -9,15 +9,14 @@ import { DashboardTypeFilter } from '../../../dto/dashboard-type-filter';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-tiles',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatCardModule,
-    MatIconModule
-  ],
-  templateUrl: './tiles.component.html',
-  styleUrl: './tiles.component.scss'
+    selector: 'app-tiles',
+    imports: [
+        FlexLayoutModule,
+        MatCardModule,
+        MatIconModule
+    ],
+    templateUrl: './tiles.component.html',
+    styleUrl: './tiles.component.scss'
 })
 export class TilesComponent implements OnInit, OnDestroy, OnChanges {
 

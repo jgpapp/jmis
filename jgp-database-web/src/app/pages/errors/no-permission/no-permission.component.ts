@@ -7,17 +7,16 @@ import { Settings, SettingsService } from '@services/settings.service';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-no-permission',
-  standalone: true,
-  imports: [
-    RouterModule,
-    FlexLayoutModule,
-    MatSidenavModule,
-    MatButtonModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './no-permission.component.html',
-  styleUrl: './no-permission.component.scss'
+    selector: 'app-no-permission',
+    imports: [
+        RouterModule,
+        FlexLayoutModule,
+        MatSidenavModule,
+        MatButtonModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './no-permission.component.html',
+    styleUrl: './no-permission.component.scss'
 })
 export class NoPermissionComponent {
 
