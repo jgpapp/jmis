@@ -1,4 +1,4 @@
-FROM eclipse-temurin:22-alpine
+FROM eclipse-temurin:25-alpine
 COPY . /home/jgp
 WORKDIR /home/jgp
 ENV HOME=/home
