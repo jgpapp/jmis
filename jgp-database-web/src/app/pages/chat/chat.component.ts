@@ -17,30 +17,29 @@ import { FormsModule } from '@angular/forms';
 import { ContentHeaderComponent } from '../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-chat',
-  standalone: true,
-  imports: [
-    DatePipe,
-    FormsModule,
-    FlexLayoutModule,
-    MatCardModule,
-    MatSidenavModule,
-    MatToolbarModule,
-    MatListModule,
-    MatButtonModule,
-    MatIconModule,
-    MatMenuModule,
-    MatDividerModule,
-    MatInputModule,
-    NgScrollbarModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './chat.component.html',
-  styleUrl: './chat.component.scss',
-  encapsulation: ViewEncapsulation.None,
-  providers: [
-    ChatService
-  ]
+    selector: 'app-chat',
+    imports: [
+        DatePipe,
+        FormsModule,
+        FlexLayoutModule,
+        MatCardModule,
+        MatSidenavModule,
+        MatToolbarModule,
+        MatListModule,
+        MatButtonModule,
+        MatIconModule,
+        MatMenuModule,
+        MatDividerModule,
+        MatInputModule,
+        NgScrollbarModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './chat.component.html',
+    styleUrl: './chat.component.scss',
+    encapsulation: ViewEncapsulation.None,
+    providers: [
+        ChatService
+    ]
 })
 export class ChatComponent implements OnInit {
   @ViewChild('sidenav') sidenav: any;

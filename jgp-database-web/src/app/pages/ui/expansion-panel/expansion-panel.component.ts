@@ -11,21 +11,20 @@ import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-expansion-panel',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatCardModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatExpansionModule,
-    MatIconModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './expansion-panel.component.html'
+    selector: 'app-expansion-panel',
+    imports: [
+        FlexLayoutModule,
+        MatCardModule,
+        MatButtonModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatExpansionModule,
+        MatIconModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './expansion-panel.component.html'
 })
 export class ExpansionPanelComponent {
   @ViewChild(MatAccordion) accordion: MatAccordion;

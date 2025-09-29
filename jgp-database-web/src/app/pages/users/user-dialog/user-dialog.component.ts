@@ -21,27 +21,26 @@ import { PartnerService } from '@services/data-management/partners.service';
 import { UserRoleService } from '@services/users/userroles.service';
 
 @Component({
-  selector: 'app-user-dialog',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    FlexLayoutModule,
-    MatTabsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatRadioModule,
-    MatDialogModule,
-    MatButtonModule,
-    MatCheckboxModule,
-    MatSelectModule,
-    DatePipe,
-    FormsModule
-  ],
-  templateUrl: './user-dialog.component.html',
-  styleUrl: './user-dialog.component.scss'
+    selector: 'app-user-dialog',
+    imports: [
+        ReactiveFormsModule,
+        FlexLayoutModule,
+        MatTabsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatIconModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatRadioModule,
+        MatDialogModule,
+        MatButtonModule,
+        MatCheckboxModule,
+        MatSelectModule,
+        DatePipe,
+        FormsModule
+    ],
+    templateUrl: './user-dialog.component.html',
+    styleUrl: './user-dialog.component.scss'
 })
 export class UserDialogComponent implements OnInit {
   public createUserForm: FormGroup;

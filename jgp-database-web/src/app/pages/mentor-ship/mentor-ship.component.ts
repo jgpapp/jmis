@@ -22,9 +22,8 @@ import { MentorShipService } from '@services/data-management/mentor-ship.service
 import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-mentor-ship',
-  standalone: true,
-  imports: [
+    selector: 'app-mentor-ship',
+    imports: [
         ContentHeaderComponent,
         FlexLayoutModule,
         MatCardModule,
@@ -36,9 +35,9 @@ import { SubscriptionsContainer } from '../../theme/utils/subscriptions-containe
         NoPermissionComponent,
         MatCheckboxModule,
         HasPermissionDirective
-      ],
-  templateUrl: './mentor-ship.component.html',
-  styleUrl: './mentor-ship.component.scss'
+    ],
+    templateUrl: './mentor-ship.component.html',
+    styleUrl: './mentor-ship.component.scss'
 })
 export class MentorShipComponent implements OnDestroy, OnInit {
 

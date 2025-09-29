@@ -4,14 +4,13 @@ import { NgxDatatableModule, DatatableComponent, SelectionType } from '@swimlane
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-ngx-table',
-  standalone: true,
-  imports: [
-    NgxDatatableModule,
-    MatInputModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './ngx-table.component.html'
+    selector: 'app-ngx-table',
+    imports: [
+        NgxDatatableModule,
+        MatInputModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './ngx-table.component.html'
 })
 export class NgxTableComponent {
   @ViewChild(DatatableComponent) table: DatatableComponent;

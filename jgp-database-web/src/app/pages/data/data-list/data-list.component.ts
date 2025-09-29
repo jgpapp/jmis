@@ -22,22 +22,21 @@ import { MatDialog } from '@angular/material/dialog';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-data-list',
-  standalone: true,
-  imports: [
-    ContentHeaderComponent,
-    FlexLayoutModule,
-    MatCardModule,
-    MatButtonModule,
-    MatButtonToggleModule,
-    MatIconModule,
-    MatTableModule,
-    MatPaginatorModule,
-    NoPermissionComponent,
-    MatCheckboxModule,
-    HasPermissionDirective
-],
-  templateUrl: './data-list.component.html'
+    selector: 'app-data-list',
+    imports: [
+        ContentHeaderComponent,
+        FlexLayoutModule,
+        MatCardModule,
+        MatButtonModule,
+        MatButtonToggleModule,
+        MatIconModule,
+        MatTableModule,
+        MatPaginatorModule,
+        NoPermissionComponent,
+        MatCheckboxModule,
+        HasPermissionDirective
+    ],
+    templateUrl: './data-list.component.html'
 })
 export class DataListComponent implements OnDestroy{
 

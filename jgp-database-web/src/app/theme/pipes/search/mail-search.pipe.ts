@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'MailSearch'
+    name: 'MailSearch',
+    standalone: false
 })
 export class MailSearchPipe implements PipeTransform {
   transform(value: any, args?: any): any {

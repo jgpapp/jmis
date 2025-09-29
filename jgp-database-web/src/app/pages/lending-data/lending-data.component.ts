@@ -22,23 +22,22 @@ import { MatDialog } from '@angular/material/dialog';
 import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-lending-data',
-  standalone: true,
-  imports: [
-    ContentHeaderComponent,
-    FlexLayoutModule,
-    MatCardModule,
-    MatButtonModule,
-    MatButtonToggleModule,
-    MatIconModule,
-    MatTableModule,
-    MatPaginatorModule,
-    NoPermissionComponent,
-    MatCheckboxModule,
-    HasPermissionDirective
-  ],
-  templateUrl: './lending-data.component.html',
-  styleUrl: './lending-data.component.scss'
+    selector: 'app-lending-data',
+    imports: [
+        ContentHeaderComponent,
+        FlexLayoutModule,
+        MatCardModule,
+        MatButtonModule,
+        MatButtonToggleModule,
+        MatIconModule,
+        MatTableModule,
+        MatPaginatorModule,
+        NoPermissionComponent,
+        MatCheckboxModule,
+        HasPermissionDirective
+    ],
+    templateUrl: './lending-data.component.html',
+    styleUrl: './lending-data.component.scss'
 })
 export class LendingDataComponent implements OnDestroy, OnInit {
 

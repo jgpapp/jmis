@@ -4,13 +4,12 @@ import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { ContentHeaderComponent } from '../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-search',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './search.component.html'
+    selector: 'app-search',
+    imports: [
+        FlexLayoutModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './search.component.html'
 })
 export class SearchComponent implements OnInit {
   param: any;

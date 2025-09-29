@@ -10,17 +10,16 @@ import { Subject, takeUntil } from 'rxjs';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-monitoring-dashboard',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    NgxChartsModule,
-    FormsModule,
-    MatRadioModule,
-    MatIconModule
-  ],
-  templateUrl: './monitoring-dashboard.component.html',
-  styleUrl: './monitoring-dashboard.component.scss'
+    selector: 'app-monitoring-dashboard',
+    imports: [
+        FlexLayoutModule,
+        NgxChartsModule,
+        FormsModule,
+        MatRadioModule,
+        MatIconModule
+    ],
+    templateUrl: './monitoring-dashboard.component.html',
+    styleUrl: './monitoring-dashboard.component.scss'
 })
 export class MonitoringDashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 

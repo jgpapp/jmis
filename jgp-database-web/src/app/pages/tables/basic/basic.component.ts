@@ -4,16 +4,15 @@ import { TablesService, Element } from '@services/tables.service';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-basic',
-  standalone: true,
-  imports: [
-    MatTableModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './basic.component.html',
-  providers: [
-    TablesService
-  ]
+    selector: 'app-basic',
+    imports: [
+        MatTableModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './basic.component.html',
+    providers: [
+        TablesService
+    ]
 })
 export class BasicComponent {
   public displayedColumns = ['position', 'name', 'weight', 'symbol'];

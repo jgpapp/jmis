@@ -9,20 +9,19 @@ import { NgScrollbarModule } from 'ngx-scrollbar';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-datepicker',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatCardModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatInputModule,
-    MatButtonModule,
-    NgScrollbarModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './datepicker.component.html',
-  styleUrl: './datepicker.component.scss'
+    selector: 'app-datepicker',
+    imports: [
+        FlexLayoutModule,
+        MatCardModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatInputModule,
+        MatButtonModule,
+        NgScrollbarModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './datepicker.component.html',
+    styleUrl: './datepicker.component.scss'
 })
 export class DatepickerComponent {
   //Datepicker start date

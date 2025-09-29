@@ -20,28 +20,27 @@ import { MatRadioModule } from '@angular/material/radio';
 import { ContentHeaderComponent } from '../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-dynamic-menu',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    FlexLayoutModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatIconModule,
-    MatButtonModule,
-    MatTooltipModule,
-    MatCheckboxModule,
-    MatRadioModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './dynamic-menu.component.html',
-  providers: [ DynamicMenuService, MenuService ],
-  animations: [ listTransition ],
-  host: {
-    '[@listTransition]': ''
-  }
+    selector: 'app-dynamic-menu',
+    imports: [
+        ReactiveFormsModule,
+        FlexLayoutModule,
+        MatCardModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatIconModule,
+        MatButtonModule,
+        MatTooltipModule,
+        MatCheckboxModule,
+        MatRadioModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './dynamic-menu.component.html',
+    providers: [DynamicMenuService, MenuService],
+    animations: [listTransition],
+    host: {
+        '[@listTransition]': ''
+    }
 })
 export class DynamicMenuComponent implements OnInit { 
   public menuItems: Array<Menu>;

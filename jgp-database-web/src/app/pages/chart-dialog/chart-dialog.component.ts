@@ -14,21 +14,20 @@ import { KenyanMapComponent } from "../dashboard/kenyan-map/kenyan-map.component
 import { KeLeafletMapComponent } from '../ke-leaflet-map/ke-leaflet-map.component';
 
 @Component({
-  selector: 'app-chart-dialog',
-  standalone: true,
-  imports: [
-    PieChartComponent,
-    FlexLayoutModule,
-    MatCardModule,
-    MatIconModule,
-    NgxChartsModule,
-    MatButtonModule,
-    ExportAsModule,
-    KenyanMapComponent,
-    KeLeafletMapComponent
-],
-  templateUrl: './chart-dialog.component.html',
-  styleUrl: './chart-dialog.component.scss'
+    selector: 'app-chart-dialog',
+    imports: [
+        PieChartComponent,
+        FlexLayoutModule,
+        MatCardModule,
+        MatIconModule,
+        NgxChartsModule,
+        MatButtonModule,
+        ExportAsModule,
+        KenyanMapComponent,
+        KeLeafletMapComponent
+    ],
+    templateUrl: './chart-dialog.component.html',
+    styleUrl: './chart-dialog.component.scss'
 })
 export class ChartDialogComponent implements AfterViewInit {
   @ViewChild('dialogContentContainer', { static: true }) dialogContentContainer!: ElementRef;

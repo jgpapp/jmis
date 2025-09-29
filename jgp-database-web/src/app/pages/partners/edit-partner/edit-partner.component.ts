@@ -21,27 +21,26 @@ import { map, Subject, takeUntil } from 'rxjs';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-edit-partner',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    FlexLayoutModule,
-    MatTabsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatRadioModule,
-    MatDialogModule,
-    MatButtonModule,
-    MatSelectModule,
-    MatOptionModule,
-    ContentHeaderComponent,
-    MatCardModule
-  ],
-  templateUrl: './edit-partner.component.html',
-  styleUrl: './edit-partner.component.scss'
+    selector: 'app-edit-partner',
+    imports: [
+        ReactiveFormsModule,
+        FlexLayoutModule,
+        MatTabsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatIconModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatRadioModule,
+        MatDialogModule,
+        MatButtonModule,
+        MatSelectModule,
+        MatOptionModule,
+        ContentHeaderComponent,
+        MatCardModule
+    ],
+    templateUrl: './edit-partner.component.html',
+    styleUrl: './edit-partner.component.scss'
 })
 export class EditPartnerComponent implements OnDestroy{
 

@@ -6,17 +6,16 @@ import { TablesService, Element } from '@services/tables.service';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-selecting',
-  standalone: true,
-  imports: [
-    MatTableModule,
-    MatCheckboxModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './selecting.component.html',
-  providers: [
-    TablesService
-  ]
+    selector: 'app-selecting',
+    imports: [
+        MatTableModule,
+        MatCheckboxModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './selecting.component.html',
+    providers: [
+        TablesService
+    ]
 })
 export class SelectingComponent implements OnInit {
   public displayedColumns: string[] = ['select', 'position', 'name', 'weight', 'symbol'];

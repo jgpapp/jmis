@@ -6,7 +6,6 @@ const document: any = window.document;
 
 @Component({
     selector: 'app-fullscreen',
-    standalone: true,
     imports: [
         MatButtonModule,
         MatIconModule

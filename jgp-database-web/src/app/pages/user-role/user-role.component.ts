@@ -19,22 +19,21 @@ import { Subject, takeUntil } from 'rxjs';
 import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-user-role',
-  standalone: true,
-  imports: [
-    MatTableModule,
-    MatPaginatorModule,
-    ContentHeaderComponent,
-    FlexLayoutModule,
-    MatButtonModule,
-    MatIconModule,
-    MatFormFieldModule,
-    RouterModule,
-    NoPermissionComponent,
-    HasPermissionDirective
-  ],
-  templateUrl: './user-role.component.html',
-  styleUrl: './user-role.component.scss'
+    selector: 'app-user-role',
+    imports: [
+        MatTableModule,
+        MatPaginatorModule,
+        ContentHeaderComponent,
+        FlexLayoutModule,
+        MatButtonModule,
+        MatIconModule,
+        MatFormFieldModule,
+        RouterModule,
+        NoPermissionComponent,
+        HasPermissionDirective
+    ],
+    templateUrl: './user-role.component.html',
+    styleUrl: './user-role.component.scss'
 })
 export class UserRoleComponent implements OnInit, OnDestroy{
   public searchText: string;

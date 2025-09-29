@@ -10,20 +10,19 @@ import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-form-field',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    FlexLayoutModule,
-    MatCardModule,
-    MatInputModule,
-    MatSelectModule,
-    MatCheckboxModule,
-    MatRadioModule,
-    MatIconModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './form-field.component.html'
+    selector: 'app-form-field',
+    imports: [
+        ReactiveFormsModule,
+        FlexLayoutModule,
+        MatCardModule,
+        MatInputModule,
+        MatSelectModule,
+        MatCheckboxModule,
+        MatRadioModule,
+        MatIconModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './form-field.component.html'
 })
 export class FormFieldComponent {
   options: FormGroup;

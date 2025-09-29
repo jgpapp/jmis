@@ -4,14 +4,13 @@ import { MatCardModule } from '@angular/material/card';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 
 @Component({
-  selector: 'app-monthly',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatCardModule,
-    MatButtonModule
-  ],
-  templateUrl: './monthly.component.html'
+    selector: 'app-monthly',
+    imports: [
+        FlexLayoutModule,
+        MatCardModule,
+        MatButtonModule
+    ],
+    templateUrl: './monthly.component.html'
 })
 export class MonthlyComponent {
   public items = [

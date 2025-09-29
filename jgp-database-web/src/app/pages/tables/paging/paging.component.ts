@@ -5,17 +5,16 @@ import { TablesService, Element } from '@services/tables.service';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-paging',
-  standalone: true,
-  imports: [
-    MatTableModule,
-    MatPaginatorModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './paging.component.html',
-  providers: [
-    TablesService
-  ]
+    selector: 'app-paging',
+    imports: [
+        MatTableModule,
+        MatPaginatorModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './paging.component.html',
+    providers: [
+        TablesService
+    ]
 })
 export class PagingComponent {
   @ViewChild(MatPaginator) paginator: MatPaginator;

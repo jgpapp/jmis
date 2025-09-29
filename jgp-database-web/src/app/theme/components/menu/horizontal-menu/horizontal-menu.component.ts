@@ -10,18 +10,17 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from '@services/users/auth.service';
 
 @Component({
-  selector: 'app-horizontal-menu',
-  standalone: true,
-  imports: [
-    RouterModule,
-    FlexLayoutModule,
-    MatButtonModule,
-    MatIconModule,
-    MatTooltipModule
-  ],
-  templateUrl: './horizontal-menu.component.html',
-  styleUrls: ['./horizontal-menu.component.scss'],
-  encapsulation: ViewEncapsulation.None
+    selector: 'app-horizontal-menu',
+    imports: [
+        RouterModule,
+        FlexLayoutModule,
+        MatButtonModule,
+        MatIconModule,
+        MatTooltipModule
+    ],
+    templateUrl: './horizontal-menu.component.html',
+    styleUrls: ['./horizontal-menu.component.scss'],
+    encapsulation: ViewEncapsulation.None
 })
 export class HorizontalMenuComponent implements OnInit {
   @Input('menuParentId') menuParentId: any;

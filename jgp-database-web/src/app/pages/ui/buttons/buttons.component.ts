@@ -7,17 +7,16 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
 @Component({
-  selector: 'app-buttons',
-  standalone: true,
-  imports: [
-    ContentHeaderComponent,
-    FlexLayoutModule,
-    MatCardModule,
-    MatButtonModule,
-    MatButtonToggleModule,
-    MatIconModule
-  ],
-  templateUrl: './buttons.component.html'
+    selector: 'app-buttons',
+    imports: [
+        ContentHeaderComponent,
+        FlexLayoutModule,
+        MatCardModule,
+        MatButtonModule,
+        MatButtonToggleModule,
+        MatIconModule
+    ],
+    templateUrl: './buttons.component.html'
 })
 export class ButtonsComponent {
 

@@ -9,14 +9,13 @@ import { Subject } from 'rxjs';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-analytics',
-  standalone: true,
-  imports: [
-    MatCardModule,
-    NgxChartsModule
-  ],
-  templateUrl: './analytics.component.html',
-  styleUrl: './analytics.component.scss'
+    selector: 'app-analytics',
+    imports: [
+        MatCardModule,
+        NgxChartsModule
+    ],
+    templateUrl: './analytics.component.html',
+    styleUrl: './analytics.component.scss'
 })
 export class AnalyticsComponent implements OnInit, OnChanges, OnDestroy {
   @Input('dashBoardFilters') dashBoardFilters: any;

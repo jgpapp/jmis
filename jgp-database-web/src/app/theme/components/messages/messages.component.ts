@@ -11,23 +11,22 @@ import { PipesModule } from '../../pipes/pipes.module';
 import { MessagesService } from '@services/messages.service';
 
 @Component({
-  selector: 'app-messages',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatButtonModule,
-    MatIconModule,
-    MatTabsModule,
-    MatCardModule,
-    MatProgressBarModule,
-    MatMenuModule,
-    NgScrollbarModule,
-    PipesModule
-  ],
-  templateUrl: './messages.component.html',
-  styleUrls: ['./messages.component.scss'],
-  encapsulation: ViewEncapsulation.None,
-  providers: [MessagesService]
+    selector: 'app-messages',
+    imports: [
+        FlexLayoutModule,
+        MatButtonModule,
+        MatIconModule,
+        MatTabsModule,
+        MatCardModule,
+        MatProgressBarModule,
+        MatMenuModule,
+        NgScrollbarModule,
+        PipesModule
+    ],
+    templateUrl: './messages.component.html',
+    styleUrls: ['./messages.component.scss'],
+    encapsulation: ViewEncapsulation.None,
+    providers: [MessagesService]
 })
 export class MessagesComponent implements OnInit {
   @ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;

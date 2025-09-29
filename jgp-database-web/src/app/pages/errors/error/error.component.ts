@@ -7,16 +7,15 @@ import { Settings, SettingsService } from '@services/settings.service';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-error',
-  standalone: true,
-  imports: [
-    RouterModule,
-    FlexLayoutModule,
-    MatSidenavModule,
-    MatButtonModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './error.component.html'
+    selector: 'app-error',
+    imports: [
+        RouterModule,
+        FlexLayoutModule,
+        MatSidenavModule,
+        MatButtonModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './error.component.html'
 })
 export class ErrorComponent {
   public settings: Settings;

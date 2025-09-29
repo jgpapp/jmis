@@ -3,14 +3,13 @@ import { ContentHeaderComponent } from '../../theme/components/content-header/co
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 
 @Component({
-  selector: 'app-blank',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './blank.component.html',
-  styleUrl: './blank.component.scss'
+    selector: 'app-blank',
+    imports: [
+        FlexLayoutModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './blank.component.html',
+    styleUrl: './blank.component.scss'
 })
 export class BlankComponent {
 

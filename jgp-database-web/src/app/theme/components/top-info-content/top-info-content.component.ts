@@ -9,20 +9,19 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
-  selector: 'app-top-info-content',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatButtonModule,
-    MatIconModule,
-    MatTooltipModule,
-    MatInputModule,
-    MatCheckboxModule,
-    ReactiveFormsModule,
-    FormsModule
-  ],
-  templateUrl: './top-info-content.component.html',
-  styleUrls: ['./top-info-content.component.scss']
+    selector: 'app-top-info-content',
+    imports: [
+        FlexLayoutModule,
+        MatButtonModule,
+        MatIconModule,
+        MatTooltipModule,
+        MatInputModule,
+        MatCheckboxModule,
+        ReactiveFormsModule,
+        FormsModule
+    ],
+    templateUrl: './top-info-content.component.html',
+    styleUrls: ['./top-info-content.component.scss']
 })
 export class TopInfoContentComponent implements OnInit {
   @Input('showInfoContent') showInfoContent:boolean = false;

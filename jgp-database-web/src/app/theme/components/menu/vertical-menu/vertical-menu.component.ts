@@ -10,18 +10,17 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from '@services/users/auth.service';
 
 @Component({
-  selector: 'app-vertical-menu',
-  standalone: true,
-  imports: [
-    RouterModule,
-    FlexLayoutModule,
-    MatButtonModule,
-    MatIconModule,
-    MatTooltipModule
-  ],
-  templateUrl: './vertical-menu.component.html',
-  styleUrls: ['./vertical-menu.component.scss'],
-  encapsulation: ViewEncapsulation.None
+    selector: 'app-vertical-menu',
+    imports: [
+        RouterModule,
+        FlexLayoutModule,
+        MatButtonModule,
+        MatIconModule,
+        MatTooltipModule
+    ],
+    templateUrl: './vertical-menu.component.html',
+    styleUrls: ['./vertical-menu.component.scss'],
+    encapsulation: ViewEncapsulation.None
 })
 export class VerticalMenuComponent implements OnInit {
   @Input('menuItems') menuItems: Menu[];

@@ -6,15 +6,14 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-pie',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatCardModule,
-    NgxChartsModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './pie.component.html'
+    selector: 'app-pie',
+    imports: [
+        FlexLayoutModule,
+        MatCardModule,
+        NgxChartsModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './pie.component.html'
 })
 export class PieComponent {
   public single: any[];

@@ -7,19 +7,18 @@ import { ContentHeaderComponent } from '../../theme/components/content-header/co
 import { MatButtonModule } from '@angular/material/button';
 
 @Component({
-  selector: 'app-icons',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatCardModule,
-    MatIconModule,
-    MatButtonModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './icons.component.html',
-  providers: [
-    IconsService
-  ]
+    selector: 'app-icons',
+    imports: [
+        FlexLayoutModule,
+        MatCardModule,
+        MatIconModule,
+        MatButtonModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './icons.component.html',
+    providers: [
+        IconsService
+    ]
 })
 export class IconsComponent {
   icons: any; 

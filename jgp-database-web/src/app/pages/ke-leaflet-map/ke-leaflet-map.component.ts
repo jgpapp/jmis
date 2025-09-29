@@ -6,11 +6,10 @@ import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 
 
 @Component({
-  selector: 'app-ke-leaflet-map',
-  standalone: true,
-  imports: [LeafletModule],
-  templateUrl: './ke-leaflet-map.component.html',
-  styleUrl: './ke-leaflet-map.component.scss'
+    selector: 'app-ke-leaflet-map',
+    imports: [LeafletModule],
+    templateUrl: './ke-leaflet-map.component.html',
+    styleUrl: './ke-leaflet-map.component.scss'
 })
 export class KeLeafletMapComponent implements OnInit, AfterViewInit, OnDestroy {
   private map!: L.Map;

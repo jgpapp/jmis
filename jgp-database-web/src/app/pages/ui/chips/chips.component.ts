@@ -10,18 +10,17 @@ import { MatIconModule } from '@angular/material/icon';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-chips',
-  standalone: true,
-  imports: [
-    ContentHeaderComponent,
-    FlexLayoutModule,
-    MatCardModule,
-    MatChipsModule,
-    MatFormFieldModule,
-    MatIconModule
-  ],
-  templateUrl: './chips.component.html',
-  styleUrl: './chips.component.scss'
+    selector: 'app-chips',
+    imports: [
+        ContentHeaderComponent,
+        FlexLayoutModule,
+        MatCardModule,
+        MatChipsModule,
+        MatFormFieldModule,
+        MatIconModule
+    ],
+    templateUrl: './chips.component.html',
+    styleUrl: './chips.component.scss'
 })
 export class ChipsComponent {
   addOnBlur: boolean = true;

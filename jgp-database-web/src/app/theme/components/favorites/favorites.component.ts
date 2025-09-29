@@ -9,25 +9,24 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 
 @Component({
-  selector: 'app-favorites',
-  standalone: true,
-  imports: [
-    RouterModule,
-    FlexLayoutModule,
-    MatIconModule,
-    MatButtonModule,
-    MatSelectModule,
-    MatTooltipModule
-  ],
-  templateUrl: './favorites.component.html',
-  styleUrls: ['./favorites.component.scss'],
-  encapsulation: ViewEncapsulation.None,
-  providers: [
-    {
-      provide: MAT_SELECT_CONFIG,
-      useValue: { overlayPanelClass: 'w-auto' }
-    }
-  ]
+    selector: 'app-favorites',
+    imports: [
+        RouterModule,
+        FlexLayoutModule,
+        MatIconModule,
+        MatButtonModule,
+        MatSelectModule,
+        MatTooltipModule
+    ],
+    templateUrl: './favorites.component.html',
+    styleUrls: ['./favorites.component.scss'],
+    encapsulation: ViewEncapsulation.None,
+    providers: [
+        {
+            provide: MAT_SELECT_CONFIG,
+            useValue: { overlayPanelClass: 'w-auto' }
+        }
+    ]
 })
 export class FavoritesComponent implements OnInit {
   toppings: any;

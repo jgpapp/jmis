@@ -8,17 +8,16 @@ import { VerticalMenuComponent } from '../menu/vertical-menu/vertical-menu.compo
 import { AuthService } from '@services/users/auth.service';
 
 @Component({
-  selector: 'app-sidenav',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    NgScrollbarModule,
-    MatDividerModule, 
-    VerticalMenuComponent
-  ],
-  templateUrl: './sidenav.component.html',
-  styleUrls: ['./sidenav.component.scss'],
-  encapsulation: ViewEncapsulation.None
+    selector: 'app-sidenav',
+    imports: [
+        FlexLayoutModule,
+        NgScrollbarModule,
+        MatDividerModule,
+        VerticalMenuComponent
+    ],
+    templateUrl: './sidenav.component.html',
+    styleUrls: ['./sidenav.component.scss'],
+    encapsulation: ViewEncapsulation.None
 })
 export class SidenavComponent implements OnInit {
   public menuItems: Array<any>;

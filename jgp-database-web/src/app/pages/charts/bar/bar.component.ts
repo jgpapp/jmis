@@ -6,15 +6,14 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-bar',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatCardModule,
-    NgxChartsModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './bar.component.html'
+    selector: 'app-bar',
+    imports: [
+        FlexLayoutModule,
+        MatCardModule,
+        NgxChartsModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './bar.component.html'
 })
 export class BarComponent {
   public single: any[];

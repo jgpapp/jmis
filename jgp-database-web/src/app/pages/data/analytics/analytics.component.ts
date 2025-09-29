@@ -21,26 +21,25 @@ import { DatePipe } from '@angular/common';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-analytics',
-  standalone: true,
-  imports: [ReactiveFormsModule,
-      ContentHeaderComponent,
-      FlexLayoutModule,
-      MatTabsModule,
-      MatFormFieldModule,
-      MatInputModule,
-      MatIconModule,
-      MatDatepickerModule,
-      MatNativeDateModule,
-      MatRadioModule,
-      MatDialogModule,
-      MatButtonModule,
-      MatSelectModule,
-      MatOptionModule,
-      MatCardModule],
-  providers: [DatePipe],
-  templateUrl: './analytics.component.html',
-  styleUrl: './analytics.component.scss'
+    selector: 'app-analytics',
+    imports: [ReactiveFormsModule,
+        ContentHeaderComponent,
+        FlexLayoutModule,
+        MatTabsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatIconModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatRadioModule,
+        MatDialogModule,
+        MatButtonModule,
+        MatSelectModule,
+        MatOptionModule,
+        MatCardModule],
+    providers: [DatePipe],
+    templateUrl: './analytics.component.html',
+    styleUrl: './analytics.component.scss'
 })
 export class AnalyticsComponent implements OnInit, OnDestroy{
 

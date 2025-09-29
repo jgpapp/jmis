@@ -4,14 +4,13 @@ import { MonthlyComponent } from './monthly/monthly.component';
 import { YearlyComponent } from './yearly/yearly.component';
 
 @Component({
-  selector: 'app-pricing',
-  standalone: true,
-  imports: [
-    MatTabsModule,
-    MonthlyComponent,
-    YearlyComponent
-  ],
-  templateUrl: './pricing.component.html'
+    selector: 'app-pricing',
+    imports: [
+        MatTabsModule,
+        MonthlyComponent,
+        YearlyComponent
+    ],
+    templateUrl: './pricing.component.html'
 })
 export class PricingComponent {
 

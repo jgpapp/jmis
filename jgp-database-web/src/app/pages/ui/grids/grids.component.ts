@@ -5,15 +5,14 @@ import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-grids',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    MatCardModule,
-    MatGridListModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './grids.component.html'
+    selector: 'app-grids',
+    imports: [
+        FlexLayoutModule,
+        MatCardModule,
+        MatGridListModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './grids.component.html'
 })
 export class GridsComponent {
   tiles = [

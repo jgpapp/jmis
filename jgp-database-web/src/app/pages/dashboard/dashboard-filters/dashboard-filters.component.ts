@@ -17,21 +17,20 @@ import { DashboardTypeFilter } from '../../../dto/dashboard-type-filter';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
-  selector: 'app-dashboard-filters',
-  standalone: true,
-  imports: [
-    FlexLayoutModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatOptionModule,
-    MatDatepickerModule,
-    MatNativeDateModule
-  ],
-  providers: [DatePipe], // Add DatePipe to providers
-  templateUrl: './dashboard-filters.component.html',
-  styleUrl: './dashboard-filters.component.scss'
+    selector: 'app-dashboard-filters',
+    imports: [
+        FlexLayoutModule,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatOptionModule,
+        MatDatepickerModule,
+        MatNativeDateModule
+    ],
+    providers: [DatePipe], // Add DatePipe to providers
+    templateUrl: './dashboard-filters.component.html',
+    styleUrl: './dashboard-filters.component.scss'
 })
 export class DashboardFiltersComponent implements OnDestroy, OnInit, OnChanges{
 

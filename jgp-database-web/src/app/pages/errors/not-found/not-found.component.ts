@@ -10,19 +10,18 @@ import { ContentHeaderComponent } from '../../../theme/components/content-header
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-not-found',
-  standalone: true,
-  imports: [
-    RouterModule,
-    FlexLayoutModule,
-    ReactiveFormsModule,
-    MatSidenavModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './not-found.component.html'
+    selector: 'app-not-found',
+    imports: [
+        RouterModule,
+        FlexLayoutModule,
+        ReactiveFormsModule,
+        MatSidenavModule,
+        MatInputModule,
+        MatButtonModule,
+        MatIconModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './not-found.component.html'
 })
 export class NotFoundComponent {
   public form: FormGroup;

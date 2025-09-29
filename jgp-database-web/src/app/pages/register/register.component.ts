@@ -11,20 +11,19 @@ import { emailValidator, matchingPasswords } from '../../theme/utils/app-validat
 import { ContentHeaderComponent } from '../../theme/components/content-header/content-header.component';
 
 @Component({
-  selector: 'app-register',
-  standalone: true,
-  imports: [
-    RouterModule,
-    ReactiveFormsModule,
-    FlexLayoutModule,
-    MatSidenavModule,
-    MatButtonModule,
-    MatIconModule,
-    MatInputModule,
-    ContentHeaderComponent
-  ],
-  templateUrl: './register.component.html',
-  styleUrl: './register.component.scss'
+    selector: 'app-register',
+    imports: [
+        RouterModule,
+        ReactiveFormsModule,
+        FlexLayoutModule,
+        MatSidenavModule,
+        MatButtonModule,
+        MatIconModule,
+        MatInputModule,
+        ContentHeaderComponent
+    ],
+    templateUrl: './register.component.html',
+    styleUrl: './register.component.scss'
 })
 export class RegisterComponent {
   public form: FormGroup;
