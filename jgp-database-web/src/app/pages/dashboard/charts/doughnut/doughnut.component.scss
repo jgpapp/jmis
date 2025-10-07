@@ -1,0 +1,14 @@
+.chart-card {
+      width: 100%;
+      max-width: 500px;
+      margin: 20px;
+    }
+    .chart-container {
+      position: relative;
+      height: 100%; /* Fixed height for better chart rendering */
+      width: 100%;
+    }
+    mat-card-title {
+      font-size: 1.25em;
+      font-weight: 500;
+    }

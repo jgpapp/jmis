@@ -12,6 +12,7 @@ import { httpInterceptor } from './util/http.interceptor';
 import { apiPrefixInterceptor } from './util/api-prefix.interceptor';
 import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
 import { AuthService } from '@services/users/auth.service';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 export function tokenGetter() {
   return inject(AuthService).getAccessToken();
@@ -39,5 +40,6 @@ export const appConfig: ApplicationConfig = {
       useFactory: adapterFactory
     })),
     { provide: OverlayContainer, useClass: CustomOverlayContainer },
+    provideCharts(withDefaultRegisterables())
   ]
 };
