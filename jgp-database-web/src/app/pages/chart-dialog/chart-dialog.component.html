@@ -1,10 +1,10 @@
-<div fxLayout="column" ngClass="chart-container">
+<div fxLayout="column" class="chart-container">
   <button mat-icon-button class="close-button" (click)="onCloseClick()" fxFlex="4%">
     <mat-icon class="close-icon" color="warn">close</mat-icon>
   </button>
 <div fxLayout="column" fxLayoutAlign="center center" fxFlex="88%" class="chart-props" id="chartDiv">
 <h1 mat-dialog-title fxFlex="10%" fxFlexAlign="center center">{{data.chartTitle}}</h1>
-<div mat-dialog-content fxLayout="row" fxFlex="90%" class="chart-props">
+<div mat-dialog-content fxLayout="row" fxFlex="100%" class="chart-props" #chartContainer>
   <div class="chart-props" fxFlex="100%" #chartContainer>
   @if (data.chartType === 'app-pie-chart') {
       <app-pie-chart 
@@ -134,6 +134,18 @@
     [roundDomains]="data.chartRoundDomains" 
     (select)="onSelect($event)"
 />  
+  }
+
+  @if (data.chartType === 'chartJS-doughnut') {
+     <app-doughnut 
+     [config]="data.pieChartConfig" 
+     />
+  }
+
+  @if (data.chartType === 'chart-js-bar') {
+     <app-bar-chart 
+     [config]="data.config" 
+     />
   }
 </div>     
 </div>

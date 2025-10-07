@@ -6,11 +6,14 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { PieChartComponent } from "../pie-chart/pie-chart.component"; 
 import { multi, single } from '@data/charts.data';
 import { DashboardService } from '@services/dashboard/dashboard.service';
-import { Subject, takeUntil } from 'rxjs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DashboardTypeFilter } from '../../../dto/dashboard-type-filter';
 import { CountySummaryDto } from '../dto/county-summary-dto';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
+import { DoughnutComponent } from '../charts/doughnut/doughnut.component';
+import { PieChartConfig } from '../charts/models/pie-chart-config.model';
+import { BarChartConfig } from '../charts/models/bar-chart-config.model';
+import { BarChartComponent } from '../charts/bar-chart/bar-chart.component';
 
 @Component({
     selector: 'app-info-cards',
@@ -20,7 +23,9 @@ import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-conta
         MatIconModule,
         NgxChartsModule,
         PieChartComponent,
-        MatDialogModule
+        MatDialogModule,
+        DoughnutComponent,
+        BarChartComponent
     ],
     templateUrl: './info-cards.component.html',
     styleUrl: './info-cards.component.scss'
@@ -67,6 +72,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   public loansDisbursedByGenderExplodeSlices: boolean = false;
   public loansDisbursedByGenderDoughnut: boolean = true;
   public loansDisbursedByGenderChartTitle: string = 'Loan Disbursed by Gender';
+  public loansDisbursedByGenderPieConfig: PieChartConfig;
 
 
   public loansDisbursedByPipeline: any[];
@@ -84,6 +90,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   public mentorshipGenderSummaryChartTitle: string = 'Gender Distribution';
 
   public loansDisbursedByStatus: any[];
+  public loansDisbursedByStatusBarChartConfig: BarChartConfig;
   public loansDisbursedByStatusShowXAxis: boolean = true;
   public loansDisbursedByStatusShowYAxis: boolean = true;
   public loansDisbursedByStatusShowLegend: boolean = false;
@@ -161,13 +168,14 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   public taTrainedBySectorChartTitle: string = 'TA Training By Industry Sector';
 
   public loansDisbursedByProduct: any[];
+  public loansDisbursedByProductBarChartConfig: BarChartConfig;
   public loansDisbursedByProductShowXAxis: boolean = true;
   public loansDisbursedByProductShowYAxis: boolean = true;
   public loansDisbursedByProductShowLegend: boolean = false;
   public loansDisbursedByProductShowXAxisLabel: boolean = true;
   public loansDisbursedByProductShowYAxisLabel: boolean = true;
   public loansDisbursedByProductXAxisLabel: string = 'Loan Products';
-  public loansDisbursedByProductYAxisLabel: string = 'Loans Disbursed';
+  public loansDisbursedByProductYAxisLabel: string = 'Amount Disbursed';
   public loansDisbursedByProductChartTitle: string = 'Loan Disbursed By Loan Product';
 
   public employeesSummary: any[];
@@ -294,6 +302,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   subs = new SubscriptionsContainer();
 
   @ViewChild('loansDisbursedByGenderContentDiv', { static: false }) loansDisbursedByGenderContentDiv!: ElementRef;
+  @ViewChild('loansDisbursedByGenderNewContentDiv', { static: false }) loansDisbursedByGenderNewContentDiv!: ElementRef;
   @ViewChild('businessesTainedByGenderContentDiv', { static: false }) businessesTainedByGenderContentDiv!: ElementRef;
   @ViewChild('mentorshipByGenderCategoryContentDiv', { static: false }) mentorshipByGenderCategoryContentDiv!: ElementRef;
   @ViewChild('loanedBusinessesByGenderContentDiv', { static: false }) loanedBusinessesByGenderContentDiv!: ElementRef;
@@ -381,9 +390,63 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       .subscribe({
         next: (response) => {
           this.loansDisbursedByGender = response;
+          this.getLoansDisbursedByGenderPieConfig(response);
         },
         error: (error) => { }
       });
+  }
+
+  getLoansDisbursedByGenderPieConfig(data: any[]) {
+    this.loansDisbursedByGenderPieConfig = {
+      title: this.loansDisbursedByGenderChartTitle,
+    type: 'pie',
+    labels: data.map(item => item.name),
+    datasets: [
+      {
+        label: 'Sales ($)',
+        data: data.map(item => item.value),
+        backgroundColor: this.chartSColorScheme.domain,
+        borderColor: this.chartSColorScheme.domain,
+        borderWidth: 2
+      },
+    ],
+    options: {
+      cutout: '75%', // Key for doughnut appearance
+      plugins: {
+        tooltip: {
+            callbacks: {
+                //label: (context) => `${context.label}: $${context.formattedValue}`
+                label: (context: any) => {
+                  return '';
+                }
+            }
+        },
+        legend: { 
+          display: this.loansDisbursedByGenderShowLegend,
+          position: 'top' 
+        },
+        datalabels: {
+          color: '#0f0e0eff', // White text color for contrast
+          anchor: 'end',        // Line ends at the outer edge of the label
+          align: 'end',         // Label text aligns to the end of the line
+          offset: 8,            // Space between line end and label text
+          clamp: true,          // Ensures label stays within chart boundary
+          clip: false,          // Prevents the label from being cut off
+
+          leaderLine: {
+              lineColor: '#050505ff',
+              lineWidth: 1.5,
+              length: 20,       // Controls the length of the straight part of the line
+              // The plugin handles connecting this line segment to the correct arc automatically.
+          },
+          // 2. Define the formatter function to show percentages
+          formatter: (value: any, ctx: any) => {
+            return ctx.chart.data.labels ? ctx.chart.data.labels[ctx.dataIndex] : '';
+          },
+        },
+      }
+    } as any // Cast to 'any' to bypass type checking
+    };
   }
 
   getLoanDisbursedByIndustrySectorSummary() {
@@ -401,6 +464,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       .subscribe({
         next: (response) => {
           this.loansDisbursedByProduct = response;
+          this.loansDisbursedByProductBarChartConfig = this.dashBoardService.getBarChartConfig(response, this.loansDisbursedByProductChartTitle, this.loansDisbursedByProductYAxisLabel, this.loansDisbursedByProductXAxisLabel, 'horizontal', this.loansDisbursedByProductShowLegend, this.chartSColorScheme.domain);
         },
         error: (error) => { }
       });
@@ -431,6 +495,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       .subscribe({
         next: (response) => {
           this.loansDisbursedByStatus = response;
+          this.loansDisbursedByStatusBarChartConfig = this.dashBoardService.getBarChartConfig(response, this.loansDisbursedByStatusChartTitle, this.loansDisbursedByStatusYAxisLabel, this.loansDisbursedByStatusXAxisLabel, 'horizontal', this.loansDisbursedByStatusShowLegend, this.chartSColorScheme.domain);
         },
         error: (error) => { }
       });
@@ -686,6 +751,27 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
     this.previousWidthOfResizedDiv = this.resizedDiv.nativeElement.clientWidth;
   }
 
+  expandNewDoughnut(){
+    const data = { 
+      content: this.loansDisbursedByGenderNewContentDiv.nativeElement.cloneNode(true),
+      chartType: 'chartJS-doughnut',
+      chartData: this.loansDisbursedByGender,
+      chartShowLegend: this.loansDisbursedByGenderShowLegend,
+      chartSColorScheme: this.chartSColorScheme,
+      chartShowLabels: this.loansDisbursedByGenderShowLabels,
+      chartExplodeSlices: this.loansDisbursedByGenderExplodeSlices,
+      chartIsDoughnut: this.loansDisbursedByGenderDoughnut,
+      labelFormatting: this.valueFormattingWithThousandSeparator,
+      chartTitle: this.loansDisbursedByGenderChartTitle,
+      chartFormatLabel: (label: string): string => {
+        // Find the data object by name and return the value instead of name
+        const item = this.loansDisbursedByGender.find(data => data.name === label);
+        return item ? `${this.valueFormattingWithThousandSeparator(item.value)}` : label; // If found, return the value; otherwise return the name as fallback
+      }
+    };
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
+  }
+
   expandLoansDisbursedByGenderDoughnut(){
     const data = { 
       content: this.loansDisbursedByGenderContentDiv.nativeElement.cloneNode(true),
@@ -881,19 +967,8 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
     const data = { 
       content: this.loansDisbursedByStatusContentDiv.nativeElement.cloneNode(true),
       mapContainerElement: this.loansDisbursedByStatusContentDiv,
-      chartType: 'ngx-charts-bar-horizontal',
-      chartData: this.loansDisbursedByStatus,
-      chartGradient: this.gradient,
-      chartShowXAxis: this.loansDisbursedByStatusShowXAxis,
-      chartShowYAxis: this.loansDisbursedByStatusShowYAxis,
-      chartSColorScheme: this.chartSColorScheme,
-      chartShowLegend: true,
-      chartShowXAxisLabel: this.loansDisbursedByStatusShowXAxisLabel,
-      chartShowYAxisLabel: this.loansDisbursedByStatusShowYAxisLabel,
-      chartYAxisLabel: this.loansDisbursedByStatusYAxisLabel,
-      chartXAxisLabel: this.loansDisbursedByStatusXAxisLabel,
-      chartFormatLabel: this.valueFormatting,
-      chartTitle: this.loansDisbursedByStatusChartTitle,
+      chartType: 'chart-js-bar',
+      config: this.dashBoardService.getBarChartConfig(this.loansDisbursedByStatus, this.loansDisbursedByStatusChartTitle, this.loansDisbursedByStatusYAxisLabel, this.loansDisbursedByStatusXAxisLabel, 'horizontal', this.loansDisbursedByStatusShowLegend, this.chartSColorScheme.domain),
     };
     this.dashBoardService.openExpandedChartDialog(this.dialog, data);
   }
@@ -987,17 +1062,8 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
     const data = { 
       content: this.loansDisbursedByProductContentDiv.nativeElement.cloneNode(true),
       mapContainerElement: this.loansDisbursedByProductContentDiv,
-      chartType: 'ngx-charts-bar-horizontal',
-      chartData: this.loansDisbursedByProduct,
-      chartGradient: this.gradient,
-      chartShowXAxis: this.loansDisbursedByProductShowXAxis,
-      chartShowYAxis: this.loansDisbursedByProductShowYAxis,
-      chartSColorScheme: this.chartSColorScheme,
-      chartShowLegend: true,
-      chartShowXAxisLabel: this.loansDisbursedByProductShowXAxisLabel,
-      chartShowYAxisLabel: this.loansDisbursedByProductShowYAxisLabel,
-      chartYAxisLabel: this.loansDisbursedByProductXAxisLabel,
-      chartXAxisLabel: this.loansDisbursedByProductYAxisLabel,
+      chartType: 'chart-js-bar',
+      config: this.dashBoardService.getBarChartConfig(this.loansDisbursedByProduct, this.loansDisbursedByProductChartTitle, this.loansDisbursedByProductYAxisLabel, this.loansDisbursedByProductXAxisLabel, 'horizontal', false, this.chartSColorScheme.domain),
       chartFormatLabel: this.valueFormatting,
       chartTitle: this.loansDisbursedByProductChartTitle,
     };

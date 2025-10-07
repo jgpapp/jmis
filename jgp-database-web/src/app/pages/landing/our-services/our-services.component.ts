@@ -7,8 +7,6 @@ import {
   NguCarousel,
   NguCarouselConfig,
   NguCarouselDefDirective,
-  NguCarouselNextDirective,
-  NguCarouselPrevDirective,
   NguTileComponent
 } from '@ngu/carousel';
 import { LandingService } from '@services/landing.service';
@@ -21,8 +19,6 @@ import { Settings, SettingsService } from '@services/settings.service';
         NguTileComponent,
         NguCarousel,
         NguCarouselDefDirective,
-        NguCarouselNextDirective,
-        NguCarouselPrevDirective,
         FlexLayoutModule,
         MatCardModule,
         MatIconModule,

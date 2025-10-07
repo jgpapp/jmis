@@ -253,11 +253,11 @@ export class DashboardService {
 
     openExpandedChartDialog(dialog: MatDialog, chartData: any): void {
       // Dynamically calculate dialog size
-      const dialogWidth = window.innerWidth;
-      const dialogHeight = window.innerHeight;
       const dialogRef = dialog.open(ChartDialogComponent, {
-        width: `${dialogWidth}px`,
-        height: `${dialogHeight}px`,
+        width: `90vw`,
+        height: '90vh',
+        maxWidth: '90vw',
+        maxHeight: '90vh',
         data: chartData,
         panelClass: 'custom-dialog-container',
       });
@@ -276,6 +276,31 @@ export class DashboardService {
         businessesMentored: this.formatNumberToShortForm(highLevelSummary.businessesMentored)
       }
     }
+
+
+    getBarChartConfig(chartdata: any[], title: string | 'Bar Chart', xLabel: string, yLabel: string, orientation: 'vertical' | 'horizontal', showLegend: boolean, colorScheme: any[]): any {
+        return {
+            title: title,
+            orientation: orientation,
+            labels: chartdata.map(item => item.name),
+            datasets: [
+              {
+                label: title,
+                data: chartdata.map(item => item.value),
+                backgroundColor: colorScheme,
+                borderColor: colorScheme[0],
+                borderWidth: 1,
+              },
+            ],
+            options: {
+                scales: {
+                    x: { title: { display: true, text: 'vertical' === orientation ? yLabel : xLabel } },
+                    y: { title: { display: true, text: 'vertical' === orientation ? xLabel : yLabel } }
+                }
+            },
+            showLegend: showLegend
+        };
+  }
 
 
 }

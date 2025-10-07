@@ -36,7 +36,6 @@ import { UserRoleService } from '@services/users/userroles.service';
         MatButtonModule,
         MatCheckboxModule,
         MatSelectModule,
-        DatePipe,
         FormsModule
     ],
     templateUrl: './user-dialog.component.html',

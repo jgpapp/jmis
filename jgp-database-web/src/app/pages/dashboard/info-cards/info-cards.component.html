@@ -1,6 +1,26 @@
 <div fxLayout="row wrap" #resizedDiv>
 
     @if(dashboardTypeFilter.isFinancialDashboard){
+
+     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByGenderContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByGenderDoughnut()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>{{loansDisbursedByGenderChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p" fxLayoutAlign="center center">
+                @if (loansDisbursedByGender && loansDisbursedByGender.length > 0) {
+                <app-doughnut [config]="loansDisbursedByGenderPieConfig" [chartSColorScheme]="chartSColorScheme"></app-doughnut>
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }        
+            </div>
+        </mat-card>
+    </div> 
+    }
+    @if(dashboardTypeFilter.isFinancialDashboard){
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByGenderContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByGenderDoughnut()">
             <mat-icon>open_in_full</mat-icon>
@@ -93,20 +113,8 @@
             </mat-card-header>
             <div class="w-100 h-300p">
                 @if (loansDisbursedByStatus && loansDisbursedByStatus.length > 0) {
-                    <ngx-charts-bar-horizontal
-                    [scheme]="chartSColorScheme"
-                    [results]="loansDisbursedByStatus"
-                    [gradient]="gradient"
-                    [xAxis]="loansDisbursedByStatusShowXAxis"
-                    [yAxis]="loansDisbursedByStatusShowYAxis"
-                    [legend]="loansDisbursedByStatusShowLegend"
-                    [showXAxisLabel]="loansDisbursedByStatusShowXAxisLabel"
-                    [showYAxisLabel]="loansDisbursedByStatusShowYAxisLabel"
-                    [xAxisLabel]="loansDisbursedByStatusYAxisLabel"
-                    [yAxisLabel]="loansDisbursedByStatusXAxisLabel"
-                    [dataLabelFormatting]="valueFormatting"
-                    [showDataLabel]="true"
-                    (select)="onSelect($event)"
+                    <app-bar-chart
+                    [config]="loansDisbursedByStatusBarChartConfig"
                 />
             } @else {
                 <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
@@ -776,6 +784,7 @@
     </div> 
 }
 
+
 @if(dashboardTypeFilter.isFinancialDashboard){
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByProductContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByProductBarChart()">
@@ -783,24 +792,12 @@
           </button>
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
-                <mat-card-title>{{loansDisbursedByProductChartTitle}}</mat-card-title>
+                <mat-card-title>{{loansDisbursedByProductBarChartConfig.title}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
                 @if (loansDisbursedByProduct && loansDisbursedByProduct.length > 0) {
-                <ngx-charts-bar-horizontal
-                    [scheme]="chartSColorScheme"
-                    [results]="loansDisbursedByProduct"
-                    [gradient]="gradient"
-                    [xAxis]="loansDisbursedByProductShowXAxis"
-                    [yAxis]="loansDisbursedByProductShowYAxis"
-                    [legend]="loansDisbursedByProductShowLegend"
-                    [showXAxisLabel]="loansDisbursedByProductShowXAxisLabel"
-                    [showYAxisLabel]="loansDisbursedByProductShowYAxisLabel"
-                    [xAxisLabel]="loansDisbursedByProductYAxisLabel"
-                    [yAxisLabel]="loansDisbursedByProductXAxisLabel"
-                    [dataLabelFormatting]="valueFormatting"
-                    [showDataLabel]="true"
-                    (select)="onSelect($event)"
+                <app-bar-chart
+                    [config]="loansDisbursedByProductBarChartConfig"
                 />
             } @else {
                 <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>

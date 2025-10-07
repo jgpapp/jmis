@@ -25,7 +25,6 @@ import { Settings, SettingsService } from '@services/settings.service';
         NguCarouselDefDirective,
         NguCarouselNextDirective,
         NguCarouselPrevDirective,
-        NguItemComponent,
         FlexLayoutModule,
         MatCardModule,
         MatIconModule,

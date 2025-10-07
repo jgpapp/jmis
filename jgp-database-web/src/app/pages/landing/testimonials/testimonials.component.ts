@@ -7,7 +7,6 @@ import {
   NguCarouselDefDirective,
   NguCarouselNextDirective,
   NguCarouselPrevDirective,
-  NguItemComponent,
   NguTileComponent
 } from '@ngu/carousel';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
@@ -24,7 +23,6 @@ import { MatIconModule } from '@angular/material/icon';
         NguCarouselDefDirective,
         NguCarouselNextDirective,
         NguCarouselPrevDirective,
-        NguItemComponent,
         FlexLayoutModule,
         MatCardModule,
         MatButtonModule,
