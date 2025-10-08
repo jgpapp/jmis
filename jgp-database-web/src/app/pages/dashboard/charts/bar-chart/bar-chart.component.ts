@@ -2,6 +2,8 @@ import { AfterViewInit, Component, DestroyRef, ElementRef, inject, Input, OnChan
 import { CommonModule } from '@angular/common';
 import { ChartConfiguration, ChartOptions, Chart } from 'chart.js';
 import { BarChartConfig } from '../models/bar-chart-config.model';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { DashboardService } from '@services/dashboard/dashboard.service';
 
 @Component({
   selector: 'app-bar-chart',
@@ -22,7 +24,7 @@ export class BarChartComponent implements AfterViewInit, OnChanges{
   
   private destroyRef = inject(DestroyRef);
 
-   constructor() {
+   constructor(private dashboardService: DashboardService) {
     this.destroyRef.onDestroy(() => {
         this.chartInstance?.destroy();
     });
@@ -61,6 +63,17 @@ export class BarChartComponent implements AfterViewInit, OnChanges{
       maintainAspectRatio: false,
       indexAxis: isHorizontal ? 'y' : 'x', // KEY for horizontal/vertical flip
       plugins: {
+        datalabels: {
+        anchor: 'end', // Default value, will be updated in ngOnInit
+        align: 'start',  // Default value, will be updated in ngOnInit
+        clamp: true,       // Prevent from drawing outside
+        clip: true,        // Ensure it's drawn inside canvas
+        formatter: (value) => this.dashboardService.formatNumberToShortForm(Number(value)), // Format the value
+        color: '#000', // Label text color
+        font: {
+          weight: 'bold'
+        }
+      },
         legend: { 
           position: 'top', display: config.showLegend ?? true
         },

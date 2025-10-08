@@ -1489,9 +1489,16 @@ public class DashboardServiceImpl implements DashboardService {
                 """;
 
         private final String valueDataType;
+        private final boolean isPercentageRequired;
 
         public DataPointMapper(String valueDataType) {
             this.valueDataType = valueDataType;
+            this.isPercentageRequired = false;
+        }
+
+        public DataPointMapper(String valueDataType, final boolean isPercentageRequired) {
+            this.valueDataType = valueDataType;
+            this.isPercentageRequired = isPercentageRequired;
         }
 
 
@@ -1502,7 +1509,7 @@ public class DashboardServiceImpl implements DashboardService {
                 final var dataKey = rs.getString("dataKey");
                 final var nullableDataKey = CommonUtil.defaultToOtherIfStringIsNull(dataKey);
                 final var percentageVal = String.valueOf(rs.getBigDecimal(DATA_PERCENTAGE_VALUE_PARAM).setScale(2, RoundingMode.HALF_UP));
-                final var nameAndPercentage = String.format("%s (%s", StringUtils.capitalize(nullableDataKey), percentageVal)+ "%)";
+                final var nameAndPercentage = this.isPercentageRequired ? String.format("%s (%s", StringUtils.capitalize(nullableDataKey), percentageVal)+ "%)": StringUtils.capitalize(nullableDataKey);
                 if (DashboardServiceImpl.INTEGER_DATA_POINT_TYPE.equals(this.valueDataType)){
                     dataPoints.add(new DataPointDto(nameAndPercentage, String.valueOf(rs.getInt(DATA_VALUE_PARAM)), percentageVal));
                 } else if (DECIMAL_DATA_POINT_TYPE.equals(this.valueDataType)) {
