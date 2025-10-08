@@ -1,26 +1,6 @@
 <div fxLayout="row wrap" #resizedDiv>
 
     @if(dashboardTypeFilter.isFinancialDashboard){
-
-     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByGenderContentDiv> 
-        <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByGenderDoughnut()">
-            <mat-icon>open_in_full</mat-icon>
-          </button>
-        <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
-                <mat-card-title>{{loansDisbursedByGenderChartTitle}}</mat-card-title>
-            </mat-card-header>
-            <div class="w-100 h-300p" fxLayoutAlign="center center">
-                @if (loansDisbursedByGender && loansDisbursedByGender.length > 0) {
-                <app-doughnut [config]="loansDisbursedByGenderPieConfig" [chartSColorScheme]="chartSColorScheme"></app-doughnut>
-            } @else {
-                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
-            }        
-            </div>
-        </mat-card>
-    </div> 
-    }
-    @if(dashboardTypeFilter.isFinancialDashboard){
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByGenderContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByGenderDoughnut()">
             <mat-icon>open_in_full</mat-icon>
@@ -50,7 +30,7 @@
 
 @if(dashboardTypeFilter.isFinancialDashboard){
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByPipelineContentDiv> 
-        <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByPipelinePieChart()">
+        <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByPipelineBarChart()">
             <mat-icon>open_in_full</mat-icon>
           </button>
         <mat-card>
@@ -59,14 +39,21 @@
             </mat-card-header>
             <div class="w-100 h-300p">
                 @if (loansDisbursedByPipeline && loansDisbursedByPipeline.length > 0) {
-                <app-pie-chart 
-            [data]="loansDisbursedByPipeline" 
-            [showLegend]="loansDisbursedByPipelineShowLegend" 
-            [colorScheme]="chartSColorScheme" 
-            [showLabels]="loansDisbursedByPipelineShowLabels" 
-            [explodeSlices]="loansDisbursedByPipelineExplodeSlices" 
-            [doughnut]="loansDisbursedByPipelineDoughnut" 
-            />
+            <ngx-charts-bar-horizontal
+                    [scheme]="chartSColorScheme"
+                    [results]="loansDisbursedByPipeline"
+                    [gradient]="gradient"
+                    [xAxis]="loansDisbursedByPipelineShowXAxis"
+                    [yAxis]="loansDisbursedByPipelineShowYAxis"
+                    [legend]="loansDisbursedByPipelineShowLegend"
+                    [showXAxisLabel]="loansDisbursedByPipelineShowXAxisLabel"
+                    [showYAxisLabel]="loansDisbursedByPipelineShowYAxisLabel"
+                    [xAxisLabel]="loansDisbursedByPipelineXAxisLabel"
+                    [yAxisLabel]="loansDisbursedByPipelineYAxisLabel"
+                    [dataLabelFormatting]="valueFormatting"
+                    [showDataLabel]="true"
+                    (select)="onSelect($event)"
+                />
         } @else {
             <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
         }         
@@ -113,8 +100,20 @@
             </mat-card-header>
             <div class="w-100 h-300p">
                 @if (loansDisbursedByStatus && loansDisbursedByStatus.length > 0) {
-                    <app-bar-chart
-                    [config]="loansDisbursedByStatusBarChartConfig"
+                    <ngx-charts-bar-horizontal
+                    [scheme]="chartSColorScheme"
+                    [results]="loansDisbursedByStatus"
+                    [gradient]="gradient"
+                    [xAxis]="loansDisbursedByStatusShowXAxis"
+                    [yAxis]="loansDisbursedByStatusShowYAxis"
+                    [legend]="loansDisbursedByStatusShowLegend"
+                    [showXAxisLabel]="loansDisbursedByStatusShowXAxisLabel"
+                    [showYAxisLabel]="loansDisbursedByStatusShowYAxisLabel"
+                    [xAxisLabel]="loansDisbursedByStatusYAxisLabel"
+                    [yAxisLabel]="loansDisbursedByStatusXAxisLabel"
+                    [dataLabelFormatting]="valueFormatting"
+                    [showDataLabel]="true"
+                    (select)="onSelect($event)"
                 />
             } @else {
                 <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
@@ -190,7 +189,7 @@
             </mat-card-header>
             <div class="w-100 h-300p">
                 @if (loanDisbursedByProductByGender && loanDisbursedByProductByGender.length > 0) {
-                <ngx-charts-bar-vertical-2d
+                <ngx-charts-bar-horizontal-2d
                     [scheme]="chartSColorScheme"
                     [results]="loanDisbursedByProductByGender"
                     [gradient]="gradient"
@@ -199,8 +198,8 @@
                     [legend]="loanDisbursedByProductByGenderShowLegend"
                     [showXAxisLabel]="loanDisbursedByProductByGenderShowXAxisLabel"
                     [showYAxisLabel]="loanDisbursedByProductByGenderShowYAxisLabel"
-                    [xAxisLabel]="loanDisbursedByProductByGenderXAxisLabel"
-                    [yAxisLabel]="loanDisbursedByProductByGenderYAxisLabel"
+                    [xAxisLabel]="loanDisbursedByProductByGenderYAxisLabel"
+                    [yAxisLabel]="loanDisbursedByProductByGenderXAxisLabel"
                     [dataLabelFormatting]="valueFormatting"
                     [showDataLabel]="true"
                     (select)="onSelect($event)" 
@@ -727,7 +726,7 @@
             </mat-card-header>
             <div class="w-100 h-300p">
                 @if (TANeedsByGender && TANeedsByGender.length > 0) {
-                <ngx-charts-bar-vertical-2d
+                <ngx-charts-bar-horizontal-2d
                     [scheme]="chartSColorScheme"
                     [results]="TANeedsByGender"
                     [gradient]="gradient"
@@ -736,8 +735,8 @@
                     [legend]="TANeedsByGenderShowLegend"
                     [showXAxisLabel]="TANeedsByGenderShowXAxisLabel"
                     [showYAxisLabel]="TANeedsByGenderShowYAxisLabel"
-                    [xAxisLabel]="TANeedsByGenderXAxisLabel"
-                    [yAxisLabel]="TANeedsByGenderYAxisLabel"
+                    [xAxisLabel]="TANeedsByGenderYAxisLabel"
+                    [yAxisLabel]="TANeedsByGenderXAxisLabel"
                     [dataLabelFormatting]="valueFormatting"
                     [showDataLabel]="true"
                     (select)="onSelect($event)"
@@ -761,7 +760,7 @@
             </mat-card-header>
             <div class="w-100 h-300p">
                 @if (trainingByPartnerByGender && trainingByPartnerByGender.length > 0) {
-                <ngx-charts-bar-vertical-2d
+                <ngx-charts-bar-horizontal-2d
                     [scheme]="chartSColorScheme"
                     [results]="trainingByPartnerByGender"
                     [gradient]="gradient"
@@ -770,8 +769,8 @@
                     [legend]="trainingByPartnerByGenderShowLegend"
                     [showXAxisLabel]="trainingByPartnerByGenderShowXAxisLabel"
                     [showYAxisLabel]="trainingByPartnerByGenderShowYAxisLabel"
-                    [xAxisLabel]="trainingByPartnerByGenderXAxisLabel"
-                    [yAxisLabel]="trainingByPartnerByGenderYAxisLabel"
+                    [xAxisLabel]="trainingByPartnerByGenderYAxisLabel"
+                    [yAxisLabel]="trainingByPartnerByGenderXAxisLabel"
                     [dataLabelFormatting]="valueFormatting"
                     [showDataLabel]="true"
                     (select)="onSelect($event)" 
@@ -792,12 +791,24 @@
           </button>
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
-                <mat-card-title>{{loansDisbursedByProductBarChartConfig.title}}</mat-card-title>
+                <mat-card-title>{{loansDisbursedByProductChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
                 @if (loansDisbursedByProduct && loansDisbursedByProduct.length > 0) {
-                <app-bar-chart
-                    [config]="loansDisbursedByProductBarChartConfig"
+                <ngx-charts-bar-horizontal
+                    [scheme]="chartSColorScheme"
+                    [results]="loansDisbursedByProduct"
+                    [gradient]="gradient"
+                    [xAxis]="loansDisbursedByProductShowXAxis"
+                    [yAxis]="loansDisbursedByProductShowYAxis"
+                    [legend]="loansDisbursedByProductShowLegend"
+                    [showXAxisLabel]="loansDisbursedByProductShowXAxisLabel"
+                    [showYAxisLabel]="loansDisbursedByProductShowYAxisLabel"
+                    [xAxisLabel]="loansDisbursedByProductYAxisLabel"
+                    [yAxisLabel]="loansDisbursedByProductXAxisLabel"
+                    [dataLabelFormatting]="valueFormatting"
+                    [showDataLabel]="true"
+                    (select)="onSelect($event)"
                 />
             } @else {
                 <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>

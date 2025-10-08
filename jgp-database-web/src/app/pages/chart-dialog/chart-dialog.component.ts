@@ -12,8 +12,6 @@ import domtoimage from 'dom-to-image';
 import { ExportAsService, ExportAsConfig, ExportAsModule } from 'ngx-export-as';
 import { KenyanMapComponent } from "../dashboard/kenyan-map/kenyan-map.component";
 import { KeLeafletMapComponent } from '../ke-leaflet-map/ke-leaflet-map.component';
-import { DoughnutComponent } from '../dashboard/charts/doughnut/doughnut.component';
-import { BarChartComponent } from "../dashboard/charts/bar-chart/bar-chart.component";
 
 @Component({
     selector: 'app-chart-dialog',
@@ -27,8 +25,6 @@ import { BarChartComponent } from "../dashboard/charts/bar-chart/bar-chart.compo
     ExportAsModule,
     KenyanMapComponent,
     KeLeafletMapComponent,
-    DoughnutComponent,
-    BarChartComponent,
     MatDialogModule
 ],
     templateUrl: './chart-dialog.component.html',
