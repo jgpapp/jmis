@@ -44,6 +44,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -501,6 +502,41 @@ public class DashboardServiceImpl implements DashboardService {
         var sqlQuery = String.format(DataPointMapper.LOANS_DISBURSED_BY_QUALITY_SCHEMA, loanWhereClause);
 
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
+    public List<DataPointDto> getSystemUserLoginSummary(LocalDate fromDate, LocalDate toDate) {
+
+        final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
+        LocalDate from = fromDate;
+        LocalDate to = toDate;
+        if (Objects.isNull(from) || Objects.isNull(to)){
+            from = LocalDate.now(ZoneId.systemDefault());
+            to = LocalDate.now(ZoneId.systemDefault());
+        }
+        if (from.plusMonths(1).isBefore(to)) {
+            to = from.plusMonths(1);
+        }
+        var whereClause = "where sl.login_date between :fromDate and :toDate ";
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, from);
+        parameters.addValue(TO_DATE_PARAM, to);
+        var isPerHour = from.isEqual(to);
+
+        var sqlQuery = String.format(isPerHour ? DataPointMapper.USER_LOGIN_PER_HOUR : DataPointMapper.USER_LOGIN_PER_DAY, whereClause);
+
+        return transformHoursIfRequired(this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm), isPerHour);
+    }
+
+    private List<DataPointDto> transformHoursIfRequired(List<DataPointDto> dataPointDtos, boolean isPerHour) {
+        if (CollectionUtils.isEmpty(dataPointDtos) || !isPerHour) {
+            return dataPointDtos;
+        }
+        return dataPointDtos.stream()
+                .map(d -> {
+                        var hour = d.name();
+                        var label = String.format("%s:00 - %s:59", hour, hour);
+                    return new DataPointDto(label, d.value(), "0");
+                }).toList();
     }
 
     @Override
@@ -1486,6 +1522,16 @@ public class DashboardServiceImpl implements DashboardService {
                 count(m.id) * 100.0 / sum(count(m.id)) OVER () AS percentage\s
                 from mentor_ships m inner join participants cl on m.participant_id = cl.id\s
                 %s group by 1;\s
+                """;
+
+        public static final String USER_LOGIN_PER_DAY = """
+                select sl.login_date as dataKey, count(DISTINCT sl.username) as dataValue, 0 AS percentage\s
+                from system_user_access_logs sl %s group by 1 order by 1;\s
+                """;
+
+        public static final String USER_LOGIN_PER_HOUR = """
+                select sl.login_hour as dataKey, count(DISTINCT sl.username) as dataValue, 0 AS percentage\s
+                from system_user_access_logs sl %s group by 1 order by 1;\s
                 """;
 
         private final String valueDataType;

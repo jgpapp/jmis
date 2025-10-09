@@ -1,1 +1,80 @@
-<p>online-users works!</p>
+@if(authService.hasPermission('ADMINISTRATION_ADMIN')){
+<app-content-header
+    icon="dashboard" 
+    desc="View summary of System User Activities (Note: Can only view Activities for a month, select same from date and to date to view activities per hour)"
+    [hideBreadcrumb]="true"
+    [hasBgImage]="true" 
+    [class]="'py-3'"/>
+
+<div fxLayout="column" class="p-2">
+    <form [formGroup]="filterForm" fxLayout="row wrap" fxLayoutAlign="center center"> 
+        <mat-form-field fxFlex="100" [fxFlex.xl]="50" [fxFlex.lg]="50" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
+            <input matInput [matDatepicker]="dateFrom" placeholder="Date From" formControlName="selectedDateFrom" 
+            (dateInput)="filterFromDateChanged()" (dateChange)="filterFromDateChanged()" [max]="fromMaxDate">
+            <mat-datepicker-toggle matSuffix [for]="dateFrom"></mat-datepicker-toggle>
+            <mat-datepicker #dateFrom></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field fxFlex="100" [fxFlex.xl]="50" [fxFlex.lg]="50" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
+            <input matInput [matDatepicker]="dateTo" placeholder="Date To" formControlName="selectedDateTo" 
+            (dateInput)="filterFormChanged()" (dateChange)="filterFormChanged()" [min]="toDateMinValue" [max]="toDateMaxValue">
+            <mat-datepicker-toggle matSuffix [for]="dateTo"></mat-datepicker-toggle>
+            <mat-datepicker #dateTo  [disabled]="disableToDate"></mat-datepicker>
+        </mat-form-field>
+    </form>
+    <div fxFlex="100" fxFlex.xl="100" fxFlex.lg="100" fxFlex.md="100" fxFlex.sm="100" class="p-2">
+        <mat-card class="gradient-green tile p-2">
+            <mat-icon>group</mat-icon>
+            <h2>{{onlineUsersCount}}</h2>
+            <p>Current Online Users Count Including You !!</p>
+        </mat-card>
+    </div>
+    
+    <div class="chart-container">
+     
+    <div fxFlex="100" fxFlex.xl="100" fxFlex.lg="100" fxFlex.md="100" fxFlex.sm="100" class="p-2"> 
+        <mat-card class="bar-chart">
+            <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-title>App User Access Summary</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (userAccessSummary && userAccessSummary.length > 0) {
+                <ngx-charts-bar-vertical
+                    [scheme]="chartSColorScheme"
+                    [results]="userAccessSummary"
+                    [gradient]="false"
+                    [xAxis]="userAccessSummaryShowXAxis"
+                    [yAxis]="userAccessSummaryShowYAxis"
+                    [legend]="userAccessSummaryShowLegend"
+                    [showXAxisLabel]="userAccessSummaryShowXAxisLabel"
+                    [showYAxisLabel]="userAccessSummaryShowYAxisLabel"
+                    [xAxisLabel]="userAccessSummaryYAxisLabel"
+                    [yAxisLabel]="userAccessSummaryXAxisLabel"
+                    [showDataLabel]="true"
+                    (select)="onSelect($event)"
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }          
+            </div>
+        </mat-card>
+    </div>  
+
+ 
+    </div>
+    
+
+   
+</div>
+
+}
+@else {
+    <app-no-permission />
+}
+
+<!-- Template for no data placeholder -->
+<ng-template #noDataPlaceholder>
+    <div class="no-data-placeholder">
+      <p>No data available to display</p>
+    </div>
+  </ng-template>

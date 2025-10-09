@@ -50,6 +50,8 @@ public interface DashboardService {
 
     List<DataPointDto> getLoansDisbursedByQualitySummary(DashboardSearchCriteria dashboardSearchCriteria);
 
+    List<DataPointDto> getSystemUserLoginSummary(final LocalDate fromDate, final LocalDate toDate);
+
     List<SeriesDataPointDto> getTaNeedsByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
     List<SeriesDataPointDto> getBusinessCategoryByCountySummary(DashboardSearchCriteria dashboardSearchCriteria);

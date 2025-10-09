@@ -278,29 +278,4 @@ export class DashboardService {
     }
 
 
-    getBarChartConfig(chartdata: any[], title: string | 'Bar Chart', xLabel: string, yLabel: string, orientation: 'vertical' | 'horizontal', showLegend: boolean, colorScheme: any[]): any {
-        return {
-            title: title,
-            orientation: orientation,
-            labels: chartdata.map(item => item.name),
-            datasets: [
-              {
-                label: title,
-                data: chartdata.map(item => item.value),
-                backgroundColor: colorScheme,
-                borderColor: colorScheme[0],
-                borderWidth: 1,
-              },
-            ],
-            options: {
-                scales: {
-                    x: { title: { display: true, text: 'vertical' === orientation ? yLabel : xLabel } },
-                    y: { title: { display: true, text: 'vertical' === orientation ? xLabel : yLabel } }
-                }
-            },
-            showLegend: showLegend
-        };
-  }
-
-
 }

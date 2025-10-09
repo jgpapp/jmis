@@ -18,6 +18,16 @@ export class UserService {
     return this.httpClient.get(`/actuator/metrics/app.active.users`);
   }
 
+  getSystemUserLoginSummary(dashBoardFilters: any): Observable<any> {
+    let params = new HttpParams();
+    if(dashBoardFilters && dashBoardFilters.selectedDateFrom && dashBoardFilters.selectedDateTo){
+      params = new HttpParams()
+        .set('from-date', dashBoardFilters.selectedDateFrom)
+        .set('to-date', dashBoardFilters.selectedDateTo);
+    }
+    return this.httpClient.get(`/reports/system-user-login-summary`, { params });
+  }
+
   createUser(user: User): Observable<any> {
     return this.httpClient.post(`/users`, JSON.stringify(user));
   }

@@ -562,4 +562,10 @@ public class DashboardController {
                                                                              @RequestParam(value = "year", required = false) String year){
         return new ResponseEntity<>(this.dashboardService.getPerformanceSummary(year, partnerId), HttpStatus.OK);
     }
+
+    @GetMapping("system-user-login-summary")
+    public ResponseEntity<List<DataPointDto>> getSystemUserLoginSummary(@RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                         @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        return new ResponseEntity<>(this.dashboardService.getSystemUserLoginSummary(fromDate, toDate), HttpStatus.OK);
+    }
 }

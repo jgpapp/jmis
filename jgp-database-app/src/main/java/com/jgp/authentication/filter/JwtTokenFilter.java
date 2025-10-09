@@ -1,6 +1,7 @@
 package com.jgp.authentication.filter;
 
 import com.jgp.authentication.service.ActiveUserService;
+import com.jgp.authentication.service.UserAuditLogService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -8,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,6 +29,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final UserDetailsService currentUserDetails;
     private final JwtTokenProvider jwtTokenProvider;
     private final ActiveUserService activeUserService;
+    private final UserAuditLogService userAuditLogService;
+    private final SimpMessagingTemplate simpMessagingTemplate;
     private static final long TWO_MINUTES = 120_000L; //2 * 60 * 1000; // 120_000
 
 
@@ -60,6 +64,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             String username = authentication.getName();
             activeUserService.userActivity(username);
             activeUserService.removeExpiredUsers(TWO_MINUTES);
+            userAuditLogService.logUserLogin(username, request.getRemoteAddr());
         }
 
         authentication.setDetails(

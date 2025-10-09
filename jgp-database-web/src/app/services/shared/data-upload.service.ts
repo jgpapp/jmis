@@ -189,6 +189,18 @@ export class DataUploadService {
     });
   }
 
+  // Method to subscribe to online users count updates
+   subscribeToOnlineUsersCount(): Observable<string> {
+    return new Observable(observer => {
+      // Wait for the connection to be established
+      if (this.webSocketClient.connected) {
+        this.webSocketClient.subscribe(`/topic/online-users`, (message) => {
+          observer.next(message.body); // Send online users count updates to observers
+        });
+      }
+    });
+  }
+
   disconnectWebSocket(): void {
     if(this.webSocketClient.connected){
       this.webSocketClient.deactivate();
