@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { PagesComponent } from './pages.component';
 import { AuthGuard } from '../util/AuthGuard';
-import { OnlineUsersComponent } from './users/online-users/online-users.component';
 
 export const routes: Routes = [
   {
@@ -97,7 +96,7 @@ export const routes: Routes = [
       },
       {
         path: 'online-users',
-        component: OnlineUsersComponent,
+        loadComponent: () => import('./users/online-users/online-users.component').then(c => c.OnlineUsersComponent),
         data: { breadcrumb: 'Online Users' }
       },
       {
