@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,7 +29,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final ActiveUserService activeUserService;
     private final UserAuditLogService userAuditLogService;
-    private final SimpMessagingTemplate simpMessagingTemplate;
     private static final long TWO_MINUTES = 120_000L; //2 * 60 * 1000; // 120_000
 
 
