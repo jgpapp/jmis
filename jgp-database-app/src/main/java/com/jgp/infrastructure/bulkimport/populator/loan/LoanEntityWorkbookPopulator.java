@@ -2,7 +2,9 @@ package com.jgp.infrastructure.bulkimport.populator.loan;
 
 import com.jgp.infrastructure.bulkimport.constants.LoanConstants;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
+import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.bulkimport.populator.AbstractWorkbookPopulator;
+import com.jgp.infrastructure.bulkimport.populator.TemplateGuidePopulator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -15,6 +17,7 @@ public class LoanEntityWorkbookPopulator extends AbstractWorkbookPopulator {
     public void populate(Workbook workbook) {
         Sheet loanSheet = workbook.createSheet(TemplatePopulateImportConstants.LOAN_SHEET_NAME);
         setLayout(loanSheet);
+        TemplateGuidePopulator.populateGuide(workbook, GlobalEntityType.LOAN_IMPORT_TEMPLATE);
     }
 
     private void setLayout(Sheet worksheet) {

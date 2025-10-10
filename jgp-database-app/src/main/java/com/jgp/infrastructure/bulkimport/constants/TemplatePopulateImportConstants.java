@@ -10,12 +10,13 @@ public class TemplatePopulateImportConstants {
     public static final String MENTOR_SHIP_SHEET_NAME = "mentorship";
     public static final String MONITORING_SHEET_NAME = "monitoring";
     public static final String OPTIONS_SHEET_NAME = "options";
+    public static final String GUIDE_SHEET_NAME = "guide";
 
     // columns sizes
     public static final int SMALL_COL_SIZE = 4000;
     public static final int MEDIUM_COL_SIZE = 6000;
     public static final int LARGE_COL_SIZE = 8000;
-    public static final int EXTRALARGE_COL_SIZE = 10000;
+    public static final int EXTRALARGE_COL_SIZE = 60000;
 
     public static final int ROWHEADER_INDEX = 0;
     public static final short ROW_HEADER_HEIGHT = 500;
