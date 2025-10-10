@@ -54,7 +54,7 @@ public interface DashboardService {
 
     List<SeriesDataPointDto> getTaNeedsByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
-    List<SeriesDataPointDto> getBusinessCategoryByCountySummary(DashboardSearchCriteria dashboardSearchCriteria);
+    List<DataPointDto> getBusinessCategoryByCountySummary(DashboardSearchCriteria dashboardSearchCriteria);
 
     List<DataPointDto> getTaTrainingBySectorSummary(DashboardSearchCriteria dashboardSearchCriteria);
 

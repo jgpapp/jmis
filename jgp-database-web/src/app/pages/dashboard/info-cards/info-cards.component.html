@@ -559,7 +559,7 @@
             <div class="w-100 h-300p">
                 @if (mentorshipBusiCategoryByCountySummary && mentorshipBusiCategoryByCountySummary.length > 0) {
 
-                <ngx-charts-bar-horizontal-stacked
+                <ngx-charts-bar-horizontal
                     [scheme]="chartSColorScheme"
                     [results]="mentorshipBusiCategoryByCountySummary"
                     [gradient]="gradient"
@@ -570,8 +570,8 @@
                     [showYAxisLabel]="mentorshipBusiCategoryByCountySummaryShowYAxisLabel"
                     [xAxisLabel]="mentorshipBusiCategoryByCountySummaryXAxisLabel"
                     [yAxisLabel]="mentorshipBusiCategoryByCountySummaryYAxisLabel"
-                    (select)="onSelect($event)">
-                </ngx-charts-bar-horizontal-stacked> 
+                    (select)="onSelect($event)"
+                    />
             } @else {
                 <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
             }          

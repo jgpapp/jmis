@@ -296,7 +296,7 @@ public class DashboardController {
     }
 
     @GetMapping("business-category-by-county")
-    public ResponseEntity<List<SeriesDataPointDto>> getBusinessCategoryByCountySummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
+    public ResponseEntity<List<DataPointDto>> getBusinessCategoryByCountySummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
                                                                               @RequestParam(value = "county-code", required = false) String countyCode,
                                                                               @RequestParam(value = "from-date", required = false) LocalDate fromDate,
                                                                               @RequestParam(value = "to-date", required = false) LocalDate toDate){
