@@ -569,8 +569,9 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<SeriesDataPointDto> getBusinessCategoryByCountySummary(DashboardSearchCriteria dashboardSearchCriteria) {
-        final var rm = new SeriesDataPointMapper();
+    public List<DataPointDto> getBusinessCategoryByCountySummary(DashboardSearchCriteria dashboardSearchCriteria) {
+
+        final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -588,7 +589,7 @@ public class DashboardServiceImpl implements DashboardService {
             parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
             whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
         }
-        var sqlQuery = String.format(SeriesDataPointMapper.MENTORSHIP_BUSINESS_CATEGORIES_BY_COUNTY_SCHEMA, whereClause);
+        var sqlQuery = String.format(DataPointMapper.MENTORSHIP_BUSINESS_CATEGORIES_SCHEMA, whereClause);
 
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
     }
@@ -1510,6 +1511,13 @@ public class DashboardServiceImpl implements DashboardService {
                 %s group by 1;\s
                 """;
 
+        public static final String MENTORSHIP_BUSINESS_CATEGORIES_SCHEMA = """
+                select cl.industry_sector as dataKey, count(m.id) as dataValue,\s
+                count(m.id) * 100.0 / sum(count(m.id)) OVER () AS percentage\s
+                from mentor_ships m inner join participants cl on m.participant_id = cl.id\s
+                %s group by 1;\s
+                """;
+
         public static final String BUSINESSES_TRAINED_BY_SEGMENT_SCHEMA = """
                 select cl.business_segment as dataKey, count(cl.id) as dataValue,\s
                 count(cl.id) * 100.0 / sum(count(cl.id)) OVER () AS percentage\s
@@ -1573,11 +1581,6 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
     public static final String TA_NEEDS_BY_GENDER_SCHEMA = """
                 SELECT unnest(string_to_array(bpd.ta_needs, ',')) AS name, cl.gender_category as seriesName, COUNT(*) AS value\s
                 FROM participants cl inner join bmo_participants_data bpd on bpd.participant_id = cl.id %s group by 1, 2;\s
-               \s""";
-
-    public static final String MENTORSHIP_BUSINESS_CATEGORIES_BY_COUNTY_SCHEMA = """
-                SELECT cl.industry_sector AS name, cl.business_location as seriesName, COUNT(m.id) AS value\s
-                FROM mentor_ships m inner join participants cl on m.participant_id = cl.id %s group by 1, 2;\s
                \s""";
 
     public static final String TRAINING_BY_PARTNER_BY_GENDER_SCHEMA = """

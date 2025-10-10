@@ -213,9 +213,9 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   public mentorshipBusiCategoryByCountySummaryShowLegend: boolean = false;
   public mentorshipBusiCategoryByCountySummaryShowXAxisLabel: boolean = true;
   public mentorshipBusiCategoryByCountySummaryShowYAxisLabel: boolean = true;
-  public mentorshipBusiCategoryByCountySummaryXAxisLabel: string = 'Counties';
-  public mentorshipBusiCategoryByCountySummaryYAxisLabel: string = 'Business Categories';
-  public mentorshipBusiCategoryByCountySummaryChartTitle: string = 'Business Category By County';
+  public mentorshipBusiCategoryByCountySummaryXAxisLabel: string = 'Count';
+  public mentorshipBusiCategoryByCountySummaryYAxisLabel: string = 'Industry Sector';
+  public mentorshipBusiCategoryByCountySummaryChartTitle: string = 'Businesses By Industry Sector';
 
   public accessedVSOutStandingAmount: any[]
   public accessedVSOutStandingAmountShowXAxis = true;
@@ -1082,7 +1082,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
     const data = { 
       content: this.mentorshipBusiCategoryByCountySummaryContentDiv.nativeElement.cloneNode(true),
       mapContainerElement: this.mentorshipBusiCategoryByCountySummaryContentDiv,
-      chartType: 'ngx-charts-bar-horizontal-stacked',
+      chartType: 'ngx-charts-bar-horizontal',
       chartData: this.mentorshipBusiCategoryByCountySummary,
       chartGradient: this.gradient,
       chartShowXAxis: this.mentorshipBusiCategoryByCountySummaryShowXAxis,
