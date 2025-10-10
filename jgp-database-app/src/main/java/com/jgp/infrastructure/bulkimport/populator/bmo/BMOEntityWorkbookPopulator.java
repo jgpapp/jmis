@@ -2,7 +2,9 @@ package com.jgp.infrastructure.bulkimport.populator.bmo;
 
 import com.jgp.infrastructure.bulkimport.constants.BMOConstants;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
+import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.bulkimport.populator.AbstractWorkbookPopulator;
+import com.jgp.infrastructure.bulkimport.populator.TemplateGuidePopulator;
 import com.jgp.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.SpreadsheetVersion;
@@ -26,6 +28,7 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         Sheet bmoSheet = workbook.createSheet(TemplatePopulateImportConstants.BMO_SHEET_NAME);
         setLayout(bmoSheet);
         setRules(bmoSheet);
+        TemplateGuidePopulator.populateGuide(workbook, GlobalEntityType.TA_IMPORT_TEMPLATE);
     }
 
     private void setLayout(Sheet worksheet) {

@@ -1,9 +1,10 @@
 package com.jgp.infrastructure.bulkimport.populator.monitoring;
 
-import com.jgp.infrastructure.bulkimport.constants.MentorShipConstants;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
+import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.bulkimport.data.MonitoringConstants;
 import com.jgp.infrastructure.bulkimport.populator.AbstractWorkbookPopulator;
+import com.jgp.infrastructure.bulkimport.populator.TemplateGuidePopulator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -15,6 +16,7 @@ public class MonitoringWorkbookPopulator extends AbstractWorkbookPopulator {
     public void populate(Workbook workbook) {
         Sheet monitoringSheet = workbook.createSheet("Monitoring");
         setLayout(monitoringSheet);
+        TemplateGuidePopulator.populateGuide(workbook, GlobalEntityType.MONITORING_IMPORT_TEMPLATE);
     }
 
     private void setLayout(Sheet worksheet) {
