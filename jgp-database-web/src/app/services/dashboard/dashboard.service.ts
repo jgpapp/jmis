@@ -242,11 +242,11 @@ export class DashboardService {
       }) : '0';
     }
 
-    formatNumberWithThousandSeparatorForm(number: any): string {
+    formatNumberWithThousandSeparatorForm(number: any, numberOfDecimals: number): string {
       // Use the toLocaleString method to add suffixes to the number
       return number && null !== number ? number.toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+        minimumFractionDigits: numberOfDecimals,
+        maximumFractionDigits: numberOfDecimals
       }) : '0.00';
     }
 
