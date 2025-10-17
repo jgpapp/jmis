@@ -681,7 +681,11 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   };
 
   valueFormattingWithThousandSeparator = (value: number) => {
-    return this.dashBoardService.formatNumberWithThousandSeparatorForm(Number(value)); // Outputs as "55,746.00"
+    return this.dashBoardService.formatNumberWithThousandSeparatorForm(Number(value), 2); // Outputs as "55,746.00"
+  };
+
+   valueFormattingWithThousandSeparatorWithZeroDecimals = (value: number) => {
+    return this.dashBoardService.formatNumberWithThousandSeparatorForm(Number(value), 0); // Outputs as "55,746"
   };
   
 
@@ -725,12 +729,12 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartShowLabels: this.businessesTainedByGenderShowLabels,
       chartExplodeSlices: this.businessesTainedByGenderExplodeSlices,
       chartIsDoughnut: this.businessesTainedByGenderDoughnut,
-      labelFormatting: this.valueFormattingWithThousandSeparator,
+      labelFormatting: this.valueFormatting,
       chartTitle: this.businessesTainedByGenderChartTitle,
       chartFormatLabel: (label: string): string => {
         // Find the data object by name and return the value instead of name
         const item = this.businessesTainedByGender.find(data => data.name === label);
-        return item ? `${this.valueFormatting(item.value)}` : label; // If found, return the value; otherwise return the name as fallback
+        return item ? `${this.valueFormattingWithThousandSeparatorWithZeroDecimals(item.value)}` : label; // If found, return the value; otherwise return the name as fallback
       }
     };
     this.dashBoardService.openExpandedChartDialog(this.dialog, data);
