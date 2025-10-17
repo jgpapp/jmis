@@ -725,7 +725,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartShowLabels: this.businessesTainedByGenderShowLabels,
       chartExplodeSlices: this.businessesTainedByGenderExplodeSlices,
       chartIsDoughnut: this.businessesTainedByGenderDoughnut,
-      labelFormatting: this.valueFormatting,
+      labelFormatting: this.valueFormattingWithThousandSeparator,
       chartTitle: this.businessesTainedByGenderChartTitle,
       chartFormatLabel: (label: string): string => {
         // Find the data object by name and return the value instead of name
