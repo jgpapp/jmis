@@ -1,4 +1,4 @@
-@import "../../theme/styles/variables";
+@use "../../theme/styles/variables" as *;
 
 .chat-container {
     height: calc(100vh - (#{$top-toolbar-height} + #{$footer-toolbar-height} + 148px));

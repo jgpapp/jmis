@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 $teal-light-primary: mat.m2-define-palette(mat.$m2-teal-palette, 700, 50, 800);
 $teal-light-accent: mat.m2-define-palette(mat.$m2-deep-orange-palette, 600, A400, 900);
 $teal-light-warn: mat.m2-define-palette(mat.$m2-red-palette, 600);

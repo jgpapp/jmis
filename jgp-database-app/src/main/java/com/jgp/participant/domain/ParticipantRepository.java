@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface ParticipantRepository extends JpaRepository<Participant, Long> , JpaSpecificationExecutor<Participant>, QuerydslPredicateExecutor<Participant> {
 
@@ -27,4 +28,6 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     void deleteParticipantsByIds(@NonNull List<Long> participantIds);
 
 
+    @Query("SELECT DISTINCT p.locationCountyCode from Participant p")
+    Set<String> getParticipantOperationCounties();
 }

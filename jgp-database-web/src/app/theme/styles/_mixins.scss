@@ -1,7 +1,9 @@
+@use 'sass:selector';
+
 @mixin menu-level-padding($direction){
     $elem: '';
     @for $i from 3 through 10 {
-        $elem: if($i == 3, ".sub-menu", selector-nest($elem, ".sub-menu"));      
+        $elem: if($i == 3, ".sub-menu", selector.nest($elem, ".sub-menu"));      
         #{$elem + ' .mat-mdc-button'} { 
             @if $direction == "rtl" {
                 padding-right: 20px * $i; 

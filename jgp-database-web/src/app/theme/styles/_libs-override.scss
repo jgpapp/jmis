@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 //----------Google Maps--------------- 
 .map-container {
     width: 100% !important;  
@@ -18,7 +20,7 @@
 ng-scrollbar {
     --scrollbar-thickness: 6 !important;
     --scrollbar-hover-thickness: 8 !important; 
-    --scrollbar-thumb-color: rgba(204,204,204,0.8) !important;
+    --scrollbar-thumb-color: #{color.change(#ccc, $alpha: 0.8)} !important;
     --scrollbar-thumb-hover-color: #ccc !important;
     --scrollbar-border-radius: 4px !important; 
     --scrollbar-offset: 2 !important;

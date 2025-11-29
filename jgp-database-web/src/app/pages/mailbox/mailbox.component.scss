@@ -1,4 +1,5 @@
-@import "../../theme/styles/variables";
+@use 'sass:color';
+@use "../../theme/styles/variables" as *;
 $mailbox-sidenav-width: 350px;
 
 .mailbox-toolbar {
@@ -106,7 +107,7 @@ $mailbox-sidenav-width: 350px;
     }
 
     .selected {
-        background: rgba(0, 0, 0, .15);
+        background: color.change(#000, $alpha: 0.15);
     }
 
     .ng-scroll-content {

@@ -2,6 +2,7 @@ package com.jgp.dashboard.service;
 
 import com.jgp.dashboard.dto.AnalyticsUpdateRequestDto;
 import com.jgp.dashboard.dto.CountyDataSummaryResponseDto;
+import com.jgp.dashboard.dto.CountyDto;
 import com.jgp.dashboard.dto.DataSummaryDto;
 import com.jgp.dashboard.dto.DashboardSearchCriteria;
 import com.jgp.dashboard.dto.DataPointDto;
@@ -12,6 +13,7 @@ import com.jgp.dashboard.dto.PerformanceSummaryDto;
 import com.jgp.dashboard.dto.TaTypeTrainedBusinessDto;
 import com.jgp.infrastructure.bulkimport.event.DataApprovedEvent;
 import com.jgp.monitoring.domain.predicate.OutComeMonitoringSearchCriteria;
+import com.jgp.participant.domain.ParticipantRepository;
 import com.jgp.patner.domain.Partner;
 import com.jgp.patner.domain.PartnerRepository;
 import com.jgp.util.CommonUtil;
@@ -24,6 +26,8 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -54,6 +58,7 @@ public class DashboardServiceImpl implements DashboardService {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final ApplicationContext applicationContext;
     private final PartnerRepository partnerRepository;
+    private final ParticipantRepository participantRepository;
     private static final String INTEGER_DATA_POINT_TYPE = "INTEGER";
     private static final String DECIMAL_DATA_POINT_TYPE = "DECIMAL";
     private static final String PARTNER_ID_PARAM = "partnerId";
@@ -1058,6 +1063,16 @@ public class DashboardServiceImpl implements DashboardService {
         var partnerIds = Objects.nonNull(analyticsUpdateRequestDto.partnerId()) ? Set.of(analyticsUpdateRequestDto.partnerId()) : this.partnerRepository.findByIsDeletedFalse().stream().map(Partner::getId).collect(Collectors.toSet());
         final var dataDates = Set.of(analyticsUpdateRequestDto.fromDate(), analyticsUpdateRequestDto.toDate());
         this.applicationContext.publishEvent(new DataApprovedEvent(partnerIds, dataDates));
+    }
+
+    @Override
+    public List<CountyDto> getOperationalCounties() {
+        final var operationsCounties = this.participantRepository.getParticipantOperationCounties();
+        return new ArrayList<>(EnumSet.allOf(CommonUtil.KenyanCounty.class)).stream()
+                .filter(c ->operationsCounties.contains(c.getCountyCode()))
+                .map(county -> new CountyDto(county.getCountyCode(), county.getCountyName(), county.getApproximateCenterLatitude(), county.getApproximateCenterLongitude()))
+                .sorted(Comparator.comparing(CountyDto::countyName))
+                .toList();
     }
 
     private static final class PerformanceSummaryMapper implements ResultSetExtractor<List<PerformanceSummaryDto>> {
