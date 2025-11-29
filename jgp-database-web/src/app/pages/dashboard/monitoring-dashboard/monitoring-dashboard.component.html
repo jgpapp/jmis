@@ -6,6 +6,7 @@
     <mat-icon>open_in_full</mat-icon>
   </button>
    @if (monitoringData && monitoringData.length > 0) {
+   @defer (on idle) {
   <ngx-charts-bar-horizontal
     [view]="[parentWidth, parentHeight]"
     [scheme]="chartSColorScheme"
@@ -19,6 +20,14 @@
     [xAxisLabel]="'Count'"
     [yAxisLabel]="'Outcome Monitoring'"
     />
+  } @loading {
+    <div style="text-align: center; padding: 2rem;">
+      <mat-spinner></mat-spinner>
+      <p>Loading chart...</p>
+    </div>
+  } @placeholder {
+    <div style="text-align: center; padding: 2rem;"></div>
+  }
   } @else {
     <ng-container *ngTemplateOutlet="noDataPlaceholder"/>
     } 

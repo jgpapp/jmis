@@ -52,6 +52,7 @@ dependencies {
 	implementation 'org.apache.tika:tika-core:3.0.0'
 	implementation 'org.apache.tika:tika-parsers:3.0.0'
 	implementation 'com.google.code.findbugs:annotations:3.0.0'
+    implementation 'org.cache2k:cache2k-spring:2.6.1.Final'
 
 	// QueryDSL
 	implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'

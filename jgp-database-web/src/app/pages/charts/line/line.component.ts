@@ -4,6 +4,7 @@ import { multi, single } from '@data/charts.data';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
     selector: 'app-line',
@@ -11,7 +12,8 @@ import { ContentHeaderComponent } from '../../../theme/components/content-header
         FlexLayoutModule,
         MatCardModule,
         NgxChartsModule,
-        ContentHeaderComponent
+        ContentHeaderComponent,
+        MatProgressSpinnerModule
     ],
     templateUrl: './line.component.html'
 })

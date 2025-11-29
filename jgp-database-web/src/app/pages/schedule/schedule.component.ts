@@ -13,6 +13,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { ContentHeaderComponent } from '../../theme/components/content-header/content-header.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 const colors: any = {
   red: {
@@ -38,7 +40,9 @@ const colors: any = {
         MatButtonModule,
         MatIconModule,
         CalendarModule,
-        ContentHeaderComponent
+        ContentHeaderComponent,
+        MatProgressBarModule,
+        MatProgressSpinnerModule
     ],
     templateUrl: './schedule.component.html',
     styleUrls: ['./schedule.component.scss'],
