@@ -2,6 +2,7 @@ package com.jgp.dashboard.service;
 
 import com.jgp.dashboard.dto.AnalyticsUpdateRequestDto;
 import com.jgp.dashboard.dto.CountyDataSummaryResponseDto;
+import com.jgp.dashboard.dto.CountyDto;
 import com.jgp.dashboard.dto.DataSummaryDto;
 import com.jgp.dashboard.dto.DashboardSearchCriteria;
 import com.jgp.dashboard.dto.DataPointDto;
@@ -93,4 +94,6 @@ public interface DashboardService {
     List<PerformanceSummaryDto> getPerformanceSummary(String year, Long partnerId);
 
     void updateAnalyticsData(AnalyticsUpdateRequestDto analyticsUpdateRequestDto);
+
+    List<CountyDto> getOperationalCounties();
 }

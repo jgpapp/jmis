@@ -551,10 +551,7 @@ public class DashboardController {
 
     @GetMapping("kenyan-counties")
     public ResponseEntity<List<CountyDto>> getKenyanCounties(){
-        return new ResponseEntity<>(new ArrayList<>(EnumSet.allOf(CommonUtil.KenyanCounty.class))
-                .stream().map(county -> new CountyDto(county.getCountyCode(), county.getCountyName(), county.getApproximateCenterLatitude(), county.getApproximateCenterLongitude()))
-                .sorted(Comparator.comparing(CountyDto::countyName))
-                .toList(), HttpStatus.OK);
+        return new ResponseEntity<>(this.dashboardService.getOperationalCounties(), HttpStatus.OK);
     }
 
     @GetMapping("performance-summary")

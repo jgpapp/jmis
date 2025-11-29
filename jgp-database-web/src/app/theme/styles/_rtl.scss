@@ -1,4 +1,4 @@
-@import "mixins";
+@use "mixins" as *;
 
 .app[dir="rtl"]{
     &.fixed-sidenav{

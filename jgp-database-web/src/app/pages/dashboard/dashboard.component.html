@@ -9,6 +9,9 @@
 <div class="p-2">
     <div fxLayout="row" fxLayoutAlign="center center">
         <mat-button-toggle-group [(ngModel)]="selectedDashboardView" name="fontStyle" aria-label="Font Style">
+            @if (showGeneralDashboardSelector()) {
+                <mat-button-toggle value="GE">General Summary</mat-button-toggle>
+            }
             @if (showFinancialDashboardSelector()) {
                 <mat-button-toggle value="FI">Financial Summary</mat-button-toggle>
             }

@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 $gray-light-primary: mat.m2-define-palette(mat.$m2-gray-palette, 700, 50, 800);
 $gray-light-accent: mat.m2-define-palette(mat.$m2-pink-palette, A200, A100, A400);
 $gray-light-warn: mat.m2-define-palette(mat.$m2-red-palette, 500);

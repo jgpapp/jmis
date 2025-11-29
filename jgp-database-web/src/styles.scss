@@ -1,3 +1,10 @@
+@use "app/theme/styles/base";
+@use "app/theme/styles/spaces";
+@use "app/theme/styles/libs-override";
+@use "app/theme/styles/theme";
+@use "app/theme/styles/gradients";
+@use "app/theme/styles/rtl";
+
 @import url('https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i');
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 @import url('https://cdn.quilljs.com/1.2.2/quill.snow.css');
@@ -12,20 +19,13 @@
 @import "../node_modules/@swimlane/ngx-datatable/assets/icons.css"; 
 @import "../node_modules/leaflet/dist/leaflet.css";
 
-@import "app/theme/styles/base";
-@import "app/theme/styles/spaces";
-@import "app/theme/styles/libs-override";
-@import "app/theme/styles/theme";
-@import "app/theme/styles/gradients";
-@import "app/theme/styles/rtl";
-
 .mat-mdc-row .mat-mdc-cell {
     border: 1px solid transparent;
     cursor: pointer;
   }
   
   .mat-mdc-row:hover .mat-mdc-cell {
-    background-color: rgb(183, 187, 187);
+    background-color: #b7bbbb;
   }
 
 
@@ -59,11 +59,11 @@
 }
 
 .dash-board-reset-link {
-  color: rgb(34, 119, 73);
+  color: #227749;
 }
 
 .dash-board-reset-link:hover {
-  color: rgb(34, 119, 73);
+  color: #227749;
   text-decoration: underline;
   cursor: pointer;
 }

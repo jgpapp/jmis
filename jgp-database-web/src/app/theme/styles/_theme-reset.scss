@@ -1,6 +1,7 @@
 @use 'sass:map';
+@use 'sass:color';
 @use '@angular/material' as mat;  
-@import "variables";
+@use "variables" as *;
 
 @mixin theme-reset($theme) {
     $color-config:  mat.m2-get-color-config($theme);
@@ -151,7 +152,7 @@
             color: mat.m2-get-color-from-palette($primary, default-contrast);
         }
         a:hover, button:hover{
-            background: rgba(mat.m2-get-color-from-palette($primary), 0.2);
+            background: color.change(mat.m2-get-color-from-palette($primary), $alpha: 0.2);
             color: mat.m2-get-color-from-palette($foreground, base);
         }
     } 
@@ -163,14 +164,14 @@
     .cal-week-view .cal-day-headers .cal-drag-over,
     .cal-month-view .cal-cell-row .cal-cell:hover, 
     .cal-month-view .cal-cell.cal-has-events.cal-open{
-        background-color: rgba(mat.m2-get-color-from-palette($primary), 0.4);  
+        background-color: color.change(mat.m2-get-color-from-palette($primary), $alpha: 0.4);  
     }
     .cal-month-view .cal-cell-row:hover{
-        background-color: rgba(mat.m2-get-color-from-palette($primary), 0.05);         
+        background-color: color.change(mat.m2-get-color-from-palette($primary), $alpha: 0.05);         
     }
     .cal-week-view .cal-header.cal-today,
     .cal-month-view .cal-day-cell.cal-today{
-        background-color: rgba(mat.m2-get-color-from-palette($primary), 0.4);   
+        background-color: color.change(mat.m2-get-color-from-palette($primary), $alpha: 0.4);   
     }
     .cal-day-view .cal-hour:nth-child(odd){
         background-color: inherit;

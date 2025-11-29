@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ContentHeaderComponent } from '../../theme/components/content-header/content-header.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -11,7 +11,6 @@ import { AuthService } from '@services/users/auth.service';
 import { DashboardFiltersComponent } from './dashboard-filters/dashboard-filters.component';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { Subject, takeUntil } from 'rxjs';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -49,9 +48,9 @@ import { SubscriptionsContainer } from '../../theme/utils/subscriptions-containe
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
 
-  private _selectedDashboardView: string = 'FI';
+  private _selectedDashboardView: string = 'GE';
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   public displayedColumns = ['year', 'partnerName', 'genderName', 'value' ];
@@ -261,16 +260,21 @@ export class DashboardComponent {
     this.currentUserPartnerId = currentUser?.partnerId;
     this.partnerType = currentUser?.partnerType === '-' ? 'NONE' : currentUser?.partnerType;
     this.dashBoardFilters = {};
-    this.updateCurrentDashBoardTypeFilters();
+   
     if(this.currentDashBoardTypeFilters.isPartnerDashboard){
       this.dashBoardFilters = {'selectedPartnerId': this.currentUserPartnerId}
     }
     this.partnerSpecificDashBoardFilters = {'selectedPartnerId': this.currentUserPartnerId};
     // Set initial dashboard type filters
+    if ((this.partnerType === 'FI' || this.partnerType === 'FI_TA') && this.isPartnerDashboard) {
+      this._selectedDashboardView = 'FI';
+    }
+
     if (this.partnerType === 'TA' && this.isPartnerDashboard) {
       this._selectedDashboardView = 'TA';
     }
-    
+    this.updateCurrentDashBoardTypeFilters();
+
 
     this.getLastThreeYearsAccessedLoanPerPartnerYearly();
     this.getLastThreeYearsAccessedLoansCountPerPartnerYearly();
@@ -282,6 +286,10 @@ export class DashboardComponent {
 
   ngOnDestroy(): void {
     this.subs.dispose();
+  }
+
+  showGeneralDashboardSelector(): boolean {
+    return !this.currentDashBoardTypeFilters.isPartnerDashboard;
   }
 
   showFinancialDashboardSelector(): boolean {

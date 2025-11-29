@@ -1,5 +1,15 @@
 @use '@angular/material' as mat;
-@import './variables'; 
+@use './variables' as *; 
+@use './theme-reset' as *;
+@use "./skins/indigo-light" as indigo-light;
+@use "./skins/teal-light" as teal-light;
+@use "./skins/red-light" as red-light;
+@use "./skins/gray-light" as gray-light;
+@use "./skins/blue-dark" as blue-dark;
+@use "./skins/green-dark" as green-dark;
+@use "./skins/pink-dark" as pink-dark;
+@use "./skins/gray-dark" as gray-dark;
+
 $custom-typography: mat.m2-define-typography-config( 
     $body-1: mat.m2-define-typography-level(14px, 20px, 400, $main-font-family),
     $button: mat.m2-define-typography-level(14px, 22px, 600, $main-font-family, $letter-spacing: 0.02em),
@@ -8,46 +18,37 @@ $custom-typography: mat.m2-define-typography-config(
 @include mat.elevation-classes();
 @include mat.app-background(); 
 
-@import 'theme-reset';
 .app{
     &.indigo-light{
-        @import "skins/indigo-light";
-        @include mat.all-component-colors($indigo-light-theme);
-        @include theme-reset($indigo-light-theme);
+        @include mat.all-component-colors(indigo-light.$indigo-light-theme);
+        @include theme-reset(indigo-light.$indigo-light-theme);
     }
     &.teal-light{
-        @import "skins/teal-light";
-        @include mat.all-component-colors($teal-light-theme);
-        @include theme-reset($teal-light-theme);
+        @include mat.all-component-colors(teal-light.$teal-light-theme);
+        @include theme-reset(teal-light.$teal-light-theme);
     }
     &.red-light{
-        @import "skins/red-light";
-        @include mat.all-component-colors($red-light-theme);
-        @include theme-reset($red-light-theme);
+        @include mat.all-component-colors(red-light.$red-light-theme);
+        @include theme-reset(red-light.$red-light-theme);
     }
     &.gray-light{
-        @import "skins/gray-light";
-        @include mat.all-component-colors($gray-light-theme);
-        @include theme-reset($gray-light-theme);
+        @include mat.all-component-colors(gray-light.$gray-light-theme);
+        @include theme-reset(gray-light.$gray-light-theme);
     }
     &.blue-dark{
-        @import "skins/blue-dark";
-        @include mat.all-component-colors($blue-dark-theme);
-        @include theme-reset($blue-dark-theme);
+        @include mat.all-component-colors(blue-dark.$blue-dark-theme);
+        @include theme-reset(blue-dark.$blue-dark-theme);
     }
     &.green-dark{
-        @import "skins/green-dark";
-        @include mat.all-component-colors($green-dark-theme);
-        @include theme-reset($green-dark-theme);
+        @include mat.all-component-colors(green-dark.$green-dark-theme);
+        @include theme-reset(green-dark.$green-dark-theme);
     }
     &.pink-dark{
-        @import "skins/pink-dark";
-        @include mat.all-component-colors($pink-dark-theme);
-        @include theme-reset($pink-dark-theme);
+        @include mat.all-component-colors(pink-dark.$pink-dark-theme);
+        @include theme-reset(pink-dark.$pink-dark-theme);
     }
     &.gray-dark{
-        @import "skins/gray-dark";
-        @include mat.all-component-colors($gray-dark-theme);
-        @include theme-reset($gray-dark-theme);
+        @include mat.all-component-colors(gray-dark.$gray-dark-theme);
+        @include theme-reset(gray-dark.$gray-dark-theme);
     }
 }
