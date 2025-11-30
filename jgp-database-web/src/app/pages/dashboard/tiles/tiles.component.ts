@@ -4,7 +4,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { HighLevelSummaryDto } from '../dto/highLevelSummaryDto';
 import { DashboardService } from '@services/dashboard/dashboard.service';
-import { Subject, takeUntil } from 'rxjs';
 import { DashboardTypeFilter } from '../../../dto/dashboard-type-filter';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
@@ -24,6 +23,12 @@ export class TilesComponent implements OnInit, OnDestroy, OnChanges {
   @Input({required: true, alias: 'dashboardTypeFilter'}) dashboardTypeFilter: DashboardTypeFilter;
   highLevelSummary: HighLevelSummaryDto = {businessesTrained: '0', businessesLoaned: '0', amountDisbursed: '0', amountDisbursedByTranches: '0', businessesMentored: '0'};
   subs = new SubscriptionsContainer();
+
+  businessesTrainedFlex: number = 100;
+  businessesLoanedFlex: number = 33.3;
+  amountDisbursedFlex: number = 33.3;
+  amountDisbursedByTranchesFlex: number = 33.3;
+
   constructor(private dashBoardService: DashboardService){
 
   }
@@ -32,6 +37,17 @@ export class TilesComponent implements OnInit, OnDestroy, OnChanges {
     
     if (changes['dashboardTypeFilter']) {
       this.dashboardTypeFilter = changes['dashboardTypeFilter']['currentValue']
+      if(this.dashboardTypeFilter.isGeneralSummaryDashBoard){
+      this.businessesTrainedFlex = 25;
+      this.businessesLoanedFlex = 25;
+      this.amountDisbursedFlex = 25;
+      this.amountDisbursedByTranchesFlex = 25;
+    }else {
+      this.businessesTrainedFlex = 100;
+      this.businessesLoanedFlex = 33.3;
+      this.amountDisbursedFlex = 33.3;
+      this.amountDisbursedByTranchesFlex = 33.3;
+    }
     }
     if (changes['dashBoardFilters']) {
       this.dashBoardFilters = changes['dashBoardFilters']['currentValue']
