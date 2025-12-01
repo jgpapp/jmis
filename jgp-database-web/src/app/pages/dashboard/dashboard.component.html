@@ -35,15 +35,27 @@
     [fieldFlex]="filterFieldFlex"
     [dashboardTypeFilter]="currentDashBoardTypeFilters"
     />
-    <app-tiles [dashBoardFilters]="dashBoardFilters" [dashboardTypeFilter]="currentDashBoardTypeFilters"/>
-    <app-info-cards [dashBoardFilters]="dashBoardFilters" [dashboardTypeFilter]="currentDashBoardTypeFilters"/>
+    @defer (on viewport) {
+        <app-tiles [dashBoardFilters]="dashBoardFilters" [dashboardTypeFilter]="currentDashBoardTypeFilters"/>
+    } @placeholder {
+        <div class="p-2"><mat-progress-bar mode="indeterminate"></mat-progress-bar></div>
+    }
+    @defer (on viewport) {
+        <app-info-cards [dashBoardFilters]="dashBoardFilters" [dashboardTypeFilter]="currentDashBoardTypeFilters"/>
+    } @placeholder {
+        <div class="p-2"><mat-progress-bar mode="indeterminate"></mat-progress-bar></div>
+    }
 
     @if(currentDashBoardTypeFilters.isFinancialDashboard){
+    @defer (on viewport) {
     <div fxLayout="row wrap">
         <div fxFlex="100" fxFlex.gt-sm="100" class="p-2"> 
             <app-analytics [dashBoardFilters]="dashBoardFilters"/>
         </div>
     </div>
+    } @placeholder {
+        <div class="p-2"><mat-progress-bar mode="indeterminate"></mat-progress-bar></div>
+    }
     }
 
     
@@ -232,15 +244,23 @@
         </div>
     }
     @if(!currentDashBoardTypeFilters.isMentorShipDashboard && !currentDashBoardTypeFilters.isMonitoringDashBoard){
+    @defer (on viewport) {
     <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
         <app-performance-summary [selectedDashboardView]="selectedDashboardView"/>
     </div>
+    } @placeholder {
+        <div class="p-2"><mat-progress-bar mode="indeterminate"></mat-progress-bar></div>
+    }
   }
 
   @if(currentDashBoardTypeFilters.isMonitoringDashBoard){
+    @defer (on viewport) {
     <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
         <app-monitoring-dashboard [dashBoardFilters]="dashBoardFilters"/>
     </div>
+    } @placeholder {
+        <div class="p-2"><mat-progress-bar mode="indeterminate"></mat-progress-bar></div>
+    }
   }
     </div>
     

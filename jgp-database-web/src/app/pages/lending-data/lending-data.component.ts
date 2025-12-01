@@ -20,6 +20,8 @@ import { ConfirmDialogModel } from '../../dto/confirm-dialog-model';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
     selector: 'app-lending-data',
@@ -34,7 +36,9 @@ import { SubscriptionsContainer } from '../../theme/utils/subscriptions-containe
         MatPaginatorModule,
         NoPermissionComponent,
         MatCheckboxModule,
-        HasPermissionDirective
+        HasPermissionDirective,
+        MatProgressBarModule,
+        MatProgressSpinnerModule
     ],
     templateUrl: './lending-data.component.html',
     styleUrl: './lending-data.component.scss'

@@ -36,6 +36,7 @@
 <div fxLayout="row wrap">
     <div fxFlex="100"> 
         <mat-card class="block p-0">  
+            @defer (on idle) {
             @switch (view) {
                 @case ('month') { 
                     <mwl-calendar-month-view 
@@ -60,7 +61,17 @@
                         [refresh]="refresh">
                     </mwl-calendar-day-view>
                 } 
-            } 
+            }
+            } @loading (minimum 500ms) {
+                <div class="p-2" style="text-align: center;">
+                    <mat-spinner></mat-spinner>
+                    <p>Loading calendar...</p>
+                </div>
+            } @placeholder {
+                <div class="p-2" style="text-align: center; min-height: 400px;">
+                    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                </div>
+            }
        </mat-card>
     </div>
 </div>

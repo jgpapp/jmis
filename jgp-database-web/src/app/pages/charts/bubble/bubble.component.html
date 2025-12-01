@@ -12,6 +12,7 @@
                 <mat-card-title>Bubble Chart</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
+                @defer (on idle) {
                 <ngx-charts-bubble-chart
                     [results]="bubble"
                     [showGridLines]="showGridLines"
@@ -30,7 +31,14 @@
                     [tooltipDisabled]="tooltipDisabled"
                     [minRadius]="minRadius"
                     [maxRadius]="maxRadius">
-                </ngx-charts-bubble-chart>                  
+                </ngx-charts-bubble-chart>
+                } @loading {
+                    <div style="text-align: center; padding: 2rem;">
+                        <mat-spinner></mat-spinner>
+                    </div>
+                } @placeholder {
+                    <div style="text-align: center; padding: 2rem;"></div>
+                }                  
             </div>
         </mat-card>
     </div>

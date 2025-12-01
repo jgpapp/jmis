@@ -2,6 +2,7 @@
 package com.jgp.infrastructure.bulkimport.importhandler;
 
 import com.google.common.base.Splitter;
+import com.jgp.infrastructure.bulkimport.exception.InvalidDataException;
 import com.jgp.shared.dto.ApiParameterError;
 import com.jgp.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -212,11 +213,15 @@ public final class ImportHandlerUtils {
         } else if (c.getCellType() == CellType.NUMERIC) {
             return ((Double) c.getNumericCellValue()).intValue();
         } else {
-            return Integer.parseInt(row.getCell(colIndex).getStringCellValue().trim());
+            try {
+                return Integer.parseInt(row.getCell(colIndex).getStringCellValue().trim());
+            } catch (NumberFormatException e) {
+                throw new InvalidDataException("Invalid number format in cell: %s".formatted(e.getMessage()));
+            }
         }
     }
 
-    public static Double readAsDouble(int colIndex, Row row) {
+    public static Double readAsDouble(int colIndex, Row row)  {
         Cell c = row.getCell(colIndex);
         if (c == null || c.getCellType() == CellType.BLANK) {
             return 0.0;
@@ -237,7 +242,11 @@ public final class ImportHandlerUtils {
         } else if (c.getCellType() == CellType.NUMERIC) {
             return row.getCell(colIndex).getNumericCellValue();
         } else {
-            return Double.parseDouble(row.getCell(colIndex).getStringCellValue());
+            try {
+                return Double.parseDouble(row.getCell(colIndex).getStringCellValue());
+            } catch (NumberFormatException e) {
+                throw new InvalidDataException("Invalid number format in cell: %s".formatted(e.getMessage()));
+            }
         }
     }
 

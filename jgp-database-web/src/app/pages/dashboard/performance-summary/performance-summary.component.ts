@@ -56,6 +56,7 @@ export class PerformanceSummaryComponent implements OnInit {
 
   @Input({alias: 'selectedDashboardView', required: true}) selectedDashboardView: string
 
+  geDisplayedColumns: string[] = ['category', 'businessesTrained',  'businessesLoaned', 'amountDisbursed'];
   fiDisplayedColumns: string[] = ['category',  'businessesLoaned', 'amountDisbursed'];
   taDisplayedColumns: string[] = ['category', 'businessesTrained'];
   private transformer = (node: PerformanceSummaryDto, level: number) => {
@@ -101,8 +102,24 @@ export class PerformanceSummaryComponent implements OnInit {
       });
   }
 
+  columnToDisplay(): string[] {
+    if (this.isFinancialDashboard()) {
+      return this.fiDisplayedColumns;
+    } else if (this.isGeneralSummaryDashboard()) {
+      return this.geDisplayedColumns;
+    } else if (this.isTADashboard()) {
+      return this.taDisplayedColumns;
+    } else {
+      return this.geDisplayedColumns;
+    }
+  }
+
   isFinancialDashboard(): boolean {
     return 'FI' === this.selectedDashboardView;
+  }
+
+  isGeneralSummaryDashboard(): boolean {
+    return 'GE' === this.selectedDashboardView;
   }
 
   isTADashboard(): boolean {

@@ -12,7 +12,6 @@ import com.jgp.infrastructure.bulkimport.domain.ImportDocument;
 import com.jgp.infrastructure.bulkimport.domain.ImportDocumentRepository;
 import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
 import com.jgp.infrastructure.bulkimport.event.DataImportDocumentDeletedEvent;
-import com.jgp.infrastructure.bulkimport.event.DataUploadedEvent;
 import com.jgp.infrastructure.bulkimport.importhandler.ImportHandlerUtils;
 import com.jgp.infrastructure.core.domain.JdbcSupport;
 import com.jgp.infrastructure.documentmanagement.contentrepository.ContentRepository;
@@ -29,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -79,6 +79,46 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
 
 
     @Override
+    @CacheEvict(cacheNames = {
+            "operationalCounties",
+            "highLevelSummary",
+            "loanDisbursedByGenderSummary",
+            "countySummary",
+            "loanedBusinessesByGenderSummary",
+            "loanDisbursedByIndustrySectorSummary",
+            "loanDisbursedByIndustrySegmentSummary",
+            "loanDisbursedTopFourPartnersSummary",
+            "loanDisbursedTopFourCountiesSummary",
+            "businessTrainedTopFourCountiesSummary",
+            "businessOwnersTrainedByGenderSummary",
+            "pLWDAndRefugeeBusinessOwnersTrainedByGenderSummary",
+            "disabledBusinessOwnersTrainedByGenderSummary",
+            "refugeeBusinessOwnersTrainedByGenderSummary",
+            "loanDisbursedByPipelineSourceSummary",
+            "mentorshipByGivenFieldSummary",
+            "loansDisbursedByQualitySummary",
+            "systemUserLoginSummary",
+            "taNeedsByGenderSummary",
+            "businessCategoryByCountySummary",
+            "taTrainingBySectorSummary",
+            "loansDisbursedByLoanProductSummary",
+            "outcomeMonitoringSummary",
+            "participantsEmployeesSummary",
+            "taTrainingBySegmentSummary",
+            "participantsMentorshipDeliveryModeSummary",
+            "trainingByPartnerByGenderSummary",
+            "loanDisbursedByLoanProductByGenderSummary",
+            "lastThreeYearsAccessedLoanPerPartnerSummary",
+            "lastThreeYearsAccessedLoanAmountPerPartnerYearly",
+            "lastThreeYearsAccessedLoansCountPerPartnerYearly",
+            "lastThreeYearsTrainedBusinessesPerPartnerYearly",
+            "taTypeTrainedBusinesses",
+            "loansAccessedVsOutStandingByPartnerSummary",
+            "loansAccessedVsOutStandingByGenderSummary",
+            "dataSummary",
+            "dataSummaryMap",
+            "performanceSummary"
+    }, allEntries = true)
     public Long importWorkbook(ImportRequestDto dto) {
         try {
             if (dto.entity() != null && dto.fileDetail() != null) {

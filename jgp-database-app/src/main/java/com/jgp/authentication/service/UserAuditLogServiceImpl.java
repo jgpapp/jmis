@@ -15,10 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
-
 
 @Service
 @RequiredArgsConstructor
@@ -39,9 +35,8 @@ public class UserAuditLogServiceImpl implements UserAuditLogService {
     @Override
     public void logUserLogin(String username, String ipAddress) throws DataIntegrityViolationException {
         synchronized (this) {
-            if (this.systemUserAccessLogRepository.findByUsernameAndLoginDateAndLoginHourAndIsDeletedFalse(username, LocalDate.now(ZoneId.systemDefault()), LocalTime.now(ZoneId.systemDefault()).getHour()).isEmpty()) {
-                this.systemUserAccessLogRepository.save(new SystemUserAccessLog(username, ipAddress));
-            }
+            final var userLogin = new SystemUserAccessLog(username, ipAddress);
+            this.systemUserAccessLogRepository.saveUserLogin(userLogin.getUsername(), userLogin.getIpAddress(), userLogin.getLoginTime(), userLogin.getLoginDate(), userLogin.getLoginHour());
         }
     }
 

@@ -6,6 +6,7 @@
     [class]="'pb-4'"></app-content-header>
 
 <div fxLayout="column" fxLayout.gt-sm="row wrap" class="p-2">
+    @defer (on viewport) {
     <div fxFlex="50" class="p-2"> 
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
@@ -29,6 +30,12 @@
             </div>
         </mat-card>
     </div>
+    } @loading {
+        <div fxFlex="50" class="p-2"><mat-spinner></mat-spinner></div>
+    } @placeholder {
+        <div fxFlex="50" class="p-2"></div>
+    }
+    @defer (on viewport) {
     <div fxFlex="50" class="p-2">
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
@@ -52,6 +59,12 @@
             </div>
         </mat-card>
     </div>
+    } @loading {
+        <div fxFlex="50" class="p-2"><mat-spinner></mat-spinner></div>
+    } @placeholder {
+        <div fxFlex="50" class="p-2"></div>
+    }
+    @defer (on viewport) {
     <div fxFlex="50" class="p-2">
         <mat-card>
             <mat-card-header fxLayoutAlign="center center">                
@@ -74,6 +87,12 @@
             </div>
         </mat-card>
     </div>
+    } @loading {
+        <div fxFlex="50" class="p-2"><mat-spinner></mat-spinner></div>
+    } @placeholder {
+        <div fxFlex="50" class="p-2"></div>
+    }
+    @defer (on viewport) {
     <div fxFlex="50" class="p-2">
       <mat-card>
           <mat-card-header fxLayoutAlign="center center">                
@@ -96,4 +115,9 @@
           </div>
       </mat-card>
   </div>
+  } @loading {
+    <div fxFlex="50" class="p-2"><mat-spinner></mat-spinner></div>
+} @placeholder {
+    <div fxFlex="50" class="p-2"></div>
+}
 </div>

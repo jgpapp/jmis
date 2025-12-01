@@ -30,6 +30,7 @@
                               </button>
                           </div>
                     </mat-toolbar>
+                    @defer (on viewport) {
                     <div class="p-2">
                         <mat-table #table [dataSource]="dataSource" class="mat-elevation-z8">
                             <ng-container matColumnDef="select">
@@ -94,6 +95,14 @@
                         (page)="onPageChange($event)"
                         />
                     </div>
+                    } @loading {
+                        <div class="p-2" style="text-align: center;">
+                            <mat-spinner></mat-spinner>
+                            <p>Loading data...</p>
+                        </div>
+                    } @placeholder {
+                        <div class="p-2"><mat-progress-bar mode="indeterminate"></mat-progress-bar></div>
+                    }
                 </div>
             </mat-card-content>
         </mat-card>
