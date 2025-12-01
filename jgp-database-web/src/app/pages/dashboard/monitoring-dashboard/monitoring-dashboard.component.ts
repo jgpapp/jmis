@@ -8,6 +8,7 @@ import { DashboardService } from '@services/dashboard/dashboard.service';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { Subject, takeUntil } from 'rxjs';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
     selector: 'app-monitoring-dashboard',
@@ -16,7 +17,8 @@ import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-conta
         NgxChartsModule,
         FormsModule,
         MatRadioModule,
-        MatIconModule
+        MatIconModule,
+        MatProgressSpinnerModule
     ],
     templateUrl: './monitoring-dashboard.component.html',
     styleUrl: './monitoring-dashboard.component.scss'

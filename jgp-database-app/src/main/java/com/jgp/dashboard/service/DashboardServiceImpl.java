@@ -41,6 +41,7 @@ import com.jgp.dashboard.dto.SeriesDataPointDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -87,6 +88,7 @@ public class DashboardServiceImpl implements DashboardService {
 
 
     @Override
+    @Cacheable(value = "highLevelSummary", key = "#dashboardSearchCriteria")
     public HighLevelSummaryDto getHighLevelSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var highLevelSummaryMapper = new HighLevelSummaryMapper();
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -122,6 +124,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "loanDisbursedByGenderSummary", key = "#dashboardSearchCriteria")
     public List<DataPointDto> getLoanDisbursedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -146,6 +149,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "countySummary", key = "#dashboardSearchCriteria")
     public List<CountyDataSummaryResponseDto> getCountySummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new CountyDataSummaryResponseMapper();
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -182,6 +186,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "loanedBusinessesByGenderSummary", key = "#dashboardSearchCriteria")
     public List<DataPointDto> getLoanedBusinessesByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -206,6 +211,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "loanDisbursedByIndustrySectorSummary", key = "#dashboardSearchCriteria")
     public List<DataPointDto> getLoanDisbursedByIndustrySectorSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -230,6 +236,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "loanDisbursedByIndustrySegmentSummary", key = "#dashboardSearchCriteria")
     public List<DataPointDto> getLoanDisbursedByIndustrySegmentSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -254,6 +261,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "loanDisbursedTopFourPartnersSummary", key = "#dashboardSearchCriteria")
     public List<DataPointDto> getLoanDisbursedTopFourPartnersSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -274,6 +282,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "loanDisbursedTopFourCountiesSummary", key = "#dashboardSearchCriteria")
     public List<DataPointDto> getLoanDisbursedTopFourCountiesSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -294,6 +303,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "businessTrainedTopFourCountiesSummary", key = "#dashboardSearchCriteria")
     public List<DataPointDto> getBusinessTrainedTopFourCountiesSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -315,6 +325,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "businessOwnersTrainedByGenderSummary", key = "#dashboardSearchCriteria")
     public List<DataPointDto> getBusinessOwnersTrainedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -344,6 +355,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "pLWDAndRefugeeBusinessOwnersTrainedByGenderSummary", key = "#dashboardSearchCriteria")
     public List<DataPointDto> getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -374,6 +386,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "disabledBusinessOwnersTrainedByGenderSummary", key = "#dashboardSearchCriteria")
     public List<DataPointDto> getDisabledBusinessOwnersTrainedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -404,6 +417,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "refugeeBusinessOwnersTrainedByGenderSummary", key = "#dashboardSearchCriteria")
     public List<DataPointDto> getRefugeeBusinessOwnersTrainedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -434,6 +448,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "loanDisbursedByPipelineSourceSummary", key = "#dashboardSearchCriteria")
     public List<DataPointDto> getLoanDisbursedByPipelineSourceSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -459,6 +474,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "mentorshipByGivenFieldSummary", key = "T(String).valueOf(#dashboardSearchCriteria) + '-' + #givenField")
     public List<DataPointDto> getMentorshipByGivenFieldSummary(DashboardSearchCriteria dashboardSearchCriteria, String givenField) {
         final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -485,6 +501,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "loansDisbursedByQualitySummary", key = "#dashboardSearchCriteria")
     public List<DataPointDto> getLoansDisbursedByQualitySummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -510,6 +527,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "systemUserLoginSummary", key = "T(String).valueOf(#fromDate) + '-' + T(String).valueOf(#toDate)")
     public List<DataPointDto> getSystemUserLoginSummary(LocalDate fromDate, LocalDate toDate) {
 
         final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
@@ -545,6 +563,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "taNeedsByGenderSummary", key = "#dashboardSearchCriteria")
     public List<SeriesDataPointDto> getTaNeedsByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new SeriesDataPointMapper();
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -574,6 +593,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "businessCategoryByCountySummary", key = "#dashboardSearchCriteria")
     public List<DataPointDto> getBusinessCategoryByCountySummary(DashboardSearchCriteria dashboardSearchCriteria) {
 
         final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
@@ -600,6 +620,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "taTrainingBySectorSummary", key = "#dashboardSearchCriteria")
     public List<DataPointDto> getTaTrainingBySectorSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -629,6 +650,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "loansDisbursedByLoanProductSummary", key = "#dashboardSearchCriteria")
     public List<DataPointDto> getLoansDisbursedByLoanProductSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -654,6 +676,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "outcomeMonitoringSummary", key = "#searchCriteria")
     public List<DataPointDto> getOutcomeMonitoringSummary(OutComeMonitoringSearchCriteria searchCriteria) {
         final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         var fromDate = searchCriteria.fromDate();
@@ -702,6 +725,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "participantsEmployeesSummary", key = "#dashboardSearchCriteria")
     public List<DataPointDto> getParticipantsEmployeesSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var employeeMapper = new EmployeesSummaryMapper();
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -731,6 +755,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "taTrainingBySegmentSummary", key = "#dashboardSearchCriteria")
     public List<DataPointDto> getTaTrainingBySegmentSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -760,6 +785,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "participantsMentorshipDeliveryModeSummary", key = "#dashboardSearchCriteria")
     public List<DataPointDto> getParticipantsMentorshipDeliveryModeSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -785,6 +811,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "trainingByPartnerByGenderSummary", key = "#dashboardSearchCriteria")
     public List<SeriesDataPointDto> getTrainingByPartnerByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new SeriesDataPointMapper();
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -813,6 +840,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "loanDisbursedByLoanProductByGenderSummary", key = "#dashboardSearchCriteria")
     public List<SeriesDataPointDto> getLoanDisbursedByLoanProductByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new SeriesDataPointMapper();
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -837,6 +865,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "lastThreeYearsAccessedLoanPerPartnerSummary", key = "#dashboardSearchCriteria")
     public List<SeriesDataPointDto> getLastThreeYearsAccessedLoanPerPartnerSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new SeriesDataPointMapper();
         MapSqlParameterSource parameters = new MapSqlParameterSource();
@@ -856,6 +885,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "lastThreeYearsAccessedLoanAmountPerPartnerYearly", key = "#dashboardSearchCriteria")
     public List<PartnerYearlyDataDto> getLastThreeYearsAccessedLoanAmountPerPartnerYearly(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new PartnerYearlyDataMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -881,6 +911,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "lastThreeYearsAccessedLoansCountPerPartnerYearly", key = "#dashboardSearchCriteria")
     public List<PartnerYearlyDataDto> getLastThreeYearsAccessedLoansCountPerPartnerYearly(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new PartnerYearlyDataMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -906,6 +937,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "lastThreeYearsTrainedBusinessesPerPartnerYearly", key = "#dashboardSearchCriteria")
     public List<PartnerYearlyDataDto> getLastThreeYearsTrainedBusinessesPerPartnerYearly(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new PartnerYearlyDataMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -935,6 +967,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "taTypeTrainedBusinesses", key = "#dashboardSearchCriteria")
     public List<TaTypeTrainedBusinessDto> getTaTypeTrainedBusinesses(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new TaTypeTrainedBusinessMapper();
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -965,6 +998,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "loansAccessedVsOutStandingByPartnerSummary", key = "#dashboardSearchCriteria")
     public List<SeriesDataPointDto> getLoansAccessedVsOutStandingByPartnerSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final SeriesDataPointMapper rm = new SeriesDataPointMapper();
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -990,6 +1024,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "loansAccessedVsOutStandingByGenderSummary", key = "#dashboardSearchCriteria")
     public List<SeriesDataPointDto> getLoansAccessedVsOutStandingByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final SeriesDataPointMapper rm = new SeriesDataPointMapper();
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -1015,6 +1050,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "dataSummary", key = "T(String).valueOf(#fromDate) + '-' + T(String).valueOf(#toDate) + '-' + T(String).valueOf(#partnerId)")
     public List<DataSummaryDto> getDataSummary(LocalDate fromDate, LocalDate toDate, Long partnerId) {
         final var countySummaryMapper = new DataSummaryDataMapper();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
@@ -1036,11 +1072,13 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "dataSummaryMap", key = "T(String).valueOf(#fromDate) + '-' + T(String).valueOf(#toDate) + '-' + T(String).valueOf(#partnerId)")
     public Map<String, DataSummaryDto> getDataSummaryMap(LocalDate fromDate, LocalDate toDate, Long partnerId) {
         return getDataSummary(fromDate, toDate, partnerId).stream().collect(Collectors.toMap(DataSummaryDto::genderCategory, s -> s));
     }
 
     @Override
+    @Cacheable(value = "performanceSummary", key = "T(String).valueOf(#year) + '-' + T(String).valueOf(#partnerId) ")
     public List<PerformanceSummaryDto> getPerformanceSummary(String year, Long partnerId) {
         final var performanceSummaryMapper = new PerformanceSummaryMapper();
         final var today = LocalDate.now(ZoneId.systemDefault());
@@ -1066,6 +1104,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "operationalCounties")
     public List<CountyDto> getOperationalCounties() {
         final var operationsCounties = this.participantRepository.getParticipantOperationCounties();
         return new ArrayList<>(EnumSet.allOf(CommonUtil.KenyanCounty.class)).stream()

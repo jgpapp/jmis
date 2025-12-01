@@ -247,6 +247,7 @@ export class DashboardComponent implements OnInit {
     isPartnerDashboard: this.isPartnerDashboard,
     currentUserPartnerId: this.currentUserPartnerId,
     partnerType: this.partnerType,
+    isGeneralSummaryDashBoard: 'GE' === this.selectedDashboardView,
     isFinancialDashboard: 'FI' === this.selectedDashboardView,
     isTADashboard: 'TA' === this.selectedDashboardView,
     isMentorShipDashboard: 'MENTOR' === this.selectedDashboardView,
@@ -333,7 +334,10 @@ export class DashboardComponent implements OnInit {
         return 33.3;
       }
       return 25;
+    }else if(this.currentDashBoardTypeFilters.isGeneralSummaryDashBoard){
+        return 25; 
+    }else {
+      return 20;
     }
-    return 20;
   }
 }
