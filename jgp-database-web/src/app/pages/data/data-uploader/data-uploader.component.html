@@ -60,11 +60,7 @@
               <mat-hint>Please <strong>DO NOT</strong> change the names of the data template as they were downloaded.</mat-hint>
 
               <div fxFlex="48%" fxLayoutGap="2%">
-                <mat-label>Update Existing Participants Information (Default is NO): </mat-label>
-                <mat-radio-group [(ngModel)]="updateParticipantInfo">
-                  <mat-radio-button value="NO" labelPosition="before">No</mat-radio-button>
-                  <mat-radio-button value="YES" labelPosition="before">Yes</mat-radio-button>
-              </mat-radio-group>
+                <mat-slide-toggle labelPosition="before" [(ngModel)]="updateParticipantInfo">Update Existing Participants Information (Default is NO): {{updateParticipantInfo ? 'YES' : 'NO'}}</mat-slide-toggle>
             </div>
         
               <div fxFlex="13%">

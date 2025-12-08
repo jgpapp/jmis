@@ -27,6 +27,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { HasPermissionDirective } from '../../../directives/has-permission.directive';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 import { ActivatedRoute } from '@angular/router';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @Component({
     selector: 'app-data-uploader',
@@ -44,6 +45,7 @@ import { ActivatedRoute } from '@angular/router';
         MatButtonModule,
         MatOptionModule,
         NoPermissionComponent,
+        MatSlideToggleModule,
         MatTableModule,
         MatPaginatorModule,
         MatTooltipModule,
@@ -64,7 +66,7 @@ export class DataUploaderComponent implements OnDestroy {
   partnerType: string | undefined = 'NONE';
   public docsFilterForm: FormGroup;
   progress: { processed: number; total: number; finished: number } | null = null;
-  updateParticipantInfo: string;
+  updateParticipantInfo: boolean = false;
   dotCount: number = 0;
   preparingText: string = 'Preparing the template';
   private readonly animationInterval = 500; // milliseconds
@@ -196,7 +198,7 @@ export class DataUploaderComponent implements OnDestroy {
     if(this.legalFormType){
       this.uploadProgressID = uuidv4();
       this.subscribeToUploadProgress(this.uploadProgressID);
-    this.subs.add = this.dataUploadService.uploadDataTemplate(this.template, this.legalFormType, this.uploadProgressID, this.updateParticipantInfo)
+    this.subs.add = this.dataUploadService.uploadDataTemplate(this.template, this.legalFormType, this.uploadProgressID, this.updateParticipantInfo ? 'YES' : 'NO')
       .subscribe({
         next: (response) => {
           this.importDocumentId = response.message;
