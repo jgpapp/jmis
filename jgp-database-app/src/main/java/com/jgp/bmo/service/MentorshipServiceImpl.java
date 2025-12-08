@@ -129,7 +129,7 @@ public class MentorshipServiceImpl implements MentorshipService {
     }
 
     @Override
-    public List<Mentorship> findByDocumentId(Long documentId, Boolean isDeleted) {
-        return this.mentorshipRepository.findByDocumentIdAndIsDeleted(documentId, isDeleted);
+    public List<Mentorship> findByDocumentId(Long documentId) {
+        return this.mentorshipRepository.findByDocumentId(documentId);
     }
 }

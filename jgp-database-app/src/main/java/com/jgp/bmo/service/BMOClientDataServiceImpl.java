@@ -1,6 +1,5 @@
 package com.jgp.bmo.service;
 
-import com.jgp.authentication.aop.AuditTrail;
 import com.jgp.authentication.service.PlatformSecurityContext;
 import com.jgp.bmo.domain.BMOParticipantData;
 import com.jgp.bmo.domain.BMOClientDataRepository;
@@ -126,7 +125,7 @@ public class BMOClientDataServiceImpl implements BMOClientDataService {
     }
 
     @Override
-    public List<BMOParticipantData> findByDocumentId(Long documentId, Boolean isDeleted) {
-        return bmoDataRepository.findByDocumentIdAndIsDeleted(documentId, isDeleted);
+    public List<BMOParticipantData> findByDocumentId(Long documentId) {
+        return bmoDataRepository.findByDocumentId(documentId);
     }
 }

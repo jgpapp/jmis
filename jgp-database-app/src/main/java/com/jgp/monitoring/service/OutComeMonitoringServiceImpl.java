@@ -106,8 +106,8 @@ public class OutComeMonitoringServiceImpl implements OutComeMonitoringService {
     }
 
     @Override
-    public List<OutComeMonitoring> findByDocumentId(Long documentId, Boolean isDeleted) {
-        return this.outComeMonitoringRepository.findByDocumentIdAndIsDeleted(documentId, isDeleted);
+    public List<OutComeMonitoring> findByDocumentId(Long documentId) {
+        return this.outComeMonitoringRepository.findByDocumentId(documentId);
     }
 
 }

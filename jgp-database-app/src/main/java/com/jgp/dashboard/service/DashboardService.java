@@ -37,6 +37,8 @@ public interface DashboardService {
 
     List<DataPointDto> getBusinessTrainedTopFourCountiesSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
+    List<DataPointDto> getParticipantCountForTrainedAndTookLoanSummary(DashboardSearchCriteria dashboardSearchCriteria);
+
     List<DataPointDto> getBusinessOwnersTrainedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
     List<DataPointDto> getPLWDAndRefugeeBusinessOwnersTrainedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);

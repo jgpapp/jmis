@@ -15,7 +15,7 @@ public class LoanTransactionServiceImpl implements LoanTransactionService {
     private final LoanTransactionMapper loanTransactionMapper;
 
     @Override
-    public List<LoanTransaction> getLoanTransactions(Long loanImportDocId, Boolean isDeleted) {
-        return loanTransactionRepository.findByLoanDocumentIdAndIsDeleted(loanImportDocId, isDeleted);
+    public List<LoanTransaction> getLoanTransactions(Long loanImportDocId) {
+        return loanTransactionRepository.findByLoanDocumentId(loanImportDocId);
     }
 }

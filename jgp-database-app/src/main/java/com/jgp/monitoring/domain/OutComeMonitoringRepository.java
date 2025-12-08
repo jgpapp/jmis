@@ -21,7 +21,7 @@ public interface OutComeMonitoringRepository extends JpaRepository<OutComeMonito
 
     List<OutComeMonitoring> findByIsDeletedFalse();
 
-    List<OutComeMonitoring> findByDocumentIdAndIsDeleted(@NonNull Long documentId, @NonNull Boolean isDeleted);
+    List<OutComeMonitoring> findByDocumentId(@NonNull Long documentId);
 
 
 }

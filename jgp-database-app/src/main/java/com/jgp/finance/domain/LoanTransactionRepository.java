@@ -30,5 +30,7 @@ public interface LoanTransactionRepository extends JpaRepository<LoanTransaction
 
     List<LoanTransaction> findByLoanDocumentIdAndIsDeleted(@NonNull Long loanImportDocId, @NonNull Boolean isDeleted);
 
+    List<LoanTransaction> findByLoanDocumentId(@NonNull Long loanImportDocId);
+
 
 }

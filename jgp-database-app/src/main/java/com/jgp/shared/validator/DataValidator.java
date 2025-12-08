@@ -83,18 +83,13 @@ public class DataValidator {
     }
 
     public static CommonUtil.KenyanCounty validateCountyName(int column, Row row, Map<Row, String> rowErrorMap) {
-        try {
             final var countyName = ImportHandlerUtils.readAsString(column, row);
             final var locationCounty = CommonUtil.KenyanCounty.getKenyanCountyFromName(countyName).orElse(CommonUtil.KenyanCounty.UNKNOWN);
             if (CommonUtil.KenyanCounty.UNKNOWN.equals(locationCounty)) {
-                throw new DataRulesViolationException("Invalid county name !!");
+                rowErrorMap.put(row, "Invalid county name !!");
+                return CommonUtil.KenyanCounty.UNKNOWN;
             }
             return locationCounty;
-        } catch (Exception e) {
-            log.error("Invalid value for county colum", e);
-            rowErrorMap.put(row, e.getMessage());
-        }
-        return CommonUtil.KenyanCounty.UNKNOWN;
     }
 
     public static LocalDate validateLocalDate(int column, Row row, Map<Row, String> rowErrorMap, String dateFieldName, boolean isRequired) {

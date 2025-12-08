@@ -69,7 +69,7 @@ public class LoanServiceImpl implements LoanService {
     @Transactional
     @Override
     public void approvedTransactionsLoans(List<Long> transactionsIds, Boolean approval) {
-        var loanTransactions = this.loanTransactionRepository.findAllById(transactionsIds).stream().filter(l -> Boolean.FALSE.equals(l.getIsDeleted())).toList();
+        var loanTransactions = this.loanTransactionRepository.findAllById(transactionsIds);
         var currentUser = this.platformSecurityContext.getAuthenticatedUserIfPresent();
         var currentUserPartner = Objects.nonNull(currentUser) ? currentUser.getPartner() : null;
         if (transactionsIds.isEmpty() && Objects.nonNull(currentUserPartner)) {

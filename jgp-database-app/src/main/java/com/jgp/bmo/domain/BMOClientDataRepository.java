@@ -22,5 +22,5 @@ public interface BMOClientDataRepository extends JpaRepository<BMOParticipantDat
 
     List<BMOParticipantData> findByDocumentIdAndIsDeleted(@NonNull Long documentId, @NonNull Boolean isDeleted);
 
-
+    List<BMOParticipantData> findByDocumentId(@NonNull Long documentId);
 }
