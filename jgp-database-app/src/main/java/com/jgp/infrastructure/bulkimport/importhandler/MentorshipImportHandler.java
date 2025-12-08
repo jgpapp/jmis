@@ -92,9 +92,13 @@ public class MentorshipImportHandler implements ImportHandler {
             row = loanSheet.getRow(rowIndex);
             if (null != row && ImportHandlerUtils.isNotImported(row, MentorShipConstants.STATUS_COL)) {
                     mentorshipDataList.add(readMentorShipData(row));
+                try {
+                    this.importProgressService.incrementAndSendProgressUpdate(this.documentImportProgressUUId);
+                } catch (JsonProcessingException | ExecutionException e) {
+                    log.error("Problem Updating Preparation Progress: {}", e.getMessage());
+                }
             }
         }
-        updateImportProgress(this.documentImportProgressUUId, true, mentorshipDataList.size());
     }
 
 
@@ -255,6 +259,12 @@ public class MentorshipImportHandler implements ImportHandler {
         int progressLevel = 0;
         String errorMessage = "";
         var loanDataSize = mentorshipDataList.size();
+        try {
+            importProgressService.resetEveryThingToZero(this.documentImportProgressUUId);
+        } catch (ExecutionException e) {
+            log.error(e.getMessage());
+        }
+        updateImportProgress(this.documentImportProgressUUId, true, loanDataSize);
         for (int i = 0; i < loanDataSize; i++) {
             final var mentorshipData = mentorshipDataList.get(i);
             Row row = mentorShipSheet.getRow(mentorshipData.getRowIndex());

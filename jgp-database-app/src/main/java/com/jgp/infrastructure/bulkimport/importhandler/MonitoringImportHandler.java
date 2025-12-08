@@ -76,9 +76,13 @@ public class MonitoringImportHandler implements ImportHandler {
             Row row = sheet.getRow(rowIndex);
             if (row != null && ImportHandlerUtils.isNotImported(row, MonitoringConstants.STATUS_COL)) {
                 monitoringDataList.add(readMonitoringData(row));
+                try {
+                    this.importProgressService.incrementAndSendProgressUpdate(this.documentImportProgressUUId);
+                } catch (JsonProcessingException | ExecutionException e) {
+                    log.error("Problem Updating Preparation Progress: {}", e.getMessage());
+                }
             }
         }
-        updateImportProgress(this.documentImportProgressUUId, true, monitoringDataList.size());
     }
 
     private OutComeMonitoring readMonitoringData(Row row) {
@@ -179,6 +183,12 @@ public class MonitoringImportHandler implements ImportHandler {
         int progressLevel = 0;
         String errorMessage = "";
         var loanDataSize = monitoringDataList.size();
+        try {
+            importProgressService.resetEveryThingToZero(this.documentImportProgressUUId);
+        } catch (ExecutionException e) {
+            log.error(e.getMessage());
+        }
+        updateImportProgress(this.documentImportProgressUUId, true, loanDataSize);
         for (int i = 0; i < loanDataSize; i++) {
             final var monitoringData = monitoringDataList.get(i);
             Row row = monitoringSheet.getRow(monitoringData.getRowIndex());
