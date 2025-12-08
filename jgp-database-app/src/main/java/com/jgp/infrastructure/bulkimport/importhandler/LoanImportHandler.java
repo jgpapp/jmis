@@ -248,7 +248,6 @@ public class LoanImportHandler implements ImportHandler {
                 statusCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.LIGHT_GREEN));
                 successCount++;
             } catch (RuntimeException ex) {
-                ex.printStackTrace();
                 errorCount++;
                 log.error("Problem occurred When Uploading Lending Data: {}", ex.getMessage());
                 errorMessage = ImportHandlerUtils.getErrorMessage(ex);

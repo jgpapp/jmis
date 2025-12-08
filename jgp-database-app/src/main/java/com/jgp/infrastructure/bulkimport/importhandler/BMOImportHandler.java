@@ -93,9 +93,13 @@ public class BMOImportHandler implements ImportHandler {
             row = bmoSheet.getRow(rowIndex);
             if (null != row && ImportHandlerUtils.isNotImported(row, BMOConstants.STATUS_COL)) {
                 bmoDataList.add(readBMOData(row));
+                try {
+                    this.importProgressService.incrementAndSendProgressUpdate(this.documentImportProgressUUId);
+                } catch (JsonProcessingException | ExecutionException e) {
+                    log.error("Problem Updating Preparation Progress: {}", e.getMessage());
+                }
             }
         }
-        updateImportProgress(this.documentImportProgressUUId, true, bmoDataList.size());
     }
 
 
@@ -205,6 +209,12 @@ public class BMOImportHandler implements ImportHandler {
         int progressLevel = 0;
         String errorMessage = "";
         var bmoDataSize = bmoDataList.size();
+        try {
+            importProgressService.resetEveryThingToZero(this.documentImportProgressUUId);
+        } catch (ExecutionException e) {
+            log.error(e.getMessage());
+        }
+        updateImportProgress(this.documentImportProgressUUId, true, bmoDataSize);
         for (int i = 0; i < bmoDataSize; i++) {
             final var bmoData = bmoDataList.get(i);
             Row row = bmoSheet.getRow(bmoData.getRowIndex());
