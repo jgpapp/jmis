@@ -91,7 +91,7 @@ public class OutComeMonitoringServiceImpl implements OutComeMonitoringService {
         }
         final var outComeMonitoringToDeleteIds = outComeMonitoringToDelete.stream()
                 .map(OutComeMonitoring::getId).toList();
-        this.outComeMonitoringRepository.deleteOutComeMonitoringsByIds(outComeMonitoringToDeleteIds);
+        this.outComeMonitoringRepository.deleteOutComeMonitoringByIds(outComeMonitoringToDeleteIds);
         final var participantsToDeleteIds = outComeMonitoringToDelete.stream().map(OutComeMonitoring::getParticipant)
                 .filter(pt -> Boolean.FALSE.equals(pt.getIsActive()))
                 .map(Participant::getId).toList();

@@ -15,16 +15,11 @@ import java.util.List;
 @Repository
 public interface MentorshipRepository extends JpaRepository<Mentorship, Long> , JpaSpecificationExecutor<Mentorship>, QuerydslPredicateExecutor<Mentorship> {
 
-    @Query("select b from Mentorship b where b.participant.id = ?1")
-    List<Mentorship> findByParticipantId(@NonNull Long id);
-
 
     @Transactional
     @Modifying
     @Query(value = "update mentor_ships m set is_deleted = true where m.id in ?1", nativeQuery = true)
     void deleteMentorshipDataByIds(@NonNull Collection<Long> ids);
-
-    List<Mentorship> findByDocumentIdAndIsDeleted(@NonNull Long id, @NonNull Boolean isDeleted);
 
     List<Mentorship> findByDocumentId(@NonNull Long id);
 }
