@@ -27,5 +27,4 @@ public interface LoanTransactionRepository extends JpaRepository<LoanTransaction
 
     List<LoanTransaction> findByLoanDocumentId(@NonNull Long loanImportDocId);
 
-
 }
