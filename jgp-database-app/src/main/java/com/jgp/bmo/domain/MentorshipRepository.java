@@ -26,5 +26,5 @@ public interface MentorshipRepository extends JpaRepository<Mentorship, Long> , 
 
     List<Mentorship> findByDocumentIdAndIsDeleted(@NonNull Long id, @NonNull Boolean isDeleted);
 
-
+    List<Mentorship> findByDocumentId(@NonNull Long id);
 }

@@ -325,6 +325,36 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "participantCountForTrainedAndTookLoanSummary", key = "#dashboardSearchCriteria")
+    public List<DataPointDto> getParticipantCountForTrainedAndTookLoanSummary(DashboardSearchCriteria dashboardSearchCriteria) {
+        final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
+        LocalDate fromDate = dashboardSearchCriteria.fromDate();
+        LocalDate toDate = dashboardSearchCriteria.toDate();
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
+        }
+        var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
+            parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
+            whereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
+            parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
+            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.trainingPartner())) {
+            parameters.addValue(TRAINING_PARTNER_PARAM, dashboardSearchCriteria.trainingPartner().toLowerCase(Locale.getDefault()));
+            whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_TRAINING_PARTNER_PARAM);
+        }
+        var sqlQuery = String.format(DataPointMapper.BUSINESSES_TRAINED_AND_TOOK_LOAN, whereClause, whereClause.concat(" and l.participant_id IS NULL"));
+
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
     @Cacheable(value = "businessOwnersTrainedByGenderSummary", key = "#dashboardSearchCriteria")
     public List<DataPointDto> getBusinessOwnersTrainedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
@@ -743,7 +773,8 @@ public class DashboardServiceImpl implements DashboardService {
         }
         var sqlQuery = String.format(EmployeesSummaryMapper.EMPLOYEES_SCHEMA, whereClause);
         final var employeeSummary = this.namedParameterJdbcTemplate.queryForObject(sqlQuery, parameters, employeeMapper);
-        if (Objects.isNull(employeeSummary)){
+        if (Objects.isNull(employeeSummary) || (employeeSummary.totalRegularEmployeesAbove35() == 0 && employeeSummary.youthRegularEmployees() == 0
+                && employeeSummary.totalCasualEmployeesAbove35() == 0 && employeeSummary.youthCasualEmployees() == 0)) {
             return List.of();
         }
         return List.of(
@@ -1519,6 +1550,18 @@ public class DashboardServiceImpl implements DashboardService {
                 select cl.business_location as dataKey, count(cl.id) as dataValue,
                 count(cl.id) * 100.0 / sum(count(cl.id)) OVER () AS percentage
                 from bmo_participants_data bpd inner join participants cl on bpd.participant_id = cl.id %s group by 1 order by 2 DESC limit 4;
+                """;
+
+        public static final String BUSINESSES_TRAINED_AND_TOOK_LOAN = """
+                SELECT 'Trained and Took Loan' AS dataKey, COUNT(DISTINCT bpd.participant_id) AS dataValue, 0 AS percentage
+                FROM bmo_participants_data bpd
+                         INNER JOIN loans l ON bpd.participant_id = l.participant_id %s  group by 1
+                
+                UNION ALL
+                
+                SELECT 'Trained Only' AS dataKey, COUNT(DISTINCT bpd.participant_id) AS dataValue, 0 AS percentage
+                FROM bmo_participants_data bpd
+                         LEFT JOIN loans l ON bpd.participant_id = l.participant_id %s  group by 1;
                 """;
 
         public static final String BUSINESSES_TRAINED_BY_GENDER_SCHEMA = """

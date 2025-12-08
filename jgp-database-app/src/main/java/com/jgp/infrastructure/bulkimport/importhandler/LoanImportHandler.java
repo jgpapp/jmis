@@ -93,9 +93,13 @@ public class LoanImportHandler implements ImportHandler {
             row = loanSheet.getRow(rowIndex);
             if (null != row && ImportHandlerUtils.isNotImported(row, LoanConstants.STATUS_COL)) {
                 loanDataList.add(readLoanData(row));
+                try {
+                    this.importProgressService.incrementAndSendProgressUpdate(this.documentImportProgressUUId);
+                } catch (JsonProcessingException | ExecutionException e) {
+                    log.error("Problem Updating Preparation Progress: {}", e.getMessage());
+                }
             }
         }
-        updateImportProgress(this.documentImportProgressUUId, true, loanDataList.size());
     }
 
     private Loan readLoanData(Row row) {
@@ -214,6 +218,12 @@ public class LoanImportHandler implements ImportHandler {
         int progressLevel = 0;
         String errorMessage = "";
         var loanDataSize = loanDataList.size();
+        try {
+            importProgressService.resetEveryThingToZero(this.documentImportProgressUUId);
+        } catch (ExecutionException e) {
+            log.error(e.getMessage());
+        }
+        updateImportProgress(this.documentImportProgressUUId, true, loanDataSize);
         for (int i = 0; i < loanDataSize; i++) {
             final var loanData = loanDataList.get(i);
             Row row = loansSheet.getRow(loanData.getRowIndex());
@@ -238,6 +248,7 @@ public class LoanImportHandler implements ImportHandler {
                 statusCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.LIGHT_GREEN));
                 successCount++;
             } catch (RuntimeException ex) {
+                ex.printStackTrace();
                 errorCount++;
                 log.error("Problem occurred When Uploading Lending Data: {}", ex.getMessage());
                 errorMessage = ImportHandlerUtils.getErrorMessage(ex);
@@ -246,9 +257,8 @@ public class LoanImportHandler implements ImportHandler {
                 }
                 writeGroupErrorMessage(errorMessage, progressLevel, statusCell, errorReportCell);
             }finally {
-                updateImportProgress(this.documentImportProgressUUId, false, 0);
                 try {
-                    this.importProgressService.sendProgressUpdate(this.documentImportProgressUUId);
+                    this.importProgressService.incrementAndSendProgressUpdate(this.documentImportProgressUUId);
                 } catch (JsonProcessingException | ExecutionException e) {
                     log.error("Problem Updating Progress: {}", e.getMessage());
                 }

@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface LoanTransactionService {
 
-    List<LoanTransaction> getLoanTransactions(Long loanImportDocId, Boolean isDeleted);
+    List<LoanTransaction> getLoanTransactions(Long loanImportDocId);
 }

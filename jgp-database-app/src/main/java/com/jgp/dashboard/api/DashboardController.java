@@ -172,6 +172,20 @@ public class DashboardController {
         return new ResponseEntity<>(this.dashboardService.getBusinessTrainedTopFourCountiesSummary(searchCriteria), HttpStatus.OK);
     }
 
+    @GetMapping("businesses-trained-and-took-loan-count")
+    public ResponseEntity<List<DataPointDto>> getParticipantCountForTrainedAndTookLoanSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                                              @RequestParam(value = "county-code", required = false) String countyCode,
+                                                                                              @RequestParam(value = "training-partner", required = false) String trainingPartner,
+                                                                                              @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                                              @RequestParam(value = "to-date", required = false) LocalDate toDate){
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getParticipantCountForTrainedAndTookLoanSummary(searchCriteria), HttpStatus.OK);
+    }
+
     @GetMapping("businesses-trained-by-gender")
     public ResponseEntity<List<DataPointDto>> getBusinessesByGenderSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
                                                                            @RequestParam(value = "county-code", required = false) String countyCode,

@@ -265,9 +265,9 @@ export class DataUploaderComponent implements OnDestroy {
   get progressText(): string {
     if (this.progress) {
       this.progressDots();
-      if (this.progress.processed > 0 && this.progress.total !== this.progress.processed) {
+      if (this.progress.processed > 0 && this.progress.total > 0 && this.progress.total !== this.progress.processed) {
         return `Processed ${this.progress.processed} of ${this.progress.total} rows`;
-      } else if (this.progress.processed > 0 && this.progress.total === this.progress.processed) {
+      } else if (this.progress.processed > 0 && this.progress.total > 0 && this.progress.total === this.progress.processed) {
         return `Completed Processing All ${this.progress.total} rows`;
       } else {
         return this.preparingText;
@@ -280,7 +280,7 @@ export class DataUploaderComponent implements OnDestroy {
     this.subs.add = interval(this.animationInterval)
       .subscribe(() => {
         this.dotCount = (this.dotCount + 1) % 4; // Cycle through 0, 1, 2, 3
-        this.preparingText = 'Preparing the template' + '.'.repeat(this.dotCount);
+        this.preparingText = `Preparing the template: ${this.progress?.processed} prepared` + '.'.repeat(this.dotCount);
       });
   }
  

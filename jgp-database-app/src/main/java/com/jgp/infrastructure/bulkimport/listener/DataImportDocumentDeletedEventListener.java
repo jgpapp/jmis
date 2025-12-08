@@ -35,28 +35,28 @@ public class DataImportDocumentDeletedEventListener {
             final var documentImportType = document.getGlobalEntityType();
             switch (documentImportType) {
                 case GlobalEntityType.LOAN_IMPORT_TEMPLATE -> {
-                    final var loanTransactionIds = this.loanTransactionService.getLoanTransactions(document.getId(), Boolean.FALSE)
+                    final var loanTransactionIds = this.loanTransactionService.getLoanTransactions(document.getId())
                             .stream()
                             .map(BaseEntity::getId)
                             .toList();
                     this.loanService.approvedTransactionsLoans(loanTransactionIds, Boolean.FALSE);
                 }
                 case GlobalEntityType.TA_IMPORT_TEMPLATE -> {
-                    final var bmoClientDataIds = this.bmoClientDataService.findByDocumentId(document.getId(), Boolean.FALSE)
+                    final var bmoClientDataIds = this.bmoClientDataService.findByDocumentId(document.getId())
                             .stream()
                             .map(BaseEntity::getId)
                             .toList();
                     this.bmoClientDataService.approvedBMOParticipantsData(bmoClientDataIds, Boolean.FALSE);
                 }
                 case GlobalEntityType.MENTORSHIP_IMPORT_TEMPLATE -> {
-                    final var mentorshipIds = this.mentorshipService.findByDocumentId(document.getId(), Boolean.FALSE)
+                    final var mentorshipIds = this.mentorshipService.findByDocumentId(document.getId())
                             .stream()
                             .map(BaseEntity::getId)
                             .toList();
                     this.mentorshipService.approvedMentorShipData(mentorshipIds, Boolean.FALSE);
                 }
                 case GlobalEntityType.MONITORING_IMPORT_TEMPLATE -> {
-                    final var outComeMonitoringIds = this.outComeMonitoringService.findByDocumentId(document.getId(), Boolean.FALSE)
+                    final var outComeMonitoringIds = this.outComeMonitoringService.findByDocumentId(document.getId())
                             .stream()
                             .map(BaseEntity::getId)
                             .toList();

@@ -17,6 +17,11 @@ public class ImportProgress {
         return total;
     }
 
+    public synchronized void reset() {
+        this.processed = 0;
+        this.total = 0;
+    }
+
     public synchronized void setTotal(int total) {
         this.total = total;
     }

@@ -21,5 +21,5 @@ public interface MentorshipService {
 
     MentorshipResponseDto findMentorshipDataById(Long mentorshipId);
 
-    List<Mentorship> findByDocumentId(Long documentId, Boolean isDeleted);
+    List<Mentorship> findByDocumentId(Long documentId);
 }
