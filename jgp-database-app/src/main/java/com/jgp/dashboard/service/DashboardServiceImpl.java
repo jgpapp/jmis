@@ -1553,7 +1553,7 @@ public class DashboardServiceImpl implements DashboardService {
                 """;
 
         public static final String BUSINESSES_TRAINED_AND_TOOK_LOAN = """
-                SELECT 'Trained and Took Loan' AS dataKey, COUNT(DISTINCT bpd.participant_id) AS dataValue, 0 AS percentage
+                SELECT 'Train and Loan' AS dataKey, COUNT(DISTINCT bpd.participant_id) AS dataValue, 0 AS percentage
                 FROM bmo_participants_data bpd
                          INNER JOIN loans l ON bpd.participant_id = l.participant_id %s  group by 1
                 
