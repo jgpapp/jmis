@@ -197,6 +197,12 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   public mentorshipDeliveryModeSummaryYAxisLabel: string = 'Count';
   public mentorshipDeliveryModeSummaryChartTitle: string = 'Delivery Mode Distribution';
 
+  public trainedAndTookLoanCountSummary: any[];
+  public trainedAndTookLoanCountSummaryShowGridLines: boolean = true;
+  public trainedAndTookLoanCountSummaryRoundDomains: boolean = true;
+  public trainedAndTookLoanCountSummaryShowLegend: boolean = false;
+  public trainedAndTookLoanCountSummaryChartTitle: string = 'Businesses Trained And Taken Loan';
+
   public mentorshipByDisabilitySummary: any[];
   public mentorshipByDisabilitySummaryShowXAxis: boolean = true;
   public mentorshipByDisabilitySummaryShowYAxis: boolean = true;
@@ -375,11 +381,13 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       this.getTaTrainingBySectorSummary();
       this.getTaTrainingBySegmentSummary();
       this.getTrainingByPartnerByGenderSummary();
-      this.getBusinessTrainedTopFourCountiesSummary();
+      this.getParticipantCountForTrainedAndTookLoanSummary();
       this.getParticipantsEmployeesSummary();
       this.getDisabledBusinessOwnersTrainedByGenderSummary();
       this.getRefugeeBusinessOwnersTrainedByGenderSummary();
-    } 
+    } else if (this.dashboardTypeFilter.isGeneralSummaryDashBoard) {
+      this.getParticipantCountForTrainedAndTookLoanSummary();
+    }
     this.getCountySummary();
     
   }
@@ -669,11 +677,58 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
         error: (error) => { }
       });
   }
+
+  getParticipantCountForTrainedAndTookLoanSummary() {
+    this.subs.add = this.dashBoardService.getParticipantCountForTrainedAndTookLoanSummary(this.dashBoardFilters)
+      .subscribe({
+        next: (response) => {
+          //this.trainedAndTookLoanCountSummary = response;
+          this.trainedAndTookLoanCountSummary = this.scaleDataForPieGrid(response);
+        },
+        error: (error) => { }
+      });
+  }
+
+  /**
+   * Scales the data values so the percentages displayed by the Pie Grid are correct.
+   */
+  scaleDataForPieGrid(data: any[]): any[] {
+    // 1. Calculate the true sum of your original values
+    const originalTotal = data.reduce((sum, item) => sum + item.value, 0);
+
+    // 2. Define the target total (the magic number the Pie Grid uses for scaling)
+    const PIE_GRID_SCALE_FACTOR = 11;
+
+    // 3. Scale each item
+    return data.map(item => {
+      // Calculate the correct proportional percentage
+      const proportion = item.value / originalTotal;
+
+      // Calculate the new scaled value needed to hit that percentage
+      const scaledValue = proportion * PIE_GRID_SCALE_FACTOR;
+
+      return {
+        ...item,
+        // The chart uses THIS value for its calculations and display
+        value: scaledValue,
+        // Store the original value for tooltips if needed
+        originalValue: item.value,
+      };
+    });
+  }
   
 
 
   public onSelect(event: any) {
     console.log(event);
+  }
+
+  onActivate(data: any): void {
+    console.log('Activate', JSON.parse(JSON.stringify(data)));
+  }
+
+  onDeactivate(data: any): void {
+    console.log('Deactivate', JSON.parse(JSON.stringify(data)));
   }
 
   valueFormatting = (value: number) => {

@@ -48,6 +48,10 @@ export class DashboardService {
       return this.httpClient.get(`/reports/businesses-trained-top-four-counties?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }
 
+    getParticipantCountForTrainedAndTookLoanSummary(dashBoardFilters: any = undefined): Observable<any> {
+      return this.httpClient.get(`/reports/businesses-trained-and-took-loan-count?${this.getDashBoardQueryParams(dashBoardFilters)}`);
+    }
+
     getBusinessesTrainedByGenderSummary(dashBoardFilters: any = undefined): Observable<any> {
       return this.httpClient.get(`/reports/businesses-trained-by-gender?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }

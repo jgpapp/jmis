@@ -26,5 +26,4 @@ public interface LoanTransactionRepository extends JpaRepository<LoanTransaction
     void deleteLoanTransactionsByIds(@NonNull List<Long> ids);
 
     List<LoanTransaction> findByLoanDocumentId(@NonNull Long loanImportDocId);
-
 }
