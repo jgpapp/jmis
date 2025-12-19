@@ -3,7 +3,7 @@ package com.jgp.bmo.dto;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-public record BMOClientDto(
+public record TAResponseDto(
          Long id,
 
          Long partnerId,

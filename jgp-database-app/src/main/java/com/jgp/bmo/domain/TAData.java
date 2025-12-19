@@ -4,6 +4,7 @@ package com.jgp.bmo.domain;
 import com.jgp.authentication.domain.AppUser;
 import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.participant.domain.Participant;
+import com.jgp.participant.dto.ParticipantDto;
 import com.jgp.patner.domain.Partner;
 import com.jgp.shared.domain.BaseEntity;
 import jakarta.persistence.Column;
@@ -18,20 +19,22 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.poi.ss.usermodel.Row;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Map;
 
+@Setter
 @Getter
 @Entity
 @Table(name = "bmo_participants_data")
-public class BMOParticipantData extends BaseEntity {
+public class TAData extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "partner_id")
     private Partner partner;
 
-    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "participant_id")
     private Participant participant;
@@ -98,19 +101,28 @@ public class BMOParticipantData extends BaseEntity {
     @JoinColumn(name = "upload_doc_id")
     private Document document;
 
+    private transient Row row;
+
+    private transient Map<Row, String> rowErrorMap;
+
     private transient Integer rowIndex;
 
     private transient String rowErrorMessage;
 
-    public BMOParticipantData() {
+    private transient ParticipantDto participantDto;
+
+    private transient Boolean hasExistingParticipant;
+
+    public TAData() {
     }
 
-    public BMOParticipantData(Partner partner, Participant participant, LocalDate dateFormSubmitted,
-                              Boolean isApplicantEligible, Integer tasAttended, Integer taSessionsAttended,
-                              Boolean isRecommendedForFinance, LocalDate decisionDate, String fiBusinessReferred,
-                              LocalDate dateRecordedByPartner, LocalDate dateRecordedToJGPDB,
-                              String taNeeds, Integer rowIndex, String trainingPartner, String taDeliveryMode,
-                              String otherTaNeeds, String taType, AppUser createdBy, Document document, String rowErrorMessage) {
+    public TAData(Partner partner, Participant participant, LocalDate dateFormSubmitted,
+                  Boolean isApplicantEligible, Integer tasAttended, Integer taSessionsAttended,
+                  Boolean isRecommendedForFinance, LocalDate decisionDate, String fiBusinessReferred,
+                  LocalDate dateRecordedByPartner, LocalDate dateRecordedToJGPDB,
+                  String taNeeds, String trainingPartner, String taDeliveryMode,
+                  String otherTaNeeds, String taType, AppUser createdBy, Document document,
+                  Row row, Map<Row, String> rowErrorMap, Integer rowIndex, String rowErrorMessage, ParticipantDto participantDto) {
         this.partner = partner;
         this.participant = participant;
         this.dateFormSubmitted = dateFormSubmitted;
@@ -122,16 +134,19 @@ public class BMOParticipantData extends BaseEntity {
         this.fiBusinessReferred = fiBusinessReferred;
         this.dateRecordedByPartner = dateRecordedByPartner;
         this.dateRecordedToJGPDB = dateRecordedToJGPDB;
-        this.rowIndex = rowIndex;
         this.isDataApprovedByPartner = false;
         this.taNeeds = taNeeds;
         this.trainingPartner = trainingPartner;
         this.taDeliveryMode = taDeliveryMode;
         this.otherTaNeeds = otherTaNeeds;
         this.taType = taType;
-        this.rowErrorMessage = rowErrorMessage;
         this.setCreatedBy(createdBy);
         this.document = document;
+        this.row = row;
+        this.rowErrorMap = rowErrorMap;
+        this.rowIndex = rowIndex;
+        this.rowErrorMessage = rowErrorMessage;
+        this.participantDto = participantDto;
     }
 
     public void approveData(Boolean approval, AppUser user){
@@ -146,7 +161,7 @@ public class BMOParticipantData extends BaseEntity {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        BMOParticipantData bmoData = (BMOParticipantData) o;
+        TAData bmoData = (TAData) o;
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o)).append(getId(), bmoData.getId())

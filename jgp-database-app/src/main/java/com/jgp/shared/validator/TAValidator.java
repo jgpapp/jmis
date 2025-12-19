@@ -1,6 +1,6 @@
 package com.jgp.shared.validator;
 
-import com.jgp.bmo.domain.BMOParticipantData;
+import com.jgp.bmo.domain.TAData;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -18,20 +18,14 @@ public class TAValidator {
     private TAValidator() {
     }
 
-    public static void validateTAData(BMOParticipantData bmoParticipantData, Row row, Map<Row, String> rowErrorMap) {
-        // Create a Validator instance
-        Validator validator;
-        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
-            validator = factory.getValidator();
-        }
-
+    public static void validateTAData(TAData taData, Validator validator) {
         // Validate the object
-        Set<ConstraintViolation<BMOParticipantData>> violations = validator.validate(bmoParticipantData);
+        Set<ConstraintViolation<TAData>> violations = validator.validate(taData);
 
         // Get the first error, if any
         if (!violations.isEmpty()) {
-            ConstraintViolation<BMOParticipantData> firstViolation = violations.iterator().next();
-            rowErrorMap.put(row, firstViolation.getMessage());
+            ConstraintViolation<TAData> firstViolation = violations.iterator().next();
+            taData.getRowErrorMap().put(taData.getRow(), firstViolation.getMessage());
         }
     }
 

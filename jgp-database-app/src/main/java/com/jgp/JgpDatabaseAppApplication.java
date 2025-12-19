@@ -17,7 +17,7 @@ import static org.springframework.data.web.config.EnableSpringDataWebSupport.Pag
 @EnableAspectJAutoProxy
 public class JgpDatabaseAppApplication {
 
-	public static void main(String[] args) {
+	static void main(String[] args) {
 		SpringApplication.run(JgpDatabaseAppApplication.class, args);
 	}
 
@@ -26,7 +26,7 @@ public class JgpDatabaseAppApplication {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 		executor.setCorePoolSize(10);  // Minimum number of threads
 		executor.setMaxPoolSize(20);  // Maximum number of threads
-		executor.setQueueCapacity(25);  // Queue size
+		executor.setQueueCapacity(100);  // Queue size
 		executor.setThreadNamePrefix("Async-");  // Thread name prefix
 		executor.initialize();  // Initialize the executor
 		return executor;

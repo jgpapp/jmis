@@ -8,6 +8,7 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -30,4 +31,8 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
 
     @Query("SELECT DISTINCT p.locationCountyCode from Participant p where p.isDeleted = false")
     Set<String> getParticipantOperationCounties();
+
+    List<Participant> findByJgpIdInAndIsDeletedFalse(@NonNull Collection<String> jgpIds);
+
+
 }

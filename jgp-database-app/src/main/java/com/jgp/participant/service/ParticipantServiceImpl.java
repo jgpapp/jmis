@@ -2,9 +2,9 @@ package com.jgp.participant.service;
 
 import com.jgp.authentication.aop.AuditTrail;
 import com.jgp.authentication.domain.UserAuditOperationConstants;
-import com.jgp.bmo.dto.BMOParticipantSearchCriteria;
+import com.jgp.bmo.dto.TAParticipantSearchCriteria;
 import com.jgp.bmo.dto.MentorshipSearchCriteria;
-import com.jgp.bmo.service.BMOClientDataService;
+import com.jgp.bmo.service.TADataService;
 import com.jgp.bmo.service.MentorshipService;
 import com.jgp.finance.dto.LoanSearchCriteria;
 import com.jgp.finance.service.LoanService;
@@ -25,7 +25,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +38,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final ParticipantRepository participantRepository;
     private final ParticipantMapper participantMapper;
     private final LoanService loanService;
-    private final BMOClientDataService bmoClientDataService;
+    private final TADataService bmoClientDataService;
     private final MentorshipService mentorshipService;
     private final OutComeMonitoringService outComeMonitoringService;
 
@@ -44,6 +47,13 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Participant createParticipant(ParticipantDto participantDto) {
         return this.participantRepository.save(new Participant(participantDto));
+    }
+
+    @Override
+    public List<Participant> createParticipants(List<ParticipantDto> participantDtos) {
+        return participantRepository.saveAll(participantDtos.stream()
+                .map(Participant::new)
+                .toList());
     }
 
     @AuditTrail(operation = UserAuditOperationConstants.UPDATE_PARTICIPANT, bodyIndex = 1, entityIdIndex = 0)
@@ -57,9 +67,32 @@ public class ParticipantServiceImpl implements ParticipantService {
         this.participantRepository.save(participant);
     }
 
+    @Transactional
+    @Override
+    public List<Participant> updateParticipants(Map<Long, ParticipantDto> participantUpdates) {
+        var participantIds = participantUpdates.keySet();
+        var participants = this.participantRepository.findAllById(participantIds)
+                .stream()
+                .filter(p -> Boolean.FALSE.equals(p.getIsDeleted()))
+                .toList();
+
+        participants.forEach(participant ->
+                participant.updateParticipant(participantUpdates.get(participant.getId()))
+        );
+
+        return this.participantRepository.saveAll(participants);
+    }
+
     @Override
     public Optional<Participant> findOneParticipantByJGPID(String jgpId) {
         return this.participantRepository.findByJgpId(jgpId);
+    }
+
+    @Override
+    public Map<String, Participant> findParticipantsByJGPIDs(List<String> jgpIds) {
+        return this.participantRepository.findByJgpIdInAndIsDeletedFalse(jgpIds)
+                .stream()
+                .collect(Collectors.toMap(Participant::getJgpId, p -> p));
     }
 
     @Override
@@ -71,7 +104,7 @@ public class ParticipantServiceImpl implements ParticipantService {
 
         if (includeAccounts){
             participant.setLoanDtos(this.loanService.getLoans(LoanSearchCriteria.builder().participantId(participantId).approvedByPartner(true).build(), Pageable.unpaged()).stream().toList());
-            participant.setBmoClientDtos(this.bmoClientDataService.getBMODataRecords(BMOParticipantSearchCriteria.builder().approvedByPartner(true).participantId(participantId).build(), Pageable.unpaged()).stream().toList());
+            participant.setBmoClientDtos(this.bmoClientDataService.getBMODataRecords(TAParticipantSearchCriteria.builder().approvedByPartner(true).participantId(participantId).build(), Pageable.unpaged()).stream().toList());
             participant.setMentorshipResponseDtos(this.mentorshipService.getMentorshipDataRecords(MentorshipSearchCriteria.builder().approvedByPartner(true).participantId(participantId).build(), Pageable.unpaged()).stream().toList());
             participant.setMonitoringResponseDtos(this.outComeMonitoringService.getOutComeMonitoringDataRecords(OutComeMonitoringSearchCriteria.builder()
                             .approved(true)

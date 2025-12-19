@@ -133,4 +133,12 @@ public class DataValidator {
         }
         return null;
     }
+
+    public static Validator getValidator() {
+        Validator validator;
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
+        return validator;
+    }
 }

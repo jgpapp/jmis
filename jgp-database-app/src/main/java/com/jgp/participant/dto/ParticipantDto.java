@@ -1,14 +1,16 @@
 package com.jgp.participant.dto;
 
-import com.jgp.bmo.dto.BMOClientDto;
+import com.jgp.bmo.dto.TAResponseDto;
 import com.jgp.finance.dto.LoanDto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
+import org.apache.poi.ss.usermodel.Row;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @Builder
 public record ParticipantDto(
@@ -64,7 +66,7 @@ public record ParticipantDto(
 
         String refugeeStatus,
 
-        List<BMOClientDto> bmoClientDtos,
+        List<TAResponseDto> bmoClientDtos,
 
         List<LoanDto> loanDtos,
 
@@ -78,7 +80,11 @@ public record ParticipantDto(
 
         Boolean isEligible,
 
-        String businessFinancier
+        String businessFinancier,
+
+        Row row,
+
+        Map<Row, String> rowErrorMap
 
         ) {
 }

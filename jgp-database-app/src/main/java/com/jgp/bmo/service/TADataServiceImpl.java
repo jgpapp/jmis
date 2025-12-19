@@ -1,12 +1,12 @@
 package com.jgp.bmo.service;
 
 import com.jgp.authentication.service.PlatformSecurityContext;
-import com.jgp.bmo.domain.BMOParticipantData;
-import com.jgp.bmo.domain.BMOClientDataRepository;
-import com.jgp.bmo.domain.predicate.BMOPredicateBuilder;
-import com.jgp.bmo.dto.BMOClientDto;
-import com.jgp.bmo.dto.BMOParticipantSearchCriteria;
-import com.jgp.bmo.mapper.BMOClientMapper;
+import com.jgp.bmo.domain.TAData;
+import com.jgp.bmo.domain.TADataRepository;
+import com.jgp.bmo.domain.predicate.TAPredicateBuilder;
+import com.jgp.bmo.dto.TAResponseDto;
+import com.jgp.bmo.dto.TAParticipantSearchCriteria;
+import com.jgp.bmo.mapper.TAMapper;
 import com.jgp.infrastructure.bulkimport.event.DataApprovedEvent;
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.domain.ParticipantRepository;
@@ -30,18 +30,18 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class BMOClientDataServiceImpl implements BMOClientDataService {
+public class TADataServiceImpl implements TADataService {
 
-    private final BMOClientDataRepository bmoDataRepository;
-    private final BMOClientMapper bmoClientMapper;
-    private final BMOPredicateBuilder bmoPredicateBuilder;
+    private final TADataRepository bmoDataRepository;
+    private final TAMapper taMapper;
+    private final TAPredicateBuilder bmoPredicateBuilder;
     private final PlatformSecurityContext platformSecurityContext;
     private final ApplicationContext applicationContext;
     private final ParticipantRepository participantRepository;
 
     @Transactional
     @Override
-    public void createBMOData(List<BMOParticipantData> bmoDataListRequest) {
+    public void createBMOData(List<TAData> bmoDataListRequest) {
         this.bmoDataRepository.saveAll(bmoDataListRequest);
     }
 
@@ -52,14 +52,14 @@ public class BMOClientDataServiceImpl implements BMOClientDataService {
         var currentUser = this.platformSecurityContext.getAuthenticatedUserIfPresent();
         var currentUserPartner = Objects.nonNull(currentUser) ? currentUser.getPartner() : null;
         if (dataIds.isEmpty() && Objects.nonNull(currentUserPartner)) {
-                bmoData = this.bmoDataRepository.findAll(this.bmoPredicateBuilder.buildPredicateForSearchTAData(new BMOParticipantSearchCriteria(currentUserPartner.getId(), null, false)), Pageable.unpaged()).getContent();
+                bmoData = this.bmoDataRepository.findAll(this.bmoPredicateBuilder.buildPredicateForSearchTAData(new TAParticipantSearchCriteria(currentUserPartner.getId(), null, false)), Pageable.unpaged()).getContent();
             }
 
         if (Boolean.TRUE.equals(approval)) {
             int count = 0;
-            var bmoToSave = new ArrayList<BMOParticipantData>();
+            var bmoToSave = new ArrayList<TAData>();
             Set<LocalDate> dataDates = new HashSet<>();
-            for (BMOParticipantData bmo : bmoData) {
+            for (TAData bmo : bmoData) {
                 bmo.approveData(true, currentUser);
                 var participant = bmo.getParticipant();
                 if (Boolean.FALSE.equals(participant.getIsActive())) {
@@ -83,10 +83,10 @@ public class BMOClientDataServiceImpl implements BMOClientDataService {
         }
     }
 
-    private void rejectAndDeleteBMOParticipantsData(List<BMOParticipantData> bmoParticipantDataList){
+    private void rejectAndDeleteBMOParticipantsData(List<TAData> bmoParticipantDataList){
         int count = 0;
-        var bmoToDelete = new ArrayList<BMOParticipantData>();
-        for (BMOParticipantData bmo : bmoParticipantDataList) {
+        var bmoToDelete = new ArrayList<TAData>();
+        for (TAData bmo : bmoParticipantDataList) {
             bmoToDelete.add(bmo);
             count++;
             if (count % 50 == 0) { // Flush and clear the session every 50 entities
@@ -101,12 +101,12 @@ public class BMOClientDataServiceImpl implements BMOClientDataService {
     }
 
 
-    private void deleteSelectedRecords(ArrayList<BMOParticipantData> bmoToDelete) {
+    private void deleteSelectedRecords(ArrayList<TAData> bmoToDelete) {
         if (bmoToDelete.isEmpty()) {
             return;
         }
-        this.bmoDataRepository.deleteTADataByIds(bmoToDelete.stream().map(BMOParticipantData::getId).toList());
-        final var participantsToDeleteIds = bmoToDelete.stream().map(BMOParticipantData::getParticipant)
+        this.bmoDataRepository.deleteTADataByIds(bmoToDelete.stream().map(TAData::getId).toList());
+        final var participantsToDeleteIds = bmoToDelete.stream().map(TAData::getParticipant)
                 .filter(pt -> Boolean.FALSE.equals(pt.getIsActive()))
                 .map(Participant::getId).toList();
 
@@ -114,18 +114,18 @@ public class BMOClientDataServiceImpl implements BMOClientDataService {
     }
 
     @Override
-    public Page<BMOClientDto> getBMODataRecords(BMOParticipantSearchCriteria searchCriteria, Pageable pageable) {
+    public Page<TAResponseDto> getBMODataRecords(TAParticipantSearchCriteria searchCriteria, Pageable pageable) {
         final var bmoData = this.bmoDataRepository.findAll(this.bmoPredicateBuilder.buildPredicateForSearchTAData(searchCriteria), pageable);
-        return new PageImpl<>(this.bmoClientMapper.toDto(bmoData.stream().toList()), pageable, bmoData.getTotalElements());
+        return new PageImpl<>(this.taMapper.toDto(bmoData.stream().toList()), pageable, bmoData.getTotalElements());
     }
 
     @Override
-    public BMOClientDto findBMODataById(Long bmoId) {
-        return this.bmoDataRepository.findById(bmoId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).map(this.bmoClientMapper::toDto).orElseThrow(() -> new RuntimeException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
+    public TAResponseDto findBMODataById(Long bmoId) {
+        return this.bmoDataRepository.findById(bmoId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).map(this.taMapper::toDto).orElseThrow(() -> new RuntimeException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
     }
 
     @Override
-    public List<BMOParticipantData> findByDocumentId(Long documentId) {
+    public List<TAData> findByDocumentId(Long documentId) {
         return bmoDataRepository.findByDocumentId(documentId);
     }
 }

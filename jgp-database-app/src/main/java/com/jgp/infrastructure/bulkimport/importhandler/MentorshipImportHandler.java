@@ -1,6 +1,5 @@
 package com.jgp.infrastructure.bulkimport.importhandler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jgp.authentication.service.UserService;
 import com.jgp.bmo.domain.Mentorship;
 import com.jgp.bmo.dto.MentorshipRequestDto;
@@ -31,7 +30,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 
 @Service
 @Slf4j
@@ -43,7 +41,6 @@ public class MentorshipImportHandler implements ImportHandler {
     private final UserService userService;
     List<Mentorship> mentorshipDataList;
     private Workbook workbook;
-    private List<String> statuses;
     private Map<Row, String> rowErrorMap;
     private Map<Long, ParticipantDto> participantDtoMap;
     private String documentImportProgressUUId;
@@ -56,7 +53,6 @@ public class MentorshipImportHandler implements ImportHandler {
     public Count process(BulkImportEvent bulkImportEvent) {
         this.workbook = bulkImportEvent.workbook();
         mentorshipDataList = new ArrayList<>();
-        statuses = new ArrayList<>();
         this.rowErrorMap = new HashMap<>();
         this.participantDtoMap = new HashMap<>();
         this.documentImportProgressUUId = bulkImportEvent.importProgressUUID();
@@ -70,40 +66,24 @@ public class MentorshipImportHandler implements ImportHandler {
         this.mentorshipService.saveMentorshipWithParticipant(mentorship, this.updateParticipantInfo, this.participantDtoMap);
     }
 
-    @Override
-    public void updateImportProgress(String importId, boolean updateTotal, int total) {
-        try {
-            if (updateTotal){
-                importProgressService.updateTotal(importId, total);
-            }else {
-                importProgressService.incrementProcessedProgress(importId);
-            }
-        } catch (ExecutionException e) {
-            log.error("Error : {}", e.getMessage(), e);
-        }
-    }
-
     public void readExcelFile() {
         Sheet loanSheet = workbook.getSheet(TemplatePopulateImportConstants.MENTOR_SHIP_SHEET_NAME);
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(loanSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
+        importProgressService.updateTotal(this.documentImportProgressUUId, noOfEntries);
 
+        this.importProgressService.updateStep(this.documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_READING_STEP);
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
             Row row;
             row = loanSheet.getRow(rowIndex);
             if (null != row && ImportHandlerUtils.isNotImported(row, MentorShipConstants.STATUS_COL)) {
-                    mentorshipDataList.add(readMentorShipData(row));
-                try {
-                    this.importProgressService.incrementAndSendProgressUpdate(this.documentImportProgressUUId);
-                } catch (JsonProcessingException | ExecutionException e) {
-                    log.error("Problem Updating Preparation Progress: {}", e.getMessage());
-                }
+                mentorshipDataList.add(readMentorShipData(row));
+                this.importProgressService.incrementAndSendProgressUpdate(this.documentImportProgressUUId);
             }
         }
     }
 
 
     private Mentorship readMentorShipData(Row row) {
-        final var status = ImportHandlerUtils.readAsString(MentorShipConstants.STATUS_COL, row);
         final var mentorShipDate = DataValidator.validateLocalDate(MentorShipConstants.MENTORSHIP_DATE_COL, row, rowErrorMap, "Mentorship Date", true);
         final var mentorShipOrg = ImportHandlerUtils.readAsString(MentorShipConstants.MENTOR_ORGANIZATION_COL, row);
         var bmoMembership = ImportHandlerUtils.readAsString(MentorShipConstants.BMO_MEMBERSHIP_COL, row);
@@ -165,8 +145,6 @@ public class MentorshipImportHandler implements ImportHandler {
         }
         final var businessGapsAgreedAction = ImportHandlerUtils.readAsString(MentorShipConstants.AGREED_ACTION_FOR_GAP_1, row);
         final var additionalSupport = ImportHandlerUtils.readAsString(MentorShipConstants.ADDITIONAL_SUPPORT_NEEDED, row);
-
-        statuses.add(status);
 
         var mentorShipData = MentorshipRequestDto.builder()
                 .mentorShipDate(mentorShipDate).mentorShipOrganization(mentorShipOrg).bmoMemberShip(bmoMembership)
@@ -256,15 +234,9 @@ public class MentorshipImportHandler implements ImportHandler {
         Sheet mentorShipSheet = workbook.getSheet(TemplatePopulateImportConstants.MENTOR_SHIP_SHEET_NAME);
         int successCount = 0;
         int errorCount = 0;
-        int progressLevel = 0;
         String errorMessage = "";
         var loanDataSize = mentorshipDataList.size();
-        try {
-            importProgressService.resetEveryThingToZero(this.documentImportProgressUUId);
-        } catch (ExecutionException e) {
-            log.error(e.getMessage());
-        }
-        updateImportProgress(this.documentImportProgressUUId, true, loanDataSize);
+        importProgressService.resetEveryThingToZero(this.documentImportProgressUUId);
         for (int i = 0; i < loanDataSize; i++) {
             final var mentorshipData = mentorshipDataList.get(i);
             Row row = mentorShipSheet.getRow(mentorshipData.getRowIndex());
@@ -274,17 +246,12 @@ public class MentorshipImportHandler implements ImportHandler {
                 rowErrorMap.put(row, "Can not associate mentorship Data data to a participant !!");
             }
             try {
-                String status = statuses.get(i);
-                progressLevel = getProgressLevel(status);
 
                 final var validationError = rowErrorMap.get(row);
                 if (null != validationError){
                     throw new InvalidDataException(validationError);
                 }
-                if (progressLevel == 0) {
-                    this.saveMentorshipData(mentorshipData);
-                    progressLevel = 1;
-                }
+                this.saveMentorshipData(mentorshipData);
                 statusCell.setCellValue(TemplatePopulateImportConstants.STATUS_CELL_IMPORTED);
                 statusCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.LIGHT_GREEN));
                 successCount++;
@@ -292,47 +259,13 @@ public class MentorshipImportHandler implements ImportHandler {
                 errorCount++;
                 log.error("Problem occurred When Uploading Mentoring Data: {}", ex.getMessage());
                 errorMessage = ImportHandlerUtils.getErrorMessage(ex);
-                writeGroupErrorMessage(errorMessage, progressLevel, statusCell, errorReportCell);
+                writeGroupErrorMessage(errorMessage, workbook, statusCell, errorReportCell);
             }finally {
-                updateImportProgress(this.documentImportProgressUUId, false, 0);
-                try {
-                    this.importProgressService.sendProgressUpdate(this.documentImportProgressUUId);
-                } catch (JsonProcessingException | ExecutionException e) {
-                    log.error("Problem Updating Progress: {}", e.getMessage());
-                }
+                this.importProgressService.incrementAndSendProgressUpdate(this.documentImportProgressUUId);
             }
         }
-        setReportHeaders(mentorShipSheet);
+        setReportHeaders(mentorShipSheet, MentorShipConstants.STATUS_COL, MentorShipConstants.FAILURE_COL);
         log.info("Finished Import Finished := {}", LocalDateTime.now(ZoneId.systemDefault()));
         return Count.instance(loanDataSize, successCount, errorCount);
-    }
-
-    private void writeGroupErrorMessage(String errorMessage, int progressLevel, Cell statusCell, Cell errorReportCell) {
-        String status = "";
-        if (progressLevel == 0) {
-            status = TemplatePopulateImportConstants.STATUS_CREATION_FAILED;
-        } else if (progressLevel == 1) {
-            status = TemplatePopulateImportConstants.STATUS_MEETING_FAILED;
-        }
-        statusCell.setCellValue(status);
-        statusCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.RED));
-        errorReportCell.setCellValue(errorMessage);
-    }
-
-    private void setReportHeaders(Sheet bmpSheet) {
-        ImportHandlerUtils.writeString(MentorShipConstants.STATUS_COL, bmpSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX),
-                TemplatePopulateImportConstants.STATUS_COL_REPORT_HEADER);
-        ImportHandlerUtils.writeString(MentorShipConstants.FAILURE_COL, bmpSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX),
-                TemplatePopulateImportConstants.FAILURE_COL_REPORT_HEADER);
-    }
-
-
-    private int getProgressLevel(String status) {
-        if (status == null || status.equals(TemplatePopulateImportConstants.STATUS_CREATION_FAILED)) {
-            return 0;
-        } else if (status.equals(TemplatePopulateImportConstants.STATUS_MEETING_FAILED)) {
-            return 1;
-        }
-        return 0;
     }
 }

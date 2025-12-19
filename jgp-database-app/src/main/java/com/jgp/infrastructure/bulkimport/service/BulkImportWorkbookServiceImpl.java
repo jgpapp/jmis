@@ -1,6 +1,7 @@
 
 package com.jgp.infrastructure.bulkimport.service;
 
+import com.github.pjfanning.xlsx.StreamingReader;
 import com.jgp.authentication.service.PlatformSecurityContext;
 import com.jgp.infrastructure.bulkimport.data.DocumentDto;
 import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
@@ -12,8 +13,8 @@ import com.jgp.infrastructure.bulkimport.domain.ImportDocument;
 import com.jgp.infrastructure.bulkimport.domain.ImportDocumentRepository;
 import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
 import com.jgp.infrastructure.bulkimport.event.DataImportDocumentDeletedEvent;
+import com.jgp.infrastructure.bulkimport.exception.DataImportException;
 import com.jgp.infrastructure.bulkimport.importhandler.ImportHandlerUtils;
-import com.jgp.infrastructure.core.domain.JdbcSupport;
 import com.jgp.infrastructure.documentmanagement.contentrepository.ContentRepository;
 import com.jgp.infrastructure.documentmanagement.data.DocumentData;
 import com.jgp.infrastructure.documentmanagement.domain.Document;
@@ -27,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
@@ -51,11 +51,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -65,6 +67,20 @@ import java.util.Objects;
 @Validated
 public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService {
 
+    private static final String SELECT_LITERAL = "select ";
+    private static final String CONTENT_TYPE_HEADER = "Content-Type";
+    private static final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
+    private static final String EXCEL_CONTENT_TYPE = "application/vnd.ms-excel";
+    private static final String PDF_CONTENT_TYPE = "application/pdf";
+    private static final String UPDATE_PARTICIPANT_FLAG = "YES";
+    private static final String DEFAULT_DOMAIN = "localhost";
+    private static final String FILE_NOT_FOUND_MESSAGE = "No such file exist";
+    private static final String INVALID_ENTITY_TYPE_MESSAGE = "Unable to find requested resource";
+    private static final String MISSING_PARAMETERS_MESSAGE = "One or more of the given parameters not found";
+    private static final int STREAMING_ROW_CACHE_SIZE = 200;
+    private static final int STREAMING_BUFFER_SIZE = 4096;
+    private static final int PRIMARY_COLUMN_INDEX = 0;
+
     private final ApplicationContext applicationContext;
     private final PlatformSecurityContext securityContext;
     private final DocumentWritePlatformService documentWritePlatformService;
@@ -73,299 +89,535 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     private final JdbcTemplate jdbcTemplate;
     private final ImportDocumentMapper importDocumentMapper;
     private final ContentRepository contentRepository;
-    private static final String SELECT_LITERAL = "select ";
-    private static final String CONTENT_TYPE = "Content-Type";
 
 
 
     @Override
     @CacheEvict(cacheNames = {
-            "operationalCounties",
-            "highLevelSummary",
-            "loanDisbursedByGenderSummary",
-            "countySummary",
-            "loanedBusinessesByGenderSummary",
-            "loanDisbursedByIndustrySectorSummary",
-            "loanDisbursedByIndustrySegmentSummary",
-            "loanDisbursedTopFourPartnersSummary",
-            "loanDisbursedTopFourCountiesSummary",
-            "businessTrainedTopFourCountiesSummary",
-            "businessOwnersTrainedByGenderSummary",
-            "pLWDAndRefugeeBusinessOwnersTrainedByGenderSummary",
-            "disabledBusinessOwnersTrainedByGenderSummary",
-            "refugeeBusinessOwnersTrainedByGenderSummary",
-            "loanDisbursedByPipelineSourceSummary",
-            "mentorshipByGivenFieldSummary",
-            "loansDisbursedByQualitySummary",
-            "systemUserLoginSummary",
-            "taNeedsByGenderSummary",
-            "businessCategoryByCountySummary",
-            "taTrainingBySectorSummary",
-            "loansDisbursedByLoanProductSummary",
-            "outcomeMonitoringSummary",
-            "participantsEmployeesSummary",
-            "taTrainingBySegmentSummary",
-            "participantsMentorshipDeliveryModeSummary",
-            "trainingByPartnerByGenderSummary",
-            "loanDisbursedByLoanProductByGenderSummary",
-            "lastThreeYearsAccessedLoanPerPartnerSummary",
-            "lastThreeYearsAccessedLoanAmountPerPartnerYearly",
-            "lastThreeYearsAccessedLoansCountPerPartnerYearly",
-            "lastThreeYearsTrainedBusinessesPerPartnerYearly",
-            "taTypeTrainedBusinesses",
-            "loansAccessedVsOutStandingByPartnerSummary",
-            "loansAccessedVsOutStandingByGenderSummary",
-            "dataSummary",
-            "dataSummaryMap",
-            "performanceSummary"
+            "operationalCounties", "highLevelSummary", "loanDisbursedByGenderSummary",
+            "countySummary", "loanedBusinessesByGenderSummary", "loanDisbursedByIndustrySectorSummary",
+            "loanDisbursedByIndustrySegmentSummary", "loanDisbursedTopFourPartnersSummary",
+            "loanDisbursedTopFourCountiesSummary", "businessTrainedTopFourCountiesSummary",
+            "businessOwnersTrainedByGenderSummary", "pLWDAndRefugeeBusinessOwnersTrainedByGenderSummary",
+            "disabledBusinessOwnersTrainedByGenderSummary", "refugeeBusinessOwnersTrainedByGenderSummary",
+            "loanDisbursedByPipelineSourceSummary", "mentorshipByGivenFieldSummary",
+            "loansDisbursedByQualitySummary", "systemUserLoginSummary", "taNeedsByGenderSummary",
+            "businessCategoryByCountySummary", "taTrainingBySectorSummary",
+            "loansDisbursedByLoanProductSummary", "outcomeMonitoringSummary",
+            "participantsEmployeesSummary", "taTrainingBySegmentSummary",
+            "participantsMentorshipDeliveryModeSummary", "trainingByPartnerByGenderSummary",
+            "loanDisbursedByLoanProductByGenderSummary", "lastThreeYearsAccessedLoanPerPartnerSummary",
+            "lastThreeYearsAccessedLoanAmountPerPartnerYearly", "lastThreeYearsAccessedLoansCountPerPartnerYearly",
+            "lastThreeYearsTrainedBusinessesPerPartnerYearly", "taTypeTrainedBusinesses",
+            "loansAccessedVsOutStandingByPartnerSummary", "loansAccessedVsOutStandingByGenderSummary",
+            "dataSummary", "dataSummaryMap", "performanceSummary"
     }, allEntries = true)
-    public Long importWorkbook(ImportRequestDto dto) {
+    public Long importWorkbook(ImportRequestDto request) {
+        validateImportRequest(request);
+
         try {
-            if (dto.entity() != null && dto.fileDetail() != null) {
+            final Path tempFilePath = createTempFile(request.fileDetail());
+            final byte[] fileBytes = readFileBytes(tempFilePath);
+            final GlobalEntityType entityType = resolveEntityType(request.entity());
 
-                final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                IOUtils.copy(dto.fileDetail().getInputStream(), baos);
-                final byte[] bytes = baos.toByteArray();
-                final BufferedInputStream bis = new BufferedInputStream(new ByteArrayInputStream(bytes));
-                Workbook workbook = new XSSFWorkbook(dto.fileDetail().getInputStream());
-                GlobalEntityType entityType = null;
-                int primaryColumn = 0;
-                if (dto.entity().trim().equalsIgnoreCase(GlobalEntityType.TA_IMPORT_TEMPLATE.toString())) {
-                    entityType = GlobalEntityType.TA_IMPORT_TEMPLATE;
-                } else if (dto.entity().trim().equalsIgnoreCase(GlobalEntityType.LOAN_IMPORT_TEMPLATE.toString())) {
-                    entityType = GlobalEntityType.LOAN_IMPORT_TEMPLATE;
-                } else if (dto.entity().trim().equalsIgnoreCase(GlobalEntityType.MENTORSHIP_IMPORT_TEMPLATE.toString())) {
-                    entityType = GlobalEntityType.MENTORSHIP_IMPORT_TEMPLATE;
-                } else if (dto.entity().trim().equalsIgnoreCase(GlobalEntityType.MONITORING_IMPORT_TEMPLATE.toString())) {
-                    entityType = GlobalEntityType.MONITORING_IMPORT_TEMPLATE;
-                } else {
-                    workbook.close();
-                    throw new InvalidEntityTypeForDocumentManagementException("Unable to find requested resource");
+            final PublishWorkbookImportEventRequestDto eventRequest = createEventRequest(
+                    tempFilePath, fileBytes, entityType, request
+            );
 
-                }
-                return publishEvent(new PublishWorkbookImportEventRequestDto(primaryColumn, dto.fileDetail(), bis, entityType, workbook, dto.importProgressUUID(), dto.updateParticipantInfo(), dto.appDomainForNotification()));
-            }
-            throw new InvalidEntityTypeForDocumentManagementException("One or more of the given parameters not found");
-        } catch (IOException e) {
-            log.error("Problem occurred in importWorkbook function", e);
-            throw new InvalidEntityTypeForDocumentManagementException("IO exception occurred with " + dto.fileDetail().getOriginalFilename() + " " + e.getMessage());
+            return publishEvent(eventRequest);
 
+        } catch (IOException exception) {
+            log.error("Failed to import workbook: {}", request.fileDetail().getOriginalFilename(), exception);
+            throw new InvalidEntityTypeForDocumentManagementException(
+                    "IO exception occurred with " + request.fileDetail().getOriginalFilename()
+            );
         }
     }
 
     @Override
-    public void importFileToDirectory(GlobalEntityType entityType, ResourceType resourceType, MultipartFile fileDetail) {
-        final var fileName = fileDetail.getOriginalFilename();
+    public void importFileToDirectory(GlobalEntityType entityType, ResourceType resourceType,
+                                      MultipartFile fileDetail) {
+        Objects.requireNonNull(fileDetail, "File detail cannot be null");
+        Objects.requireNonNull(entityType, "Entity type cannot be null");
 
-        final var baos = new ByteArrayOutputStream();
-        try {
-            IOUtils.copy(fileDetail.getInputStream(), baos);
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
-        }
-        final byte[] bytes = baos.toByteArray();
-        final BufferedInputStream inputStream = new BufferedInputStream(new ByteArrayInputStream(bytes));
+        final String fileName = fileDetail.getOriginalFilename();
 
-        final Long documentId = this.documentWritePlatformService.createInternalDocument(new DocumentDto( entityType,
-                DocumentWritePlatformServiceJpaRepositoryImpl.DocumentManagementEntity.IMPORT.name(),
-                this.securityContext.getAuthenticatedUserIfPresent().getId(), null, inputStream,
-                URLConnection.guessContentTypeFromName(fileName), fileName, null, fileName));
-        final Document document = this.documentRepository.findById(documentId)
-                .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
-                .orElse(null);
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+             InputStream inputStream = fileDetail.getInputStream()) {
 
-        final ImportDocument importDocument = ImportDocument.instance(document, LocalDateTime.now(ZoneId.systemDefault()), GlobalEntityType.RESOURCES_IMPORT.getValue(),
-                0, this.securityContext.getAuthenticatedUserIfPresent().getPartner());
-        this.importDocumentRepository.saveAndFlush(importDocument);
-    }
+            IOUtils.copy(inputStream, outputStream);
+            final byte[] fileBytes = outputStream.toByteArray();
 
-    @Override
-    public void deleteFileFromDbAndDirectory(Long importDocumentId, final boolean deleteAssociatedData) {
-        final var importDoc = this.importDocumentRepository.findById(importDocumentId)
-                .filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).orElse(null);
-        final var doc = Objects.nonNull(importDoc) ? importDoc.getDocument() : null;
-        if (Objects.nonNull(importDoc)){
-            importDoc.setIsDeleted(true);
-            this.importDocumentRepository.save(importDoc);
-        }
-        if (Objects.nonNull(doc) && null != doc.getLocation()) {
-            this.contentRepository.deleteFile(doc.getLocation());
-            doc.setIsDeleted(true);
-            this.documentRepository.save(doc);
-        }
+            final Long documentId = createDocument(entityType, fileName, fileBytes);
+            final Document document = fetchDocument(documentId);
 
-        this.applicationContext.publishEvent(new DataImportDocumentDeletedEvent(doc, deleteAssociatedData));
-
-    }
-
-
-    private Long publishEvent(final PublishWorkbookImportEventRequestDto dto) {
-
-        final String fileName = dto.fileDetail().getOriginalFilename();
-
-        final Long documentId = this.documentWritePlatformService.createInternalDocument(new DocumentDto( dto.entityType(),
-                DocumentWritePlatformServiceJpaRepositoryImpl.DocumentManagementEntity.IMPORT.name(),
-                this.securityContext.getAuthenticatedUserIfPresent().getId(), null, dto.clonedInputStreamWorkbook(),
-                URLConnection.guessContentTypeFromName(fileName), fileName, null, fileName));
-        final Document document = this.documentRepository.findById(documentId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).orElse(null);
-
-        try(Workbook workbook = dto.workbook()) {
-            final ImportDocument importDocument = ImportDocument.instance(document, LocalDateTime.now(ZoneId.systemDefault()), dto.entityType().getValue(),
-                    ImportHandlerUtils.getNumberOfRows(workbook.getSheetAt(0), dto.primaryColumn()), this.securityContext.getAuthenticatedUserIfPresent().getPartner());
+            final ImportDocument importDocument = createImportDocument(document, entityType);
             this.importDocumentRepository.saveAndFlush(importDocument);
 
-            final var importDocumentId = importDocument.getId();
-            final var appDocumentURL = null == dto.appDomainForNotification() ? "localhost" : dto.appDomainForNotification().concat(importDocumentId.toString()).concat("/").concat(dto.entityType().name());
-            BulkImportEvent event = new BulkImportEvent(workbook, document, dto.entityType(), importDocument.getId(), dto.importProgressUUID(), "YES".equalsIgnoreCase(dto.updateParticipantInfo()), appDocumentURL);
-            applicationContext.publishEvent(event);
-            return importDocumentId;
-        } catch (IOException e) {
-            log.error("Problem occurred in publishEvent function", e);
+        } catch (IOException exception) {
+            log.error("Failed to import file to directory: {}", fileName, exception);
+            throw new DataImportException("File import failed", exception);
         }
-        return -1L;
     }
 
     @Override
-    public Collection<ImportData> getImports(GlobalEntityType type) {
+    public void deleteFileFromDbAndDirectory(Long importDocumentId, boolean deleteAssociatedData) {
+        Objects.requireNonNull(importDocumentId, "Import document ID cannot be null");
 
-        final ImportMapper rm = new ImportMapper();
-        final String sql = SELECT_LITERAL + rm.schema() + " order by i.id desc";
+        final ImportDocument importDocument = fetchImportDocument(importDocumentId);
+        if (Objects.isNull(importDocument)) {
+            return;
+        }
 
-        return this.jdbcTemplate.query(sql, rm, type.getValue()); // NOSONAR
+        markImportDocumentAsDeleted(importDocument);
+
+        final Document document = importDocument.getDocument();
+        if (Objects.nonNull(document)) {
+            deleteDocumentFile(document);
+            this.applicationContext.publishEvent(
+                    new DataImportDocumentDeletedEvent(document, deleteAssociatedData)
+            );
+        }
     }
 
     @Override
     public Page<ImportData> getImports(GlobalEntityType type, Long partnerId, Pageable pageable) {
-        Page<ImportDocument> imports;
-        if (Objects.nonNull(partnerId)){
-            imports = this.importDocumentRepository.findByPartnerIdAndEntityTypeAndIsDeletedFalse(partnerId, type.getValue(), pageable);
-        }else {
-            imports = this.importDocumentRepository.findByEntityTypeAndIsDeletedFalse(type.getValue(), pageable);
-        }
-        return new PageImpl<>(this.importDocumentMapper.toDto(imports.getContent()), pageable, imports.getTotalElements());
+        Objects.requireNonNull(type, "Entity type cannot be null");
+        Objects.requireNonNull(pageable, "Pageable cannot be null");
+
+        final Page<ImportDocument> imports = Objects.nonNull(partnerId)
+                ? this.importDocumentRepository.findByPartnerIdAndEntityTypeAndIsDeletedFalse(
+                partnerId, type.getValue(), pageable)
+                : this.importDocumentRepository.findByEntityTypeAndIsDeletedFalse(
+                type.getValue(), pageable);
+
+        final List<ImportData> importDataList = this.importDocumentMapper.toDto(imports.getContent());
+        return new PageImpl<>(importDataList, pageable, imports.getTotalElements());
     }
 
     @Override
     public Page<ImportData> getImportById(Long importDocumentId) {
-        final var importDoc = this.importDocumentRepository.findById(importDocumentId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).orElse(null);
-        return Objects.nonNull(importDoc) ? new PageImpl<>(List.of(this.importDocumentMapper.toDto(importDoc))) : null;
-    }
+        Objects.requireNonNull(importDocumentId, "Import document ID cannot be null");
 
-    private static final class ImportMapper implements RowMapper<ImportData> {
-
-        public String schema() {
-            return "i.id as id, i.document_id as documentId, d.doc_name as name, i.import_time as importTime, i.end_time as endTime, " +
-                    "i.completed as completed, i.total_records as totalRecords, i.success_count as successCount, " +
-                    "i.failure_count as failureCount, i.created_by_id as createdBy " +
-                    "from import_document i inner join jgp_document d on i.document_id=d.id " + "where i.entity_type= ? and i.is_deleted=false ";
+        final ImportDocument importDocument = fetchImportDocument(importDocumentId);
+        if (Objects.isNull(importDocument)) {
+            return Page.empty();
         }
 
-        @Override
-        public ImportData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
-
-            final Long id = rs.getLong("id");
-            final Long documentId = rs.getLong("documentId");
-            final String name = rs.getString("name");
-            final LocalDateTime importTime = JdbcSupport.getLocalDateTime(rs, "importTime");
-            final LocalDateTime endTime = JdbcSupport.getLocalDateTime(rs, "endTime");
-            final Boolean completed = rs.getBoolean("completed");
-            final Integer totalRecords = JdbcSupport.getInteger(rs, "totalRecords");
-            final Integer successCount = JdbcSupport.getInteger(rs, "successCount");
-            final Integer failureCount = JdbcSupport.getInteger(rs, "failureCount");
-            final Long createdBy = rs.getLong("createdBy");
-
-            return new ImportData(id, documentId, name, importTime, endTime, completed, createdBy, totalRecords, successCount,
-                    failureCount);
-        }
+        final ImportData importData = this.importDocumentMapper.toDto(importDocument);
+        return new PageImpl<>(List.of(importData));
     }
 
     @Override
     public DocumentData getOutputTemplateLocation(String importDocumentId) {
-        final ImportTemplateLocationMapper importTemplateLocationMapper = new ImportTemplateLocationMapper();
-        final String sql = SELECT_LITERAL + ImportTemplateLocationMapper.IMPORT_DOCUMENT_SCHEMA;
+        Objects.requireNonNull(importDocumentId, "Import document ID cannot be null");
 
-        return this.jdbcTemplate.queryForObject(sql, importTemplateLocationMapper, Integer.parseInt(importDocumentId)); // NOSONAR
+        final String sql = SELECT_LITERAL + ImportTemplateLocationMapper.IMPORT_DOCUMENT_SCHEMA;
+        return this.jdbcTemplate.queryForObject(sql,
+                new ImportTemplateLocationMapper(),
+                Integer.parseInt(importDocumentId));
     }
 
     @Override
     public ResponseEntity<?> getOutputTemplate(String importDocumentId, String fileType) {
-        final ImportTemplateLocationMapper importTemplateLocationMapper = new ImportTemplateLocationMapper();
-        final String sql = SELECT_LITERAL + ImportTemplateLocationMapper.IMPORT_DOCUMENT_SCHEMA;
-        DocumentData documentData = this.jdbcTemplate.queryForObject(sql, importTemplateLocationMapper,
-                Integer.parseInt(importDocumentId)); // NOSONAR
-        return (documentData != null) ? buildResponse(documentData, fileType) : null;
+        Objects.requireNonNull(importDocumentId, "Import document ID cannot be null");
+        Objects.requireNonNull(fileType, "File type cannot be null");
+
+        final DocumentData documentData = getOutputTemplateLocation(importDocumentId);
+        if (Objects.isNull(documentData)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return buildFileResponse(documentData, "Output" + documentData.fileName(), fileType);
     }
 
     @Override
     public ResponseEntity<?> downloadFile(String importDocumentId) {
-        final ImportTemplateLocationMapper importTemplateLocationMapper = new ImportTemplateLocationMapper();
-        final String sql = SELECT_LITERAL + ImportTemplateLocationMapper.IMPORT_DOCUMENT_SCHEMA;
-        DocumentData documentData = this.jdbcTemplate.queryForObject(sql, importTemplateLocationMapper,
-                Integer.parseInt(importDocumentId)); // NOSONAR
+        Objects.requireNonNull(importDocumentId, "Import document ID cannot be null");
 
-        if (Objects.isNull(documentData)){
-            return new ResponseEntity<>(new ApiResponseDto(false, "No such file exist"), HttpStatus.BAD_REQUEST);
+        final DocumentData documentData = getOutputTemplateLocation(importDocumentId);
+        if (Objects.isNull(documentData)) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponseDto(false, FILE_NOT_FOUND_MESSAGE));
         }
 
-        String fileName = documentData.fileName();
-        String fileLocation = documentData.fileLocation();
-        File file = new File(fileLocation);
-        HttpHeaders headers = new HttpHeaders();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            InputStream initialStream = new FileInputStream(file);
-            byte[] targetArray = IOUtils.toByteArray(initialStream);
-            baos.write(targetArray);
-            // Set response headers
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.add("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-            headers.add(CONTENT_TYPE, documentData.contentType());
-
-        } catch (IOException e) {
-            log.error("Problem occurred in buildResponse function", e);
-        }
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(baos.toByteArray());
+        return buildFileResponse(documentData, documentData.fileName(), documentData.contentType());
     }
 
-    private ResponseEntity<?> buildResponse(DocumentData documentData, String fileType) {
-        String fileName = "Output" + documentData.fileName();
-        String fileLocation = documentData.fileLocation();
-        File file = new File(fileLocation);
-        HttpHeaders headers = new HttpHeaders();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            InputStream initialStream = new FileInputStream(file);
-            byte[] targetArray = IOUtils.toByteArray(initialStream);
-            baos.write(targetArray);
-            // Set response headers
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.add("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-            if (fileType.equals("EXCEL")) {
-                headers.add(CONTENT_TYPE, "application/vnd.ms-excel");
-            } else if (fileType.equals("PDF")) {
-                headers.add(CONTENT_TYPE, "application/pdf");
-            }
+    // ==================== Private Helper Methods ====================
 
-        } catch (IOException e) {
-            log.error("Problem occurred in buildResponse function", e);
+    /**
+     * Validates the import request to ensure required parameters are present.
+     *
+     * @param request the import request DTO
+     * @throws InvalidEntityTypeForDocumentManagementException if required parameters are missing
+     */
+    private void validateImportRequest(ImportRequestDto request) {
+        if (Objects.isNull(request.entity()) || Objects.isNull(request.fileDetail())) {
+            throw new InvalidEntityTypeForDocumentManagementException(MISSING_PARAMETERS_MESSAGE);
         }
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(baos.toByteArray());
     }
 
+    /**
+     * Creates a temporary file from the uploaded multipart file.
+     *
+     * @param file the multipart file to be saved temporarily
+     * @return the path to the created temporary file
+     * @throws IOException if an I/O error occurs during file creation
+     */
+    private Path createTempFile(MultipartFile file) throws IOException {
+        final Path tempDir = Paths.get(System.getProperty("java.io.tmpdir"));
+        final Path tempFilePath = Files.createTempFile(tempDir, "upload_", file.getOriginalFilename());
+        file.transferTo(tempFilePath);
+        return tempFilePath;
+    }
+
+    /**
+     * Reads the bytes from a file at the specified path.
+     *
+     * @param filePath the path to the file
+     * @return a byte array containing the file's contents
+     * @throws IOException if an I/O error occurs during file reading
+     */
+    private byte[] readFileBytes(Path filePath) throws IOException {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+             InputStream inputStream = Files.newInputStream(filePath)) {
+            IOUtils.copy(inputStream, outputStream);
+            return outputStream.toByteArray();
+        }
+    }
+
+    /**
+     * Resolves the string representation of an entity type to its corresponding enum value.
+     *
+     * @param entityTypeString the string representation of the entity type
+     * @return the corresponding GlobalEntityType enum value
+     * @throws InvalidEntityTypeForDocumentManagementException if the entity type is invalid
+     */
+    private GlobalEntityType resolveEntityType(String entityTypeString) {
+        final String normalizedType = entityTypeString.trim().toUpperCase();
+
+        return switch (normalizedType) {
+            case "TA_IMPORT_TEMPLATE" -> GlobalEntityType.TA_IMPORT_TEMPLATE;
+            case "LOAN_IMPORT_TEMPLATE" -> GlobalEntityType.LOAN_IMPORT_TEMPLATE;
+            case "MENTORSHIP_IMPORT_TEMPLATE" -> GlobalEntityType.MENTORSHIP_IMPORT_TEMPLATE;
+            case "MONITORING_IMPORT_TEMPLATE" -> GlobalEntityType.MONITORING_IMPORT_TEMPLATE;
+            default -> throw new InvalidEntityTypeForDocumentManagementException(
+                    INVALID_ENTITY_TYPE_MESSAGE);
+        };
+    }
+
+    /**
+     * Publishes a bulk import event for the given request.
+     *
+     * @param request the publish workbook import event request DTO
+     * @return the ID of the created import document, or -1L if an error occurs
+     */
+    private Long publishEvent(PublishWorkbookImportEventRequestDto request) {
+        final String fileName = request.tempFilePath().getFileName().toString();
+        final String contentType = URLConnection.guessContentTypeFromName(fileName);
+
+        final Long documentId = createDocument(request.entityType(), fileName,
+                request.clonedInputStreamWorkbook(), contentType);
+        final Document document = fetchDocument(documentId);
+
+        try (Workbook workbook = openWorkbook(request.tempFilePath())) {
+            final int rowCount = ImportHandlerUtils.getNumberOfRows(
+                    workbook.getSheetAt(0), request.primaryColumn());
+
+            final ImportDocument importDocument = createImportDocument(document, request.entityType(), rowCount);
+            this.importDocumentRepository.saveAndFlush(importDocument);
+
+            final String appDocumentURL = buildAppDocumentURL(request, importDocument);
+            final boolean shouldUpdateParticipant = UPDATE_PARTICIPANT_FLAG.equalsIgnoreCase(
+                    request.updateParticipantInfo());
+
+            final BulkImportEvent event = new BulkImportEvent(
+                    workbook,
+                    document,
+                    request.entityType(),
+                    importDocument.getId(),
+                    request.importProgressUUID(),
+                    shouldUpdateParticipant,
+                    appDocumentURL
+            );
+
+            this.applicationContext.publishEvent(event);
+            return importDocument.getId();
+
+        } catch (IOException exception) {
+            log.error("Failed to publish import event for file: {}", fileName, exception);
+            return -1L;
+        }
+    }
+
+    /**
+     * Creates a publish workbook import event request DTO.
+     *
+     * @param tempFilePath the path to the temporary file
+     * @param fileBytes    the byte array of the file contents
+     * @param entityType   the global entity type
+     * @param request      the import request DTO
+     * @return the created PublishWorkbookImportEventRequestDto
+     */
+    private PublishWorkbookImportEventRequestDto createEventRequest(
+            Path tempFilePath, byte[] fileBytes, GlobalEntityType entityType, ImportRequestDto request) {
+
+        final BufferedInputStream inputStream = new BufferedInputStream(new ByteArrayInputStream(fileBytes));
+
+        return new PublishWorkbookImportEventRequestDto(
+                PRIMARY_COLUMN_INDEX,
+                tempFilePath,
+                inputStream,
+                entityType,
+                request.importProgressUUID(),
+                request.updateParticipantInfo(),
+                request.appDomainForNotification()
+        );
+    }
+
+    /**
+     * Opens a workbook from the specified file path using streaming reader.
+     *
+     * @param filePath the path to the file
+     * @return the opened Workbook
+     * @throws IOException if an I/O error occurs during workbook opening
+     */
+    private Workbook openWorkbook(Path filePath) throws IOException {
+        return StreamingReader.builder()
+                .rowCacheSize(STREAMING_ROW_CACHE_SIZE)
+                .bufferSize(STREAMING_BUFFER_SIZE)
+                .open(Files.newInputStream(filePath));
+    }
+
+    /**
+     * Builds the application document URL for notification purposes.
+     *
+     * @param request        the publish workbook import event request DTO
+     * @param importDocument the import document
+     * @return the constructed application document URL
+     */
+    private String buildAppDocumentURL(PublishWorkbookImportEventRequestDto request,
+                                       ImportDocument importDocument) {
+        final String domain = Objects.isNull(request.appDomainForNotification())
+                ? DEFAULT_DOMAIN
+                : request.appDomainForNotification();
+
+        return domain + importDocument.getId() + "/" + request.entityType().name();
+    }
+
+    /** Creates a document in the document management system.
+     *
+     * @param entityType   the global entity type
+     * @param fileName     the name of the file
+     * @param inputStream  the input stream of the file content
+     * @param contentType  the content type of the file
+     * @return the ID of the created document
+     */
+    private Long createDocument(GlobalEntityType entityType, String fileName,
+                                InputStream inputStream, String contentType) {
+        final DocumentDto documentDto = new DocumentDto(
+                entityType,
+                DocumentWritePlatformServiceJpaRepositoryImpl.DocumentManagementEntity.IMPORT.name(),
+                this.securityContext.getAuthenticatedUserIfPresent().getId(),
+                null,
+                inputStream,
+                contentType,
+                fileName,
+                null,
+                fileName
+        );
+
+        return this.documentWritePlatformService.createInternalDocument(documentDto);
+    }
+
+    /**
+     * Creates a document in the document management system from byte array.
+     *
+     * @param entityType the global entity type
+     * @param fileName   the name of the file
+     * @param fileBytes  the byte array of the file content
+     * @return the ID of the created document
+     */
+    private Long createDocument(GlobalEntityType entityType, String fileName, byte[] fileBytes) {
+        final String contentType = URLConnection.guessContentTypeFromName(fileName);
+        try (BufferedInputStream inputStream = new BufferedInputStream(new ByteArrayInputStream(fileBytes))) {
+            return createDocument(entityType, fileName, inputStream, contentType);
+        } catch (IOException exception) {
+            throw new DataImportException("Failed to create document", exception);
+        }
+    }
+
+    /**
+     * Fetches a document by its ID, ensuring it is not marked as deleted.
+     *
+     * @param documentId the ID of the document to fetch
+     * @return the fetched Document
+     * @throws IllegalStateException if the document is not found or is deleted
+     */
+    private Document fetchDocument(Long documentId) {
+        return this.documentRepository.findById(documentId)
+                .filter(doc -> Boolean.FALSE.equals(doc.getIsDeleted()))
+                .orElseThrow(() -> new IllegalStateException("Document not found: " + documentId));
+    }
+
+    /**
+     * Fetches an import document by its ID, ensuring it is not marked as deleted.
+     *
+     * @param importDocumentId the ID of the import document to fetch
+     * @return the fetched ImportDocument, or null if not found or deleted
+     */
+    private ImportDocument fetchImportDocument(Long importDocumentId) {
+        return this.importDocumentRepository.findById(importDocumentId)
+                .filter(doc -> Boolean.FALSE.equals(doc.getIsDeleted()))
+                .orElse(null);
+    }
+
+    /** Creates an import document entity.
+     *
+     * @param document   the associated document
+     * @param entityType the global entity type
+     * @return the created ImportDocument
+     */
+    private ImportDocument createImportDocument(Document document, GlobalEntityType entityType) {
+        return ImportDocument.instance(
+                document,
+                LocalDateTime.now(ZoneId.systemDefault()),
+                entityType.getValue(),
+                0,
+                this.securityContext.getAuthenticatedUserIfPresent().getPartner()
+        );
+    }
+
+    /** Creates an import document entity with row count.
+     *
+     * @param document   the associated document
+     * @param entityType the global entity type
+     * @param rowCount   the number of rows in the import
+     * @return the created ImportDocument
+     */
+    private ImportDocument createImportDocument(Document document, GlobalEntityType entityType, int rowCount) {
+        return ImportDocument.instance(
+                document,
+                LocalDateTime.now(ZoneId.systemDefault()),
+                entityType.getValue(),
+                rowCount,
+                this.securityContext.getAuthenticatedUserIfPresent().getPartner()
+        );
+    }
+
+    /** Marks an import document as deleted and saves the change.
+     *
+     * @param importDocument the import document to mark as deleted
+     */
+    private void markImportDocumentAsDeleted(ImportDocument importDocument) {
+        importDocument.setIsDeleted(true);
+        this.importDocumentRepository.save(importDocument);
+    }
+
+    /** Deletes the physical file associated with a document and marks the document as deleted.
+     *
+     * @param document the document whose file is to be deleted
+     */
+    private void deleteDocumentFile(Document document) {
+        if (Objects.nonNull(document.getLocation())) {
+            this.contentRepository.deleteFile(document.getLocation());
+            document.setIsDeleted(true);
+            this.documentRepository.save(document);
+        }
+    }
+
+    /**
+     * Builds a file response entity for downloading a file.
+     *
+     * @param documentData the document data containing file location and metadata
+     * @param fileName     the name of the file to be downloaded
+     * @param fileType     the requested file type
+     * @return the ResponseEntity containing the file bytes and headers
+     */
+    private ResponseEntity<?> buildFileResponse(DocumentData documentData, String fileName, String fileType) {
+        final File file = new File(documentData.fileLocation());
+        if (!file.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        try (FileInputStream fileInputStream = new FileInputStream(file);
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            final byte[] fileBytes = IOUtils.toByteArray(fileInputStream);
+            outputStream.write(fileBytes);
+
+            final HttpHeaders headers = buildResponseHeaders(fileName, fileType, documentData.contentType());
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(outputStream.toByteArray());
+
+        } catch (IOException exception) {
+            log.error("Failed to build file response for: {}", fileName, exception);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Builds HTTP headers for the file response.
+     *
+     * @param fileName            the name of the file
+     * @param fileType            the requested file type
+     * @param defaultContentType  the default content type if fileType is not recognized
+     * @return the constructed HttpHeaders
+     */
+    private HttpHeaders buildResponseHeaders(String fileName, String fileType, String defaultContentType) {
+        final HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.add(CONTENT_DISPOSITION_HEADER, "attachment; filename=\"" + fileName + "\"");
+
+        final String contentType = resolveContentType(fileType, defaultContentType);
+        headers.add(CONTENT_TYPE_HEADER, contentType);
+
+        return headers;
+    }
+
+    /**
+     * Resolves the content type based on the requested file type.
+     *
+     * @param fileType            the requested file type
+     * @param defaultContentType  the default content type if fileType is not recognized
+     * @return the resolved content type
+     */
+    private String resolveContentType(String fileType, String defaultContentType) {
+        if (Objects.isNull(fileType)) {
+            return defaultContentType;
+        }
+
+        return switch (fileType.toUpperCase()) {
+            case "EXCEL" -> EXCEL_CONTENT_TYPE;
+            case "PDF" -> PDF_CONTENT_TYPE;
+            default -> defaultContentType;
+        };
+    }
+
+    // ==================== Inner Classes ====================
+
+    /**
+     * RowMapper implementation to map SQL result set to DocumentData for import template location.
+     */
     private static final class ImportTemplateLocationMapper implements RowMapper<DocumentData> {
 
-        public static final String IMPORT_DOCUMENT_SCHEMA = "d.location,d.file_name,d.type from import_document i inner join jgp_document d on i.document_id=d.id where d.id= ? and i.is_deleted=false ";
+        public static final String IMPORT_DOCUMENT_SCHEMA = """
+                        d.location, d.file_name, d.type \
+                        from import_document i \
+                        inner join jgp_document d on i.document_id = d.id \
+                        where d.id = ? and i.is_deleted = false""";
 
         @Override
-        public DocumentData mapRow(ResultSet rs, @SuppressWarnings("unused") int rowNum) throws SQLException {
-            final String location = rs.getString("location");
-            final String fileName = rs.getString("file_name");
-            final String fileContentType = rs.getString("type");
-            return new DocumentData(null, null, null, null, fileName, null, fileContentType, null, location);
+        public DocumentData mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+            final String location = resultSet.getString("location");
+            final String fileName = resultSet.getString("file_name");
+            final String contentType = resultSet.getString("type");
+
+            return new DocumentData(null, null, null, null, fileName, null,
+                    contentType, null, location);
         }
     }
 }

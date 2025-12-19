@@ -1,6 +1,5 @@
 package com.jgp.infrastructure.bulkimport.importhandler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jgp.authentication.service.UserService;
 import com.jgp.infrastructure.bulkimport.data.Count;
 import com.jgp.infrastructure.bulkimport.data.MonitoringConstants;
@@ -27,7 +26,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 
 @Service
 @Slf4j
@@ -41,28 +39,13 @@ public class MonitoringImportHandler implements ImportHandler {
     private List<OutComeMonitoring> monitoringDataList;
     private Map<Row, String> rowErrorMap;
     private String documentImportProgressUUId;
-    private List<String> statuses;
     private Document document;
-
-    @Override
-    public void updateImportProgress(String importId, boolean updateTotal, int total) {
-        try {
-            if (updateTotal){
-                importProgressService.updateTotal(importId, total);
-            }else {
-                importProgressService.incrementProcessedProgress(importId);
-            }
-        } catch (ExecutionException e) {
-            log.error("Error : {}", e.getMessage(), e);
-        }
-    }
 
     @Override
     public Count process(BulkImportEvent bulkImportEvent) {
         this.workbook = bulkImportEvent.workbook();
         this.monitoringDataList = new ArrayList<>();
         this.rowErrorMap = new HashMap<>();
-        statuses = new ArrayList<>();
         this.documentImportProgressUUId = bulkImportEvent.importProgressUUID();
         this.document = bulkImportEvent.document();
         readExcelFile();
@@ -72,21 +55,18 @@ public class MonitoringImportHandler implements ImportHandler {
     public void readExcelFile() {
         Sheet sheet = workbook.getSheet("Monitoring");
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(sheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
+        importProgressService.updateTotal(this.documentImportProgressUUId, noOfEntries);
+        this.importProgressService.updateStep(this.documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_READING_STEP);
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
             Row row = sheet.getRow(rowIndex);
             if (row != null && ImportHandlerUtils.isNotImported(row, MonitoringConstants.STATUS_COL)) {
                 monitoringDataList.add(readMonitoringData(row));
-                try {
-                    this.importProgressService.incrementAndSendProgressUpdate(this.documentImportProgressUUId);
-                } catch (JsonProcessingException | ExecutionException e) {
-                    log.error("Problem Updating Preparation Progress: {}", e.getMessage());
-                }
+                this.importProgressService.incrementAndSendProgressUpdate(this.documentImportProgressUUId);
             }
         }
     }
 
     private OutComeMonitoring readMonitoringData(Row row) {
-        final var status = ImportHandlerUtils.readAsString(MonitoringConstants.STATUS_COL, row);
         final var jgpID = ImportHandlerUtils.readAsString(MonitoringConstants.JGP_ID_COL, row);
         final var participant = (null == jgpID ? null : this.participantService.findOneParticipantByJGPID(jgpID).orElse(null));
         final var locationLatDouble = DataValidator.validateTemplateDoubleValue(MonitoringConstants.LOCATION_LATITUDE_COL, row, "location latitude", rowErrorMap, false);
@@ -172,7 +152,6 @@ public class MonitoringImportHandler implements ImportHandler {
         }
         var monitoring = new OutComeMonitoring(monitoringDto, participant, this.document, row.getRowNum());
         monitoring.setCreatedBy(userService.currentUser());
-        statuses.add(status);
         return monitoring;
     }
 
@@ -180,15 +159,9 @@ public class MonitoringImportHandler implements ImportHandler {
         Sheet monitoringSheet = workbook.getSheet(TemplatePopulateImportConstants.MONITORING_SHEET_NAME);
         int successCount = 0;
         int errorCount = 0;
-        int progressLevel = 0;
         String errorMessage = "";
         var loanDataSize = monitoringDataList.size();
-        try {
-            importProgressService.resetEveryThingToZero(this.documentImportProgressUUId);
-        } catch (ExecutionException e) {
-            log.error(e.getMessage());
-        }
-        updateImportProgress(this.documentImportProgressUUId, true, loanDataSize);
+        importProgressService.resetEveryThingToZero(this.documentImportProgressUUId);
         for (int i = 0; i < loanDataSize; i++) {
             final var monitoringData = monitoringDataList.get(i);
             Row row = monitoringSheet.getRow(monitoringData.getRowIndex());
@@ -198,17 +171,12 @@ public class MonitoringImportHandler implements ImportHandler {
                 rowErrorMap.put(row, "Can not associate mentorship Data data to a participant !!");
             }
             try {
-                String status = statuses.get(i);
-                progressLevel = getProgressLevel(status);
 
                 final var validationError = rowErrorMap.get(row);
                 if (null != validationError){
                     throw new InvalidDataException(validationError);
                 }
-                if (progressLevel == 0) {
-                    this.outComeMonitoringService.createOutComeMonitoring(monitoringData);
-                    progressLevel = 1;
-                }
+                this.outComeMonitoringService.createOutComeMonitoring(monitoringData);
                 statusCell.setCellValue(TemplatePopulateImportConstants.STATUS_CELL_IMPORTED);
                 statusCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.LIGHT_GREEN));
                 successCount++;
@@ -216,48 +184,14 @@ public class MonitoringImportHandler implements ImportHandler {
                 errorCount++;
                 log.error("Problem occurred When Uploading Monitoring Data: {}", ex.getMessage());
                 errorMessage = ImportHandlerUtils.getErrorMessage(ex);
-                writeGroupErrorMessage(errorMessage, progressLevel, statusCell, errorReportCell);
+                writeGroupErrorMessage(errorMessage, workbook, statusCell, errorReportCell);
             }finally {
-                updateImportProgress(this.documentImportProgressUUId, false, 0);
-                try {
-                    this.importProgressService.sendProgressUpdate(this.documentImportProgressUUId);
-                } catch (JsonProcessingException | ExecutionException e) {
-                    log.error("Problem Updating Progress: {}", e.getMessage());
-                }
+                this.importProgressService.incrementAndSendProgressUpdate(this.documentImportProgressUUId);
             }
         }
-        setReportHeaders(monitoringSheet);
+        setReportHeaders(monitoringSheet, MonitoringConstants.STATUS_COL, MonitoringConstants.FAILURE_COL);
         log.info("Finished Import Finished := {}", LocalDateTime.now(ZoneId.systemDefault()));
         return Count.instance(loanDataSize, successCount, errorCount);
-    }
-
-    private void writeGroupErrorMessage(String errorMessage, int progressLevel, Cell statusCell, Cell errorReportCell) {
-        String status = "";
-        if (progressLevel == 0) {
-            status = TemplatePopulateImportConstants.STATUS_CREATION_FAILED;
-        } else if (progressLevel == 1) {
-            status = TemplatePopulateImportConstants.STATUS_MEETING_FAILED;
-        }
-        statusCell.setCellValue(status);
-        statusCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.RED));
-        errorReportCell.setCellValue(errorMessage);
-    }
-
-    private void setReportHeaders(Sheet bmpSheet) {
-        ImportHandlerUtils.writeString(MonitoringConstants.STATUS_COL, bmpSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX),
-                TemplatePopulateImportConstants.STATUS_COL_REPORT_HEADER);
-        ImportHandlerUtils.writeString(MonitoringConstants.FAILURE_COL, bmpSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX),
-                TemplatePopulateImportConstants.FAILURE_COL_REPORT_HEADER);
-    }
-
-
-    private int getProgressLevel(String status) {
-        if (status == null || status.equals(TemplatePopulateImportConstants.STATUS_CREATION_FAILED)) {
-            return 0;
-        } else if (status.equals(TemplatePopulateImportConstants.STATUS_MEETING_FAILED)) {
-            return 1;
-        }
-        return 0;
     }
 }
 

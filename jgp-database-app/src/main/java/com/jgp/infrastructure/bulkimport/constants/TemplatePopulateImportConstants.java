@@ -12,6 +12,12 @@ public class TemplatePopulateImportConstants {
     public static final String OPTIONS_SHEET_NAME = "options";
     public static final String GUIDE_SHEET_NAME = "guide";
 
+    // Excel Upload Steps
+    public static final String EXCEL_UPLOAD_READING_STEP = "Reading Data";
+    public static final String EXCEL_UPLOAD_VALIDATING_STEP = "Validating Data";
+    public static final String EXCEL_UPLOAD_STORING_STEP = "Storing Data";
+    public static final String EXCEL_UPLOAD_UPLOAD_STATUS_STEP = "Updating Upload Status";
+
     // columns sizes
     public static final int SMALL_COL_SIZE = 4000;
     public static final int MEDIUM_COL_SIZE = 6000;

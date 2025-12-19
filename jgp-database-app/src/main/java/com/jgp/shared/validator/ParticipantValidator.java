@@ -76,12 +76,7 @@ public class ParticipantValidator {
         }
     }
 
-    public static void validateParticipant(ParticipantDto participantDto, Row row, Map<Row, String> rowErrorMap) {
-        // Create a Validator instance
-        Validator validator;
-        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
-            validator = factory.getValidator();
-        }
+    public static void validateParticipant(ParticipantDto participantDto, Validator validator) {
 
         // Validate the object
         Set<ConstraintViolation<ParticipantDto>> violations = validator.validate(participantDto);
@@ -89,11 +84,11 @@ public class ParticipantValidator {
         // Get the first error, if any
         if (!violations.isEmpty()) {
             ConstraintViolation<ParticipantDto> firstViolation = violations.iterator().next();
-            rowErrorMap.put(row, firstViolation.getMessage());
+            participantDto.rowErrorMap().put(participantDto.row(), firstViolation.getMessage());
         }
 
-        if (null == rowErrorMap.get(row) && CommonUtil.isStringValueLengthNotValid(participantDto.jgpId(), 5, 11)){
-                rowErrorMap.put(row, "JGP ID must be 5-11 characters !!");
+        if (null == participantDto.rowErrorMap().get(participantDto.row()) && CommonUtil.isStringValueLengthNotValid(participantDto.jgpId(), 5, 11)){
+            participantDto.rowErrorMap().put(participantDto.row(), "JGP ID must be 5-11 characters !!");
             }
 
     }

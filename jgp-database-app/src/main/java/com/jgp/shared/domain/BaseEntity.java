@@ -25,7 +25,7 @@ import java.util.Objects;
 public class BaseEntity implements Serializable {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     private LocalDate dateCreated = LocalDate.now();

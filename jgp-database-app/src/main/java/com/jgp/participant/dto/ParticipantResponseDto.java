@@ -1,6 +1,6 @@
 package com.jgp.participant.dto;
 
-import com.jgp.bmo.dto.BMOClientDto;
+import com.jgp.bmo.dto.TAResponseDto;
 import com.jgp.bmo.dto.MentorshipResponseDto;
 import com.jgp.finance.dto.LoanDto;
 import com.jgp.monitoring.dto.OutComeMonitoringResponseDto;
@@ -66,7 +66,7 @@ public class ParticipantResponseDto implements Serializable {
 
     private String savings;
 
-    private List<BMOClientDto> bmoClientDtos;
+    private List<TAResponseDto> bmoClientDtos;
 
     private List<LoanDto> loanDtos;
 
