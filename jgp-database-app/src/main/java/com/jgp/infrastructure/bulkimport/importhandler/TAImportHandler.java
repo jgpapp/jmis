@@ -80,10 +80,15 @@ public class TAImportHandler implements ImportHandler {
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(taSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
 
         importProgressService.updateTotal(documentImportProgressUUId, noOfEntries);
-        importProgressService.updateStep(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_READING_STEP);
+        importProgressService.updateStepAndSendProgress(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_READING_STEP);
+        boolean headerSkipped = false;
+        for (Row row : taSheet) {
+            // Skip header row
+            if (!headerSkipped) {
+                headerSkipped = true;
+                continue;
+            }
 
-        for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
-            Row row = taSheet.getRow(rowIndex);
             if (Objects.nonNull(row) && ImportHandlerUtils.isNotImported(row, BMOConstants.STATUS_COL)) {
                 taDataList.add(readTAData(row));
                 importProgressService.incrementAndSendProgressUpdate(documentImportProgressUUId);
@@ -236,7 +241,7 @@ public class TAImportHandler implements ImportHandler {
 
         // 2. Validate each chunk asynchronously
         importProgressService.resetEveryThingToZero(documentImportProgressUUId);
-        importProgressService.updateStep(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_VALIDATING_STEP);
+        importProgressService.updateStepAndSendProgress(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_VALIDATING_STEP);
 
         final var validatedFutures = chunks.stream()
                 .map(chunk -> CompletableFuture.supplyAsync(() -> validateSingleChunk(chunk)))
@@ -245,7 +250,7 @@ public class TAImportHandler implements ImportHandler {
         CompletableFuture.allOf(validatedFutures.toArray(new CompletableFuture[0])).join();
 
         importProgressService.resetEveryThingToZero(documentImportProgressUUId);
-        importProgressService.updateStep(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_STORING_STEP);
+        importProgressService.updateStepAndSendProgress(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_STORING_STEP);
 
         // 3. Create or update participants and associate them with TA data
         final var allParticipantsToUpdate = createOrUpdateParticipants(existingParticipants);
@@ -266,7 +271,7 @@ public class TAImportHandler implements ImportHandler {
         taDataService.createBMOData(validatedAndAssociatedFutures);
 
         importProgressService.resetEveryThingToZero(documentImportProgressUUId);
-        importProgressService.updateStep(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_UPLOAD_STATUS_STEP);
+        importProgressService.updateStepAndSendProgress(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_STATUS_STEP);
 
         chunks.forEach(chunk -> chunk.forEach(this::saveTAData));
 

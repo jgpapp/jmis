@@ -30,6 +30,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
@@ -50,7 +51,7 @@ public class MentorshipImportHandler implements ImportHandler {
 
 
     @Override
-    public Count process(BulkImportEvent bulkImportEvent) {
+    public CompletableFuture<Count> process(BulkImportEvent bulkImportEvent) {
         this.workbook = bulkImportEvent.workbook();
         mentorshipDataList = new ArrayList<>();
         this.rowErrorMap = new HashMap<>();
@@ -59,7 +60,7 @@ public class MentorshipImportHandler implements ImportHandler {
         this.updateParticipantInfo = bulkImportEvent.updateParticipantInfo();
         this.document = bulkImportEvent.document();
         readExcelFile();
-        return importEntity();
+        return CompletableFuture.completedFuture(importEntity());
     }
 
     public void saveMentorshipData(Mentorship mentorship) {
@@ -71,7 +72,7 @@ public class MentorshipImportHandler implements ImportHandler {
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(loanSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
         importProgressService.updateTotal(this.documentImportProgressUUId, noOfEntries);
 
-        this.importProgressService.updateStep(this.documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_READING_STEP);
+        this.importProgressService.updateStepAndSendProgress(this.documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_READING_STEP);
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
             Row row;
             row = loanSheet.getRow(rowIndex);

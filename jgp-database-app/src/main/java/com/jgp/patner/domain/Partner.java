@@ -7,6 +7,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
@@ -17,7 +20,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Getter
 @Entity
 @Table(name = "partners", uniqueConstraints = { @UniqueConstraint(columnNames = { "partner_name" }, name = "NAME_UNIQUE")})
+@SequenceGenerator(name = "partners_seq", sequenceName = "partners_seq", allocationSize = 1)
 public class Partner extends BaseEntity {
+
+    @Override
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "partners_seq")
+    public Long getId() {
+        return super.getId();
+    }
 
     @Column(name = "partner_name")
 	private String partnerName;

@@ -7,6 +7,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +23,14 @@ import java.util.Objects;
 @Getter
 @Entity
 @Table(name = "participants")
+@SequenceGenerator(name = "participants_seq", sequenceName = "participants_seq", allocationSize = 1)
 public class Participant extends BaseEntity {
+
+    @Override
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "participants_seq")
+    public Long getId() {
+        return super.getId();
+    }
 
     @Column(name = "participant_name")
     private String participantName;

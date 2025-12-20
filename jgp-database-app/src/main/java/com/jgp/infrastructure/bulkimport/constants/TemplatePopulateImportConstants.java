@@ -5,6 +5,7 @@ public class TemplatePopulateImportConstants {
     private TemplatePopulateImportConstants() {
     }
 
+    public static final String WEB_SOCKET_EXCEL_UPLOAD_PROGRESS_ENDPOINT = "/topic/progress/%s";
     public static final String BMO_SHEET_NAME = "bmos";
     public static final String LOAN_SHEET_NAME = "loans";
     public static final String MENTOR_SHIP_SHEET_NAME = "mentorship";
@@ -16,7 +17,8 @@ public class TemplatePopulateImportConstants {
     public static final String EXCEL_UPLOAD_READING_STEP = "Reading Data";
     public static final String EXCEL_UPLOAD_VALIDATING_STEP = "Validating Data";
     public static final String EXCEL_UPLOAD_STORING_STEP = "Storing Data";
-    public static final String EXCEL_UPLOAD_UPLOAD_STATUS_STEP = "Updating Upload Status";
+    public static final String EXCEL_UPLOAD_STATUS_STEP = "Updating Upload Status";
+    public static final String EXCEL_UPLOAD_COMPLETED_STEP = "Upload Completed";
 
     // columns sizes
     public static final int SMALL_COL_SIZE = 4000;
@@ -31,10 +33,6 @@ public class TemplatePopulateImportConstants {
     // Status column
     public static final String STATUS_CELL_IMPORTED = "Imported";
     public static final String STATUS_CREATION_FAILED = "Creation failed";
-    public static final String STATUS_APPROVAL_FAILED = "Approval failed";
-    public static final String STATUS_MEETING_FAILED = "Meeting failed";
-    public static final String STATUS_DISBURSAL_FAILED = "Disbursal failed";
-    public static final String STATUS_DISBURSAL_REPAYMENT_FAILED = "Repayment failed";
     public static final String STATUS_COLUMN_HEADER = "Status";
 
     public static final String STATUS_COL_REPORT_HEADER = "Status";

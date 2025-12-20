@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
@@ -42,21 +43,21 @@ public class MonitoringImportHandler implements ImportHandler {
     private Document document;
 
     @Override
-    public Count process(BulkImportEvent bulkImportEvent) {
+    public CompletableFuture<Count> process(BulkImportEvent bulkImportEvent) {
         this.workbook = bulkImportEvent.workbook();
         this.monitoringDataList = new ArrayList<>();
         this.rowErrorMap = new HashMap<>();
         this.documentImportProgressUUId = bulkImportEvent.importProgressUUID();
         this.document = bulkImportEvent.document();
         readExcelFile();
-        return importEntity();
+        return CompletableFuture.completedFuture(importEntity());
     }
 
     public void readExcelFile() {
         Sheet sheet = workbook.getSheet("Monitoring");
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(sheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
         importProgressService.updateTotal(this.documentImportProgressUUId, noOfEntries);
-        this.importProgressService.updateStep(this.documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_READING_STEP);
+        this.importProgressService.updateStepAndSendProgress(this.documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_READING_STEP);
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
             Row row = sheet.getRow(rowIndex);
             if (row != null && ImportHandlerUtils.isNotImported(row, MonitoringConstants.STATUS_COL)) {

@@ -1,6 +1,7 @@
 package com.jgp.infrastructure.bulkimport.listener;
 
 import com.jgp.authentication.service.UserService;
+import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import com.jgp.infrastructure.bulkimport.data.Count;
 import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.bulkimport.domain.ImportDocument;
@@ -103,13 +104,13 @@ public class BulkImportEventListener {
     private ImportHandler resolveImportHandler(GlobalEntityType entityType) {
         return switch (entityType) {
             case TA_IMPORT_TEMPLATE ->
-                    this.applicationContext.getBean(TA_IMPORT_HANDLER_BEAN, TAImportHandler.class);
+                    this.applicationContext.getBean(TA_IMPORT_HANDLER_BEAN, ImportHandler.class);
             case LOAN_IMPORT_TEMPLATE ->
-                    this.applicationContext.getBean(LOAN_IMPORT_HANDLER_BEAN, LoanImportHandler.class);
+                    this.applicationContext.getBean(LOAN_IMPORT_HANDLER_BEAN, ImportHandler.class);
             case MENTORSHIP_IMPORT_TEMPLATE ->
-                    this.applicationContext.getBean(MENTORSHIP_IMPORT_HANDLER_BEAN, MentorshipImportHandler.class);
+                    this.applicationContext.getBean(MENTORSHIP_IMPORT_HANDLER_BEAN, ImportHandler.class);
             case MONITORING_IMPORT_TEMPLATE ->
-                    this.applicationContext.getBean(MONITORING_IMPORT_HANDLER_BEAN, MonitoringImportHandler.class);
+                    this.applicationContext.getBean(MONITORING_IMPORT_HANDLER_BEAN, ImportHandler.class);
             default -> throw new IllegalArgumentException(UNSUPPORTED_ENTITY_TYPE_ERROR + entityType);
         };
     }
@@ -132,6 +133,8 @@ public class BulkImportEventListener {
         } catch (Exception e) {
             log.error("Failed to process import", e);
             throw new DataImportException("Import processing failed", e);
+        }finally {
+            importProgressService.updateStepAndSendProgress(bulkImportEvent.importProgressUUID(), TemplatePopulateImportConstants.EXCEL_UPLOAD_COMPLETED_STEP);
         }
     }
 

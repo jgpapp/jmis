@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 
 @Service
@@ -55,7 +56,7 @@ public class LoanImportHandler implements ImportHandler {
     private Document document;
 
     @Override
-    public Count process(BulkImportEvent bulkImportEvent) {
+    public CompletableFuture<Count> process(BulkImportEvent bulkImportEvent) {
         this.workbook = bulkImportEvent.workbook();
         loanDataList = new ArrayList<>();
         this.rowErrorMap = new HashMap<>();
@@ -63,7 +64,7 @@ public class LoanImportHandler implements ImportHandler {
         this.updateParticipantInfo = bulkImportEvent.updateParticipantInfo();
         this.document = bulkImportEvent.document();
         readExcelFile();
-        return importEntity();
+        return CompletableFuture.completedFuture(importEntity());
     }
 
 
@@ -72,7 +73,7 @@ public class LoanImportHandler implements ImportHandler {
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(loanSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
         importProgressService.updateTotal(this.documentImportProgressUUId, noOfEntries);
 
-        this.importProgressService.updateStep(this.documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_READING_STEP);
+        this.importProgressService.updateStepAndSendProgress(this.documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_READING_STEP);
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
             Row row;
             row = loanSheet.getRow(rowIndex);

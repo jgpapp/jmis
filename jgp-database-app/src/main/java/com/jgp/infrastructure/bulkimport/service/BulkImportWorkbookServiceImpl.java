@@ -322,8 +322,10 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
         final Document document = fetchDocument(documentId);
 
         try (Workbook workbook = openWorkbook(request.tempFilePath())) {
-            final int rowCount = ImportHandlerUtils.getNumberOfRows(
-                    workbook.getSheetAt(0), request.primaryColumn());
+            //final int rowCount2 = ImportHandlerUtils.getNumberOfRows(
+             //       workbook.getSheetAt(0), request.primaryColumn());
+
+            final int rowCount = 0;
 
             final ImportDocument importDocument = createImportDocument(document, request.entityType(), rowCount);
             this.importDocumentRepository.saveAndFlush(importDocument);
@@ -348,6 +350,8 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
         } catch (IOException exception) {
             log.error("Failed to publish import event for file: {}", fileName, exception);
             return -1L;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

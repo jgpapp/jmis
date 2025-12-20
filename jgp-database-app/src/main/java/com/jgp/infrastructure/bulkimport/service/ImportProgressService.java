@@ -4,7 +4,7 @@ import com.jgp.infrastructure.bulkimport.data.ImportProgress;
 
 public interface ImportProgressService {
 
-    void updateStep(String importUUId, String step);
+    void updateStepAndSendProgress(String importUUId, String step);
 
     void updateTotal(String importUUId, int total);
 

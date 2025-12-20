@@ -10,8 +10,11 @@ import com.jgp.shared.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -28,8 +31,15 @@ import java.util.Map;
 @Setter
 @Getter
 @Entity
-@Table(name = "bmo_participants_data")
+@Table(name = "ta_participants_data")
+@SequenceGenerator(name = "ta_participants_data_seq", sequenceName = "ta_participants_data_seq", allocationSize = 1)
 public class TAData extends BaseEntity {
+
+    @Override
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ta_participants_data_seq")
+    public Long getId() {
+        return super.getId();
+    }
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "partner_id")

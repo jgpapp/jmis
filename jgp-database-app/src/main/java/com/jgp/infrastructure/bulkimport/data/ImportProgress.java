@@ -22,4 +22,17 @@ public class ImportProgress {
     public synchronized void setTotal(int total) {
         this.total = total;
     }
+
+    // Add these getters for Jackson serialization
+    public synchronized String getStep() {
+        return step;
+    }
+
+    public synchronized int getProcessed() {
+        return processed;
+    }
+
+    public synchronized int getTotal() {
+        return total;
+    }
 }

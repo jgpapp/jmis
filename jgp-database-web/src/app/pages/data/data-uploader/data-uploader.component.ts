@@ -65,7 +65,7 @@ export class DataUploaderComponent implements OnDestroy {
   bulkImportForm: UntypedFormGroup;
   partnerType: string | undefined = 'NONE';
   public docsFilterForm: FormGroup;
-  progress: { processed: number; total: number; finished: number } | null = null;
+  progress: { processed: number; total: number; step: string } | null = null;
   updateParticipantInfo: boolean = false;
   dotCount: number = 0;
   preparingText: string = 'Preparing the template';
@@ -266,24 +266,13 @@ export class DataUploaderComponent implements OnDestroy {
 
   get progressText(): string {
     if (this.progress) {
-      this.progressDots();
-      if (this.progress.processed > 0 && this.progress.total > 0 && this.progress.total !== this.progress.processed) {
-        return `Processed ${this.progress.processed} of ${this.progress.total} rows`;
-      } else if (this.progress.processed > 0 && this.progress.total > 0 && this.progress.total === this.progress.processed) {
-        return `Completed Processing All ${this.progress.total} rows`;
+      if ('Upload Completed' === this.progress.step) {
+        return `Completed Processing ${this.progress.total} rows`;
       } else {
-        return this.preparingText;
+        return `${this.progress.step} ${this.progress.processed} of ${this.progress.total} rows`;
       }
     }
     return '';
-  }
-
-  progressDots(){
-    this.subs.add = interval(this.animationInterval)
-      .subscribe(() => {
-        this.dotCount = (this.dotCount + 1) % 4; // Cycle through 0, 1, 2, 3
-        this.preparingText = `Preparing the template: ${this.progress?.processed} prepared` + '.'.repeat(this.dotCount);
-      });
   }
  
 

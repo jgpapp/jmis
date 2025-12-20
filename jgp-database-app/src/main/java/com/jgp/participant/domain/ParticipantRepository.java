@@ -21,7 +21,7 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     @Modifying
     @Query(value = """
             update participants p set is_deleted = true, jgp_id = CONCAT(p.jgp_id, '_', p.id, '_', 'DELETED')\s
-            where p.id in ?1 and not exists (select 1 from bmo_participants_data bpd where bpd.participant_id = p.id and bpd.is_deleted = false)\s
+            where p.id in ?1 and not exists (select 1 from ta_participants_data bpd where bpd.participant_id = p.id and bpd.is_deleted = false)\s
             and not exists (select 1 from loans l where l.participant_id = p.id and l.is_deleted = false)\s
             and not exists (select 1 from mentor_ships m where m.participant_id = p.id and m.is_deleted = false)\s
             and not exists (select 1 from outcome_monitoring om where om.participant_id = p.id and om.is_deleted = false)\s

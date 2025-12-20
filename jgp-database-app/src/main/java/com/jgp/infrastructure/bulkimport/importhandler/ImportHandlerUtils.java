@@ -36,9 +36,22 @@ public final class ImportHandlerUtils {
 
     public static Integer getNumberOfRows(Sheet sheet, int primaryColumn) {
         int noOfEntries = 0;
-        // getLastRowNum and getPhysicalNumberOfRows showing false values
-        // sometimes
-        while (sheet.getRow(noOfEntries + 1) != null && sheet.getRow(noOfEntries + 1).getCell(primaryColumn) != null && CellType.BLANK != sheet.getRow(noOfEntries + 1).getCell(primaryColumn).getCellType()) {
+        boolean headerSkipped = false;
+
+        for (Row row : sheet) {
+            // Skip header row
+            if (!headerSkipped) {
+                headerSkipped = true;
+                continue;
+            }
+
+            Cell primaryCell = row.getCell(primaryColumn);
+
+            // Stop counting when we hit an empty primary column cell
+            if (primaryCell == null || CellType.BLANK == primaryCell.getCellType()) {
+                break;
+            }
+
             noOfEntries++;
         }
 

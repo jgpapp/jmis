@@ -1,6 +1,6 @@
 package com.jgp.bmo.domain.predicate;
 
-import com.jgp.bmo.domain.QBMOParticipantData;
+import com.jgp.bmo.domain.QTAData;
 import com.jgp.bmo.dto.TAParticipantSearchCriteria;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
@@ -20,7 +20,7 @@ public class TAPredicateBuilder {
      */
     public BooleanBuilder buildPredicateForSearchTAData(TAParticipantSearchCriteria searchCriteria) {
 
-        QBMOParticipantData qbmoParticipantData = QBMOParticipantData.bMOParticipantData;
+        QTAData qbmoParticipantData = QTAData.tAData;
         BooleanBuilder builder = new BooleanBuilder();
 
         List<Predicate> predicateList = new ArrayList<>();

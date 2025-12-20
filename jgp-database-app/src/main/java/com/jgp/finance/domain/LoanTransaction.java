@@ -7,8 +7,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -25,7 +28,14 @@ import java.time.ZoneId;
 @Getter
 @Entity
 @Table(name = "loan_transactions")
+@SequenceGenerator(name = "loan_transactions_seq", sequenceName = "loan_transactions_seq", allocationSize = 1)
 public class LoanTransaction extends BaseEntity implements Comparable<LoanTransaction> {
+
+    @Override
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "loan_transactions_seq")
+    public Long getId() {
+        return super.getId();
+    }
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)

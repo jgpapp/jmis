@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import com.jgp.infrastructure.bulkimport.data.ImportProgress;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,11 +34,17 @@ public class ImportProgressServiceImpl implements ImportProgressService {
 
 
     @Override
-    public void updateStep(String importUUId, String step) {
-        var progress = this.getImportProgress(importUUId);
-        if (Objects.nonNull(progress)) {
-            progress.updateProgressStep(step);
+    public void updateStepAndSendProgress(String importUUId, String step) {
+        try {
+            var progress = this.getImportProgress(importUUId);
+            if (Objects.nonNull(progress)) {
+                progress.updateProgressStep(step);
+                simpMessagingTemplate.convertAndSend(String.format(TemplatePopulateImportConstants.WEB_SOCKET_EXCEL_UPLOAD_PROGRESS_ENDPOINT, importUUId), this.objectMapper.writeValueAsString(progress));
+            }
+        } catch (Exception e) {
+            log.error("Problem Sending  Progress After Updating Step: {}", e.getMessage());
         }
+
     }
 
     @Override
@@ -73,7 +80,7 @@ public class ImportProgressServiceImpl implements ImportProgressService {
         try {
             var progress = this.getImportProgress(importUUId);
             if (Objects.nonNull(progress)) {
-                simpMessagingTemplate.convertAndSend(String.format("/topic/progress/%s", importUUId), this.objectMapper.writeValueAsString(progress));
+                simpMessagingTemplate.convertAndSend(String.format(TemplatePopulateImportConstants.WEB_SOCKET_EXCEL_UPLOAD_PROGRESS_ENDPOINT, importUUId), this.objectMapper.writeValueAsString(progress));
             }
         } catch (Exception e) {
             log.error("Problem Sending  Progress: {}", e.getMessage());
@@ -87,7 +94,7 @@ public class ImportProgressServiceImpl implements ImportProgressService {
             var progress = this.getImportProgress(importUUId);
             if (Objects.nonNull(progress)) {
                 progress.incrementProcessed();
-                simpMessagingTemplate.convertAndSend(String.format("/topic/progress/%s", importUUId), this.objectMapper.writeValueAsString(progress));
+                simpMessagingTemplate.convertAndSend(String.format(TemplatePopulateImportConstants.WEB_SOCKET_EXCEL_UPLOAD_PROGRESS_ENDPOINT, importUUId), this.objectMapper.writeValueAsString(progress));
             }
         } catch (Exception e) {
             log.error("Problem Updating & Sending Progress: {}", e.getMessage());

@@ -8,8 +8,11 @@ import com.jgp.shared.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,7 +29,14 @@ import java.util.stream.Collectors;
 @Getter
 @Entity
 @Table(name = "outcome_monitoring")
+@SequenceGenerator(name = "outcome_monitoring_seq", sequenceName = "outcome_monitoring_seq", allocationSize = 1)
 public class OutComeMonitoring extends BaseEntity {
+
+    @Override
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outcome_monitoring_seq")
+    public Long getId() {
+        return super.getId();
+    }
 
     @Column(name = "survey_date")
     private LocalDate surveyDate;
