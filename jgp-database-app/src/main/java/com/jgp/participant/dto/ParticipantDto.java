@@ -1,5 +1,6 @@
 package com.jgp.participant.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jgp.bmo.dto.TAResponseDto;
 import com.jgp.finance.dto.LoanDto;
 import jakarta.validation.constraints.Min;
@@ -82,8 +83,10 @@ public record ParticipantDto(
 
         String businessFinancier,
 
+        @JsonIgnore
         Row row,
 
+        @JsonIgnore
         Map<Row, String> rowErrorMap
 
         ) {

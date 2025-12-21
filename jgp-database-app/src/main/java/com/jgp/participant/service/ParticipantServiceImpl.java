@@ -17,7 +17,10 @@ import com.jgp.participant.dto.ParticipantDto;
 import com.jgp.participant.dto.ParticipantResponseDto;
 import com.jgp.participant.exception.ParticipantNotFoundException;
 import com.jgp.participant.mapper.ParticipantMapper;
+import com.jgp.shared.exception.DataRulesViolationException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,9 +30,11 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Validated
@@ -81,6 +86,27 @@ public class ParticipantServiceImpl implements ParticipantService {
         );
 
         return this.participantRepository.saveAll(participants);
+    }
+
+    //@AuditTrail(operation = UserAuditOperationConstants.CREATE_PARTICIPANT)
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Participant createOrUpdateParticipant(ParticipantDto participantDto, Map<String, Participant> existingParticipants, boolean updateParticipant) {
+        try {
+            var existingParticipant = existingParticipants.get(participantDto.jgpId());
+            if (Objects.nonNull(existingParticipant)){
+                if (updateParticipant){
+                    existingParticipant.updateParticipant(participantDto);
+                    return this.participantRepository.save(existingParticipant);
+                }
+                return existingParticipant;
+            }
+            return this.participantRepository.save(new Participant(participantDto));
+        } catch (Exception e) {
+            log.error("Error in createOrUpdateParticipant: {}", e.getMessage());
+        }
+        return null;
+
     }
 
     @Override

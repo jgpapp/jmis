@@ -20,6 +20,8 @@ public interface ParticipantService {
 
     List<Participant> updateParticipants(Map<Long, ParticipantDto> participantUpdates);
 
+    Participant createOrUpdateParticipant(ParticipantDto participantDto, Map<String, Participant> existingParticipants, boolean updateParticipant);
+
     Optional<Participant> findOneParticipantByJGPID(String jgpId);
 
     Map<String, Participant> findParticipantsByJGPIDs(List<String> jgpIds);

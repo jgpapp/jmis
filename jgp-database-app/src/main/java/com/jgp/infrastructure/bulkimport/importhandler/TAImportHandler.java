@@ -3,6 +3,7 @@ package com.jgp.infrastructure.bulkimport.importhandler;
 import com.google.common.collect.Lists;
 import com.jgp.authentication.service.UserService;
 import com.jgp.bmo.domain.TAData;
+import com.jgp.bmo.dto.TARequestDto;
 import com.jgp.bmo.service.TADataService;
 import com.jgp.infrastructure.bulkimport.exception.InvalidDataException;
 import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
@@ -49,18 +50,22 @@ public class TAImportHandler implements ImportHandler {
     private static final String PARTICIPANT_ASSOCIATION_ERROR = "Cannot associate data to a participant!";
     private static final String DUPLICATE_ENTRY_ERROR = "unique_bmo_participant_data";
     private static final String DUPLICATE_ENTRY_MESSAGE = "Row with same partner/participant/training date already exists!";
+    private static final int CHUNK_SIZE = 100; // Default chunk size for parallel processing
 
     private final TADataService taDataService;
     private final ParticipantService participantService;
     private final UserService userService;
     private final ImportProgressService importProgressService;
 
-    private List<TAData> taDataList;
+    private List<TARequestDto> taDataList;
     private Workbook workbook;
     private Map<Row, String> rowErrorMap;
     private String documentImportProgressUUId;
     private Boolean updateParticipantInfo;
     private Document document;
+
+    // Record to hold processing results
+    private record ProcessingResult(Row row, boolean success, String errorMessage) {}
 
     @Override
     public CompletableFuture<Count> process(BulkImportEvent bulkImportEvent) {
@@ -77,11 +82,25 @@ public class TAImportHandler implements ImportHandler {
 
     public void readExcelFile() {
         Sheet taSheet = workbook.getSheet(TemplatePopulateImportConstants.BMO_SHEET_NAME);
-        Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(taSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
+        if (taSheet == null) {
+            log.error("Sheet '{}' not found in workbook", TemplatePopulateImportConstants.BMO_SHEET_NAME);
+            throw new InvalidDataException("Required sheet not found: " + TemplatePopulateImportConstants.BMO_SHEET_NAME);
+        }
 
+        Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(taSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
+        if (noOfEntries == null || noOfEntries == 0) {
+            log.warn("No data rows found in sheet");
+            importProgressService.updateTotal(documentImportProgressUUId, 0);
+            return;
+        }
+
+        log.info("Starting to read {} rows from sheet", noOfEntries);
         importProgressService.updateTotal(documentImportProgressUUId, noOfEntries);
         importProgressService.updateStepAndSendProgress(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_READING_STEP);
+
         boolean headerSkipped = false;
+        int processedRows = 0;
+
         for (Row row : taSheet) {
             // Skip header row
             if (!headerSkipped) {
@@ -89,15 +108,23 @@ public class TAImportHandler implements ImportHandler {
                 continue;
             }
 
-            if (Objects.nonNull(row) && ImportHandlerUtils.isNotImported(row, BMOConstants.STATUS_COL)) {
-                taDataList.add(readTAData(row));
+            if (row != null && ImportHandlerUtils.isNotImported(row, BMOConstants.STATUS_COL)) {
+                try {
+                    taDataList.add(readTAData(row));
+                    processedRows++;
+                } catch (Exception ex) {
+                    log.error("Error reading row {}: {}", row.getRowNum(), ex.getMessage());
+                    rowErrorMap.put(row, "Error reading row: " + ex.getMessage());
+                }
                 importProgressService.incrementAndSendProgressUpdate(documentImportProgressUUId);
             }
         }
+
+        log.info("Successfully read {} rows from sheet", processedRows);
     }
 
 
-    private TAData readTAData(Row row) {
+    private TARequestDto readTAData(Row row) {
         Boolean isApplicantEligible = YES.equalsIgnoreCase(ImportHandlerUtils.readAsString(BMOConstants.IS_APPLICANT_ELIGIBLE_COL, row));
         Boolean isRecommendedForFinance = YES.equalsIgnoreCase(ImportHandlerUtils.readAsString(BMOConstants.RECOMMENDED_FOR_FINANCE_COL, row));
         LocalDate pipelineDecisionDate = DataValidator.validateLocalDate(BMOConstants.DATE_OF_PIPELINE_DECISION_COL, row, rowErrorMap, "Date of Pipeline Decision", false);
@@ -118,37 +145,45 @@ public class TAImportHandler implements ImportHandler {
         taType = TAValidator.validateTATypes(taType, row, rowErrorMap);
 
         final LocalDate currentDate = LocalDate.now(ZoneId.systemDefault());
-        final String normalizedTaNeeds = Objects.nonNull(taNeeds)
+        final String normalizedTaNeeds = normalizeTaNeeds(taNeeds);
+
+        final var currentUser = userService.currentUser();
+        return TARequestDto.builder()
+                .dateFormSubmitted(currentDate)
+                .isApplicantEligible(isApplicantEligible)
+                .tasAttended(0)
+                .taSessionsAttended(0)
+                .isRecommendedForFinance(isRecommendedForFinance)
+                .decisionDate(pipelineDecisionDate)
+                .fiBusinessReferred(referredFIBusiness)
+                .dateRecordedByPartner(dateRecordedByPartner)
+                .dateRecordedToJGPDB(currentDate)
+                .taNeeds(normalizedTaNeeds)
+                .trainingPartner(trainingPartner)
+                .taDeliveryMode(taDeliveryMode)
+                .otherTaNeeds(otherTaNeeds)
+                .taType(taType)
+                .createdBy(currentUser)
+                .document(document)
+                .row(row)
+                .rowErrorMap(rowErrorMap)
+                .rowIndex(row.getRowNum())
+                .rowErrorMessage(rowErrorMap.get(row))
+                .participantDto(getParticipantDto(row))
+                .partner(Objects.nonNull(currentUser) ? currentUser.getPartner() : null)
+                .build();
+    }
+
+    /**
+     * Normalizes TA needs by trimming whitespace around comma-separated values
+     */
+    private String normalizeTaNeeds(String taNeeds) {
+        return Objects.nonNull(taNeeds)
                 ? Arrays.stream(taNeeds.split(","))
                         .map(String::trim)
+                        .filter(s -> !s.isEmpty())
                         .collect(Collectors.joining(","))
                 : null;
-
-        return new TAData(
-                Objects.nonNull(userService.currentUser()) ? userService.currentUser().getPartner() : null,
-                null,
-                currentDate,
-                isApplicantEligible,
-                0,
-                0,
-                isRecommendedForFinance,
-                pipelineDecisionDate,
-                referredFIBusiness,
-                dateRecordedByPartner,
-                currentDate,
-                normalizedTaNeeds,
-                trainingPartner,
-                taDeliveryMode,
-                otherTaNeeds,
-                taType,
-                userService.currentUser(),
-                document,
-                row,
-                rowErrorMap,
-                row.getRowNum(),
-                rowErrorMap.get(row),
-                getParticipantDto(row)
-        );
     }
 
     private ParticipantDto getParticipantDto(Row row) {
@@ -208,9 +243,7 @@ public class TAImportHandler implements ImportHandler {
                 .youthRegularEmployees(youthRegularEmployees)
                 .totalCasualEmployees(totalCasualEmployees)
                 .youthCasualEmployees(youthCasualEmployees)
-                .sampleRecords(Objects.nonNull(sampleRecordsKept)
-                        ? Arrays.stream(sampleRecordsKept.split(",")).map(String::trim).toList()
-                        : null)
+                .sampleRecords(parseSampleRecords(sampleRecordsKept))
                 .personWithDisability(convertYesNoToCapitalized(personWithDisability))
                 .refugeeStatus(convertYesNoToCapitalized(refugeeStatus))
                 .jgpId(jgpId)
@@ -221,15 +254,38 @@ public class TAImportHandler implements ImportHandler {
                 .build();
     }
 
+    /**
+     * Parses comma-separated sample records string into a list
+     */
+    private List<String> parseSampleRecords(String sampleRecordsKept) {
+        return Objects.nonNull(sampleRecordsKept)
+                ? Arrays.stream(sampleRecordsKept.split(","))
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .toList()
+                : null;
+    }
+
     private String convertYesNoToCapitalized(String value) {
         return YES.equalsIgnoreCase(value) ? "Yes" : "No";
     }
 
+    /**
+     * Processes all chunks of TA data asynchronously.
+     * Steps: 1) Validate chunks in parallel, 2) Store to database in parallel, 3) Write results to workbook sequentially
+     * @return CompletableFuture containing count of total, success and failure records
+     */
     @Async
     public CompletableFuture<Count> processChunks() {
+        // Early return if no data to process
+        if (taDataList.isEmpty()) {
+            log.warn("No TA data to process");
+            return CompletableFuture.completedFuture(Count.instance(0, 0, 0));
+        }
+
         final var existingParticipants = participantService.findParticipantsByJGPIDs(
                 taDataList.stream()
-                        .map(TAData::getParticipantDto)
+                        .map(TARequestDto::participantDto)
                         .map(ParticipantDto::jgpId)
                         .filter(Objects::nonNull)
                         .distinct()
@@ -238,6 +294,7 @@ public class TAImportHandler implements ImportHandler {
 
         // 1. Split the taDataList into smaller chunks
         final var chunks = Lists.partition(taDataList, CHUNK_SIZE);
+        log.info("Processing {} records in {} chunks", taDataList.size(), chunks.size());
 
         // 2. Validate each chunk asynchronously
         importProgressService.resetEveryThingToZero(documentImportProgressUUId);
@@ -252,71 +309,56 @@ public class TAImportHandler implements ImportHandler {
         importProgressService.resetEveryThingToZero(documentImportProgressUUId);
         importProgressService.updateStepAndSendProgress(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_STORING_STEP);
 
-        // 3. Create or update participants and associate them with TA data
-        final var allParticipantsToUpdate = createOrUpdateParticipants(existingParticipants);
-        final var participantMap = allParticipantsToUpdate.stream()
-                .collect(Collectors.toMap(Participant::getJgpId, p -> p));
-
-        final var associateFutures = chunks.stream()
+        // 3. Storing TA data - process in parallel, collect results
+        final var storingFutures = chunks.stream()
                 .map(chunk -> CompletableFuture.supplyAsync(() -> chunk.stream()
-                        .map(taData -> associateParticipantToTAData(taData, participantMap))
-                        .collect(Collectors.toList())))
+                        .map(taData -> storeDataWithoutWritingToWorkbook(taData, existingParticipants))
+                        .toList()))
                 .toList();
 
-        final var validatedAndAssociatedFutures = associateFutures.stream()
+        // Wait for all futures to complete and collect results
+        final var allResults = storingFutures.stream()
                 .map(CompletableFuture::join)
                 .flatMap(List::stream)
                 .toList();
 
-        taDataService.createBMOData(validatedAndAssociatedFutures);
-
+        // 4. Write results to workbook sequentially (not thread-safe)
         importProgressService.resetEveryThingToZero(documentImportProgressUUId);
         importProgressService.updateStepAndSendProgress(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_STATUS_STEP);
+        Sheet taSheet = workbook.getSheet(TemplatePopulateImportConstants.BMO_SHEET_NAME);
+        setReportHeaders(taSheet, BMOConstants.STATUS_COL, BMOConstants.FAILURE_COL);
 
-        chunks.forEach(chunk -> chunk.forEach(this::saveTAData));
+        // Count successes and failures while writing results
+        long successCount = allResults.stream().filter(ProcessingResult::success).count();
+        long failureCount = allResults.size() - successCount;
 
-        finish();
-
-        long successCount = taDataList.stream()
-                .filter(taData -> rowErrorMap.get(taData.getRow()) == null && taData.getParticipant() != null)
-                .count();
-        long errorCount = taDataList.size() - successCount;
-
-        return CompletableFuture.completedFuture(Count.instance(taDataList.size(), (int) successCount, (int) errorCount));
-    }
-
-    private TAData associateParticipantToTAData(TAData taData, Map<String, Participant> participantMap) {
-        final var participantDto = taData.getParticipantDto();
-        taData.setParticipant(participantMap.get(participantDto.jgpId()));
-        return taData;
-    }
-
-    private List<Participant> createOrUpdateParticipants(Map<String, Participant> existingParticipants) {
-        final var allAffectedParticipants = new ArrayList<Participant>();
-
-        if (Boolean.TRUE.equals(updateParticipantInfo)) {
-            final var participantsToUpdateMap = taDataList
-                    .stream()
-                    .filter(ta -> Objects.isNull(ta.getRowErrorMap().get(ta.getRow())))
-                    .map(TAData::getParticipantDto)
-                    .filter(p -> p.jgpId() != null && existingParticipants.containsKey(p.jgpId()))
-                    .collect(Collectors.toMap(
-                            p -> existingParticipants.get(p.jgpId()).getId(),
-                            p -> p,
-                            (p1, p2) -> p1
-                    ));
-            allAffectedParticipants.addAll(participantService.updateParticipants(participantsToUpdateMap));
+        for (var result : allResults) {
+            writeResultToWorkbook(result);
+            importProgressService.incrementAndSendProgressUpdate(documentImportProgressUUId);
         }
 
-        final var participantsToCreate = taDataList
-                .stream()
-                .filter(ta -> Objects.isNull(ta.getRowErrorMap().get(ta.getRow())))
-                .map(TAData::getParticipantDto)
-                .filter(p -> p.jgpId() == null || !existingParticipants.containsKey(p.jgpId()))
-                .toList();
-        allAffectedParticipants.addAll(participantService.createParticipants(participantsToCreate));
+        log.info("Finished Import - Total: {}, Success: {}, Failed: {} at {}",
+                taDataList.size(), successCount, failureCount, LocalDateTime.now(ZoneId.systemDefault()));
 
-        return allAffectedParticipants;
+        return CompletableFuture.completedFuture(Count.instance(taDataList.size(), (int) successCount, (int) failureCount));
+    }
+
+    /**
+     * Associates a participant to the given TA data based on the provided participant map.
+     *
+     * @param taDataDto      the TA data DTO
+     * @param participantMap a map of participants keyed by their JGP IDs
+     * @return the TAData object with the associated participant
+     */
+    private TAData associateParticipantToTAData(TARequestDto taDataDto, Map<String, Participant> participantMap) {
+        final var participantDto = taDataDto.participantDto();
+        final var taData = new TAData(taDataDto);
+        final var participant = this.participantService.createOrUpdateParticipant(participantDto, participantMap, this.updateParticipantInfo);
+        if (Objects.isNull(participant)) {
+            taDataDto.rowErrorMap().put(taDataDto.row(), PARTICIPANT_ASSOCIATION_ERROR);
+        }
+        taData.setParticipant(participant);
+        return taData;
     }
 
     /**
@@ -325,11 +367,10 @@ public class TAImportHandler implements ImportHandler {
      * @param chunk the list of TAData to validate
      * @return a list of valid TAData
      */
-    private List<TAData> validateSingleChunk(List<TAData> chunk) {
-        List<TAData> validData = new ArrayList<>();
-        for (TAData taData : chunk) {
-            Row row = taData.getRow();
-            final var participantDto = taData.getParticipantDto();
+    private List<TARequestDto> validateSingleChunk(List<TARequestDto> chunk) {
+        List<TARequestDto> validData = new ArrayList<>();
+        for (TARequestDto taData : chunk) {
+            final var participantDto = taData.participantDto();
             try {
                 final var validator = DataValidator.getValidator();
                 ParticipantValidator.validateParticipant(participantDto, validator);
@@ -338,7 +379,7 @@ public class TAImportHandler implements ImportHandler {
             } catch (RuntimeException ex) {
                 log.error("Problem occurred when validating participant: {}", ex.getMessage());
                 var errorMessage = ImportHandlerUtils.getErrorMessage(ex);
-                rowErrorMap.put(row, errorMessage);
+                taData.rowErrorMap().put(taData.row(), errorMessage);
             } finally {
                 importProgressService.incrementAndSendProgressUpdate(documentImportProgressUUId);
             }
@@ -347,38 +388,65 @@ public class TAImportHandler implements ImportHandler {
     }
 
 
-    public void finish() {
-        Sheet taSheet = workbook.getSheet(TemplatePopulateImportConstants.BMO_SHEET_NAME);
-        setReportHeaders(taSheet, BMOConstants.STATUS_COL, BMOConstants.FAILURE_COL);
-        log.info("Finished Import := {}", LocalDateTime.now(ZoneId.systemDefault()));
-    }
-
-    private void saveTAData(TAData taData) {
-        Row row = taData.getRow();
-        Cell errorReportCell = row.createCell(BMOConstants.FAILURE_COL);
-        Cell statusCell = row.createCell(BMOConstants.STATUS_COL);
-
-        if (Objects.isNull(rowErrorMap.get(row)) && Objects.isNull(taData.getParticipant())) {
-            rowErrorMap.put(row, PARTICIPANT_ASSOCIATION_ERROR);
-        }
+    /**
+     * Stores data to database without writing to workbook (thread-safe for parallel execution)
+     */
+    private ProcessingResult storeDataWithoutWritingToWorkbook(TARequestDto taData, Map<String, Participant> participantMap) {
+        Row row = taData.row();
 
         try {
-            final var validationError = rowErrorMap.get(row);
+            final var dataWithParticipant = associateParticipantToTAData(taData, participantMap);
+            final var validationError = taData.rowErrorMap().get(row);
             if (Objects.nonNull(validationError)) {
                 throw new InvalidDataException(validationError);
             }
-            statusCell.setCellValue(TemplatePopulateImportConstants.STATUS_CELL_IMPORTED);
-            statusCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.LIGHT_GREEN));
+            this.taDataService.createBMOData(List.of(dataWithParticipant));
+            return new ProcessingResult(row, true, null);
         } catch (RuntimeException ex) {
             log.error("Problem occurred when uploading TA: {}", ex.getMessage());
             var errorMessage = ImportHandlerUtils.getErrorMessage(ex);
             if (errorMessage.contains(DUPLICATE_ENTRY_ERROR)) {
                 errorMessage = DUPLICATE_ENTRY_MESSAGE;
             }
-            writeGroupErrorMessage(errorMessage, workbook, statusCell, errorReportCell);
+            return new ProcessingResult(row, false, errorMessage);
         } finally {
             importProgressService.incrementAndSendProgressUpdate(documentImportProgressUUId);
         }
+    }
+
+    /**
+     * Writes processing result to workbook (must be called sequentially, not thread-safe)
+     */
+    private void writeResultToWorkbook(ProcessingResult result) {
+        Row row = result.row();
+        Cell errorReportCell = row.createCell(BMOConstants.FAILURE_COL);
+        Cell statusCell = row.createCell(BMOConstants.STATUS_COL);
+
+        if (result.success()) {
+            statusCell.setCellValue(TemplatePopulateImportConstants.STATUS_CELL_IMPORTED);
+            statusCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.LIGHT_GREEN));
+        } else {
+            writeGroupErrorMessage(result.errorMessage(), workbook, statusCell, errorReportCell);
+        }
+    }
+
+    /**
+     * Sets report headers in the workbook
+     */
+    @Override
+    public void setReportHeaders(Sheet sheet, int statusColIndex, int failureColIndex) {
+        Row headerRow = sheet.getRow(0);
+        if (headerRow == null) {
+            headerRow = sheet.createRow(0);
+        }
+
+        Cell statusHeaderCell = headerRow.createCell(statusColIndex);
+        statusHeaderCell.setCellValue("Status");
+        statusHeaderCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.LIGHT_BLUE));
+
+        Cell failureHeaderCell = headerRow.createCell(failureColIndex);
+        failureHeaderCell.setCellValue("Failure Report");
+        failureHeaderCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.LIGHT_BLUE));
     }
 
 }

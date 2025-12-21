@@ -122,9 +122,15 @@ public class DataValidator {
                 phoneNumber = String.format("+%s", phoneNumber);
             }
             PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
-            Phonenumber.PhoneNumber phone = phoneNumberUtil.parse(phoneNumber, Phonenumber.PhoneNumber.CountryCodeSource.UNSPECIFIED.name());
+            Phonenumber.PhoneNumber phone = phoneNumberUtil.parse(phoneNumber, "KE");
             if (!phoneNumberUtil.isValidNumber(phone)) {
-                rowErrorMap.put(row, "Invalid Phone number provided !!");
+                rowErrorMap.put(row, "Invalid Kenyan phone number provided !!");
+                return phoneNumber;
+            }
+            // Verify it's a Kenyan number (country code 254)
+            if (phone.getCountryCode() != 254) {
+                rowErrorMap.put(row, "Phone number must be a valid Kenyan number (country code +254) !!");
+                return phoneNumber;
             }
             return phoneNumber;
         } catch (Exception e) {

@@ -1,7 +1,6 @@
 
 package com.jgp.infrastructure.bulkimport.service;
 
-import com.github.pjfanning.xlsx.StreamingReader;
 import com.jgp.authentication.service.PlatformSecurityContext;
 import com.jgp.infrastructure.bulkimport.data.DocumentDto;
 import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
@@ -14,7 +13,6 @@ import com.jgp.infrastructure.bulkimport.domain.ImportDocumentRepository;
 import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
 import com.jgp.infrastructure.bulkimport.event.DataImportDocumentDeletedEvent;
 import com.jgp.infrastructure.bulkimport.exception.DataImportException;
-import com.jgp.infrastructure.bulkimport.importhandler.ImportHandlerUtils;
 import com.jgp.infrastructure.documentmanagement.contentrepository.ContentRepository;
 import com.jgp.infrastructure.documentmanagement.data.DocumentData;
 import com.jgp.infrastructure.documentmanagement.domain.Document;
@@ -28,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
@@ -77,9 +76,8 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     private static final String FILE_NOT_FOUND_MESSAGE = "No such file exist";
     private static final String INVALID_ENTITY_TYPE_MESSAGE = "Unable to find requested resource";
     private static final String MISSING_PARAMETERS_MESSAGE = "One or more of the given parameters not found";
-    private static final int STREAMING_ROW_CACHE_SIZE = 200;
-    private static final int STREAMING_BUFFER_SIZE = 4096;
     private static final int PRIMARY_COLUMN_INDEX = 0;
+    public static final String IMPORT_DOCUMENT_ID_CANNOT_BE_NULL = "Import document ID cannot be null";
 
     private final ApplicationContext applicationContext;
     private final PlatformSecurityContext securityContext;
@@ -162,7 +160,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
 
     @Override
     public void deleteFileFromDbAndDirectory(Long importDocumentId, boolean deleteAssociatedData) {
-        Objects.requireNonNull(importDocumentId, "Import document ID cannot be null");
+        Objects.requireNonNull(importDocumentId, IMPORT_DOCUMENT_ID_CANNOT_BE_NULL);
 
         final ImportDocument importDocument = fetchImportDocument(importDocumentId);
         if (Objects.isNull(importDocument)) {
@@ -197,7 +195,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
 
     @Override
     public Page<ImportData> getImportById(Long importDocumentId) {
-        Objects.requireNonNull(importDocumentId, "Import document ID cannot be null");
+        Objects.requireNonNull(importDocumentId, IMPORT_DOCUMENT_ID_CANNOT_BE_NULL);
 
         final ImportDocument importDocument = fetchImportDocument(importDocumentId);
         if (Objects.isNull(importDocument)) {
@@ -210,7 +208,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
 
     @Override
     public DocumentData getOutputTemplateLocation(String importDocumentId) {
-        Objects.requireNonNull(importDocumentId, "Import document ID cannot be null");
+        Objects.requireNonNull(importDocumentId, IMPORT_DOCUMENT_ID_CANNOT_BE_NULL);
 
         final String sql = SELECT_LITERAL + ImportTemplateLocationMapper.IMPORT_DOCUMENT_SCHEMA;
         return this.jdbcTemplate.queryForObject(sql,
@@ -220,7 +218,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
 
     @Override
     public ResponseEntity<?> getOutputTemplate(String importDocumentId, String fileType) {
-        Objects.requireNonNull(importDocumentId, "Import document ID cannot be null");
+        Objects.requireNonNull(importDocumentId, IMPORT_DOCUMENT_ID_CANNOT_BE_NULL);
         Objects.requireNonNull(fileType, "File type cannot be null");
 
         final DocumentData documentData = getOutputTemplateLocation(importDocumentId);
@@ -233,7 +231,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
 
     @Override
     public ResponseEntity<?> downloadFile(String importDocumentId) {
-        Objects.requireNonNull(importDocumentId, "Import document ID cannot be null");
+        Objects.requireNonNull(importDocumentId, IMPORT_DOCUMENT_ID_CANNOT_BE_NULL);
 
         final DocumentData documentData = getOutputTemplateLocation(importDocumentId);
         if (Objects.isNull(documentData)) {
@@ -322,12 +320,8 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
         final Document document = fetchDocument(documentId);
 
         try (Workbook workbook = openWorkbook(request.tempFilePath())) {
-            //final int rowCount2 = ImportHandlerUtils.getNumberOfRows(
-             //       workbook.getSheetAt(0), request.primaryColumn());
 
-            final int rowCount = 0;
-
-            final ImportDocument importDocument = createImportDocument(document, request.entityType(), rowCount);
+            final ImportDocument importDocument = createImportDocument(document, request.entityType());
             this.importDocumentRepository.saveAndFlush(importDocument);
 
             final String appDocumentURL = buildAppDocumentURL(request, importDocument);
@@ -351,7 +345,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
             log.error("Failed to publish import event for file: {}", fileName, exception);
             return -1L;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new DataImportException(e.getMessage());
         }
     }
 
@@ -381,17 +375,17 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     }
 
     /**
-     * Opens a workbook from the specified file path using streaming reader.
+     * Opens a workbook from the specified file path using XSSFWorkbook for full read/write support.
+     * This allows modifications like creating cells for status updates.
      *
      * @param filePath the path to the file
-     * @return the opened Workbook
+     * @return the opened Workbook (cloned for write operations)
      * @throws IOException if an I/O error occurs during workbook opening
      */
     private Workbook openWorkbook(Path filePath) throws IOException {
-        return StreamingReader.builder()
-                .rowCacheSize(STREAMING_ROW_CACHE_SIZE)
-                .bufferSize(STREAMING_BUFFER_SIZE)
-                .open(Files.newInputStream(filePath));
+        // Use XSSFWorkbook for full read/write support
+        // This is necessary because handlers need to write status updates back to the Excel file
+        return new XSSFWorkbook(Files.newInputStream(filePath));
     }
 
     /**
@@ -477,7 +471,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                 .orElse(null);
     }
 
-    /** Creates an import document entity.
+    /** Creates an import document entity with row count.
      *
      * @param document   the associated document
      * @param entityType the global entity type
@@ -489,23 +483,6 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                 LocalDateTime.now(ZoneId.systemDefault()),
                 entityType.getValue(),
                 0,
-                this.securityContext.getAuthenticatedUserIfPresent().getPartner()
-        );
-    }
-
-    /** Creates an import document entity with row count.
-     *
-     * @param document   the associated document
-     * @param entityType the global entity type
-     * @param rowCount   the number of rows in the import
-     * @return the created ImportDocument
-     */
-    private ImportDocument createImportDocument(Document document, GlobalEntityType entityType, int rowCount) {
-        return ImportDocument.instance(
-                document,
-                LocalDateTime.now(ZoneId.systemDefault()),
-                entityType.getValue(),
-                rowCount,
                 this.securityContext.getAuthenticatedUserIfPresent().getPartner()
         );
     }

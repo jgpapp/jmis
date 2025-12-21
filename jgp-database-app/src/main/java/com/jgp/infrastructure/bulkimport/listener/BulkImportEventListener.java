@@ -74,11 +74,13 @@ public class BulkImportEventListener {
 
             updateDocumentWithWorkbook(importDocument, bulkImportEvent.workbook(), entityType);
 
-    } catch (Exception exception) {
-        log.error("Error processing bulk import event for import ID: {}",
-                bulkImportEvent.importId(), exception);
-        throw new DataImportException("Failed to process bulk import", exception);
-    }
+        } catch (Exception exception) {
+            log.error("Error processing bulk import event for import ID: {}",
+                    bulkImportEvent.importId(), exception);
+            throw new DataImportException("Failed to process bulk import", exception);
+        }finally {
+            importProgressService.updateStepAndSendProgress(bulkImportEvent.importProgressUUID(), TemplatePopulateImportConstants.EXCEL_UPLOAD_COMPLETED_STEP);
+        }
     }
 
     /**
@@ -133,8 +135,6 @@ public class BulkImportEventListener {
         } catch (Exception e) {
             log.error("Failed to process import", e);
             throw new DataImportException("Import processing failed", e);
-        }finally {
-            importProgressService.updateStepAndSendProgress(bulkImportEvent.importProgressUUID(), TemplatePopulateImportConstants.EXCEL_UPLOAD_COMPLETED_STEP);
         }
     }
 

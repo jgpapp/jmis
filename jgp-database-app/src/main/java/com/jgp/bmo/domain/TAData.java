@@ -2,6 +2,7 @@ package com.jgp.bmo.domain;
 
 
 import com.jgp.authentication.domain.AppUser;
+import com.jgp.bmo.dto.TARequestDto;
 import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.dto.ParticipantDto;
@@ -16,8 +17,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -67,11 +66,9 @@ public class TAData extends BaseEntity {
     @Column(name = "decision_date")
     private LocalDate decisionDate;
 
-    @NotBlank(message = "Business referred is required !!")
     @Column(name = "fi_business_referred")
     private String fiBusinessReferred;
 
-    @NotNull(message = "Date partner recorded is required !!")
     @Column(name = "date_partner_recorded")
     private LocalDate dateRecordedByPartner;
 
@@ -81,22 +78,18 @@ public class TAData extends BaseEntity {
     @Column(name = "data_is_approved")
     private Boolean isDataApprovedByPartner;
 
-    @NotBlank(message = "TA needs is required !!")
     @Column(name = "ta_needs")
     private String taNeeds;
 
-    @NotNull(message = "Training Partner is required !!")
     @Column(name = "training_partner")
     private String trainingPartner;
 
-    @NotNull(message = "Delivery mode is required !!")
     @Column(name = "ta_delivery_mode")
     private String taDeliveryMode;
 
     @Column(name = "other_ta_needs")
     private String otherTaNeeds;
 
-    @NotNull(message = "TA Type is required !!")
     @Column(name = "ta_type")
     private String taType;
 
@@ -111,52 +104,34 @@ public class TAData extends BaseEntity {
     @JoinColumn(name = "upload_doc_id")
     private Document document;
 
-    private transient Row row;
-
-    private transient Map<Row, String> rowErrorMap;
-
     private transient Integer rowIndex;
 
     private transient String rowErrorMessage;
 
-    private transient ParticipantDto participantDto;
-
-    private transient Boolean hasExistingParticipant;
-
     public TAData() {
     }
 
-    public TAData(Partner partner, Participant participant, LocalDate dateFormSubmitted,
-                  Boolean isApplicantEligible, Integer tasAttended, Integer taSessionsAttended,
-                  Boolean isRecommendedForFinance, LocalDate decisionDate, String fiBusinessReferred,
-                  LocalDate dateRecordedByPartner, LocalDate dateRecordedToJGPDB,
-                  String taNeeds, String trainingPartner, String taDeliveryMode,
-                  String otherTaNeeds, String taType, AppUser createdBy, Document document,
-                  Row row, Map<Row, String> rowErrorMap, Integer rowIndex, String rowErrorMessage, ParticipantDto participantDto) {
-        this.partner = partner;
-        this.participant = participant;
-        this.dateFormSubmitted = dateFormSubmitted;
-        this.isApplicantEligible = isApplicantEligible;
-        this.tasAttended = tasAttended;
-        this.taSessionsAttended = taSessionsAttended;
-        this.isRecommendedForFinance = isRecommendedForFinance;
-        this.decisionDate = decisionDate;
-        this.fiBusinessReferred = fiBusinessReferred;
-        this.dateRecordedByPartner = dateRecordedByPartner;
-        this.dateRecordedToJGPDB = dateRecordedToJGPDB;
+    public TAData(TARequestDto dto) {
+        this.partner = dto.partner();
+        this.dateFormSubmitted = dto.dateFormSubmitted();
+        this.isApplicantEligible = dto.isApplicantEligible();
+        this.tasAttended = dto.tasAttended();
+        this.taSessionsAttended = dto.taSessionsAttended();
+        this.isRecommendedForFinance = dto.isRecommendedForFinance();
+        this.decisionDate = dto.decisionDate();
+        this.fiBusinessReferred = dto.fiBusinessReferred();
+        this.dateRecordedByPartner = dto.dateRecordedByPartner();
+        this.dateRecordedToJGPDB = dto.dateRecordedToJGPDB();
         this.isDataApprovedByPartner = false;
-        this.taNeeds = taNeeds;
-        this.trainingPartner = trainingPartner;
-        this.taDeliveryMode = taDeliveryMode;
-        this.otherTaNeeds = otherTaNeeds;
-        this.taType = taType;
-        this.setCreatedBy(createdBy);
-        this.document = document;
-        this.row = row;
-        this.rowErrorMap = rowErrorMap;
-        this.rowIndex = rowIndex;
-        this.rowErrorMessage = rowErrorMessage;
-        this.participantDto = participantDto;
+        this.taNeeds = dto.taNeeds();
+        this.trainingPartner = dto.trainingPartner();
+        this.taDeliveryMode = dto.taDeliveryMode();
+        this.otherTaNeeds = dto.otherTaNeeds();
+        this.taType = dto.taType();
+        this.setCreatedBy(dto.createdBy());
+        this.document = dto.document();
+        this.rowIndex = dto.rowIndex();
+        this.rowErrorMessage = dto.rowErrorMessage();
     }
 
     public void approveData(Boolean approval, AppUser user){

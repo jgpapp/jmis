@@ -1,31 +1,35 @@
 package com.jgp.shared.validator;
 
 import com.jgp.bmo.domain.TAData;
+import com.jgp.bmo.dto.TARequestDto;
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 
 public class TAValidator {
     private static final String VALUE_REGEX = "[^a-zA-Z ]+";
     private TAValidator() {
     }
 
-    public static void validateTAData(TAData taData, Validator validator) {
+    public static void validateTAData(TARequestDto taData, Validator validator) {
         // Validate the object
-        Set<ConstraintViolation<TAData>> violations = validator.validate(taData);
+        Set<ConstraintViolation<TARequestDto>> violations = validator.validate(taData);
 
         // Get the first error, if any
         if (!violations.isEmpty()) {
-            ConstraintViolation<TAData> firstViolation = violations.iterator().next();
-            taData.getRowErrorMap().put(taData.getRow(), firstViolation.getMessage());
+            ConstraintViolation<TARequestDto> firstViolation = violations.iterator().next();
+            taData.rowErrorMap().put(taData.row(), firstViolation.getMessage());
         }
     }
 
