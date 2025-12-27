@@ -104,9 +104,6 @@ export class DataUploaderComponent implements OnDestroy {
   documents: ImportDocument[]
   importDocumentId: any;
 
-  private uploadCheckInterval: any = null;
-  private uploadTimeoutId: any = null;
-
   subs = new SubscriptionsContainer();
   constructor(
     public fb: FormBuilder,
@@ -168,34 +165,8 @@ export class DataUploaderComponent implements OnDestroy {
 
   getAvailableDocuments() {
     let partnerId = this.authService.currentUser()?.partnerId;
-    // Clear any existing intervals/timeouts first
-  if (this.uploadCheckInterval) {
-    clearInterval(this.uploadCheckInterval);
-    this.uploadCheckInterval = null;
-  }
-  if (this.uploadTimeoutId) {
-    clearTimeout(this.uploadTimeoutId);
-    this.uploadTimeoutId = null;
-  }
-  
-  if(this.importDocumentId){
-    // Poll for upload completion
-    this.uploadCheckInterval = setInterval(() => {
-      if (this.progress && this.progress.step === 'Upload Completed') {
-        clearInterval(this.uploadCheckInterval);
-        this.uploadCheckInterval = null;
-        this.getDocumentsById(this.importDocumentId, this.entityType);
-      }
-    }, 1000); // Check every second
-
-    // Timeout after 10 minutes
-    this.uploadTimeoutId = setTimeout(() => {
-      if (this.uploadCheckInterval) {
-        clearInterval(this.uploadCheckInterval);
-        this.uploadCheckInterval = null;
-      }
+    if(this.importDocumentId){
       this.getDocumentsById(this.importDocumentId, this.entityType);
-    }, 600000);
     } else if(partnerId){
       this.subs.add = this.dataUploadService.getAvailableDocuments(partnerId, this.entityType, this.pageIndex, this.pageSize)
         .subscribe({
@@ -244,39 +215,39 @@ export class DataUploaderComponent implements OnDestroy {
   }
 
   onFileSelect($event: Event) {
-  const input = $event.target as HTMLInputElement;
-  
-  if (!input.files || input.files.length === 0) {
-    return;
-  }
-  
-  this.template = input.files[0];
-  this.uploadProgressID = null;
-  this.progress = null;
-  this.legalFormType = undefined;
-  
-  const fileName = this.template.name.toUpperCase();
-  
-  // Define template mappings
-  const templateMappings: Record<string, { keyword: string; permission: string }> = {
-    'LOAN_IMPORT_TEMPLATE': { keyword: 'LOAN_IMPORT_TEMPLATE', permission: 'LOAN_UPLOAD' },
-    'TA_IMPORT_TEMPLATE': { keyword: 'TA_IMPORT_TEMPLATE', permission: 'BMO_PARTICIPANTS_DATA_UPLOAD' },
-    'MENTORSHIP_IMPORT_TEMPLATE': { keyword: 'MENTORSHIP_IMPORT_TEMPLATE', permission: 'MENTOR_SHIP_UPLOAD' },
-    'MONITORING_IMPORT_TEMPLATE': { keyword: 'MONITORING_IMPORT_TEMPLATE', permission: 'MONITORING_OUTCOME_UPLOAD' }
-  };
-  
-  // Find matching template type
-  for (const [templateType, config] of Object.entries(templateMappings)) {
-    if (fileName.includes(config.keyword) && this.authService.hasPermission(config.permission)) {
-      this.legalFormType = templateType;
-      break;
+    const input = $event.target as HTMLInputElement;
+    
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+    
+    this.template = input.files[0];
+    this.uploadProgressID = null;
+    this.progress = null;
+    this.legalFormType = undefined;
+    
+    const fileName = this.template.name.toUpperCase();
+    
+    // Define template mappings
+    const templateMappings: Record<string, { keyword: string; permission: string }> = {
+      'LOAN_IMPORT_TEMPLATE': { keyword: 'LOAN_IMPORT_TEMPLATE', permission: 'LOAN_UPLOAD' },
+      'TA_IMPORT_TEMPLATE': { keyword: 'TA_IMPORT_TEMPLATE', permission: 'BMO_PARTICIPANTS_DATA_UPLOAD' },
+      'MENTORSHIP_IMPORT_TEMPLATE': { keyword: 'MENTORSHIP_IMPORT_TEMPLATE', permission: 'MENTOR_SHIP_UPLOAD' },
+      'MONITORING_IMPORT_TEMPLATE': { keyword: 'MONITORING_IMPORT_TEMPLATE', permission: 'MONITORING_OUTCOME_UPLOAD' }
+    };
+    
+    // Find matching template type
+    for (const [templateType, config] of Object.entries(templateMappings)) {
+      if (fileName.includes(config.keyword) && this.authService.hasPermission(config.permission)) {
+        this.legalFormType = templateType;
+        break;
+      }
+    }
+    
+    if (!this.legalFormType) {
+      this.gs.openSnackBar('Invalid template file or insufficient permissions', 'Dismiss');
     }
   }
-  
-  if (!this.legalFormType) {
-    this.gs.openSnackBar('Invalid template file or insufficient permissions', 'Dismiss');
-  }
-}
 
   uploadTemplate() {
     if(!this.authService.currentUser()?.partnerId){
@@ -424,13 +395,6 @@ get progressText(): string {
 }
 
   ngOnDestroy(): void {
-     // Clear intervals/timeouts on destroy
-  if (this.uploadCheckInterval) {
-    clearInterval(this.uploadCheckInterval);
-  }
-  if (this.uploadTimeoutId) {
-    clearTimeout(this.uploadTimeoutId);
-  }
     this.dataUploadService.disconnectWebSocket();
     this.subs.dispose();
   }

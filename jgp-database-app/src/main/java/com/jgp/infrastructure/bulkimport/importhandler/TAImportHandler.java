@@ -5,6 +5,7 @@ import com.jgp.authentication.service.UserService;
 import com.jgp.bmo.domain.TAData;
 import com.jgp.bmo.dto.TARequestDto;
 import com.jgp.bmo.service.TADataService;
+import com.jgp.infrastructure.bulkimport.data.ExcelTemplateProcessingResult;
 import com.jgp.infrastructure.bulkimport.exception.InvalidDataException;
 import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
 import com.jgp.infrastructure.documentmanagement.domain.Document;
@@ -20,8 +21,6 @@ import com.jgp.shared.validator.ParticipantValidator;
 import com.jgp.shared.validator.TAValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -47,10 +46,8 @@ import java.util.stream.Collectors;
 public class TAImportHandler implements ImportHandler {
 
     private static final String YES = "YES";
-    private static final String PARTICIPANT_ASSOCIATION_ERROR = "Cannot associate data to a participant!";
     private static final String DUPLICATE_ENTRY_ERROR = "unique_bmo_participant_data";
     private static final String DUPLICATE_ENTRY_MESSAGE = "Row with same partner/participant/training date already exists!";
-    private static final int CHUNK_SIZE = 100; // Default chunk size for parallel processing
 
     private final TADataService taDataService;
     private final ParticipantService participantService;
@@ -64,8 +61,6 @@ public class TAImportHandler implements ImportHandler {
     private Boolean updateParticipantInfo;
     private Document document;
 
-    // Record to hold processing results
-    private record ProcessingResult(Row row, boolean success, String errorMessage) {}
 
     @Override
     public CompletableFuture<Count> process(BulkImportEvent bulkImportEvent) {
@@ -186,6 +181,9 @@ public class TAImportHandler implements ImportHandler {
                 : null;
     }
 
+    /**
+     * Extracts ParticipantDto from the given row
+     */
     private ParticipantDto getParticipantDto(Row row) {
         final String participantName = ImportHandlerUtils.readAsString(BMOConstants.PARTICIPANT_NAME_COL, row);
         final String jgpId = ImportHandlerUtils.readAsString(BMOConstants.JGP_ID_COL, row);
@@ -329,11 +327,11 @@ public class TAImportHandler implements ImportHandler {
         setReportHeaders(taSheet, BMOConstants.STATUS_COL, BMOConstants.FAILURE_COL);
 
         // Count successes and failures while writing results
-        long successCount = allResults.stream().filter(ProcessingResult::success).count();
+        long successCount = allResults.stream().filter(ExcelTemplateProcessingResult::success).count();
         long failureCount = allResults.size() - successCount;
 
         for (var result : allResults) {
-            writeResultToWorkbook(result);
+            writeResultToWorkbook(result, BMOConstants.STATUS_COL, BMOConstants.FAILURE_COL);
             importProgressService.incrementAndSendProgressUpdate(documentImportProgressUUId);
         }
 
@@ -391,7 +389,7 @@ public class TAImportHandler implements ImportHandler {
     /**
      * Stores data to database without writing to workbook (thread-safe for parallel execution)
      */
-    private ProcessingResult storeDataWithoutWritingToWorkbook(TARequestDto taData, Map<String, Participant> participantMap) {
+    private ExcelTemplateProcessingResult storeDataWithoutWritingToWorkbook(TARequestDto taData, Map<String, Participant> participantMap) {
         Row row = taData.row();
 
         try {
@@ -401,52 +399,17 @@ public class TAImportHandler implements ImportHandler {
                 throw new InvalidDataException(validationError);
             }
             this.taDataService.createBMOData(List.of(dataWithParticipant));
-            return new ProcessingResult(row, true, null);
+            return new ExcelTemplateProcessingResult(row, true, null);
         } catch (RuntimeException ex) {
             log.error("Problem occurred when uploading TA: {}", ex.getMessage());
             var errorMessage = ImportHandlerUtils.getErrorMessage(ex);
             if (errorMessage.contains(DUPLICATE_ENTRY_ERROR)) {
                 errorMessage = DUPLICATE_ENTRY_MESSAGE;
             }
-            return new ProcessingResult(row, false, errorMessage);
+            return new ExcelTemplateProcessingResult(row, false, errorMessage);
         } finally {
             importProgressService.incrementAndSendProgressUpdate(documentImportProgressUUId);
         }
-    }
-
-    /**
-     * Writes processing result to workbook (must be called sequentially, not thread-safe)
-     */
-    private void writeResultToWorkbook(ProcessingResult result) {
-        Row row = result.row();
-        Cell errorReportCell = row.createCell(BMOConstants.FAILURE_COL);
-        Cell statusCell = row.createCell(BMOConstants.STATUS_COL);
-
-        if (result.success()) {
-            statusCell.setCellValue(TemplatePopulateImportConstants.STATUS_CELL_IMPORTED);
-            statusCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.LIGHT_GREEN));
-        } else {
-            writeGroupErrorMessage(result.errorMessage(), workbook, statusCell, errorReportCell);
-        }
-    }
-
-    /**
-     * Sets report headers in the workbook
-     */
-    @Override
-    public void setReportHeaders(Sheet sheet, int statusColIndex, int failureColIndex) {
-        Row headerRow = sheet.getRow(0);
-        if (headerRow == null) {
-            headerRow = sheet.createRow(0);
-        }
-
-        Cell statusHeaderCell = headerRow.createCell(statusColIndex);
-        statusHeaderCell.setCellValue("Status");
-        statusHeaderCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.LIGHT_BLUE));
-
-        Cell failureHeaderCell = headerRow.createCell(failureColIndex);
-        failureHeaderCell.setCellValue("Failure Report");
-        failureHeaderCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.LIGHT_BLUE));
     }
 
 }
