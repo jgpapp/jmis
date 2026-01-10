@@ -19,11 +19,6 @@
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
-    "lib": [
-      "es2018",
-      "ES2022",
-      "dom"
-    ],
     "strictPropertyInitialization": false,
     "paths": { 
       "@data/*": ["./src/app/common/data/*"],
