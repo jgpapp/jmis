@@ -1,11 +1,11 @@
 package com.jgp.bmo.domain;
 
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +18,7 @@ public interface TADataRepository extends JpaRepository<TAData, Long>, JpaSpecif
     @Transactional
     @Modifying
     @Query(value = "update ta_participants_data b set is_deleted = true where b.id in ?1", nativeQuery = true)
-    void deleteTADataByIds(@NonNull Collection<Long> ids);
+    void deleteTADataByIds(@NonNull Collection<Long> taIds);
 
     List<TAData> findByDocumentId(@NonNull Long documentId);
 }

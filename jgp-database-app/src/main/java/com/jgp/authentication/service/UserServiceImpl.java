@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService{
     @Transactional
     @Override
     public void updateUserPassword(UserPassChangeDto userPassChangeDto) {
-        if (!StringUtils.equals(userPassChangeDto.newPass(), userPassChangeDto.passConfirm())){
+        if (!Objects.equals(userPassChangeDto.newPass(), userPassChangeDto.passConfirm())){
             throw new DataRulesViolationException("New password must match with confirmation password!!");
         }
         final var passWordStrengthRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";

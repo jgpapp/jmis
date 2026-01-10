@@ -17,6 +17,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.util.Objects;
+
 @Getter
 @Entity
 @Table(name = "partners", uniqueConstraints = { @UniqueConstraint(columnNames = { "partner_name" }, name = "NAME_UNIQUE")})
@@ -49,10 +51,10 @@ public class Partner extends BaseEntity {
     }
 
     public void updatePartner(PartnerDto partnerDto){
-        if(!StringUtils.equals(partnerDto.partnerName(), this.partnerName)){
+        if(!Objects.equals(partnerDto.partnerName(), this.partnerName)){
             this.partnerName = partnerDto.partnerName();
         }
-        if(!StringUtils.equals(partnerDto.type(), this.type.name())){
+        if(!Objects.equals(partnerDto.type(), this.type.name())){
             this.type = PartnerType.valueOf(partnerDto.type());
         }
     }

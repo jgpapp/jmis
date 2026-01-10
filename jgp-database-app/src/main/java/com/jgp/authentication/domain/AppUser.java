@@ -20,7 +20,6 @@ import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.security.core.GrantedAuthority;
@@ -122,25 +121,25 @@ public class AppUser extends BaseEntity implements PlatformUser {
     }
 
     public void updateUser(UserDtoV2 userDto, Partner partner){
-        if(!StringUtils.equals(userDto.firstName(), this.firstName)){
+        if(!Objects.equals(userDto.firstName(), this.firstName)){
             this.firstName = userDto.firstName();
         }
-        if(!StringUtils.equals(userDto.lastName(), this.lastName)){
+        if(!Objects.equals(userDto.lastName(), this.lastName)){
             this.lastName = userDto.lastName();
         }
-        if(!StringUtils.equals(userDto.gender(), this.gender)){
+        if(!Objects.equals(userDto.gender(), this.gender)){
             this.gender = userDto.gender();
         }
         if(!Objects.equals(partner, this.partner)){
             this.partner = partner;
         }
-        if(!StringUtils.equals(userDto.designation(), this.designation)){
+        if(!Objects.equals(userDto.designation(), this.designation)){
             this.designation = userDto.designation();
         }
-        if(!StringUtils.equals(userDto.town(), this.town)){
+        if(!Objects.equals(userDto.town(), this.town)){
             this.town = userDto.town();
         }
-        if(!StringUtils.equals(userDto.cellPhone(), this.cellPhone)){
+        if(!Objects.equals(userDto.cellPhone(), this.cellPhone)){
             this.cellPhone = userDto.cellPhone();
         }
         this.setLastModified(LocalDate.now(ZoneId.systemDefault()));
