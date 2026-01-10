@@ -12,6 +12,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -39,7 +40,7 @@ public class ImportProgressServiceImpl implements ImportProgressService {
             var progress = this.getImportProgress(importUUId);
             if (Objects.nonNull(progress)) {
                 progress.updateProgressStep(step);
-                simpMessagingTemplate.convertAndSend(String.format(TemplatePopulateImportConstants.WEB_SOCKET_EXCEL_UPLOAD_PROGRESS_ENDPOINT, importUUId), this.objectMapper.writeValueAsString(progress));
+                sendProgressSync(importUUId, progress);
             }
         } catch (Exception e) {
             log.error("Problem Sending  Progress After Updating Step: {}", e.getMessage());
@@ -80,7 +81,7 @@ public class ImportProgressServiceImpl implements ImportProgressService {
         try {
             var progress = this.getImportProgress(importUUId);
             if (Objects.nonNull(progress)) {
-                simpMessagingTemplate.convertAndSend(String.format(TemplatePopulateImportConstants.WEB_SOCKET_EXCEL_UPLOAD_PROGRESS_ENDPOINT, importUUId), this.objectMapper.writeValueAsString(progress));
+                sendProgressSync(importUUId, progress);
             }
         } catch (Exception e) {
             log.error("Problem Sending  Progress: {}", e.getMessage());
@@ -94,11 +95,36 @@ public class ImportProgressServiceImpl implements ImportProgressService {
             var progress = this.getImportProgress(importUUId);
             if (Objects.nonNull(progress)) {
                 progress.incrementProcessed();
-                simpMessagingTemplate.convertAndSend(String.format(TemplatePopulateImportConstants.WEB_SOCKET_EXCEL_UPLOAD_PROGRESS_ENDPOINT, importUUId), this.objectMapper.writeValueAsString(progress));
+                sendProgressSync(importUUId, progress);
             }
         } catch (Exception e) {
             log.error("Problem Updating & Sending Progress: {}", e.getMessage());
         }
 
+    }
+
+    /**
+     * Sends the current progress synchronously, ensuring the message is sent before returning.
+     *
+     * @param importUUId      the unique identifier for the import process
+     * @param currentProgress the current progress to be sent
+     * @throws Exception if there is an error during message sending
+     */
+    public void sendProgressSync(String importUUId, ImportProgress currentProgress) throws Exception {
+        // Use CountDownLatch to ensure message is sent
+        CountDownLatch latch = new CountDownLatch(1);
+
+        simpMessagingTemplate.convertAndSend(String.format(TemplatePopulateImportConstants.WEB_SOCKET_EXCEL_UPLOAD_PROGRESS_ENDPOINT, importUUId), this.objectMapper.writeValueAsString(currentProgress),
+                headers -> {
+                    latch.countDown();
+                    return headers;
+                });
+
+        try {
+            latch.await(1, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("Progress update wait interrupted", e);
+        }
     }
 }

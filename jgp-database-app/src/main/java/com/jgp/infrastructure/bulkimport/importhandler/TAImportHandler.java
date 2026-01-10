@@ -304,6 +304,10 @@ public class TAImportHandler implements ImportHandler {
 
         CompletableFuture.allOf(validatedFutures.toArray(new CompletableFuture[0])).join();
 
+        // Wait for UI to sync before moving to next step
+        sleep(500);
+
+        // STORING DATA STEP
         importProgressService.resetEveryThingToZero(documentImportProgressUUId);
         importProgressService.updateStepAndSendProgress(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_STORING_STEP);
 
@@ -319,6 +323,9 @@ public class TAImportHandler implements ImportHandler {
                 .map(CompletableFuture::join)
                 .flatMap(List::stream)
                 .toList();
+
+        // Wait for UI to sync before moving to next step
+        sleep(500);
 
         // 4. Write results to workbook sequentially (not thread-safe)
         importProgressService.resetEveryThingToZero(documentImportProgressUUId);
@@ -339,6 +346,15 @@ public class TAImportHandler implements ImportHandler {
                 taDataList.size(), successCount, failureCount, LocalDateTime.now(ZoneId.systemDefault()));
 
         return CompletableFuture.completedFuture(Count.instance(taDataList.size(), (int) successCount, (int) failureCount));
+    }
+
+    private void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("Sleep interrupted", e);
+        }
     }
 
     /**

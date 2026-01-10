@@ -33,6 +33,10 @@ public class DataImportDocumentDeletedEventListener {
         final var document = event.document();
         if (Objects.nonNull(document) && event.deleteAssociatedData()) {
             final var documentImportType = document.getGlobalEntityType();
+            if(Objects.isNull(documentImportType)){
+                log.info("Document Import Type is null, skipping associated data deletion");
+                return;
+            }
             switch (documentImportType) {
                 case GlobalEntityType.LOAN_IMPORT_TEMPLATE -> {
                     final var loanTransactionIds = this.loanTransactionService.getLoanTransactions(document.getId())
