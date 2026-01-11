@@ -3,7 +3,7 @@ package com.jgp.bmo.service;
 import com.jgp.bmo.domain.Mentorship;
 import com.jgp.bmo.dto.MentorshipResponseDto;
 import com.jgp.bmo.dto.MentorshipSearchCriteria;
-import com.jgp.participant.dto.ParticipantDto;
+import com.jgp.participant.dto.ParticipantRequestDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -13,7 +13,7 @@ import java.util.Map;
 
 public interface MentorshipService {
 
-    void saveMentorshipWithParticipant(Mentorship mentorship, Boolean updateParticipantInfo, Map<Long, ParticipantDto> participantDtoMap);
+    void saveMentorshipWithParticipant(Mentorship mentorship, Boolean updateParticipantInfo, Map<Long, ParticipantRequestDto> participantDtoMap);
 
     void approvedMentorShipData(List<Long> dataIds, Boolean approval);
 

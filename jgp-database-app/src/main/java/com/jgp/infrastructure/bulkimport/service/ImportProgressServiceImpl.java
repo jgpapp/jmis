@@ -12,7 +12,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -89,12 +88,12 @@ public class ImportProgressServiceImpl implements ImportProgressService {
     }
 
     @Override
-    public void incrementAndSendProgressUpdate(String importUUId) {
+    public void sendProgressUpdate(String importUUId, int processed) {
         //Update & Send progress to the WebSocket
         try {
             var progress = this.getImportProgress(importUUId);
             if (Objects.nonNull(progress)) {
-                progress.incrementProcessed();
+                progress.setProcessed(processed);
                 sendProgressSync(importUUId, progress);
             }
         } catch (Exception e) {
@@ -108,23 +107,8 @@ public class ImportProgressServiceImpl implements ImportProgressService {
      *
      * @param importUUId      the unique identifier for the import process
      * @param currentProgress the current progress to be sent
-     * @throws Exception if there is an error during message sending
      */
-    public void sendProgressSync(String importUUId, ImportProgress currentProgress) throws Exception {
-        // Use CountDownLatch to ensure message is sent
-        CountDownLatch latch = new CountDownLatch(1);
-
-        simpMessagingTemplate.convertAndSend(String.format(TemplatePopulateImportConstants.WEB_SOCKET_EXCEL_UPLOAD_PROGRESS_ENDPOINT, importUUId), this.objectMapper.writeValueAsString(currentProgress),
-                headers -> {
-                    latch.countDown();
-                    return headers;
-                });
-
-        try {
-            latch.await(1, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.warn("Progress update wait interrupted", e);
-        }
+    public void sendProgressSync(String importUUId, ImportProgress currentProgress) {
+        simpMessagingTemplate.convertAndSend(String.format(TemplatePopulateImportConstants.WEB_SOCKET_EXCEL_UPLOAD_PROGRESS_ENDPOINT, importUUId), currentProgress);
     }
 }

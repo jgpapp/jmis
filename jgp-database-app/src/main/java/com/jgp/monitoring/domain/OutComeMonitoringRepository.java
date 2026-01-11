@@ -16,7 +16,7 @@ public interface OutComeMonitoringRepository extends JpaRepository<OutComeMonito
 
     @Transactional
     @Modifying
-    @Query(value = "update outcome_monitoring mon set is_deleted = true where mon.id in ?1", nativeQuery = true)
+    @Query(value = "delete from outcome_monitoring mon where mon.id in ?1", nativeQuery = true)
     void deleteOutComeMonitoringByIds(@NonNull List<Long> monitoringIds);
 
     List<OutComeMonitoring> findByIsDeletedFalse();

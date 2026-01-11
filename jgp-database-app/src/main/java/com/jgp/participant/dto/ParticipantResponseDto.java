@@ -2,7 +2,7 @@ package com.jgp.participant.dto;
 
 import com.jgp.bmo.dto.TAResponseDto;
 import com.jgp.bmo.dto.MentorshipResponseDto;
-import com.jgp.finance.dto.LoanDto;
+import com.jgp.finance.dto.LoanResponseDto;
 import com.jgp.monitoring.dto.OutComeMonitoringResponseDto;
 import lombok.Getter;
 import lombok.Setter;
@@ -68,7 +68,7 @@ public class ParticipantResponseDto implements Serializable {
 
     private List<TAResponseDto> bmoClientDtos;
 
-    private List<LoanDto> loanDtos;
+    private List<LoanResponseDto> loanResponseDtos;
 
     private List<MentorshipResponseDto> mentorshipResponseDtos;
 

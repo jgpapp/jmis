@@ -9,6 +9,8 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import java.util.concurrent.ThreadPoolExecutor;
+
 import static org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO;
 
 @SpringBootApplication
@@ -28,6 +30,7 @@ public class JgpDatabaseAppApplication {
 		executor.setMaxPoolSize(20);  // Maximum number of threads
 		executor.setQueueCapacity(100);  // Queue size
 		executor.setThreadNamePrefix("Async-");  // Thread name prefix
+		executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 		executor.initialize();  // Initialize the executor
 		return executor;
 	}

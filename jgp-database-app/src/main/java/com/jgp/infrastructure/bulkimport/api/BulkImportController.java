@@ -45,13 +45,13 @@ public class BulkImportController {
         return this.bulkImportWorkbookPopulatorService.getTemplate(entityType, response);
     }
 
-    @PostMapping("upload-template/{entityType}/{documentProgressId}/{updateParticipantInfo}")
+    @PostMapping("upload-excel-template")
     public ResponseEntity<ApiResponseDto> createBMOParticipantData(
             @RequestParam("excelFile") MultipartFile excelFile,
             @RequestParam("appDomain") String appDomain,
-            @PathVariable("entityType") String entityType,
-            @PathVariable("documentProgressId") String documentProgressId,
-            @PathVariable("updateParticipantInfo") String updateParticipantInfo) {
+            @RequestParam("entityType") String entityType,
+            @RequestParam("documentProgressId") String documentProgressId,
+            @RequestParam("updateParticipantInfo") String updateParticipantInfo) {
         if (excelFile.isEmpty() || "INVALID".equalsIgnoreCase(entityType)) {
             return new ResponseEntity<>(new ApiResponseDto(false, CommonUtil.NO_FILE_TO_UPLOAD), HttpStatus.BAD_REQUEST);
         }

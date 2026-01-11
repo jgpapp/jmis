@@ -21,8 +21,8 @@ public interface LoanRepository extends JpaRepository<Loan, Long> , JpaSpecifica
     @Transactional
     @Modifying
     @Query(value = """
-            update loans l set is_deleted = true, loan_number = CONCAT(l.loan_number, '_', l.id, '_', 'DELETED') where l.id in ?1 and\s
-            not exists (select 1 from loan_transactions lt where lt.loan_id = l.id and lt.is_deleted = false) \s
+            delete from loans l where l.id in ?1 and \
+            not exists (select 1 from loan_transactions lt where lt.loan_id = l.id) \
             """, nativeQuery = true)
     void deleteLoansByIds(@NonNull List<Long> loanIds);
 

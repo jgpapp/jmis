@@ -1,6 +1,6 @@
 package com.jgp.participant.domain;
 
-import com.jgp.participant.dto.ParticipantDto;
+import com.jgp.participant.dto.ParticipantRequestDto;
 import com.jgp.shared.domain.BaseEntity;
 import com.jgp.util.CommonUtil;
 import jakarta.persistence.Column;
@@ -126,7 +126,7 @@ public class Participant extends BaseEntity {
     public Participant() {
     }
 
-    public Participant(ParticipantDto dto) {
+    public Participant(ParticipantRequestDto dto) {
         this.businessName = dto.businessName();
         this.jgpId = dto.jgpId();
         this.phoneNumber = dto.phoneNumber();
@@ -155,7 +155,7 @@ public class Participant extends BaseEntity {
         this.disabilityType = dto.disabilityType();
     }
 
-    public void updateParticipant(ParticipantDto dto){
+    public void updateParticipant(ParticipantRequestDto dto){
         if (StringUtils.isNotBlank(dto.businessName())){
             this.businessName = dto.businessName().trim();
         }
@@ -236,7 +236,7 @@ public class Participant extends BaseEntity {
         }
     }
 
-    public void updateBusinessLocation(ParticipantDto dto){
+    public void updateBusinessLocation(ParticipantRequestDto dto){
         if (StringUtils.isNotBlank(dto.locationCountyCode())){
             var countyCode = dto.locationCountyCode().trim();
             if (countyCode.length() == 1){

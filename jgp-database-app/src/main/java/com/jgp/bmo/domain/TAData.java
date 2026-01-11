@@ -5,7 +5,6 @@ import com.jgp.authentication.domain.AppUser;
 import com.jgp.bmo.dto.TARequestDto;
 import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.participant.domain.Participant;
-import com.jgp.participant.dto.ParticipantDto;
 import com.jgp.patner.domain.Partner;
 import com.jgp.shared.domain.BaseEntity;
 import jakarta.persistence.Column;
@@ -21,11 +20,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.poi.ss.usermodel.Row;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Map;
 
 @Setter
 @Getter

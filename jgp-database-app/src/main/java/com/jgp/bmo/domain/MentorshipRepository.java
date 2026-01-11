@@ -18,7 +18,7 @@ public interface MentorshipRepository extends JpaRepository<Mentorship, Long> , 
 
     @Transactional
     @Modifying
-    @Query(value = "update mentor_ships m set is_deleted = true where m.id in ?1", nativeQuery = true)
+    @Query(value = "delete from mentor_ships m where m.id in ?1", nativeQuery = true)
     void deleteMentorshipDataByIds(@NonNull Collection<Long> mentorshipIds);
 
     List<Mentorship> findByDocumentId(@NonNull Long documentId);

@@ -13,14 +13,12 @@ import com.jgp.monitoring.service.OutComeMonitoringService;
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.domain.ParticipantRepository;
 import com.jgp.participant.domain.QParticipant;
-import com.jgp.participant.dto.ParticipantDto;
+import com.jgp.participant.dto.ParticipantRequestDto;
 import com.jgp.participant.dto.ParticipantResponseDto;
 import com.jgp.participant.exception.ParticipantNotFoundException;
 import com.jgp.participant.mapper.ParticipantMapper;
-import com.jgp.shared.exception.DataRulesViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -50,13 +48,13 @@ public class ParticipantServiceImpl implements ParticipantService {
     @AuditTrail(operation = UserAuditOperationConstants.CREATE_PARTICIPANT)
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Participant createParticipant(ParticipantDto participantDto) {
-        return this.participantRepository.save(new Participant(participantDto));
+    public Participant createParticipant(ParticipantRequestDto participantRequestDto) {
+        return this.participantRepository.save(new Participant(participantRequestDto));
     }
 
     @Override
-    public List<Participant> createParticipants(List<ParticipantDto> participantDtos) {
-        return participantRepository.saveAll(participantDtos.stream()
+    public List<Participant> createParticipants(List<ParticipantRequestDto> participantRequestDtos) {
+        return participantRepository.saveAll(participantRequestDtos.stream()
                 .map(Participant::new)
                 .toList());
     }
@@ -64,17 +62,17 @@ public class ParticipantServiceImpl implements ParticipantService {
     @AuditTrail(operation = UserAuditOperationConstants.UPDATE_PARTICIPANT, bodyIndex = 1, entityIdIndex = 0)
     @Override
     @Transactional
-    public void updateParticipant(Long participantId, ParticipantDto participantDto) {
+    public void updateParticipant(Long participantId, ParticipantRequestDto participantRequestDto) {
         var participant =  this.participantRepository.findById(participantId)
                 .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
                 .orElseThrow(() -> new ParticipantNotFoundException(participantId));
-        participant.updateParticipant(participantDto);
+        participant.updateParticipant(participantRequestDto);
         this.participantRepository.save(participant);
     }
 
     @Transactional
     @Override
-    public List<Participant> updateParticipants(Map<Long, ParticipantDto> participantUpdates) {
+    public List<Participant> updateParticipants(Map<Long, ParticipantRequestDto> participantUpdates) {
         var participantIds = participantUpdates.keySet();
         var participants = this.participantRepository.findAllById(participantIds)
                 .stream()
@@ -91,17 +89,17 @@ public class ParticipantServiceImpl implements ParticipantService {
     //@AuditTrail(operation = UserAuditOperationConstants.CREATE_PARTICIPANT)
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Participant createOrUpdateParticipant(ParticipantDto participantDto, Map<String, Participant> existingParticipants, boolean updateParticipant) {
+    public Participant createOrUpdateParticipant(ParticipantRequestDto participantRequestDto, Map<String, Participant> existingParticipants, boolean updateParticipant) {
         try {
-            var existingParticipant = existingParticipants.get(participantDto.jgpId());
+            var existingParticipant = existingParticipants.get(participantRequestDto.jgpId());
             if (Objects.nonNull(existingParticipant)){
                 if (updateParticipant){
-                    existingParticipant.updateParticipant(participantDto);
+                    existingParticipant.updateParticipant(participantRequestDto);
                     return this.participantRepository.save(existingParticipant);
                 }
                 return existingParticipant;
             }
-            return this.participantRepository.save(new Participant(participantDto));
+            return this.participantRepository.save(new Participant(participantRequestDto));
         } catch (Exception e) {
             log.error("Error in createOrUpdateParticipant: {}", e.getMessage());
         }
@@ -129,7 +127,7 @@ public class ParticipantServiceImpl implements ParticipantService {
                 .orElseThrow(() -> new ParticipantNotFoundException(participantId));
 
         if (includeAccounts){
-            participant.setLoanDtos(this.loanService.getLoans(LoanSearchCriteria.builder().participantId(participantId).approvedByPartner(true).build(), Pageable.unpaged()).stream().toList());
+            participant.setLoanResponseDtos(this.loanService.getLoans(LoanSearchCriteria.builder().participantId(participantId).approvedByPartner(true).build(), Pageable.unpaged()).stream().toList());
             participant.setBmoClientDtos(this.bmoClientDataService.getBMODataRecords(TAParticipantSearchCriteria.builder().approvedByPartner(true).participantId(participantId).build(), Pageable.unpaged()).stream().toList());
             participant.setMentorshipResponseDtos(this.mentorshipService.getMentorshipDataRecords(MentorshipSearchCriteria.builder().approvedByPartner(true).participantId(participantId).build(), Pageable.unpaged()).stream().toList());
             participant.setMonitoringResponseDtos(this.outComeMonitoringService.getOutComeMonitoringDataRecords(OutComeMonitoringSearchCriteria.builder()

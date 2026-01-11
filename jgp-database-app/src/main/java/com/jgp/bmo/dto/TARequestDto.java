@@ -3,7 +3,7 @@ package com.jgp.bmo.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jgp.authentication.domain.AppUser;
 import com.jgp.infrastructure.documentmanagement.domain.Document;
-import com.jgp.participant.dto.ParticipantDto;
+import com.jgp.participant.dto.ParticipantRequestDto;
 import com.jgp.patner.domain.Partner;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -40,10 +40,10 @@ public record TARequestDto(
         @JsonIgnore
         Row row,
         @JsonIgnore
-        Map<Row, String> rowErrorMap,
+        Map<Integer, String> rowErrorMap,
         Integer rowIndex,
         String rowErrorMessage,
-        ParticipantDto participantDto,
+        ParticipantRequestDto participantRequestDto,
         Partner partner
 ) {
 }

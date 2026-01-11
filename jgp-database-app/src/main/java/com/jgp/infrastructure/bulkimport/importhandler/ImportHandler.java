@@ -9,13 +9,22 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.slf4j.Logger;
 
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 public interface ImportHandler {
 
     String PARTICIPANT_ASSOCIATION_ERROR = "Cannot associate data to a participant!";
     int CHUNK_SIZE = 100; // Default chunk size for parallel processing
+    int BULK_SIZE_FOR_PROGRESS_UPDATE = 500; // Default bulk size for batch operations
+    ExecutorService IMPORT_EXECUTOR =
+            Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     /**
      * Process the bulk import event asynchronously
@@ -65,4 +74,29 @@ public interface ImportHandler {
             writeGroupErrorMessage(result.errorMessage(), row.getSheet().getWorkbook(), statusCell, errorReportCell);
         }
     }
+
+    /**
+     * Sleeps the current thread for a short duration to avoid tight loops
+     */
+    default void sleep(Logger log) {
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("Sleep interrupted", e);
+        }
+    }
+
+    /**
+     * Normalizes TA needs by trimming whitespace around comma-separated values
+     */
+    default String normalizeStringValues(String stringValues) {
+        return Objects.nonNull(stringValues)
+                ? Arrays.stream(stringValues.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.joining(","))
+                : null;
+    }
+
 }

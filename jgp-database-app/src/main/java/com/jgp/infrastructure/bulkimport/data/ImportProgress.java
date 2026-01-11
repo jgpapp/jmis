@@ -11,8 +11,8 @@ public class ImportProgress {
         this.step = step;
     }
 
-    public synchronized void incrementProcessed() {
-        this.processed++;
+    public synchronized void setProcessed(int processed) {
+        this.processed = processed;
     }
 
     public synchronized void reset() {

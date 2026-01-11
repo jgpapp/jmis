@@ -14,5 +14,5 @@ public interface ImportProgressService {
 
     void sendProgressUpdate(String importUUId);
 
-    void incrementAndSendProgressUpdate(String importUUId);
+    void sendProgressUpdate(String importUUId, int processed);
 }

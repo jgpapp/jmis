@@ -4,12 +4,12 @@ import com.jgp.authentication.service.PlatformSecurityContext;
 import com.jgp.finance.domain.LoanTransaction;
 import com.jgp.finance.domain.LoanTransactionRepository;
 import com.jgp.finance.domain.predicate.LoanPredicateBuilder;
+import com.jgp.finance.dto.LoanResponseDto;
 import com.jgp.finance.dto.LoanSearchCriteria;
 import com.jgp.finance.dto.LoanTransactionResponseDto;
 import com.jgp.finance.mapper.LoanMapper;
 import com.jgp.finance.domain.Loan;
 import com.jgp.finance.domain.LoanRepository;
-import com.jgp.finance.dto.LoanDto;
 import com.jgp.finance.mapper.LoanTransactionMapper;
 import com.jgp.infrastructure.bulkimport.event.DataApprovedEvent;
 import com.jgp.participant.domain.ParticipantRepository;
@@ -146,13 +146,13 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
-    public Page<LoanDto> getLoans(LoanSearchCriteria searchCriteria, Pageable pageable) {
+    public Page<LoanResponseDto> getLoans(LoanSearchCriteria searchCriteria, Pageable pageable) {
         final var loans = this.loanRepository.findAll(loanPredicateBuilder.buildPredicateForSearchLoans(searchCriteria), pageable);
         return new PageImpl<>(this.loanMapper.toDto(loans.stream().toList()), pageable, loans.getTotalElements());
     }
 
     @Override
-    public LoanDto findLoanById(Long loanId) {
+    public LoanResponseDto findLoanById(Long loanId) {
         return this.loanRepository.findById(loanId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).map(this.loanMapper::toDto).orElseThrow(() -> new RuntimeException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
 
     }

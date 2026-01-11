@@ -2,7 +2,7 @@ package com.jgp.participant.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jgp.bmo.dto.TAResponseDto;
-import com.jgp.finance.dto.LoanDto;
+import com.jgp.finance.dto.LoanResponseDto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @Builder
-public record ParticipantDto(
+public record ParticipantRequestDto(
         String businessName,
 
         @NotNull(message = "JGP Id is required !!")
@@ -69,7 +69,7 @@ public record ParticipantDto(
 
         List<TAResponseDto> bmoClientDtos,
 
-        List<LoanDto> loanDtos,
+        List<LoanResponseDto> loanResponseDtos,
 
         String locationCountyCode,
 
@@ -87,7 +87,7 @@ public record ParticipantDto(
         Row row,
 
         @JsonIgnore
-        Map<Row, String> rowErrorMap
+        Map<Integer, String> rowErrorMap
 
         ) {
 }

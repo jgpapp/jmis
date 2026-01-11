@@ -10,7 +10,7 @@ import com.jgp.infrastructure.bulkimport.exception.InvalidDataException;
 import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
 import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.participant.domain.Participant;
-import com.jgp.participant.dto.ParticipantDto;
+import com.jgp.participant.dto.ParticipantRequestDto;
 import com.jgp.participant.service.ParticipantService;
 import com.jgp.infrastructure.bulkimport.constants.BMOConstants;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
@@ -19,6 +19,7 @@ import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
 import com.jgp.shared.validator.DataValidator;
 import com.jgp.shared.validator.ParticipantValidator;
 import com.jgp.shared.validator.TAValidator;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
@@ -33,12 +34,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Slf4j
@@ -48,6 +49,7 @@ public class TAImportHandler implements ImportHandler {
     private static final String YES = "YES";
     private static final String DUPLICATE_ENTRY_ERROR = "unique_bmo_participant_data";
     private static final String DUPLICATE_ENTRY_MESSAGE = "Row with same partner/participant/training date already exists!";
+    private final AtomicInteger currentStepProgress = new AtomicInteger(0);
 
     private final TADataService taDataService;
     private final ParticipantService participantService;
@@ -56,7 +58,7 @@ public class TAImportHandler implements ImportHandler {
 
     private List<TARequestDto> taDataList;
     private Workbook workbook;
-    private Map<Row, String> rowErrorMap;
+    private Map<Integer, String> rowErrorMap;
     private String documentImportProgressUUId;
     private Boolean updateParticipantInfo;
     private Document document;
@@ -64,9 +66,10 @@ public class TAImportHandler implements ImportHandler {
 
     @Override
     public CompletableFuture<Count> process(BulkImportEvent bulkImportEvent) {
+        log.info("Starting TA import process for document: {}", bulkImportEvent.document().getId());
         this.workbook = bulkImportEvent.workbook();
         this.taDataList = new ArrayList<>();
-        this.rowErrorMap = new HashMap<>();
+        this.rowErrorMap = new ConcurrentHashMap<>();
         this.documentImportProgressUUId = bulkImportEvent.importProgressUUID();
         this.updateParticipantInfo = bulkImportEvent.updateParticipantInfo();
         this.document = bulkImportEvent.document();
@@ -94,7 +97,7 @@ public class TAImportHandler implements ImportHandler {
         importProgressService.updateStepAndSendProgress(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_READING_STEP);
 
         boolean headerSkipped = false;
-        int processedRows = 0;
+        currentStepProgress.set(0); // Reset counter
 
         for (Row row : taSheet) {
             // Skip header row
@@ -106,16 +109,18 @@ public class TAImportHandler implements ImportHandler {
             if (row != null && ImportHandlerUtils.isNotImported(row, BMOConstants.STATUS_COL)) {
                 try {
                     taDataList.add(readTAData(row));
-                    processedRows++;
+                    int processedRows = currentStepProgress.incrementAndGet();
+                    updateProgressInBulk(processedRows);
                 } catch (Exception ex) {
                     log.error("Error reading row {}: {}", row.getRowNum(), ex.getMessage());
-                    rowErrorMap.put(row, "Error reading row: " + ex.getMessage());
+                    rowErrorMap.put(row.getRowNum(), "Error reading row: " + ex.getMessage());
                 }
-                importProgressService.incrementAndSendProgressUpdate(documentImportProgressUUId);
             }
         }
+        // Final progress update
+        importProgressService.sendProgressUpdate(documentImportProgressUUId, currentStepProgress.get());
 
-        log.info("Successfully read {} rows from sheet", processedRows);
+        log.info("Successfully read {} rows from sheet", currentStepProgress.get());
     }
 
 
@@ -140,7 +145,7 @@ public class TAImportHandler implements ImportHandler {
         taType = TAValidator.validateTATypes(taType, row, rowErrorMap);
 
         final LocalDate currentDate = LocalDate.now(ZoneId.systemDefault());
-        final String normalizedTaNeeds = normalizeTaNeeds(taNeeds);
+        final String normalizedTaNeeds = normalizeStringValues(taNeeds);
 
         final var currentUser = userService.currentUser();
         return TARequestDto.builder()
@@ -163,28 +168,16 @@ public class TAImportHandler implements ImportHandler {
                 .row(row)
                 .rowErrorMap(rowErrorMap)
                 .rowIndex(row.getRowNum())
-                .rowErrorMessage(rowErrorMap.get(row))
-                .participantDto(getParticipantDto(row))
+                .rowErrorMessage(rowErrorMap.get(row.getRowNum()))
+                .participantRequestDto(getParticipantDto(row))
                 .partner(Objects.nonNull(currentUser) ? currentUser.getPartner() : null)
                 .build();
     }
 
     /**
-     * Normalizes TA needs by trimming whitespace around comma-separated values
-     */
-    private String normalizeTaNeeds(String taNeeds) {
-        return Objects.nonNull(taNeeds)
-                ? Arrays.stream(taNeeds.split(","))
-                        .map(String::trim)
-                        .filter(s -> !s.isEmpty())
-                        .collect(Collectors.joining(","))
-                : null;
-    }
-
-    /**
      * Extracts ParticipantDto from the given row
      */
-    private ParticipantDto getParticipantDto(Row row) {
+    private ParticipantRequestDto getParticipantDto(Row row) {
         final String participantName = ImportHandlerUtils.readAsString(BMOConstants.PARTICIPANT_NAME_COL, row);
         final String jgpId = ImportHandlerUtils.readAsString(BMOConstants.JGP_ID_COL, row);
         final String phoneNumber = DataValidator.validatePhoneNumber(BMOConstants.BUSINESS_PHONE_NUMBER_COL, row, rowErrorMap);
@@ -225,7 +218,7 @@ public class TAImportHandler implements ImportHandler {
         final String refugeeStatus = ImportHandlerUtils.readAsString(BMOConstants.REFUGEE_STATUS_COL, row);
         ParticipantValidator.validateRefugeeStatus(refugeeStatus, row, rowErrorMap);
 
-        return ParticipantDto.builder()
+        return ParticipantRequestDto.builder()
                 .phoneNumber(phoneNumber)
                 .alternativePhoneNumber(alternativePhoneNumber)
                 .bestMonthlyRevenue(bestMonthlyRevenue)
@@ -280,11 +273,12 @@ public class TAImportHandler implements ImportHandler {
             log.warn("No TA data to process");
             return CompletableFuture.completedFuture(Count.instance(0, 0, 0));
         }
+        final var taDataSize = taDataList.size();
 
         final var existingParticipants = participantService.findParticipantsByJGPIDs(
                 taDataList.stream()
-                        .map(TARequestDto::participantDto)
-                        .map(ParticipantDto::jgpId)
+                        .map(TARequestDto::participantRequestDto)
+                        .map(ParticipantRequestDto::jgpId)
                         .filter(Objects::nonNull)
                         .distinct()
                         .toList()
@@ -295,28 +289,32 @@ public class TAImportHandler implements ImportHandler {
         log.info("Processing {} records in {} chunks", taDataList.size(), chunks.size());
 
         // 2. Validate each chunk asynchronously
+        currentStepProgress.set(0); // Reset counter
         importProgressService.resetEveryThingToZero(documentImportProgressUUId);
+        importProgressService.updateTotal(documentImportProgressUUId, taDataSize);
         importProgressService.updateStepAndSendProgress(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_VALIDATING_STEP);
 
         final var validatedFutures = chunks.stream()
-                .map(chunk -> CompletableFuture.supplyAsync(() -> validateSingleChunk(chunk)))
+                .map(chunk -> CompletableFuture.supplyAsync(() -> validateSingleChunk(chunk), IMPORT_EXECUTOR))
                 .toList();
 
         CompletableFuture.allOf(validatedFutures.toArray(new CompletableFuture[0])).join();
 
         // Wait for UI to sync before moving to next step
-        sleep(500);
+        sleep(log);
 
         // STORING DATA STEP
+        currentStepProgress.set(0); // Reset counter
         importProgressService.resetEveryThingToZero(documentImportProgressUUId);
+        importProgressService.updateTotal(documentImportProgressUUId, taDataSize);
         importProgressService.updateStepAndSendProgress(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_STORING_STEP);
 
         // 3. Storing TA data - process in parallel, collect results
         final var storingFutures = chunks.stream()
-                .map(chunk -> CompletableFuture.supplyAsync(() -> chunk.stream()
-                        .map(taData -> storeDataWithoutWritingToWorkbook(taData, existingParticipants))
-                        .toList()))
+                .map(chunk -> CompletableFuture.supplyAsync(() -> storeDataWithoutWritingToWorkbook(chunk, existingParticipants), IMPORT_EXECUTOR))
                 .toList();
+
+        CompletableFuture.allOf(storingFutures.toArray(new CompletableFuture[0])).join();
 
         // Wait for all futures to complete and collect results
         final var allResults = storingFutures.stream()
@@ -325,10 +323,12 @@ public class TAImportHandler implements ImportHandler {
                 .toList();
 
         // Wait for UI to sync before moving to next step
-        sleep(500);
+        sleep(log);
 
         // 4. Write results to workbook sequentially (not thread-safe)
+        currentStepProgress.set(0); // Reset counter
         importProgressService.resetEveryThingToZero(documentImportProgressUUId);
+        importProgressService.updateTotal(documentImportProgressUUId, taDataSize);
         importProgressService.updateStepAndSendProgress(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_STATUS_STEP);
         Sheet taSheet = workbook.getSheet(TemplatePopulateImportConstants.BMO_SHEET_NAME);
         setReportHeaders(taSheet, BMOConstants.STATUS_COL, BMOConstants.FAILURE_COL);
@@ -339,22 +339,16 @@ public class TAImportHandler implements ImportHandler {
 
         for (var result : allResults) {
             writeResultToWorkbook(result, BMOConstants.STATUS_COL, BMOConstants.FAILURE_COL);
-            importProgressService.incrementAndSendProgressUpdate(documentImportProgressUUId);
+            int processedRows = currentStepProgress.incrementAndGet();
+            updateProgressInBulk(processedRows);
         }
+        // Final progress update
+        importProgressService.sendProgressUpdate(documentImportProgressUUId, currentStepProgress.get());
 
         log.info("Finished Import - Total: {}, Success: {}, Failed: {} at {}",
                 taDataList.size(), successCount, failureCount, LocalDateTime.now(ZoneId.systemDefault()));
 
         return CompletableFuture.completedFuture(Count.instance(taDataList.size(), (int) successCount, (int) failureCount));
-    }
-
-    private void sleep(long millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.warn("Sleep interrupted", e);
-        }
     }
 
     /**
@@ -365,11 +359,11 @@ public class TAImportHandler implements ImportHandler {
      * @return the TAData object with the associated participant
      */
     private TAData associateParticipantToTAData(TARequestDto taDataDto, Map<String, Participant> participantMap) {
-        final var participantDto = taDataDto.participantDto();
+        final var participantDto = taDataDto.participantRequestDto();
         final var taData = new TAData(taDataDto);
         final var participant = this.participantService.createOrUpdateParticipant(participantDto, participantMap, this.updateParticipantInfo);
         if (Objects.isNull(participant)) {
-            taDataDto.rowErrorMap().put(taDataDto.row(), PARTICIPANT_ASSOCIATION_ERROR);
+            taDataDto.rowErrorMap().put(taDataDto.row().getRowNum(), PARTICIPANT_ASSOCIATION_ERROR);
         }
         taData.setParticipant(participant);
         return taData;
@@ -384,33 +378,48 @@ public class TAImportHandler implements ImportHandler {
     private List<TARequestDto> validateSingleChunk(List<TARequestDto> chunk) {
         List<TARequestDto> validData = new ArrayList<>();
         for (TARequestDto taData : chunk) {
-            final var participantDto = taData.participantDto();
+            final var participantDto = taData.participantRequestDto();
             try {
                 final var validator = DataValidator.getValidator();
                 ParticipantValidator.validateParticipant(participantDto, validator);
                 TAValidator.validateTAData(taData, validator);
                 validData.add(taData);
+                int processedRows = currentStepProgress.incrementAndGet();
+                updateProgressInBulk(processedRows);
             } catch (RuntimeException ex) {
                 log.error("Problem occurred when validating participant: {}", ex.getMessage());
                 var errorMessage = ImportHandlerUtils.getErrorMessage(ex);
-                taData.rowErrorMap().put(taData.row(), errorMessage);
-            } finally {
-                importProgressService.incrementAndSendProgressUpdate(documentImportProgressUUId);
+                taData.rowErrorMap().put(taData.row().getRowNum(), errorMessage);
             }
         }
+        // Final progress update for the chunk
+        importProgressService.sendProgressUpdate(documentImportProgressUUId, currentStepProgress.get());
         return validData;
+    }
+
+    private List<ExcelTemplateProcessingResult> storeDataWithoutWritingToWorkbook(List<TARequestDto> chunk, Map<String, Participant> participantMap) {
+        List<ExcelTemplateProcessingResult> results = new ArrayList<>();
+        for (TARequestDto taData : chunk) {
+            var result = storeSingleDataWithoutWritingToWorkbook(taData, participantMap);
+            results.add(result);
+            int processedRows = currentStepProgress.incrementAndGet();
+            updateProgressInBulk(processedRows);
+        }
+        // Final progress update for the chunk
+        importProgressService.sendProgressUpdate(documentImportProgressUUId, currentStepProgress.get());
+        return results;
     }
 
 
     /**
      * Stores data to database without writing to workbook (thread-safe for parallel execution)
      */
-    private ExcelTemplateProcessingResult storeDataWithoutWritingToWorkbook(TARequestDto taData, Map<String, Participant> participantMap) {
+    private ExcelTemplateProcessingResult storeSingleDataWithoutWritingToWorkbook(TARequestDto taData, Map<String, Participant> participantMap) {
         Row row = taData.row();
 
         try {
             final var dataWithParticipant = associateParticipantToTAData(taData, participantMap);
-            final var validationError = taData.rowErrorMap().get(row);
+            final var validationError = taData.rowErrorMap().get(row.getRowNum());
             if (Objects.nonNull(validationError)) {
                 throw new InvalidDataException(validationError);
             }
@@ -423,9 +432,21 @@ public class TAImportHandler implements ImportHandler {
                 errorMessage = DUPLICATE_ENTRY_MESSAGE;
             }
             return new ExcelTemplateProcessingResult(row, false, errorMessage);
-        } finally {
-            importProgressService.incrementAndSendProgressUpdate(documentImportProgressUUId);
         }
     }
 
+    /**
+     * Updates progress in bulk after processing a certain number of records
+     * @param processedCount processedCount
+     */
+    private void updateProgressInBulk(int processedCount) {
+        if (processedCount % BULK_SIZE_FOR_PROGRESS_UPDATE == 0) {
+            importProgressService.sendProgressUpdate(documentImportProgressUUId, processedCount);
+        }
+    }
+
+    @PreDestroy
+    public void cleanup() {
+        IMPORT_EXECUTOR.shutdown();
+    }
 }

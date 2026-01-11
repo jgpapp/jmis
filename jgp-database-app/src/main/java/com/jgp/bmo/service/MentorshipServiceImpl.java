@@ -10,7 +10,7 @@ import com.jgp.bmo.mapper.MentorshipMapper;
 import com.jgp.infrastructure.bulkimport.event.DataApprovedEvent;
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.domain.ParticipantRepository;
-import com.jgp.participant.dto.ParticipantDto;
+import com.jgp.participant.dto.ParticipantRequestDto;
 import com.jgp.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,13 +43,13 @@ public class MentorshipServiceImpl implements MentorshipService {
 
     @Transactional
     @Override
-    public void saveMentorshipWithParticipant(Mentorship mentorship, Boolean updateParticipantInfo, Map<Long, ParticipantDto> participantDtoMap) {
+    public void saveMentorshipWithParticipant(Mentorship mentorship, Boolean updateParticipantInfo, Map<Long, ParticipantRequestDto> participantDtoMap) {
         Participant participant = mentorship.getParticipant();
-        ParticipantDto participantDto = participantDtoMap.get(participant.getId());
+        ParticipantRequestDto participantRequestDto = participantDtoMap.get(participant.getId());
         if (Boolean.TRUE.equals(updateParticipantInfo)) {
-            participant.updateParticipant(participantDto);
+            participant.updateParticipant(participantRequestDto);
         }
-        participant.updateBusinessLocation(participantDto);
+        participant.updateBusinessLocation(participantRequestDto);
         this.participantRepository.save(participant);
         this.mentorshipRepository.save(mentorship);
     }
