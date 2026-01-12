@@ -1,17 +1,12 @@
 package com.jgp.infrastructure.bulkimport.importhandler;
 
-import com.google.common.collect.Lists;
 import com.jgp.authentication.service.UserService;
-import com.jgp.bmo.dto.TARequestDto;
 import com.jgp.finance.domain.Loan;
 import com.jgp.finance.domain.LoanTransaction;
-import com.jgp.finance.dto.LoanRequestDto;
 import com.jgp.finance.service.LoanService;
-import com.jgp.infrastructure.bulkimport.constants.BMOConstants;
 import com.jgp.infrastructure.bulkimport.constants.LoanConstants;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import com.jgp.infrastructure.bulkimport.data.Count;
-import com.jgp.infrastructure.bulkimport.data.ExcelTemplateProcessingResult;
 import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
 import com.jgp.infrastructure.bulkimport.exception.InvalidDataException;
 import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
@@ -29,7 +24,6 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -43,86 +37,58 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class LoanImportHandlerV2 implements ImportHandler {
-
+public class LoanImportHandlerV1 implements ImportHandler {
+    @Override
+    public CompletableFuture<Count> process(BulkImportEvent bulkImportEvent) {
+        return null;
+    }
+/*
     private final LoanService loanService;
     private final ParticipantService participantService;
     private final UserService userService;
     private final ImportProgressService importProgressService;
-    List<LoanRequestDto> loanDataList;
+    List<Loan> loanDataList;
     private Workbook workbook;
     private Map<Integer, String> rowErrorMap;
     private String documentImportProgressUUId;
     private Boolean updateParticipantInfo;
     private Document document;
-    private final AtomicInteger currentStepProgress = new AtomicInteger(0);
-
 
     @Override
     public CompletableFuture<Count> process(BulkImportEvent bulkImportEvent) {
-        log.info("Starting Loan import process for document: {}", bulkImportEvent.document().getId());
         this.workbook = bulkImportEvent.workbook();
-        this.loanDataList = new ArrayList<>();
+        loanDataList = new ArrayList<>();
         this.rowErrorMap = new ConcurrentHashMap<>();
         this.documentImportProgressUUId = bulkImportEvent.importProgressUUID();
         this.updateParticipantInfo = bulkImportEvent.updateParticipantInfo();
         this.document = bulkImportEvent.document();
         readExcelFile();
-        return processChunks();
+        return CompletableFuture.completedFuture(importEntity());
     }
+
 
     public void readExcelFile() {
         Sheet loanSheet = workbook.getSheet(TemplatePopulateImportConstants.LOAN_SHEET_NAME);
-        if (loanSheet == null) {
-            log.error("Sheet '{}' not found in workbook", TemplatePopulateImportConstants.LOAN_SHEET_NAME);
-            throw new InvalidDataException("Required sheet not found: " + TemplatePopulateImportConstants.LOAN_SHEET_NAME);
-        }
-
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(loanSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
-        if (noOfEntries == null || noOfEntries == 0) {
-            log.warn("No data rows found in sheet");
-            importProgressService.updateTotal(documentImportProgressUUId, 0);
-            return;
-        }
+        importProgressService.updateTotal(this.documentImportProgressUUId, noOfEntries);
 
-        log.info("Starting to read {} rows from sheet", noOfEntries);
-        importProgressService.updateTotal(documentImportProgressUUId, noOfEntries);
-        importProgressService.updateStepAndSendProgress(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_READING_STEP);
-
-        boolean headerSkipped = false;
-        currentStepProgress.set(0); // Reset counter
-
-        for (Row row : loanSheet) {
-            // Skip header row
-            if (!headerSkipped) {
-                headerSkipped = true;
-                continue;
-            }
-
-            if (row != null && ImportHandlerUtils.isNotImported(row, LoanConstants.STATUS_COL)) {
-                try {
-                    loanDataList.add(readLoanData(row));
-                    int processedRows = currentStepProgress.incrementAndGet();
-                    updateProgressInBulk(processedRows);
-                } catch (Exception ex) {
-                    log.error("Error reading row {}: {}", row.getRowNum(), ex.getMessage());
-                    rowErrorMap.put(row.getRowNum(), "Error reading row: " + ex.getMessage());
-                }
+        this.importProgressService.updateStepAndSendProgress(this.documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_READING_STEP);
+        for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
+            Row row;
+            row = loanSheet.getRow(rowIndex);
+            if (null != row && ImportHandlerUtils.isNotImported(row, LoanConstants.STATUS_COL)) {
+                loanDataList.add(readLoanData(row));
+                this.importProgressService.sendProgressUpdate(this.documentImportProgressUUId);
             }
         }
-        // Final progress update
-        importProgressService.sendProgressUpdate(documentImportProgressUUId, currentStepProgress.get());
-
-        log.info("Successfully read {} rows from sheet", currentStepProgress.get());
     }
 
-    private LoanRequestDto readLoanData(Row row) {
+    private Loan readLoanData(Row row) {
         final var pipeLineSource = ImportHandlerUtils.readAsString(LoanConstants.PIPELINE_SOURCE, row);
         final var applicationDate = DataValidator.validateLocalDate(LoanConstants.DATE_APPLIED, row, rowErrorMap, "Application Date", true);
         final var dateDisbursed = DataValidator.validateLocalDate(LoanConstants.DATE_DISBURSED, row, rowErrorMap, "Date Disbursed", true);
@@ -229,96 +195,6 @@ public class LoanImportHandlerV2 implements ImportHandler {
                 .businessRegNumber(businessRegNumber).participantName(participantName).row(row).rowErrorMap(rowErrorMap).build();
     }
 
-    /**
-     * Processes all chunks of TA data asynchronously.
-     * Steps: 1) Validate chunks in parallel, 2) Store to database in parallel, 3) Write results to workbook sequentially
-     * @return CompletableFuture containing count of total, success and failure records
-     */
-    @Async
-    public CompletableFuture<Count> processChunks() {
-        // Early return if no data to process
-        if (loanDataList.isEmpty()) {
-            log.warn("No TA data to process");
-            return CompletableFuture.completedFuture(Count.instance(0, 0, 0));
-        }
-        final var taDataSize = loanDataList.size();
-
-        final var existingParticipants = participantService.findParticipantsByJGPIDs(
-                loanDataList.stream()
-                        .map(TARequestDto::participantRequestDto)
-                        .map(ParticipantRequestDto::jgpId)
-                        .filter(Objects::nonNull)
-                        .distinct()
-                        .toList()
-        );
-
-        // 1. Split the taDataList into smaller chunks
-        final var chunks = Lists.partition(loanDataList, CHUNK_SIZE);
-        log.info("Processing {} records in {} chunks", loanDataList.size(), chunks.size());
-
-        // 2. Validate each chunk asynchronously
-        currentStepProgress.set(0); // Reset counter
-        importProgressService.resetEveryThingToZero(documentImportProgressUUId);
-        importProgressService.updateTotal(documentImportProgressUUId, taDataSize);
-        importProgressService.updateStepAndSendProgress(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_VALIDATING_STEP);
-
-        final var validatedFutures = chunks.stream()
-                .map(chunk -> CompletableFuture.supplyAsync(() -> validateSingleChunk(chunk), IMPORT_EXECUTOR))
-                .toList();
-
-        CompletableFuture.allOf(validatedFutures.toArray(new CompletableFuture[0])).join();
-
-        // Wait for UI to sync before moving to next step
-        sleep(log);
-
-        // STORING DATA STEP
-        currentStepProgress.set(0); // Reset counter
-        importProgressService.resetEveryThingToZero(documentImportProgressUUId);
-        importProgressService.updateTotal(documentImportProgressUUId, taDataSize);
-        importProgressService.updateStepAndSendProgress(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_STORING_STEP);
-
-        // 3. Storing TA data - process in parallel, collect results
-        final var storingFutures = chunks.stream()
-                .map(chunk -> CompletableFuture.supplyAsync(() -> storeDataWithoutWritingToWorkbook(chunk, existingParticipants), IMPORT_EXECUTOR))
-                .toList();
-
-        CompletableFuture.allOf(storingFutures.toArray(new CompletableFuture[0])).join();
-
-        // Wait for all futures to complete and collect results
-        final var allResults = storingFutures.stream()
-                .map(CompletableFuture::join)
-                .flatMap(List::stream)
-                .toList();
-
-        // Wait for UI to sync before moving to next step
-        sleep(log);
-
-        // 4. Write results to workbook sequentially (not thread-safe)
-        currentStepProgress.set(0); // Reset counter
-        importProgressService.resetEveryThingToZero(documentImportProgressUUId);
-        importProgressService.updateTotal(documentImportProgressUUId, taDataSize);
-        importProgressService.updateStepAndSendProgress(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_STATUS_STEP);
-        Sheet taSheet = workbook.getSheet(TemplatePopulateImportConstants.BMO_SHEET_NAME);
-        setReportHeaders(taSheet, BMOConstants.STATUS_COL, BMOConstants.FAILURE_COL);
-
-        // Count successes and failures while writing results
-        long successCount = allResults.stream().filter(ExcelTemplateProcessingResult::success).count();
-        long failureCount = allResults.size() - successCount;
-
-        for (var result : allResults) {
-            writeResultToWorkbook(result, BMOConstants.STATUS_COL, BMOConstants.FAILURE_COL);
-            int processedRows = currentStepProgress.incrementAndGet();
-            updateProgressInBulk(processedRows);
-        }
-        // Final progress update
-        importProgressService.sendProgressUpdate(documentImportProgressUUId, currentStepProgress.get());
-
-        log.info("Finished Import - Total: {}, Success: {}, Failed: {} at {}",
-                loanDataList.size(), successCount, failureCount, LocalDateTime.now(ZoneId.systemDefault()));
-
-        return CompletableFuture.completedFuture(Count.instance(loanDataList.size(), (int) successCount, (int) failureCount));
-    }
-
     public Count importEntity() {
         Sheet loansSheet = workbook.getSheet(TemplatePopulateImportConstants.LOAN_SHEET_NAME);
         int successCount = 0;
@@ -358,5 +234,5 @@ public class LoanImportHandlerV2 implements ImportHandler {
         setReportHeaders(loansSheet, LoanConstants.STATUS_COL, LoanConstants.FAILURE_COL);
         log.info("Finished Import Finished := {}", LocalDateTime.now(ZoneId.systemDefault()));
         return Count.instance(loanDataSize, successCount, errorCount);
-    }
+    }*/
 }

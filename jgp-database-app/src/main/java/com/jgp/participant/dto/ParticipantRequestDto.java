@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import org.apache.poi.ss.usermodel.Row;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -84,10 +83,7 @@ public record ParticipantRequestDto(
         String businessFinancier,
 
         @JsonIgnore
-        Row row,
-
-        @JsonIgnore
-        Map<Integer, String> rowErrorMap
+        Integer rowIndex
 
         ) {
 }

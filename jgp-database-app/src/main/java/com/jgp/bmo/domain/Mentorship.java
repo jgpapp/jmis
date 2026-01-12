@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
+@Setter
 @Getter
 @Entity
 @Table(name = "mentor_ships")
@@ -106,11 +107,9 @@ public class Mentorship extends BaseEntity {
     public Mentorship() {
     }
 
-    public Mentorship(Partner partner, Participant participant, Document document, Integer rowIndex, AppUser createdBy, MentorshipRequestDto dto) {
-        this.partner = partner;
-        this.participant = participant;
-        this.rowIndex = rowIndex;
-        this.setCreatedBy(createdBy);
+    public Mentorship(MentorshipRequestDto dto) {
+        this.rowIndex = dto.rowIndex();
+        this.setCreatedBy(dto.createdBy());
         this.isDataApproved = Boolean.FALSE;
         this.mentorShipDate = dto.mentorShipDate();
         this.mentorShipOrganization = dto.mentorShipOrganization();
@@ -126,7 +125,7 @@ public class Mentorship extends BaseEntity {
         this.identifiedBusinessGaps = dto.identifiedBusinessGaps();
         this.agreedActionForGapOne = dto.agreedActionForGapOne();
         this.additionalNeededSupport = dto.additionalNeededSupport();
-        this.document = document;
+        this.document = dto.document();
     }
 
     public void approveData(Boolean approval, AppUser user){

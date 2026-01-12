@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface TADataService {
 
-    void createBMOData(List<TAData> bmoDataListRequest);
+    void createBMOData(TAData bmoDataListRequest);
 
     void approvedBMOParticipantsData(List<Long> dataIds, Boolean approval);
 

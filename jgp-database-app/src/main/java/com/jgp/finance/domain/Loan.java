@@ -134,7 +134,6 @@ public class Loan extends BaseEntity {
     }
 
     public Loan(LoanRequestDto dto) {
-        this.partner = dto.partner();
         this.loanNumber = dto.loanNumber();
         this.pipeLineSource = dto.pipeLineSource();
         this.loanQuality = dto.loanQuality();
@@ -154,6 +153,7 @@ public class Loan extends BaseEntity {
         this.isDataApprovedByPartner = false;
         this.setCreatedBy(dto.createdBy());
         this.document = dto.document();
+        this.addLoanTransaction(dto.loanTransaction());
     }
 
     public void addLoanTransaction(LoanTransaction loanTransaction){

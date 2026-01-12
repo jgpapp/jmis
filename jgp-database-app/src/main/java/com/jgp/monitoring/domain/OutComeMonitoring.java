@@ -274,13 +274,12 @@ public class OutComeMonitoring extends BaseEntity {
     public OutComeMonitoring() {
         // Default constructor
     }
-    public OutComeMonitoring(OutComeMonitoringRequestDto dto, Participant participant, Document document, Integer rowIndex) {
+    public OutComeMonitoring(OutComeMonitoringRequestDto dto) {
         this.surveyDate = dto.surveyDate();
         this.surveyLanguage = dto.surveyLanguage();
         this.consented = "Yes".equalsIgnoreCase(dto.consented());
         this.locationLatitude = dto.locationLatitude();
         this.locationLongitude = dto.locationLongitude();
-        this.participant = participant;
         this.age = dto.age();
         this.genderCategory = dto.genderCategory();
         this.segment = dto.segment();
@@ -347,8 +346,9 @@ public class OutComeMonitoring extends BaseEntity {
         this.marketAccess = dto.marketAccess() != null ? Arrays.stream(dto.marketAccess().split(",")).map(String::trim).collect(Collectors.joining(",")) : null;
         this.businessOpportunities = dto.businessOpportunities();
         this.marketChallenges = dto.marketChallenges();
-        this.rowIndex = rowIndex;
-        this.document = document;
+        this.rowIndex = dto.rowIndex();
+        this.document = dto.document();
+        this.setCreatedBy(dto.createdBy());
     }
 
     public void approveData(Boolean approval, AppUser user){

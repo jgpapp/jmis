@@ -74,7 +74,9 @@ public class ParticipantValidator {
         }
     }
 
-    public static void validateParticipant(ParticipantRequestDto participantRequestDto, Validator validator) {
+    public static void validateParticipant(ParticipantRequestDto participantRequestDto, Map<Integer, String> rowErrorMap) {
+
+        final var validator = DataValidator.getValidator();
 
         // Validate the object
         Set<ConstraintViolation<ParticipantRequestDto>> violations = validator.validate(participantRequestDto);
@@ -82,11 +84,11 @@ public class ParticipantValidator {
         // Get the first error, if any
         if (!violations.isEmpty()) {
             ConstraintViolation<ParticipantRequestDto> firstViolation = violations.iterator().next();
-            participantRequestDto.rowErrorMap().put(participantRequestDto.row().getRowNum(), firstViolation.getMessage());
+            rowErrorMap.put(participantRequestDto.rowIndex(), firstViolation.getMessage());
         }
 
-        if (null == participantRequestDto.rowErrorMap().get(participantRequestDto.row().getRowNum()) && CommonUtil.isStringValueLengthNotValid(participantRequestDto.jgpId(), 5, 11)){
-            participantRequestDto.rowErrorMap().put(participantRequestDto.row().getRowNum(), "JGP ID must be 5-11 characters !!");
+        if (null == rowErrorMap.get(participantRequestDto.rowIndex()) && CommonUtil.isStringValueLengthNotValid(participantRequestDto.jgpId(), 5, 11)){
+            rowErrorMap.put(participantRequestDto.rowIndex(), "JGP ID must be 5-11 characters !!");
             }
 
     }

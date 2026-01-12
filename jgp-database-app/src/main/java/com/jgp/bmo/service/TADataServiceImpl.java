@@ -41,8 +41,8 @@ public class TADataServiceImpl implements TADataService {
 
     @Transactional
     @Override
-    public void createBMOData(List<TAData> bmoDataListRequest) {
-        this.bmoDataRepository.saveAll(bmoDataListRequest);
+    public void createBMOData(TAData bmoDataListRequest) {
+        this.bmoDataRepository.save(bmoDataListRequest);
     }
 
     @Transactional

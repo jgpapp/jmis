@@ -17,14 +17,17 @@ public class TAValidator {
     private TAValidator() {
     }
 
-    public static void validateTAData(TARequestDto taData, Validator validator) {
+    public static void validateTAData(TARequestDto taData, Map<Integer, String> rowErrorMap) {
+        // Create a Validator instance
+        Validator validator = DataValidator.getValidator();
+
         // Validate the object
         Set<ConstraintViolation<TARequestDto>> violations = validator.validate(taData);
 
         // Get the first error, if any
         if (!violations.isEmpty()) {
             ConstraintViolation<TARequestDto> firstViolation = violations.iterator().next();
-            taData.rowErrorMap().put(taData.row().getRowNum(), firstViolation.getMessage());
+            rowErrorMap.put(taData.rowIndex(), firstViolation.getMessage());
         }
     }
 

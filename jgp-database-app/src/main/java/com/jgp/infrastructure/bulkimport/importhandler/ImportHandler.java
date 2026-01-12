@@ -1,9 +1,11 @@
 package com.jgp.infrastructure.bulkimport.importhandler;
 
+import com.jgp.authentication.service.UserService;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import com.jgp.infrastructure.bulkimport.data.Count;
 import com.jgp.infrastructure.bulkimport.data.ExcelTemplateProcessingResult;
 import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
+import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 public interface ImportHandler {
 
     String PARTICIPANT_ASSOCIATION_ERROR = "Cannot associate data to a participant!";
+    String PARTNER_ASSOCIATION_ERROR = "Cannot associate data to a partner!";
     int CHUNK_SIZE = 100; // Default chunk size for parallel processing
     int BULK_SIZE_FOR_PROGRESS_UPDATE = 500; // Default bulk size for batch operations
     ExecutorService IMPORT_EXECUTOR =
@@ -97,6 +100,24 @@ public interface ImportHandler {
                 .filter(s -> !s.isEmpty())
                 .collect(Collectors.joining(","))
                 : null;
+    }
+
+
+    /**
+     * Updates import progress in bulk to reduce overhead
+     */
+    default void updateProgressInBulk(ImportProgressService importProgressService, String documentImportProgressUUId, int processedCount) {
+        if (processedCount % BULK_SIZE_FOR_PROGRESS_UPDATE == 0) {
+            importProgressService.sendProgressUpdate(documentImportProgressUUId, processedCount);
+        }
+    }
+
+    default Long getCurrentPartnerId(UserService userService) {
+        final var currentUser = userService.currentUser();
+        if (Objects.nonNull(currentUser) && Objects.nonNull(currentUser.getPartner())) {
+            return currentUser.getPartner().getId();
+        }
+        return null;
     }
 
 }

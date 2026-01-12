@@ -74,8 +74,7 @@ public class LoanTransaction extends BaseEntity implements Comparable<LoanTransa
     public LoanTransaction() {
     }
 
-    public LoanTransaction(Loan loan, TransactionType transactionType, String tranchName, LocalDate transactionDate, BigDecimal amount, BigDecimal outStandingAmount, AppUser createdBy, boolean isGivenInTranches) {
-        this.loan = loan;
+    public LoanTransaction(TransactionType transactionType, String tranchName, LocalDate transactionDate, BigDecimal amount, BigDecimal outStandingAmount, AppUser createdBy, boolean isGivenInTranches) {
         this.transactionType = transactionType;
         this.transactionDate = transactionDate;
         this.amount = amount;

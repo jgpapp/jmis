@@ -109,7 +109,6 @@ public class TAData extends BaseEntity {
     }
 
     public TAData(TARequestDto dto) {
-        this.partner = dto.partner();
         this.dateFormSubmitted = dto.dateFormSubmitted();
         this.isApplicantEligible = dto.isApplicantEligible();
         this.tasAttended = dto.tasAttended();

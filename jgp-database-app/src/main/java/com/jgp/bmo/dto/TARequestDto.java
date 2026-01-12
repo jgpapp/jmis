@@ -8,7 +8,6 @@ import com.jgp.patner.domain.Partner;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import org.apache.poi.ss.usermodel.Row;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -37,10 +36,6 @@ public record TARequestDto(
         String taType,
         AppUser createdBy,
         Document document,
-        @JsonIgnore
-        Row row,
-        @JsonIgnore
-        Map<Integer, String> rowErrorMap,
         Integer rowIndex,
         String rowErrorMessage,
         ParticipantRequestDto participantRequestDto,

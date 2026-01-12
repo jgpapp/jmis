@@ -60,7 +60,7 @@ public class DataValidator {
         return null;
     }
 
-    public static void validateMonitoringData(OutComeMonitoringRequestDto dto, Row row, Map<Integer, String> rowErrorMap) {
+    public static void validateMonitoringData(OutComeMonitoringRequestDto dto, Map<Integer, String> rowErrorMap) {
         // Create a Validator instance
         Validator validator = getValidator();
 
@@ -68,9 +68,9 @@ public class DataValidator {
         Set<ConstraintViolation<OutComeMonitoringRequestDto>> violations = validator.validate(dto);
 
         // Get the first error, if any
-        if (null == rowErrorMap.get(row.getRowNum()) && !violations.isEmpty()) {
+        if (null == rowErrorMap.get(dto.rowIndex()) && !violations.isEmpty()) {
             ConstraintViolation<OutComeMonitoringRequestDto> firstViolation = violations.iterator().next();
-            rowErrorMap.put(row.getRowNum(), firstViolation.getMessage());
+            rowErrorMap.put(dto.rowIndex(), firstViolation.getMessage());
         }
     }
 

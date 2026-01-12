@@ -1,11 +1,9 @@
 package com.jgp.shared.validator;
 
-import com.jgp.finance.domain.Loan;
+import com.jgp.finance.dto.LoanRequestDto;
 import com.jgp.util.CommonUtil;
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
 import org.apache.poi.ss.usermodel.Row;
@@ -21,17 +19,17 @@ public class LoanValidator {
     private LoanValidator() {
     }
 
-    public static void validateLoan(Loan loan, Row row, Map<Integer, String> rowErrorMap) {
+    public static void validateLoan(LoanRequestDto loan, Map<Integer, String> rowErrorMap) {
         // Create a Validator instance
         Validator validator = DataValidator.getValidator();
 
         // Validate the object
-        Set<ConstraintViolation<Loan>> violations = validator.validate(loan);
+        Set<ConstraintViolation<LoanRequestDto>> violations = validator.validate(loan);
 
         // Get the first error, if any
-        if (null == rowErrorMap.get(row.getRowNum()) && !violations.isEmpty()) {
-            ConstraintViolation<Loan> firstViolation = violations.iterator().next();
-            rowErrorMap.put(row.getRowNum(), firstViolation.getMessage());
+        if (null == rowErrorMap.get(loan.rowIndex()) && !violations.isEmpty()) {
+            ConstraintViolation<LoanRequestDto> firstViolation = violations.iterator().next();
+            rowErrorMap.put(loan.rowIndex(), firstViolation.getMessage());
         }
     }
 

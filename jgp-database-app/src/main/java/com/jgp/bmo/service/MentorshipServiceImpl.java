@@ -43,6 +43,12 @@ public class MentorshipServiceImpl implements MentorshipService {
 
     @Transactional
     @Override
+    public void createMentorship(Mentorship mentorship) {
+        this.mentorshipRepository.save(mentorship);
+    }
+
+    @Transactional
+    @Override
     public void saveMentorshipWithParticipant(Mentorship mentorship, Boolean updateParticipantInfo, Map<Long, ParticipantRequestDto> participantDtoMap) {
         Participant participant = mentorship.getParticipant();
         ParticipantRequestDto participantRequestDto = participantDtoMap.get(participant.getId());

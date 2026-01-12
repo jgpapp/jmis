@@ -2,6 +2,7 @@ package com.jgp.finance.dto;
 
 import com.jgp.authentication.domain.AppUser;
 import com.jgp.finance.domain.Loan;
+import com.jgp.finance.domain.LoanTransaction;
 import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.participant.dto.ParticipantRequestDto;
 import com.jgp.patner.domain.Partner;
@@ -60,11 +61,15 @@ public record LoanRequestDto(
 
         String rowErrorMessage,
 
+        @NotNull
         Partner partner,
 
         AppUser createdBy,
 
-        Document document
+        Document document,
+
+        @NotNull
+        LoanTransaction loanTransaction
 
 ) {
 }
