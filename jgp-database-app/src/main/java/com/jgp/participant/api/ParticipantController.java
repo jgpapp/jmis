@@ -1,7 +1,7 @@
 package com.jgp.participant.api;
 
 import com.jgp.participant.domain.Participant;
-import com.jgp.participant.dto.ParticipantDto;
+import com.jgp.participant.dto.ParticipantRequestDto;
 import com.jgp.participant.dto.ParticipantResponseDto;
 import com.jgp.participant.service.ParticipantService;
 import com.jgp.shared.dto.ApiResponseDto;
@@ -43,8 +43,8 @@ public class ParticipantController {
     }
 
     @PutMapping("{participantId}")
-    public ResponseEntity<ApiResponseDto> updateParticipant(@PathVariable("participantId") Long participantId, @RequestBody ParticipantDto participantDto) {
-        this.participantService.updateParticipant(participantId, participantDto);
+    public ResponseEntity<ApiResponseDto> updateParticipant(@PathVariable("participantId") Long participantId, @RequestBody ParticipantRequestDto participantRequestDto) {
+        this.participantService.updateParticipant(participantId, participantRequestDto);
         return new ResponseEntity<>(new ApiResponseDto(true, "Participant Updated!!"), HttpStatus.OK);
     }
 }

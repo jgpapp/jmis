@@ -1,21 +1,23 @@
 # Stage 1: Build the Angular app
-FROM node:20-alpine AS build
+FROM node:22.12-alpine AS build
 
 # Set working directory
 WORKDIR /app
 
-# Install dependencies
+# Copy package files for better caching
 COPY package*.json ./
-RUN npm install --force
 
-# Copy the rest of the application files
+# Install dependencies
+RUN npm ci --legacy-peer-deps
+
+# Copy source files
 COPY . .
 
 # Build the Angular app
-RUN npm cache clean --force && npm run build -- --configuration production
+RUN npm run build -- --configuration production
 
 # Stage 2: Serve the app with Nginx
-FROM nginx:alpine
+FROM nginx:1.27-alpine
 
 # Install gettext for envsubst
 RUN apk add --no-cache gettext
@@ -27,24 +29,27 @@ WORKDIR /usr/share/nginx/html
 RUN rm -rf ./*
 
 # Copy the build output to Nginx's HTML directory
-COPY --from=build /app/dist/jgp-database-web/browser /usr/share/nginx/html
+COPY --from=build --chown=nginx:nginx /app/dist/jgp-database-web/browser /usr/share/nginx/html
 
 # Copy the Nginx TEMPLATE config
-# Note the change in filename and destination path (temporary location)
 COPY nginx.template.conf /etc/nginx/nginx.template.conf
 
-#COPY nginx-http.conf /etc/nginx/conf.d/default.conf
 # Create NGINX cache directory
 RUN mkdir -p /var/cache/nginx/client_temp
-# Set ownership of NGINX cache directory
-RUN chown -R nginx:nginx /var/cache/nginx
+
+# Set ownership of NGINX directories
+RUN chown -R nginx:nginx /var/cache/nginx /usr/share/nginx/html
 
 # Copy the entrypoint script and make it executable
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Expose port 80
+# Expose ports
 EXPOSE 80 443
+
+# Add health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --quiet --tries=1 --spider http://localhost/ || exit 1
 
 # Set the entrypoint script to run on container start
 ENTRYPOINT ["/entrypoint.sh"]

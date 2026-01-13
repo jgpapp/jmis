@@ -37,12 +37,12 @@ public class OutComeMonitoringServiceImpl implements OutComeMonitoringService {
 
     @Override
     public OutComeMonitoringResponseDto findOneById(Long id) {
-        return outComeMonitoringRepository.findById(id).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).map(outComeMonitoringMapper::toDto).orElse(null);
+        return outComeMonitoringRepository.findById(id).map(outComeMonitoringMapper::toDto).orElse(null);
     }
 
     @Override
     public void approvedOutComeMonitoringData(List<Long> dataIds, Boolean approval) {
-        var outComeMonitoringData = this.outComeMonitoringRepository.findAllById(dataIds).stream().filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).toList();
+        var outComeMonitoringData = this.outComeMonitoringRepository.findAllById(dataIds);
         if (dataIds.isEmpty()) {
             outComeMonitoringData = this.outComeMonitoringRepository.findByIsDeletedFalse().stream().toList();
         }
@@ -93,7 +93,6 @@ public class OutComeMonitoringServiceImpl implements OutComeMonitoringService {
                 .map(OutComeMonitoring::getId).toList();
         this.outComeMonitoringRepository.deleteOutComeMonitoringByIds(outComeMonitoringToDeleteIds);
         final var participantsToDeleteIds = outComeMonitoringToDelete.stream().map(OutComeMonitoring::getParticipant)
-                .filter(pt -> Boolean.FALSE.equals(pt.getIsActive()))
                 .map(Participant::getId).toList();
 
         this.participantRepository.deleteParticipantsByIds(participantsToDeleteIds);

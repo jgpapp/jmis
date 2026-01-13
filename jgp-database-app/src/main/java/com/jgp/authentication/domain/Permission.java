@@ -3,6 +3,9 @@ package com.jgp.authentication.domain;
 import com.jgp.shared.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
@@ -14,7 +17,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Table(name = "permission", uniqueConstraints = {
         @UniqueConstraint(columnNames = { "code" }, name = "UNIQUE_PERMISSION")
 })
+@SequenceGenerator(name = "permission_seq", sequenceName = "permission_seq", allocationSize = 1)
 public class Permission extends BaseEntity {
+
+    @Override
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "permission_seq")
+    public Long getId() {
+        return super.getId();
+    }
 
     @Column(name = "code", nullable = false, length = 100)
     private String code;

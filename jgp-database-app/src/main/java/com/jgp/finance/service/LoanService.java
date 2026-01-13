@@ -1,7 +1,7 @@
 package com.jgp.finance.service;
 
 import com.jgp.finance.domain.Loan;
-import com.jgp.finance.dto.LoanDto;
+import com.jgp.finance.dto.LoanResponseDto;
 import com.jgp.finance.dto.LoanSearchCriteria;
 import com.jgp.finance.dto.LoanTransactionResponseDto;
 import org.springframework.data.domain.Page;
@@ -15,9 +15,9 @@ public interface LoanService {
 
     void approvedTransactionsLoans(List<Long> transactionsIds, Boolean approval);
 
-    Page<LoanDto> getLoans(LoanSearchCriteria searchCriteria, Pageable pageable);
+    Page<LoanResponseDto> getLoans(LoanSearchCriteria searchCriteria, Pageable pageable);
 
-    LoanDto findLoanById(Long loanId);
+    LoanResponseDto findLoanById(Long loanId);
 
     Page<LoanTransactionResponseDto> getAvailableLoanTransactions(Long partnerId, Long loanId, Boolean isApproved, Pageable pageable);
 }

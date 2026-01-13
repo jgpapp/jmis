@@ -8,16 +8,18 @@ import com.jgp.shared.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.security.core.GrantedAuthority;
@@ -38,7 +40,15 @@ import java.util.stream.Collectors;
 @Getter
 @Entity
 @Table(name = "users", uniqueConstraints = { @UniqueConstraint(columnNames = { "email_address" }, name = "EMAIL_UNIQUE")})
+@SequenceGenerator(name = "users_seq", sequenceName = "users_seq", allocationSize = 1)
 public class AppUser extends BaseEntity implements PlatformUser {
+
+
+    @Override
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq")
+    public Long getId() {
+        return super.getId();
+    }
 
 	private String firstName;
 
@@ -111,25 +121,25 @@ public class AppUser extends BaseEntity implements PlatformUser {
     }
 
     public void updateUser(UserDtoV2 userDto, Partner partner){
-        if(!StringUtils.equals(userDto.firstName(), this.firstName)){
+        if(!Objects.equals(userDto.firstName(), this.firstName)){
             this.firstName = userDto.firstName();
         }
-        if(!StringUtils.equals(userDto.lastName(), this.lastName)){
+        if(!Objects.equals(userDto.lastName(), this.lastName)){
             this.lastName = userDto.lastName();
         }
-        if(!StringUtils.equals(userDto.gender(), this.gender)){
+        if(!Objects.equals(userDto.gender(), this.gender)){
             this.gender = userDto.gender();
         }
         if(!Objects.equals(partner, this.partner)){
             this.partner = partner;
         }
-        if(!StringUtils.equals(userDto.designation(), this.designation)){
+        if(!Objects.equals(userDto.designation(), this.designation)){
             this.designation = userDto.designation();
         }
-        if(!StringUtils.equals(userDto.town(), this.town)){
+        if(!Objects.equals(userDto.town(), this.town)){
             this.town = userDto.town();
         }
-        if(!StringUtils.equals(userDto.cellPhone(), this.cellPhone)){
+        if(!Objects.equals(userDto.cellPhone(), this.cellPhone)){
             this.cellPhone = userDto.cellPhone();
         }
         this.setLastModified(LocalDate.now(ZoneId.systemDefault()));

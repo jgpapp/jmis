@@ -1,12 +1,15 @@
 package com.jgp.participant.domain;
 
-import com.jgp.participant.dto.ParticipantDto;
+import com.jgp.participant.dto.ParticipantRequestDto;
 import com.jgp.shared.domain.BaseEntity;
 import com.jgp.util.CommonUtil;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +23,14 @@ import java.util.Objects;
 @Getter
 @Entity
 @Table(name = "participants")
+@SequenceGenerator(name = "participants_seq", sequenceName = "participants_seq", allocationSize = 1)
 public class Participant extends BaseEntity {
+
+    @Override
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "participants_seq")
+    public Long getId() {
+        return super.getId();
+    }
 
     @Column(name = "participant_name")
     private String participantName;
@@ -116,7 +126,7 @@ public class Participant extends BaseEntity {
     public Participant() {
     }
 
-    public Participant(ParticipantDto dto) {
+    public Participant(ParticipantRequestDto dto) {
         this.businessName = dto.businessName();
         this.jgpId = dto.jgpId();
         this.phoneNumber = dto.phoneNumber();
@@ -145,7 +155,7 @@ public class Participant extends BaseEntity {
         this.disabilityType = dto.disabilityType();
     }
 
-    public void updateParticipant(ParticipantDto dto){
+    public void updateParticipant(ParticipantRequestDto dto){
         if (StringUtils.isNotBlank(dto.businessName())){
             this.businessName = dto.businessName().trim();
         }
@@ -226,7 +236,7 @@ public class Participant extends BaseEntity {
         }
     }
 
-    public void updateBusinessLocation(ParticipantDto dto){
+    public void updateBusinessLocation(ParticipantRequestDto dto){
         if (StringUtils.isNotBlank(dto.locationCountyCode())){
             var countyCode = dto.locationCountyCode().trim();
             if (countyCode.length() == 1){

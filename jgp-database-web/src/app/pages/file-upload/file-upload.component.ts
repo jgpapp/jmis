@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { MatInputModule } from '@angular/material/input';
 
 /**
@@ -16,16 +16,15 @@ import { MatInputModule } from '@angular/material/input';
 @Component({
     selector: 'jgp-file-upload',
     imports: [
-        MatTableModule,
-        MatPaginatorModule,
-        FlexLayoutModule,
-        MatButtonModule,
-        MatIconModule,
-        MatFormFieldModule,
-        MatInputModule,
-        RouterModule,
-        CommonModule
-    ],
+    MatTableModule,
+    MatPaginatorModule,
+    FlexLayoutModule,
+    MatButtonModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    RouterModule
+],
     templateUrl: './file-upload.component.html',
     styleUrls: ['./file-upload.component.scss']
 })

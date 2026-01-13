@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,11 +13,11 @@ import java.util.Optional;
 public interface AppUserRepository extends JpaRepository<AppUser, Long>, JpaSpecificationExecutor<AppUser>, PlatformUserRepository,
         QuerydslPredicateExecutor<AppUser> {
 
-    Optional<AppUser> findByUsernameAndIsDeletedFalse(@NonNull String username);
+    Optional<AppUser> findByUsernameAndIsDeletedFalse(String username);
 
 
     @Query("select a from AppUser a where a.partner.id = ?1 and a.isDeleted = false ")
-    List<AppUser> findUsersByPartnerId(@NonNull Long id);
+    List<AppUser> findUsersByPartnerId(Long partnerId);
 
     List<AppUser> findByIsDeletedFalse();
 

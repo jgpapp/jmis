@@ -1,13 +1,15 @@
 <h1 mat-dialog-title>
-    {{title}}
-  </h1>
-  
-  <div mat-dialog-content>
-    <p>{{message}}</p>
-  </div>
-  
-  <div mat-dialog-actions class="dialog-actions">
-    <button mat-button class="btn-cancel" (click)="onDismiss()">{{cancelButtonLabel}}</button>
-    <button mat-raised-button color="primary" class="btn-confirm" (click)="onConfirm()">{{confirmButtonLabel}}</button>
-    <button mat-raised-button color="primary" class="btn-second-confirm" (click)="onConfirmSecond()" *ngIf="includeSecondConfirmBtn">{{secondConfirmButtonLabel}}</button>
-  </div>
+  {{title}}
+</h1>
+
+<div mat-dialog-content>
+  <p>{{message}}</p>
+</div>
+
+<div mat-dialog-actions class="dialog-actions">
+  <button mat-button class="btn-cancel" (click)="onDismiss()">{{cancelButtonLabel}}</button>
+  <button mat-raised-button color="primary" class="btn-confirm" (click)="onConfirm()">{{confirmButtonLabel}}</button>
+  @if (includeSecondConfirmBtn) {
+    <button mat-raised-button color="primary" class="btn-second-confirm" (click)="onConfirmSecond()">{{secondConfirmButtonLabel}}</button>
+  }
+</div>

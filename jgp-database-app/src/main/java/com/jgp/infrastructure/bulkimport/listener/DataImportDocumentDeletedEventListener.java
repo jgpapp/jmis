@@ -1,6 +1,6 @@
 package com.jgp.infrastructure.bulkimport.listener;
 
-import com.jgp.bmo.service.BMOClientDataService;
+import com.jgp.bmo.service.TADataService;
 import com.jgp.bmo.service.MentorshipService;
 import com.jgp.finance.service.LoanService;
 import com.jgp.finance.service.LoanTransactionService;
@@ -23,7 +23,7 @@ public class DataImportDocumentDeletedEventListener {
 
     private final LoanService loanService;
     private final LoanTransactionService loanTransactionService;
-    private final BMOClientDataService bmoClientDataService;
+    private final TADataService bmoClientDataService;
     private final MentorshipService mentorshipService;
     private final OutComeMonitoringService outComeMonitoringService;
 
@@ -33,6 +33,10 @@ public class DataImportDocumentDeletedEventListener {
         final var document = event.document();
         if (Objects.nonNull(document) && event.deleteAssociatedData()) {
             final var documentImportType = document.getGlobalEntityType();
+            if(Objects.isNull(documentImportType)){
+                log.info("Document Import Type is null, skipping associated data deletion");
+                return;
+            }
             switch (documentImportType) {
                 case GlobalEntityType.LOAN_IMPORT_TEMPLATE -> {
                     final var loanTransactionIds = this.loanTransactionService.getLoanTransactions(document.getId())

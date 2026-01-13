@@ -1,5 +1,9 @@
 package com.jgp.bmo.dto;
 
+import com.jgp.authentication.domain.AppUser;
+import com.jgp.infrastructure.documentmanagement.domain.Document;
+import com.jgp.participant.dto.ParticipantRequestDto;
+import com.jgp.patner.domain.Partner;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -7,32 +11,43 @@ import java.time.LocalDate;
 
 @Builder
 public record MentorshipRequestDto(
-         LocalDate mentorShipDate,
+        ParticipantRequestDto participantRequestDto,
 
-         String mentorShipOrganization,
+        LocalDate mentorShipDate,
 
-         String bmoMemberShip,
+        String mentorShipOrganization,
 
-         String mentorShipDeliveryMode,
+        String bmoMemberShip,
 
-         String businessSituation,
+        String mentorShipDeliveryMode,
 
-         int newHiresBecauseOfLoan,
+        String businessSituation,
 
-         BigDecimal revenueIncreaseDueToTraining,
+        int newHiresBecauseOfLoan,
 
-         String usefulTrainingTopics,
+        BigDecimal revenueIncreaseDueToTraining,
 
-         String supportNeededAreas,
+        String usefulTrainingTopics,
 
-         String msmeSessionsCovered,
+        String supportNeededAreas,
 
-         String smeSessionsCovered,
+        String msmeSessionsCovered,
 
-         String identifiedBusinessGaps,
+        String smeSessionsCovered,
 
-         String agreedActionForGapOne,
+        String identifiedBusinessGaps,
 
-         String additionalNeededSupport
+        String agreedActionForGapOne,
+
+        String additionalNeededSupport,
+
+        Partner partner,
+
+        Document document,
+
+        AppUser createdBy,
+
+        Integer rowIndex
+
 ) {
 }

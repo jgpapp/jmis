@@ -3,6 +3,9 @@ package com.jgp.authentication.domain;
 import com.jgp.shared.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -14,7 +17,14 @@ import java.time.ZoneId;
 @Getter
 @Entity
 @Table(name = "user_audit_logs")
+@SequenceGenerator(name = "user_audit_logs_seq", sequenceName = "user_audit_logs_seq", allocationSize = 1)
 public class UserAuditLog extends BaseEntity {
+
+    @Override
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_audit_logs_seq")
+    public Long getId() {
+        return super.getId();
+    }
 
     @Column(name = "username", nullable = false)
     private String username;

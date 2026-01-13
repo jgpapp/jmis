@@ -5,9 +5,12 @@ import com.jgp.shared.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
@@ -20,7 +23,14 @@ import java.util.Set;
 @Getter
 @Entity
 @Table(name = "user_roles", uniqueConstraints = { @UniqueConstraint(columnNames = { "role_name" }, name = "UNIQUE_ROLE") })
+@SequenceGenerator(name = "user_roles_seq", sequenceName = "user_roles_seq", allocationSize = 1)
 public class Role extends BaseEntity {
+
+    @Override
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_roles_seq")
+    public Long getId() {
+        return super.getId();
+    }
 
     @Column(name = "role_name")
     private String roleName;

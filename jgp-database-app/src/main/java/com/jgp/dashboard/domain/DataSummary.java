@@ -6,8 +6,11 @@ import com.jgp.shared.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
@@ -19,7 +22,14 @@ import java.math.BigDecimal;
 @Getter
 @Entity
 @Table(name = "data_summary", uniqueConstraints = @UniqueConstraint(columnNames = {"partner_id", "gender_category", "data_year", "data_month"}))
+@SequenceGenerator(name = "data_summary_seq", sequenceName = "data_summary_seq", allocationSize = 1)
 public class DataSummary extends BaseEntity {
+
+    @Override
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "data_summary_seq")
+    public Long getId() {
+        return super.getId();
+    }
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "partner_id")

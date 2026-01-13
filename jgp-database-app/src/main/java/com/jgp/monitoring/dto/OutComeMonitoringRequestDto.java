@@ -1,5 +1,8 @@
 package com.jgp.monitoring.dto;
 
+import com.jgp.authentication.domain.AppUser;
+import com.jgp.infrastructure.documentmanagement.domain.Document;
+import com.jgp.participant.dto.ParticipantRequestDto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -176,5 +179,13 @@ public record OutComeMonitoringRequestDto(
         //        message = "New business opportunities must be a comma-separated list of New clients/customers|New suppliers|Purchase agreements|Business relationships|Other [specify]|None of the above|DON'T KNOW|REFUSED"
         //)
         String businessOpportunities,
-        String marketChallenges
+        String marketChallenges,
+
+        String participantJgpId,
+
+        Document document,
+
+        AppUser createdBy,
+
+        Integer rowIndex
 ) {}

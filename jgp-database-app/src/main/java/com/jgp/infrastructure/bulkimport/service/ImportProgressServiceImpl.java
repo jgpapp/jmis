@@ -1,10 +1,10 @@
 package com.jgp.infrastructure.bulkimport.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import com.jgp.infrastructure.bulkimport.data.ImportProgress;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,21 @@ public class ImportProgressServiceImpl implements ImportProgressService {
 
 
     @Override
-    public void updateTotal(String importUUId, int total) throws ExecutionException{
+    public void updateStepAndSendProgress(String importUUId, String step) {
+        try {
+            var progress = this.getImportProgress(importUUId);
+            if (Objects.nonNull(progress)) {
+                progress.updateProgressStep(step);
+                sendProgressSync(importUUId, progress);
+            }
+        } catch (Exception e) {
+            log.error("Problem Sending  Progress After Updating Step: {}", e.getMessage());
+        }
+
+    }
+
+    @Override
+    public void updateTotal(String importUUId, int total) {
         var newProgress = this.getImportProgress(importUUId);
         if (Objects.nonNull(newProgress)) {
             newProgress.setTotal(total);
@@ -42,15 +56,7 @@ public class ImportProgressServiceImpl implements ImportProgressService {
     }
 
     @Override
-    public void incrementProcessedProgress(String importUUId) throws ExecutionException {
-        var progress = this.getImportProgress(importUUId);
-        if (Objects.nonNull(progress)) {
-            progress.incrementProcessed();
-        }
-    }
-
-    @Override
-    public void resetEveryThingToZero(String importUUId) throws ExecutionException {
+    public void resetEveryThingToZero(String importUUId) {
         var newProgress = this.getImportProgress(importUUId);
         if (Objects.nonNull(newProgress)) {
             newProgress.reset();
@@ -59,26 +65,50 @@ public class ImportProgressServiceImpl implements ImportProgressService {
     }
 
     @Override
-    public ImportProgress getImportProgress(String importUUId) throws ExecutionException {
-        return requestCountsPerIdIdempotencyCache.get(importUUId);
+    public ImportProgress getImportProgress(String importUUId) {
+        try {
+            return requestCountsPerIdIdempotencyCache.get(importUUId);
+        } catch (ExecutionException e) {
+            log.error("Problem getting  Progress: {}", e.getMessage());
+        }
+        return null;
     }
 
     @Override
-    public void sendProgressUpdate(String importUUId) throws ExecutionException, JsonProcessingException {
+    public void sendProgressUpdate(String importUUId) {
         // Send progress to the WebSocket
-        var progress = this.getImportProgress(importUUId);
-        if (Objects.nonNull(progress)) {
-            simpMessagingTemplate.convertAndSend(String.format("/topic/progress/%s", importUUId), this.objectMapper.writeValueAsString(progress));
+        try {
+            var progress = this.getImportProgress(importUUId);
+            if (Objects.nonNull(progress)) {
+                sendProgressSync(importUUId, progress);
+            }
+        } catch (Exception e) {
+            log.error("Problem Sending  Progress: {}", e.getMessage());
         }
     }
 
     @Override
-    public void incrementAndSendProgressUpdate(String importUUId) throws ExecutionException, JsonProcessingException {
+    public void sendProgressUpdate(String importUUId, int processed) {
         //Update & Send progress to the WebSocket
-        var progress = this.getImportProgress(importUUId);
-        if (Objects.nonNull(progress)) {
-            progress.incrementProcessed();
-            simpMessagingTemplate.convertAndSend(String.format("/topic/progress/%s", importUUId), this.objectMapper.writeValueAsString(progress));
+        try {
+            var progress = this.getImportProgress(importUUId);
+            if (Objects.nonNull(progress)) {
+                progress.setProcessed(processed);
+                sendProgressSync(importUUId, progress);
+            }
+        } catch (Exception e) {
+            log.error("Problem Updating & Sending Progress: {}", e.getMessage());
         }
+
+    }
+
+    /**
+     * Sends the current progress synchronously, ensuring the message is sent before returning.
+     *
+     * @param importUUId      the unique identifier for the import process
+     * @param currentProgress the current progress to be sent
+     */
+    public void sendProgressSync(String importUUId, ImportProgress currentProgress) {
+        simpMessagingTemplate.convertAndSend(String.format(TemplatePopulateImportConstants.WEB_SOCKET_EXCEL_UPLOAD_PROGRESS_ENDPOINT, importUUId), currentProgress);
     }
 }

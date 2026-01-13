@@ -3,7 +3,6 @@ package com.jgp.infrastructure.bulkimport.importhandler;
 
 import com.google.common.base.Splitter;
 import com.jgp.infrastructure.bulkimport.exception.InvalidDataException;
-import com.jgp.shared.dto.ApiParameterError;
 import com.jgp.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
@@ -23,7 +22,6 @@ import org.apache.poi.ss.util.CellReference;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -36,9 +34,22 @@ public final class ImportHandlerUtils {
 
     public static Integer getNumberOfRows(Sheet sheet, int primaryColumn) {
         int noOfEntries = 0;
-        // getLastRowNum and getPhysicalNumberOfRows showing false values
-        // sometimes
-        while (sheet.getRow(noOfEntries + 1) != null && sheet.getRow(noOfEntries + 1).getCell(primaryColumn) != null && CellType.BLANK != sheet.getRow(noOfEntries + 1).getCell(primaryColumn).getCellType()) {
+        boolean headerSkipped = false;
+
+        for (Row row : sheet) {
+            // Skip header row
+            if (!headerSkipped) {
+                headerSkipped = true;
+                continue;
+            }
+
+            Cell primaryCell = row.getCell(primaryColumn);
+
+            // Stop counting when we hit an empty primary column cell
+            if (primaryCell == null || CellType.BLANK == primaryCell.getCellType()) {
+                break;
+            }
+
             noOfEntries++;
         }
 
@@ -279,28 +290,6 @@ public final class ImportHandlerUtils {
         return style;
     }
 
-    public static String getDefaultUserMessages(List<ApiParameterError> apiParamErrors) {
-        StringBuilder defaultUserMessages = new StringBuilder();
-        for (ApiParameterError error : apiParamErrors) {
-            defaultUserMessages = defaultUserMessages.append(error.getDefaultUserMessage()).append('\t');
-        }
-        return defaultUserMessages.toString();
-    }
-
-    public static String getErrorList(List<String> errorList) {
-        StringBuilder errors = new StringBuilder();
-        for (String error : errorList) {
-            errors = errors.append(error);
-        }
-        return errors.toString();
-    }
-
-    public static void writeErrorMessage(Sheet sheet, Integer rowIndex, String errorMessage, int statusColumn) {
-        Cell statusCell = sheet.getRow(rowIndex).createCell(statusColumn);
-        statusCell.setCellValue(errorMessage);
-        statusCell.setCellStyle(getCellStyle(sheet.getWorkbook(), IndexedColors.RED));
-    }
-
     public static String getErrorMessage(Exception re) {
         if (re.getMessage() != null) {
             return re.getMessage();
@@ -309,10 +298,10 @@ public final class ImportHandlerUtils {
         }
     }
 
-    public static void validateCellDoesNotContainFormular(Cell cell, Map<Row, String> rowErrorMap) {
+    public static void validateCellDoesNotContainFormular(Cell cell, Map<Integer, String> rowErrorMap) {
         if (CellType.FORMULA == cell.getCellType()) {
             Row row = cell.getRow();
-            rowErrorMap.put(row, String.format("Cell %s contains a formula. Please remove the formula and try again.", new CellReference(cell).formatAsString()));
+            rowErrorMap.put(row.getRowNum(), String.format("Cell %s contains a formula. Please remove the formula and try again.", new CellReference(cell).formatAsString()));
         }
     }
 

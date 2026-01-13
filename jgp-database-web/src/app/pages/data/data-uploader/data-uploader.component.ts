@@ -14,7 +14,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { GlobalService } from '@services/shared/global.service';
 import { NoPermissionComponent } from '../../errors/no-permission/no-permission.component';
 import { AuthService } from '@services/users/auth.service';
-import { interval } from 'rxjs';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -28,6 +27,34 @@ import { HasPermissionDirective } from '../../../directives/has-permission.direc
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 import { ActivatedRoute } from '@angular/router';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+
+// Define interfaces at the top of the file
+interface UploadProgress {
+  processed: number;
+  total: number;
+  step: string;
+}
+
+interface ImportDocument {
+  id: number;
+  name: string;
+  importTime: Date;
+  endTime: Date;
+  completed: boolean;
+  totalRecords: number;
+  successCount: number;
+  failureCount: number;
+}
+
+interface PagedResponse<T> {
+  content: T[];
+  page: {
+    totalElements: number;
+    totalPages: number;
+    size: number;
+    number: number;
+  };
+}
 
 @Component({
     selector: 'app-data-uploader',
@@ -59,26 +86,22 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 })
 export class DataUploaderComponent implements OnDestroy {
 
-  bulkImport: any = {};
-  template: File;
+  template: File | null = null;
   legalFormType: string | undefined;
   bulkImportForm: UntypedFormGroup;
   partnerType: string | undefined = 'NONE';
   public docsFilterForm: FormGroup;
-  progress: { processed: number; total: number; finished: number } | null = null;
+  progress: UploadProgress | null = null;
   updateParticipantInfo: boolean = false;
-  dotCount: number = 0;
-  preparingText: string = 'Preparing the template';
-  private readonly animationInterval = 500; // milliseconds
   uploadProgressID: string | null = null;
 
   public displayedColumns = ['name', 'importTime', 'endTime', 'completed', 'totalRecords', 'successCount', 'failureCount', 'actions'];
-  public dataSource: any;
+  public dataSource: MatTableDataSource<ImportDocument>;
   pageSize = 10;
   pageIndex = 0;
   totalItems = 0;
   entityType: any;
-  documents: any[]
+  documents: ImportDocument[]
   importDocumentId: any;
 
   subs = new SubscriptionsContainer();
@@ -174,43 +197,107 @@ export class DataUploaderComponent implements OnDestroy {
    * Sets file form control value.
    * @param {any} $event file change event.
    */
-  onFileSelect($event: any) {
+  onFileSelect2($event: any) {
     if ($event.target.files.length > 0) {
       this.template = $event.target.files[0];
       this.uploadProgressID = null; // to reset progress bar
       this.progress = null; // to reset progress bar
-      if (this.template.name.toUpperCase().includes('LOAN_IMPORT_TEMPLATE') && this.authService.hasPermission('LOAN_UPLOAD')) {
+      if (this.template && this.template.name.toUpperCase().includes('LOAN_IMPORT_TEMPLATE') && this.authService.hasPermission('LOAN_UPLOAD')) {
         this.legalFormType = 'LOAN_IMPORT_TEMPLATE';
-      } else if (this.template.name.toUpperCase().includes('TA_IMPORT_TEMPLATE') && this.authService.hasPermission('BMO_PARTICIPANTS_DATA_UPLOAD')) {
+      } else if (this.template && this.template.name.toUpperCase().includes('TA_IMPORT_TEMPLATE') && this.authService.hasPermission('BMO_PARTICIPANTS_DATA_UPLOAD')) {
         this.legalFormType = 'TA_IMPORT_TEMPLATE';
-      }else if (this.template.name.toUpperCase().includes('MENTORSHIP_IMPORT_TEMPLATE') && this.authService.hasPermission('MENTOR_SHIP_UPLOAD')) {
+      }else if (this.template && this.template.name.toUpperCase().includes('MENTORSHIP_IMPORT_TEMPLATE') && this.authService.hasPermission('MENTOR_SHIP_UPLOAD')) {
         this.legalFormType = 'MENTORSHIP_IMPORT_TEMPLATE';
-      }else if (this.template.name.toUpperCase().includes('MONITORING_IMPORT_TEMPLATE') && this.authService.hasPermission('MONITORING_OUTCOME_UPLOAD')) {
+      }else if (this.template && this.template.name.toUpperCase().includes('MONITORING_IMPORT_TEMPLATE') && this.authService.hasPermission('MONITORING_OUTCOME_UPLOAD')) {
         this.legalFormType = 'MONITORING_IMPORT_TEMPLATE';
       }
+    }
+  }
+
+  onFileSelect($event: Event) {
+    const input = $event.target as HTMLInputElement;
+    
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+    
+    this.template = input.files[0];
+    this.uploadProgressID = null;
+    this.progress = null;
+    this.legalFormType = undefined;
+    
+    const fileName = this.template.name.toUpperCase();
+    
+    // Define template mappings
+    const templateMappings: Record<string, { keyword: string; permission: string }> = {
+      'LOAN_IMPORT_TEMPLATE': { keyword: 'LOAN_IMPORT_TEMPLATE', permission: 'LOAN_UPLOAD' },
+      'TA_IMPORT_TEMPLATE': { keyword: 'TA_IMPORT_TEMPLATE', permission: 'BMO_PARTICIPANTS_DATA_UPLOAD' },
+      'MENTORSHIP_IMPORT_TEMPLATE': { keyword: 'MENTORSHIP_IMPORT_TEMPLATE', permission: 'MENTOR_SHIP_UPLOAD' },
+      'MONITORING_IMPORT_TEMPLATE': { keyword: 'MONITORING_IMPORT_TEMPLATE', permission: 'MONITORING_OUTCOME_UPLOAD' }
+    };
+    
+    // Find matching template type
+    for (const [templateType, config] of Object.entries(templateMappings)) {
+      if (fileName.includes(config.keyword) && this.authService.hasPermission(config.permission)) {
+        this.legalFormType = templateType;
+        break;
+      }
+    }
+    
+    if (!this.legalFormType) {
+      this.gs.openSnackBar('Invalid template file or insufficient permissions', 'Dismiss');
     }
   }
 
   uploadTemplate() {
     if(!this.authService.currentUser()?.partnerId){
       this.gs.openSnackBar('User must be assigned to a patner!!', "Dismiss");
-    }else {
-    if(this.legalFormType){
-      this.uploadProgressID = uuidv4();
-      this.subscribeToUploadProgress(this.uploadProgressID);
-    this.subs.add = this.dataUploadService.uploadDataTemplate(this.template, this.legalFormType, this.uploadProgressID, this.updateParticipantInfo ? 'YES' : 'NO')
-      .subscribe({
+      return;
+    }
+    if(!this.legalFormType){
+      this.gs.openSnackBar('Invalid Template or You have no required permissions!', "Dismiss");
+      return;
+    }
+    if(!this.template){
+      this.gs.openSnackBar('No file selected!', "Dismiss");
+      return;
+    }
+    this.uploadProgressID = uuidv4();
+    this.subscribeToUploadProgress(this.uploadProgressID);
+    this.subs.add = this.dataUploadService.uploadDataTemplate(
+      this.template, 
+      this.legalFormType, 
+      this.uploadProgressID, 
+      this.updateParticipantInfo ? 'YES' : 'NO'
+    ).subscribe({
         next: (response) => {
           this.importDocumentId = response.message;
           this.entityType = this.legalFormType;
           this.getAvailableDocuments();
-        }
+          this.gs.openSnackBar('Upload initiated successfully', 'Dismiss');
+        
+        // Reset form after successful upload initiation
+        this.resetUploadForm();
+        },
+      error: (error) => {
+        this.gs.openSnackBar('Error uploading file: ' + (error.message || 'Unknown error'), 'Dismiss');
+        this.uploadProgressID = null;
+        this.progress = null;
+      }
       });
-    }else {
-      this.gs.openSnackBar('Invalid Template or You have no required permissions!!', "Dismiss");
-    }
   }
+
+  private resetUploadForm(): void {
+  this.template = null;
+  this.legalFormType = undefined;
+  this.updateParticipantInfo = false;
+  
+  // Reset file input element
+  const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+  if (fileInput) {
+    fileInput.value = '';
   }
+}
 
   
   downloadTemplate() {
@@ -261,41 +348,51 @@ export class DataUploaderComponent implements OnDestroy {
       }
 
   get uploadButtonIsDisabled(): boolean {
-    return !this.template || !this.isExcelFile(this.template) || !this.authService.currentUser()?.partnerId || this.uploadProgressID !== null;
-  }
+  return !this.template 
+    || !this.isExcelFile(this.template) 
+    || !this.authService.currentUser()?.partnerId 
+    || this.uploadProgressID !== null
+    || !this.legalFormType;
+}
 
-  get progressText(): string {
-    if (this.progress) {
-      this.progressDots();
-      if (this.progress.processed > 0 && this.progress.total > 0 && this.progress.total !== this.progress.processed) {
-        return `Processed ${this.progress.processed} of ${this.progress.total} rows`;
-      } else if (this.progress.processed > 0 && this.progress.total > 0 && this.progress.total === this.progress.processed) {
-        return `Completed Processing All ${this.progress.total} rows`;
-      } else {
-        return this.preparingText;
-      }
-    }
+get isUploading(): boolean {
+  return this.uploadProgressID !== null && this.progress !== null;
+}
+
+get uploadComplete(): boolean {
+  return this.progress?.step === 'Upload Completed';
+}
+
+get uploadPercentage(): number {
+  if (!this.progress || this.progress.total === 0) {
+    return 0;
+  }
+  return Math.round((this.progress.processed / this.progress.total) * 100);
+}
+
+get progressText(): string {
+  if (!this.progress) {
     return '';
   }
-
-  progressDots(){
-    this.subs.add = interval(this.animationInterval)
-      .subscribe(() => {
-        this.dotCount = (this.dotCount + 1) % 4; // Cycle through 0, 1, 2, 3
-        this.preparingText = `Preparing the template: ${this.progress?.processed} prepared` + '.'.repeat(this.dotCount);
-      });
+  
+  if (this.uploadComplete) {
+    return `Completed Processing ${this.progress.total} rows`;
   }
+  
+  return `${this.progress.step} ${this.progress.processed} of ${this.progress.total} rows`;
+}
  
 
-  isExcelFile(file: File): boolean {
-    if (!file || !file.name) {
-      return false;
-    }
-    // Check if the file name ends with .xls or .xlsx (case insensitive)
-    const fileName = file.name;
-    const lowerCaseFileName = fileName.toLowerCase();
-    return lowerCaseFileName.endsWith('.xls') || lowerCaseFileName.endsWith('.xlsx');
+  isExcelFile(file: File | null): boolean {
+  if (!file || !file.name) {
+    return false;
   }
+  
+  const validExtensions = ['.xls', '.xlsx'];
+  const fileName = file.name.toLowerCase();
+  
+  return validExtensions.some(ext => fileName.endsWith(ext));
+}
 
   ngOnDestroy(): void {
     this.dataUploadService.disconnectWebSocket();

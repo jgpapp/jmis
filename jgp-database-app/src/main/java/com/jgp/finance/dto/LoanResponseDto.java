@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record LoanDto(
+public record LoanResponseDto(
          Long id,
 
          String participantJGPID,

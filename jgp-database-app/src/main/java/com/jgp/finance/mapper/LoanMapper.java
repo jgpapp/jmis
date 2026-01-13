@@ -1,7 +1,7 @@
 package com.jgp.finance.mapper;
 
 import com.jgp.finance.domain.Loan;
-import com.jgp.finance.dto.LoanDto;
+import com.jgp.finance.dto.LoanResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueCheckStrategy;
@@ -34,7 +34,7 @@ public interface LoanMapper {
     @Mapping(target = "dateUploaded", expression = "java(null != loan.getDateCreated() ? loan.getDateCreated() : null)")
     @Mapping(target = "approvedBy", expression = "java(null != loan.getApprovalBy() ? loan.getApprovalBy().getUserFullName() : null)")
     @Mapping(target = "dateApproved", expression = "java(null != loan.getDateApproved() ? loan.getDateApproved() : null)")
-    LoanDto toDto(Loan loan);
+    LoanResponseDto toDto(Loan loan);
 
-    List<LoanDto> toDto(List<Loan> loan);
+    List<LoanResponseDto> toDto(List<Loan> loan);
 }

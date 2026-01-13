@@ -6,9 +6,11 @@ import com.jgp.infrastructure.documentmanagement.command.DocumentCommand;
 import com.jgp.shared.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -16,7 +18,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Getter
 @Entity
 @Table(name = "jgp_document")
+@SequenceGenerator(name = "jgp_document_seq", sequenceName = "jgp_document_seq", allocationSize = 1)
 public class Document extends BaseEntity {
+
+    @Override
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "jgp_document_seq")
+    public Long getId() {
+        return super.getId();
+    }
 
     @Column(name = "parent_entity_type", length = 50)
     private String parentEntityType;

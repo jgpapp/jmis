@@ -25,13 +25,20 @@ public class PartnerServiceImpl implements PartnerService {
     @AuditTrail(operation = UserAuditOperationConstants.CREATE_PARTNER)
     @Transactional
     @Override
-    public Partner createPartner(PartnerDto partnerDto) {
+    public void createPartner(PartnerDto partnerDto) {
         try {
-            return this.partnerRepository.save(Partner.createPartner(partnerDto));
+            this.partnerRepository.save(Partner.createPartner(partnerDto));
         }catch (Exception e){
             throw new IllegalArgumentException(e);
         }
 
+    }
+
+    @Override
+    public Partner findPartnerById(Long partnerId) {
+        return this.partnerRepository.findById(partnerId)
+                .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
+                .orElseThrow(() -> new PartnerNotFoundException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
     }
 
     @AuditTrail(operation = UserAuditOperationConstants.UPDATE_PARTNER, bodyIndex = 1, entityIdIndex = 0)
@@ -51,7 +58,7 @@ public class PartnerServiceImpl implements PartnerService {
     }
 
     @Override
-    public PartnerDto findPartnerById(Long userId) {
+    public PartnerDto findPartnerDtoById(Long userId) {
         return this.partnerRepository.findById(userId)
                 .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
                 .map(p -> new PartnerDto(p.getId(), p.getPartnerName(), p.getType().getName(), p.getType().name()))

@@ -27,7 +27,6 @@ public class BMOEntityWorkbookPopulator extends AbstractWorkbookPopulator {
     public void populate(Workbook workbook) {
         Sheet bmoSheet = workbook.createSheet(TemplatePopulateImportConstants.BMO_SHEET_NAME);
         setLayout(bmoSheet);
-        setRules(bmoSheet);
         TemplateGuidePopulator.populateGuide(workbook, GlobalEntityType.TA_IMPORT_TEMPLATE);
     }
 

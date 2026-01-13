@@ -2,7 +2,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { GlobalService } from '../shared/global.service';
 import { Observable, of } from 'rxjs';
-import { Client} from '@stomp/stompjs'; 
+import { Client, StompSubscription} from '@stomp/stompjs'; 
+import SockJS from 'sockjs-client';
 
 
 @Injectable({
@@ -31,7 +32,10 @@ export class DataUploadService {
         }else if(templateName.toUpperCase().includes('MONITORING_IMPORT_TEMPLATE')){
             templateEntityType = 'MONITORING_IMPORT_TEMPLATE';
         }
-        return this.httpClient.post(`/imports/upload-template/${templateEntityType}/${uploadProgressID}/${updateParticipantInfo}`, formData);
+        formData.append('entityType', templateEntityType);
+        formData.append('documentProgressId', uploadProgressID);
+        formData.append('updateParticipantInfo', updateParticipantInfo);
+        return this.httpClient.post(`/imports/upload-excel-template`, formData);
       }
 
       uploadResourceFile(file: File, legalFormType: string): Observable<any> {
@@ -107,7 +111,6 @@ export class DataUploadService {
     const headers = res.headers;
     const contentType = headers.get('Content-Type');
     const blob = new Blob([res.body], { type: contentType });
-    const fileName = this.getFileNameFromHttpHeaders(headers);
     const fileURL = URL.createObjectURL(blob);
 
     // Open the Blob URL in a new tab
@@ -160,7 +163,10 @@ export class DataUploadService {
   initializeStompClient(): void {
     // Initialize the STOMP client
     this.webSocketClient = new Client({
-      brokerURL: this.gs.baseWebSocketUrl, // WebSocket URL for the backend
+      webSocketFactory: () => new SockJS(this.gs.baseWebSocketUrl || ''), // WebSocket URL for the backend
+      reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
       connectHeaders: {},
       debug: (str) => {
         //console.log(str); // Debugging logs for STOMP. Enable in case of issues

@@ -3,6 +3,9 @@ package com.jgp.authentication.domain;
 import com.jgp.shared.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
@@ -13,12 +16,19 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 
+@Getter
 @Entity
 @Table(name = "system_user_access_logs", uniqueConstraints = {
         @UniqueConstraint(name = "uk_username_login_date_login_hour", columnNames = {"username", "login_date", "login_hour"})
 })
-@Getter
+@SequenceGenerator(name = "system_user_access_logs_seq", sequenceName = "system_user_access_logs_seq", allocationSize = 1)
 public class SystemUserAccessLog extends BaseEntity {
+
+    @Override
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "system_user_access_logs_seq")
+    public Long getId() {
+        return super.getId();
+    }
 
     @Column(name = "username", nullable = false)
     private String username;
