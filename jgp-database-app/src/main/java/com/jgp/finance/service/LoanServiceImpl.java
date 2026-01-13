@@ -52,7 +52,7 @@ public class LoanServiceImpl implements LoanService {
     @Transactional
     @Override
     public void createOrUpdateLoan(Loan loan) {
-        final var existingLoanOptional = null != loan.getLoanNumber() ? this.loanRepository.findByParticipantAndLoanNumber(loan.getParticipant(), loan.getLoanNumber()).filter(l -> Boolean.FALSE.equals(l.getIsDeleted())) : Optional.<Loan>empty();
+        final var existingLoanOptional = null != loan.getLoanNumber() ? this.loanRepository.findByParticipantAndLoanNumber(loan.getParticipant(), loan.getLoanNumber()) : Optional.<Loan>empty();
         if (existingLoanOptional.isPresent()){
             var existingLoan = existingLoanOptional.get();
             var loanTransaction = loan.getLoanTransactions().stream().findFirst().orElse(null);
@@ -153,7 +153,7 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     public LoanResponseDto findLoanById(Long loanId) {
-        return this.loanRepository.findById(loanId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).map(this.loanMapper::toDto).orElseThrow(() -> new RuntimeException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
+        return this.loanRepository.findById(loanId).map(this.loanMapper::toDto).orElseThrow(() -> new RuntimeException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
 
     }
 
@@ -161,7 +161,7 @@ public class LoanServiceImpl implements LoanService {
     public Page<LoanTransactionResponseDto> getAvailableLoanTransactions(Long partnerId, Long loanId, Boolean isApproved, Pageable pageable) {
         Page<LoanTransaction> transactions;
         if (Objects.nonNull(loanId)){
-            final var loan = this.loanRepository.findById(loanId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).orElseThrow(() -> new ResourceNotFound(HttpStatus.NOT_FOUND));
+            final var loan = this.loanRepository.findById(loanId).orElseThrow(() -> new ResourceNotFound(HttpStatus.NOT_FOUND));
             final var txns = loan.getLoanTransactions().stream().toList();
             transactions = new PageImpl<>(txns, pageable, txns.size());
         }else {

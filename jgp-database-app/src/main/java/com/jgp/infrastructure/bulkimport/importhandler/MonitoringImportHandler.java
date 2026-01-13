@@ -189,7 +189,7 @@ public class MonitoringImportHandler implements ImportHandler {
             .marketAccess(ImportHandlerUtils.readAsString(MonitoringConstants.MARKET_ACCESS_COL, row))
             .businessOpportunities(ImportHandlerUtils.readAsString(MonitoringConstants.BUSINESS_OPPORTUNITIES_COL, row))
             .marketChallenges(ImportHandlerUtils.readAsString(MonitoringConstants.MARKET_CHALLENGES_COL, row))
-            .rowIndex(row.getRowNum()).document(this.document).participantJgpId(jgpId)
+            .rowIndex(row.getRowNum()).document(this.document).participantJgpId(jgpId).createdBy(userService.currentUser())
             .build();
     }
 

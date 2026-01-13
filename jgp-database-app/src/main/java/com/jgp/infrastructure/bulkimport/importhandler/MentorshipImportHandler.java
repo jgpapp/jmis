@@ -192,7 +192,7 @@ public class MentorshipImportHandler implements ImportHandler {
                 .agreedActionForGapOne(businessGapsAgreedAction).additionalNeededSupport(additionalSupport)
                 .partner(Objects.nonNull(userService.currentUser()) ? userService.currentUser().getPartner() : null)
                 .document(this.document).rowIndex(row.getRowNum()).createdBy(userService.currentUser())
-                .participantDto(getParticipantDto(row))
+                .participantRequestDto(getParticipantDto(row))
                 .build();
     }
 
@@ -256,7 +256,7 @@ public class MentorshipImportHandler implements ImportHandler {
                 .locationCountyCode(null != businessLocation ? businessLocation.getCountyCode() : null)
                 .locationSubCounty(businessLocationSubCounty).locationLatitude(businessLocationLatitude)
                 .locationLongitude(businessLocationLongitude).businessSegment(businessSegment)
-                .participantName(participantName).businessFinancier(financier)
+                .participantName(participantName).businessFinancier(financier).rowIndex(row.getRowNum())
                 .personWithDisability(personWithDisability).disabilityType(personWithDisabilityType).build();
     }
 
@@ -381,9 +381,8 @@ public class MentorshipImportHandler implements ImportHandler {
     private List<MentorshipRequestDto> validateSingleChunk(List<MentorshipRequestDto> chunk) {
         List<MentorshipRequestDto> validData = new ArrayList<>();
         for (MentorshipRequestDto mentorshipData : chunk) {
-            final var participantDto = mentorshipData.participantRequestDto();
             try {
-                ParticipantValidator.validateParticipant(participantDto, rowErrorMap);
+                //ParticipantValidator.validateParticipant(mentorshipData.participantRequestDto(), rowErrorMap);
                 validData.add(mentorshipData);
                 int processedRows = currentStepProgress.incrementAndGet();
                 updateProgressInBulk(importProgressService, documentImportProgressUUId, processedRows);
@@ -427,7 +426,7 @@ public class MentorshipImportHandler implements ImportHandler {
             this.mentorshipService.createMentorship(dataWithParticipant);
             return new ExcelTemplateProcessingResult(row, true, null);
         } catch (RuntimeException ex) {
-            log.error("Problem occurred when uploading TA: {}", ex.getMessage());
+            log.error("Problem occurred when uploading Mentorship: {}", ex.getMessage());
             var errorMessage = ImportHandlerUtils.getErrorMessage(ex);
             return new ExcelTemplateProcessingResult(row, false, errorMessage);
         }

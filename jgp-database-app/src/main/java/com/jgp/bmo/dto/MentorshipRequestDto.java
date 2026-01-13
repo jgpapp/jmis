@@ -2,7 +2,6 @@ package com.jgp.bmo.dto;
 
 import com.jgp.authentication.domain.AppUser;
 import com.jgp.infrastructure.documentmanagement.domain.Document;
-import com.jgp.participant.domain.Participant;
 import com.jgp.participant.dto.ParticipantRequestDto;
 import com.jgp.patner.domain.Partner;
 import lombok.Builder;
@@ -43,8 +42,6 @@ public record MentorshipRequestDto(
         String additionalNeededSupport,
 
         Partner partner,
-
-        ParticipantRequestDto participantDto,
 
         Document document,
 

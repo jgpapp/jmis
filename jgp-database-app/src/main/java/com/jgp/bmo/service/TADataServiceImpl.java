@@ -48,7 +48,7 @@ public class TADataServiceImpl implements TADataService {
     @Transactional
     @Override
     public void approvedBMOParticipantsData(List<Long> dataIds, Boolean approval) {
-        var bmoData = this.bmoDataRepository.findAllById(dataIds).stream().filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).toList();
+        var bmoData = this.bmoDataRepository.findAllById(dataIds);
         var currentUser = this.platformSecurityContext.getAuthenticatedUserIfPresent();
         var currentUserPartner = Objects.nonNull(currentUser) ? currentUser.getPartner() : null;
         if (dataIds.isEmpty() && Objects.nonNull(currentUserPartner)) {
@@ -107,7 +107,6 @@ public class TADataServiceImpl implements TADataService {
         }
         this.bmoDataRepository.deleteTADataByIds(bmoToDelete.stream().map(TAData::getId).toList());
         final var participantsToDeleteIds = bmoToDelete.stream().map(TAData::getParticipant)
-                .filter(pt -> Boolean.FALSE.equals(pt.getIsActive()))
                 .map(Participant::getId).toList();
 
         this.participantRepository.deleteParticipantsByIds(participantsToDeleteIds);
@@ -121,7 +120,7 @@ public class TADataServiceImpl implements TADataService {
 
     @Override
     public TAResponseDto findBMODataById(Long bmoId) {
-        return this.bmoDataRepository.findById(bmoId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).map(this.taMapper::toDto).orElseThrow(() -> new RuntimeException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
+        return this.bmoDataRepository.findById(bmoId).map(this.taMapper::toDto).orElseThrow(() -> new RuntimeException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
     }
 
     @Override

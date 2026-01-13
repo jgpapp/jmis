@@ -64,7 +64,6 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Transactional
     public void updateParticipant(Long participantId, ParticipantRequestDto participantRequestDto) {
         var participant =  this.participantRepository.findById(participantId)
-                .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
                 .orElseThrow(() -> new ParticipantNotFoundException(participantId));
         participant.updateParticipant(participantRequestDto);
         this.participantRepository.save(participant);
@@ -74,10 +73,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Override
     public List<Participant> updateParticipants(Map<Long, ParticipantRequestDto> participantUpdates) {
         var participantIds = participantUpdates.keySet();
-        var participants = this.participantRepository.findAllById(participantIds)
-                .stream()
-                .filter(p -> Boolean.FALSE.equals(p.getIsDeleted()))
-                .toList();
+        var participants = this.participantRepository.findAllById(participantIds);
 
         participants.forEach(participant ->
                 participant.updateParticipant(participantUpdates.get(participant.getId()))
@@ -122,7 +118,6 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Override
     public ParticipantResponseDto findParticipantById(Long participantId, boolean includeAccounts) {
         var participant =  this.participantRepository.findById(participantId)
-                .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
                 .map(this.participantMapper::toDto)
                 .orElseThrow(() -> new ParticipantNotFoundException(participantId));
 

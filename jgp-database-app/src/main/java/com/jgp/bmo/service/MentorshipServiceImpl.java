@@ -62,7 +62,7 @@ public class MentorshipServiceImpl implements MentorshipService {
 
     @Override
     public void approvedMentorShipData(List<Long> dataIds, Boolean approval) {
-        var mentorshipData = this.mentorshipRepository.findAllById(dataIds).stream().filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).toList();
+        var mentorshipData = this.mentorshipRepository.findAllById(dataIds);
         var currentUser = this.platformSecurityContext.getAuthenticatedUserIfPresent();
         var currentUserPartner = Objects.nonNull(currentUser) ? currentUser.getPartner() : null;
         if (dataIds.isEmpty() && Objects.nonNull(currentUserPartner)) {
@@ -117,7 +117,6 @@ public class MentorshipServiceImpl implements MentorshipService {
         }
         this.mentorshipRepository.deleteMentorshipDataByIds(mentorshipsToDelete.stream().map(Mentorship::getId).toList());
         final var participantsToDeleteIds = mentorshipsToDelete.stream().map(Mentorship::getParticipant)
-                .filter(pt -> Boolean.FALSE.equals(pt.getIsActive()))
                 .map(Participant::getId).toList();
 
         this.participantRepository.deleteParticipantsByIds(participantsToDeleteIds);
@@ -131,7 +130,7 @@ public class MentorshipServiceImpl implements MentorshipService {
 
     @Override
     public MentorshipResponseDto findMentorshipDataById(Long mentorshipId) {
-        return this.mentorshipRepository.findById(mentorshipId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).map(this.mentorshipMapper::toDto).orElseThrow(() -> new RuntimeException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
+        return this.mentorshipRepository.findById(mentorshipId).map(this.mentorshipMapper::toDto).orElseThrow(() -> new RuntimeException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
     }
 
     @Override
