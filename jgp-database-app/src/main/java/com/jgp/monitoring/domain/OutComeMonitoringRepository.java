@@ -1,11 +1,11 @@
 package com.jgp.monitoring.domain;
 
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +16,7 @@ public interface OutComeMonitoringRepository extends JpaRepository<OutComeMonito
 
     @Transactional
     @Modifying
-    @Query(value = "update outcome_monitoring mon set is_deleted = true where mon.id in ?1", nativeQuery = true)
+    @Query(value = "delete from outcome_monitoring mon where mon.id in ?1", nativeQuery = true)
     void deleteOutComeMonitoringByIds(@NonNull List<Long> monitoringIds);
 
     List<OutComeMonitoring> findByIsDeletedFalse();

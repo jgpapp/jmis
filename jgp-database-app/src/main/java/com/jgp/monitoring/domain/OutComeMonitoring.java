@@ -8,8 +8,11 @@ import com.jgp.shared.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,7 +29,14 @@ import java.util.stream.Collectors;
 @Getter
 @Entity
 @Table(name = "outcome_monitoring")
+@SequenceGenerator(name = "outcome_monitoring_seq", sequenceName = "outcome_monitoring_seq", allocationSize = 1)
 public class OutComeMonitoring extends BaseEntity {
+
+    @Override
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outcome_monitoring_seq")
+    public Long getId() {
+        return super.getId();
+    }
 
     @Column(name = "survey_date")
     private LocalDate surveyDate;
@@ -264,13 +274,12 @@ public class OutComeMonitoring extends BaseEntity {
     public OutComeMonitoring() {
         // Default constructor
     }
-    public OutComeMonitoring(OutComeMonitoringRequestDto dto, Participant participant, Document document, Integer rowIndex) {
+    public OutComeMonitoring(OutComeMonitoringRequestDto dto) {
         this.surveyDate = dto.surveyDate();
         this.surveyLanguage = dto.surveyLanguage();
         this.consented = "Yes".equalsIgnoreCase(dto.consented());
         this.locationLatitude = dto.locationLatitude();
         this.locationLongitude = dto.locationLongitude();
-        this.participant = participant;
         this.age = dto.age();
         this.genderCategory = dto.genderCategory();
         this.segment = dto.segment();
@@ -337,8 +346,9 @@ public class OutComeMonitoring extends BaseEntity {
         this.marketAccess = dto.marketAccess() != null ? Arrays.stream(dto.marketAccess().split(",")).map(String::trim).collect(Collectors.joining(",")) : null;
         this.businessOpportunities = dto.businessOpportunities();
         this.marketChallenges = dto.marketChallenges();
-        this.rowIndex = rowIndex;
-        this.document = document;
+        this.rowIndex = dto.rowIndex();
+        this.document = dto.document();
+        this.setCreatedBy(dto.createdBy());
     }
 
     public void approveData(Boolean approval, AppUser user){

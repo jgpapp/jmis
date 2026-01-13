@@ -1,8 +1,8 @@
 package com.jgp.bmo.api;
 
-import com.jgp.bmo.dto.BMOClientDto;
-import com.jgp.bmo.dto.BMOParticipantSearchCriteria;
-import com.jgp.bmo.service.BMOClientDataService;
+import com.jgp.bmo.dto.TAResponseDto;
+import com.jgp.bmo.dto.TAParticipantSearchCriteria;
+import com.jgp.bmo.service.TADataService;
 import com.jgp.shared.dto.ApiResponseDto;
 import com.jgp.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
@@ -28,21 +28,21 @@ import java.util.List;
 @RequestMapping("api/v1/bmos")
 public class BMOClientController {
 
-    private final BMOClientDataService bmoDataService;
+    private final TADataService bmoDataService;
 
     @GetMapping
-    public ResponseEntity<Page<BMOClientDto>> getAvailableBMODataRecords(@RequestParam(name = "partnerId", required = false) Long partnerId,
-                                                                         @RequestParam(name = "participantId", required = false) Long participantId,
-                                                                         @RequestParam(name = "approvedByPartner", required = false) Boolean approvedByPartner,
-                                                                         @RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
-                                                                         @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
+    public ResponseEntity<Page<TAResponseDto>> getAvailableBMODataRecords(@RequestParam(name = "partnerId", required = false) Long partnerId,
+                                                                          @RequestParam(name = "participantId", required = false) Long participantId,
+                                                                          @RequestParam(name = "approvedByPartner", required = false) Boolean approvedByPartner,
+                                                                          @RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
+                                                                          @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
         final var sortedByDateCreated =
                 PageRequest.of(pageNumber, pageSize, Sort.by("dateCreated").descending());
-        return new ResponseEntity<>(this.bmoDataService.getBMODataRecords(new BMOParticipantSearchCriteria(partnerId, participantId, approvedByPartner), sortedByDateCreated), HttpStatus.OK);
+        return new ResponseEntity<>(this.bmoDataService.getBMODataRecords(new TAParticipantSearchCriteria(partnerId, participantId, approvedByPartner), sortedByDateCreated), HttpStatus.OK);
     }
 
     @GetMapping("{bmoId}")
-    public ResponseEntity<BMOClientDto> getBMOParticipantData(@PathVariable("bmoId") Long bmoId){
+    public ResponseEntity<TAResponseDto> getBMOParticipantData(@PathVariable("bmoId") Long bmoId){
         return new ResponseEntity<>(this.bmoDataService.findBMODataById(bmoId), HttpStatus.OK);
     }
 

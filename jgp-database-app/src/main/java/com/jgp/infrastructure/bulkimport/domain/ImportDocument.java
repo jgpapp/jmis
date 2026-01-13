@@ -7,12 +7,14 @@ import com.jgp.shared.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -22,7 +24,14 @@ import java.time.ZoneId;
 @Getter
 @Entity
 @Table(name = "import_document")
+@SequenceGenerator(name = "import_document_seq", sequenceName = "import_document_seq", allocationSize = 1)
 public class ImportDocument extends BaseEntity {
+
+    @Override
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "import_document_seq")
+    public Long getId() {
+        return super.getId();
+    }
 
     @OneToOne
     @JoinColumn(name = "document_id")

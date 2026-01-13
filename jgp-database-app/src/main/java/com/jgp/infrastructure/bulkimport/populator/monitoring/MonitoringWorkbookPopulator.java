@@ -14,7 +14,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 public class MonitoringWorkbookPopulator extends AbstractWorkbookPopulator {
     @Override
     public void populate(Workbook workbook) {
-        Sheet monitoringSheet = workbook.createSheet("Monitoring");
+        Sheet monitoringSheet = workbook.createSheet(TemplatePopulateImportConstants.MONITORING_SHEET_NAME);
         setLayout(monitoringSheet);
         TemplateGuidePopulator.populateGuide(workbook, GlobalEntityType.MONITORING_IMPORT_TEMPLATE);
     }

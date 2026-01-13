@@ -99,7 +99,7 @@ public class DataSummaryServiceImpl implements DataSummaryService {
                 with highLevelSummary as (
                                      select p.gender_category as genderCategory, count(*) as businessesTrained,
                                      0 as businessesLoaned, 0 as amountDisbursed,
-                                     0 as outStandingAmount from bmo_participants_data bpd\s
+                                     0 as outStandingAmount from ta_participants_data bpd\s
                                      inner join participants p on p.id = bpd.participant_id %s
                                      group by 1
                                      union

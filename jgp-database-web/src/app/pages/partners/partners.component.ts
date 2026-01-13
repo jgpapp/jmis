@@ -12,7 +12,7 @@ import { PartnerService } from '@services/data-management/partners.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { NoPermissionComponent } from '../errors/no-permission/no-permission.component';
 import { AuthService } from '@services/users/auth.service';
 import { HasPermissionDirective } from '../../directives/has-permission.directive';
@@ -23,18 +23,17 @@ import { SubscriptionsContainer } from '../../theme/utils/subscriptions-containe
 @Component({
     selector: 'app-partners',
     imports: [
-        MatTableModule,
-        MatPaginatorModule,
-        ContentHeaderComponent,
-        FlexLayoutModule,
-        MatButtonModule,
-        MatIconModule,
-        MatFormFieldModule,
-        RouterModule,
-        CommonModule,
-        NoPermissionComponent,
-        HasPermissionDirective
-    ],
+    MatTableModule,
+    MatPaginatorModule,
+    ContentHeaderComponent,
+    FlexLayoutModule,
+    MatButtonModule,
+    MatIconModule,
+    MatFormFieldModule,
+    RouterModule,
+    NoPermissionComponent,
+    HasPermissionDirective
+],
     templateUrl: './partners.component.html',
     styleUrl: './partners.component.scss'
 })

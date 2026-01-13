@@ -1,15 +1,16 @@
 package com.jgp.bmo.mapper;
 
-import com.jgp.bmo.domain.BMOParticipantData;
-import com.jgp.bmo.dto.BMOClientDto;
+import com.jgp.bmo.domain.TAData;
+import com.jgp.bmo.dto.TAResponseDto;
 import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.NullValueMappingStrategy;
 
 @Mapper(componentModel = "spring", nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT, nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
-public interface BMOClientMapper {
+public interface TAMapper {
 
     @Mapping(target = "id", expression = "java(bmoClientData.getId())")
     @Mapping(target = "partnerId", expression = "java(null != bmoClientData.getPartner() ? bmoClientData.getPartner().getId() : null)")
@@ -31,7 +32,7 @@ public interface BMOClientMapper {
     @Mapping(target = "dateUploaded", expression = "java(null != bmoClientData.getDateCreated() ? bmoClientData.getDateCreated() : null)")
     @Mapping(target = "approvedBy", expression = "java(null != bmoClientData.getApprovalBy() ? bmoClientData.getApprovalBy().getUserFullName() : null)")
     @Mapping(target = "dateApproved", expression = "java(null != bmoClientData.getDateApproved() ? bmoClientData.getDateApproved() : null)")
-    BMOClientDto toDto(BMOParticipantData bmoClientData);
+    TAResponseDto toDto(TAData bmoClientData);
 
-    List<BMOClientDto> toDto(List<BMOParticipantData> bmoClientDataList);
+    List<TAResponseDto> toDto(List<TAData> bmoClientDataList);
 }

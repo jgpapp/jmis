@@ -52,6 +52,6 @@ public class PartnerController {
 
     @GetMapping("{partnerId}")
     public ResponseEntity<PartnerDto> getPartner(@PathVariable("partnerId") Long partnerId){
-        return new ResponseEntity<>(this.partnerService.findPartnerById(partnerId), HttpStatus.OK);
+        return new ResponseEntity<>(this.partnerService.findPartnerDtoById(partnerId), HttpStatus.OK);
     }
 }

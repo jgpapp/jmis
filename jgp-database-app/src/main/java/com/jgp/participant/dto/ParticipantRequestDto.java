@@ -1,7 +1,8 @@
 package com.jgp.participant.dto;
 
-import com.jgp.bmo.dto.BMOClientDto;
-import com.jgp.finance.dto.LoanDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jgp.bmo.dto.TAResponseDto;
+import com.jgp.finance.dto.LoanResponseDto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -11,7 +12,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Builder
-public record ParticipantDto(
+public record ParticipantRequestDto(
         String businessName,
 
         @NotNull(message = "JGP Id is required !!")
@@ -64,9 +65,9 @@ public record ParticipantDto(
 
         String refugeeStatus,
 
-        List<BMOClientDto> bmoClientDtos,
+        List<TAResponseDto> bmoClientDtos,
 
-        List<LoanDto> loanDtos,
+        List<LoanResponseDto> loanResponseDtos,
 
         String locationCountyCode,
 
@@ -78,7 +79,10 @@ public record ParticipantDto(
 
         Boolean isEligible,
 
-        String businessFinancier
+        String businessFinancier,
+
+        @JsonIgnore
+        Integer rowIndex
 
         ) {
 }

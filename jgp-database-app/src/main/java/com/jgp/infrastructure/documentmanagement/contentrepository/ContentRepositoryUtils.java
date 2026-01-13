@@ -1,20 +1,15 @@
 
 package com.jgp.infrastructure.documentmanagement.contentrepository;
 
-import com.jgp.infrastructure.core.domain.Base64EncodedFile;
-import com.jgp.infrastructure.core.domain.Base64EncodedImage;
 import com.jgp.infrastructure.documentmanagement.exception.ContentManagementException;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
 
 import java.security.SecureRandom;
 
 public final class ContentRepositoryUtils {
 
     private static final SecureRandom random = new SecureRandom();
-    private static final String DATA_AND_BASE_64_PARAM = "data:%s;base64,";
 
     private ContentRepositoryUtils() {}
 
@@ -51,77 +46,20 @@ public final class ContentRepositoryUtils {
             this.value = value;
         }
 
-        public String getValueWithoutDot() {
-            return this.value.substring(1);
-        }
-
-        public ImageFileExtension getFileExtension() {
-            return switch (this) {
-                case GIF -> ImageFileExtension.GIF;
-                case JPEG -> ImageFileExtension.JPEG;
-                case PNG -> ImageFileExtension.PNG;
-                default -> throw new IllegalArgumentException();
-            };
-        }
-    }
-
-    @Getter
-    public enum ImageDataURIsuffix {
-        GIF(String.format(DATA_AND_BASE_64_PARAM, ImageMIMEtype.GIF.getValue())),
-        JPEG(String.format(DATA_AND_BASE_64_PARAM, ImageMIMEtype.JPEG.getValue())),
-        PNG(String.format(DATA_AND_BASE_64_PARAM, ImageMIMEtype.PNG.getValue()));
-
-        private final String value;
-
-        ImageDataURIsuffix(final String value) {
-            this.value = value;
-        }
     }
 
     public static ImageFileExtension imageExtensionFromFileName(String fileName) {
-        if (StringUtils.endsWith(fileName.toLowerCase(), ImageFileExtension.GIF.getValue())) {
+        if (fileName == null) {
+            return ImageFileExtension.JPEG;
+        }
+        String lowerFileName = fileName.toLowerCase();
+        if (lowerFileName.endsWith(ImageFileExtension.GIF.getValue())) {
             return ImageFileExtension.GIF;
-        } else if (StringUtils.endsWith(fileName, ImageFileExtension.PNG.getValue())) {
+        } else if (lowerFileName.endsWith(ImageFileExtension.PNG.getValue())) {
             return ImageFileExtension.PNG;
         } else {
             return ImageFileExtension.JPEG;
         }
-    }
-
-    /**
-     * Validates that passed in Mime type maps to known image mime types
-     *
-     */
-    public static void validateImageMimeType(final String mimeType) {
-        if ((!mimeType.equalsIgnoreCase(ImageMIMEtype.GIF.getValue()) && !mimeType.equalsIgnoreCase(ImageMIMEtype.JPEG.getValue())
-                && !mimeType.equalsIgnoreCase(ImageMIMEtype.PNG.getValue()))) {
-            throw new ContentManagementException(mimeType);
-        }
-    }
-
-    /**
-     * Extracts Image from a Data URL
-     *
-     * @param dataURL
-     *            mimeType
-     */
-    public static Base64EncodedImage extractImageFromDataURL(final String dataURL) {
-        String fileExtension = "";
-        String base64EncodedString = null;
-        if (StringUtils.startsWith(dataURL, ImageDataURIsuffix.GIF.getValue())) {
-            base64EncodedString = dataURL.replaceAll(ImageDataURIsuffix.GIF.getValue(), "");
-            fileExtension = ImageFileExtension.GIF.getValue();
-        } else if (StringUtils.startsWith(dataURL, ImageDataURIsuffix.PNG.getValue())) {
-            base64EncodedString = dataURL.replaceAll(ImageDataURIsuffix.PNG.getValue(), "");
-            fileExtension = ImageFileExtension.PNG.getValue();
-        } else if (StringUtils.startsWith(dataURL, ImageDataURIsuffix.JPEG.getValue())) {
-            base64EncodedString = dataURL.replaceAll(ImageDataURIsuffix.JPEG.getValue(), "");
-            fileExtension = ImageFileExtension.JPEG.getValue();
-        } else {
-            throw new ContentManagementException("Invalid file !!!");
-        }
-
-        return new Base64EncodedImage(base64EncodedString, fileExtension);
     }
 
     /**
@@ -153,32 +91,4 @@ public final class ContentRepositoryUtils {
         return new String(text);
     }
 
-    /**
-     * Extracts File from a Data URL
-     *
-     * @param dataURL
-     *            mimeType
-     */
-    public static Base64EncodedFile extractFileFromDataURL(final String dataURL) throws FileUploadException {
-        String fileExtension = "";
-        String fileType = "";
-        String base64EncodedString = null;
-        if (StringUtils.startsWith(dataURL, ImageDataURIsuffix.PNG.getValue())) {
-            base64EncodedString = dataURL.replaceAll(ImageDataURIsuffix.PNG.getValue(), "");
-            fileExtension = ImageFileExtension.PNG.getValue();
-            fileType = ImageMIMEtype.PNG.getValue();
-        } else if (StringUtils.startsWith(dataURL, ImageDataURIsuffix.JPEG.getValue())) {
-            base64EncodedString = dataURL.replaceAll(ImageDataURIsuffix.JPEG.getValue(), "");
-            fileExtension = ImageFileExtension.JPEG.getValue();
-            fileType = ImageMIMEtype.JPEG.getValue();
-        } else if (StringUtils.startsWith(dataURL, ImageDataURIsuffix.GIF.getValue())) {
-            base64EncodedString = dataURL.replaceAll(ImageDataURIsuffix.GIF.getValue(), "");
-            fileExtension = ImageFileExtension.GIF.getValue();
-            fileType = ImageMIMEtype.GIF.getValue();
-        } else {
-            throw new FileUploadException();
-        }
-
-        return new Base64EncodedFile(base64EncodedString, fileExtension, base64EncodedString.length(), fileType);
-    }
 }

@@ -1,6 +1,7 @@
 package com.jgp.finance.domain;
 
 import com.jgp.authentication.domain.AppUser;
+import com.jgp.finance.dto.LoanRequestDto;
 import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.participant.domain.Participant;
 import com.jgp.patner.domain.Partner;
@@ -11,9 +12,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -30,16 +34,23 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+@Setter
 @Getter
 @Entity
 @Table(name = "loans")
+@SequenceGenerator(name = "loans_seq", sequenceName = "loans_seq", allocationSize = 1)
 public class Loan extends BaseEntity {
+
+    @Override
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "loans_seq")
+    public Long getId() {
+        return super.getId();
+    }
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "partner_id")
     private Partner partner;
 
-    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "participant_id")
     private Participant participant;
@@ -122,35 +133,27 @@ public class Loan extends BaseEntity {
     public Loan() {
     }
 
-    public Loan(Partner partner, Participant participant, String loanNumber,
-                String pipeLineSource, LoanQuality loanQuality,
-                LoanStatus loanStatus, LocalDate dateApplied,
-                LocalDate dateDisbursed, BigDecimal loanAmount,
-                Integer loanDuration, BigDecimal loanOutStandingAmount,
-                LocalDate dateRecordedByPartner, String uniqueValues,
-                LocalDate dateAddedToDB, BigDecimal loanAmountRepaid,
-                String loanerType, String loanProduct, AppUser createdBy, Document document, Integer rowIndex) {
-        this.partner = partner;
-        this.participant = participant;
-        this.loanNumber = loanNumber;
-        this.pipeLineSource = pipeLineSource;
-        this.loanQuality = loanQuality;
-        this.loanStatus = loanStatus;
-        this.dateApplied = dateApplied;
-        this.dateDisbursed = dateDisbursed;
-        this.loanAmount = loanAmount;
-        this.loanDuration = loanDuration;
-        this.loanOutStandingAmount = loanOutStandingAmount;
-        this.dateRecordedByPartner = dateRecordedByPartner;
-        this.uniqueValues = uniqueValues;
-        this.dateAddedToDB = dateAddedToDB;
-        this.rowIndex = rowIndex;
-        this.loanAmountRepaid = loanAmountRepaid;
-        this.loanerType = loanerType;
-        this.loanProduct = loanProduct;
+    public Loan(LoanRequestDto dto) {
+        this.loanNumber = dto.loanNumber();
+        this.pipeLineSource = dto.pipeLineSource();
+        this.loanQuality = dto.loanQuality();
+        this.loanStatus = dto.loanStatus();
+        this.dateApplied = dto.dateApplied();
+        this.dateDisbursed = dto.dateDisbursed();
+        this.loanAmount = dto.loanAmount();
+        this.loanDuration = dto.loanDuration();
+        this.loanOutStandingAmount = dto.loanOutStandingAmount();
+        this.dateRecordedByPartner = dto.dateRecordedByPartner();
+        this.uniqueValues = dto.uniqueValues();
+        this.dateAddedToDB = dto.dateAddedToDB();
+        this.rowIndex = dto.rowIndex();
+        this.loanAmountRepaid = dto.loanAmountRepaid();
+        this.loanerType = dto.loanerType();
+        this.loanProduct = dto.loanProduct();
         this.isDataApprovedByPartner = false;
-        this.setCreatedBy(createdBy);
-        this.document = document;
+        this.setCreatedBy(dto.createdBy());
+        this.document = dto.document();
+        this.addLoanTransaction(dto.loanTransaction());
     }
 
     public void addLoanTransaction(LoanTransaction loanTransaction){

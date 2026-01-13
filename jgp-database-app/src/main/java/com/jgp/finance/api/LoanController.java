@@ -1,7 +1,7 @@
 package com.jgp.finance.api;
 
 import com.jgp.finance.domain.Loan;
-import com.jgp.finance.dto.LoanDto;
+import com.jgp.finance.dto.LoanResponseDto;
 import com.jgp.finance.dto.LoanSearchCriteria;
 import com.jgp.finance.dto.LoanTransactionResponseDto;
 import com.jgp.finance.service.LoanService;
@@ -39,13 +39,13 @@ public class LoanController {
     private final BulkImportWorkbookService bulkImportWorkbookService;
 
     @GetMapping
-    public ResponseEntity<Page<LoanDto>> getAvailableLoanRecords(@RequestParam(name = "partnerId", required = false) Long partnerId,
-                                                                 @RequestParam(name = "participantId", required = false) Long participantId,
-                                                                 @RequestParam(name = "status", required = false) Loan.LoanStatus status,
-                                                                 @RequestParam(name = "quality", required = false) Loan.LoanQuality quality,
-                                                                 @RequestParam(name = "approvedByPartner", required = false) Boolean approvedByPartner,
-                                                                 @RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
-                                                                 @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
+    public ResponseEntity<Page<LoanResponseDto>> getAvailableLoanRecords(@RequestParam(name = "partnerId", required = false) Long partnerId,
+                                                                         @RequestParam(name = "participantId", required = false) Long participantId,
+                                                                         @RequestParam(name = "status", required = false) Loan.LoanStatus status,
+                                                                         @RequestParam(name = "quality", required = false) Loan.LoanQuality quality,
+                                                                         @RequestParam(name = "approvedByPartner", required = false) Boolean approvedByPartner,
+                                                                         @RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
+                                                                         @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
         final var sortedByDateCreated =
                 PageRequest.of(pageNumber, pageSize, Sort.by("dateCreated").descending());
         return new ResponseEntity<>(this.loanService.getLoans(new LoanSearchCriteria(partnerId, participantId, status, quality, approvedByPartner, null, null), sortedByDateCreated), HttpStatus.OK);
@@ -63,7 +63,7 @@ public class LoanController {
     }
 
     @GetMapping("{loanId}")
-    public ResponseEntity<LoanDto> getLoan(@PathVariable("loanId") Long loanId){
+    public ResponseEntity<LoanResponseDto> getLoan(@PathVariable("loanId") Long loanId){
         return new ResponseEntity<>(this.loanService.findLoanById(loanId), HttpStatus.OK);
     }
 

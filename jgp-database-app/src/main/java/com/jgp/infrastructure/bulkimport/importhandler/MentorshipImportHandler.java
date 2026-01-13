@@ -1,6 +1,6 @@
 package com.jgp.infrastructure.bulkimport.importhandler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.collect.Lists;
 import com.jgp.authentication.service.UserService;
 import com.jgp.bmo.domain.Mentorship;
 import com.jgp.bmo.dto.MentorshipRequestDto;
@@ -8,30 +8,40 @@ import com.jgp.bmo.service.MentorshipService;
 import com.jgp.infrastructure.bulkimport.constants.MentorShipConstants;
 import com.jgp.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import com.jgp.infrastructure.bulkimport.data.Count;
+import com.jgp.infrastructure.bulkimport.data.ExcelTemplateProcessingResult;
 import com.jgp.infrastructure.bulkimport.event.BulkImportEvent;
 import com.jgp.infrastructure.bulkimport.exception.InvalidDataException;
 import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
 import com.jgp.infrastructure.documentmanagement.domain.Document;
-import com.jgp.participant.dto.ParticipantDto;
+import com.jgp.participant.domain.Participant;
+import com.jgp.participant.dto.ParticipantRequestDto;
 import com.jgp.participant.service.ParticipantService;
+import com.jgp.patner.service.PartnerService;
 import com.jgp.shared.validator.DataValidator;
 import com.jgp.shared.validator.ParticipantValidator;
 import com.jgp.util.CommonUtil;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Slf4j
@@ -41,69 +51,81 @@ public class MentorshipImportHandler implements ImportHandler {
     private final MentorshipService mentorshipService;
     private final ParticipantService participantService;
     private final UserService userService;
-    List<Mentorship> mentorshipDataList;
+    private final PartnerService partnerService;
+    List<MentorshipRequestDto> mentorshipDataList;
     private Workbook workbook;
-    private List<String> statuses;
-    private Map<Row, String> rowErrorMap;
-    private Map<Long, ParticipantDto> participantDtoMap;
+    private Sheet mentorShipSheet;
+    private Map<Integer, String> rowErrorMap;
+    private Map<Long, ParticipantRequestDto> participantDtoMap;
     private String documentImportProgressUUId;
     private Boolean updateParticipantInfo;
     private Document document;
+    private Long currentPartnerId;
     private static final String OTHER = "OTHER";
+    private final AtomicInteger currentStepProgress = new AtomicInteger(0);
 
 
     @Override
-    public Count process(BulkImportEvent bulkImportEvent) {
+    public CompletableFuture<Count> process(BulkImportEvent bulkImportEvent) {
+        log.info("Starting Mentorship import process for document: {}", bulkImportEvent.document().getId());
         this.workbook = bulkImportEvent.workbook();
-        mentorshipDataList = new ArrayList<>();
-        statuses = new ArrayList<>();
-        this.rowErrorMap = new HashMap<>();
-        this.participantDtoMap = new HashMap<>();
+        this.mentorShipSheet = this.workbook.getSheet(TemplatePopulateImportConstants.MENTOR_SHIP_SHEET_NAME);
+        this.mentorshipDataList = new ArrayList<>();
+        this.rowErrorMap = new ConcurrentHashMap<>();
         this.documentImportProgressUUId = bulkImportEvent.importProgressUUID();
         this.updateParticipantInfo = bulkImportEvent.updateParticipantInfo();
         this.document = bulkImportEvent.document();
+        this.currentPartnerId = getCurrentPartnerId(userService);
         readExcelFile();
-        return importEntity();
-    }
-
-    public void saveMentorshipData(Mentorship mentorship) {
-        this.mentorshipService.saveMentorshipWithParticipant(mentorship, this.updateParticipantInfo, this.participantDtoMap);
-    }
-
-    @Override
-    public void updateImportProgress(String importId, boolean updateTotal, int total) {
-        try {
-            if (updateTotal){
-                importProgressService.updateTotal(importId, total);
-            }else {
-                importProgressService.incrementProcessedProgress(importId);
-            }
-        } catch (ExecutionException e) {
-            log.error("Error : {}", e.getMessage(), e);
-        }
+        return processChunks();
     }
 
     public void readExcelFile() {
-        Sheet loanSheet = workbook.getSheet(TemplatePopulateImportConstants.MENTOR_SHIP_SHEET_NAME);
-        Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(loanSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
+        if (mentorShipSheet == null) {
+            log.error("Sheet '{}' not found in workbook", TemplatePopulateImportConstants.MENTOR_SHIP_SHEET_NAME);
+            throw new InvalidDataException("Required sheet not found: " + TemplatePopulateImportConstants.MENTOR_SHIP_SHEET_NAME);
+        }
 
-        for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
-            Row row;
-            row = loanSheet.getRow(rowIndex);
-            if (null != row && ImportHandlerUtils.isNotImported(row, MentorShipConstants.STATUS_COL)) {
-                    mentorshipDataList.add(readMentorShipData(row));
+        Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(mentorShipSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
+        if (noOfEntries == null || noOfEntries == 0) {
+            log.warn("No data rows found in sheet");
+            importProgressService.updateTotal(documentImportProgressUUId, 0);
+            return;
+        }
+
+        log.info("Starting to read {} rows from mentorship sheet", noOfEntries);
+        importProgressService.updateTotal(documentImportProgressUUId, noOfEntries);
+        importProgressService.updateStepAndSendProgress(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_READING_STEP);
+
+        boolean headerSkipped = false;
+        currentStepProgress.set(0); // Reset counter
+
+        for (Row row : mentorShipSheet) {
+            // Skip header row
+            if (!headerSkipped) {
+                headerSkipped = true;
+                continue;
+            }
+
+            if (row != null && ImportHandlerUtils.isNotImported(row, MentorShipConstants.STATUS_COL)) {
                 try {
-                    this.importProgressService.incrementAndSendProgressUpdate(this.documentImportProgressUUId);
-                } catch (JsonProcessingException | ExecutionException e) {
-                    log.error("Problem Updating Preparation Progress: {}", e.getMessage());
+                    mentorshipDataList.add(readMentorShipData(row));
+                    int processedRows = currentStepProgress.incrementAndGet();
+                    updateProgressInBulk(importProgressService, documentImportProgressUUId, processedRows);
+                } catch (Exception ex) {
+                    log.error("Error reading row {}: {}", row.getRowNum(), ex.getMessage());
+                    rowErrorMap.put(row.getRowNum(), "Error reading row: " + ex.getMessage());
                 }
             }
         }
+        // Final progress update
+        importProgressService.sendProgressUpdate(documentImportProgressUUId, currentStepProgress.get());
+
+        log.info("Successfully read {} rows from sheet", currentStepProgress.get());
     }
 
 
-    private Mentorship readMentorShipData(Row row) {
-        final var status = ImportHandlerUtils.readAsString(MentorShipConstants.STATUS_COL, row);
+    private MentorshipRequestDto readMentorShipData(Row row) {
         final var mentorShipDate = DataValidator.validateLocalDate(MentorShipConstants.MENTORSHIP_DATE_COL, row, rowErrorMap, "Mentorship Date", true);
         final var mentorShipOrg = ImportHandlerUtils.readAsString(MentorShipConstants.MENTOR_ORGANIZATION_COL, row);
         var bmoMembership = ImportHandlerUtils.readAsString(MentorShipConstants.BMO_MEMBERSHIP_COL, row);
@@ -111,24 +133,19 @@ public class MentorshipImportHandler implements ImportHandler {
             bmoMembership =ImportHandlerUtils.readAsString(MentorShipConstants.OTHER_BMO_MEMBERSHIP_COL, row);
         }
         if (Objects.isNull(bmoMembership)){
-            rowErrorMap.put(row, "BMO Membership is required !!");
+            rowErrorMap.put(row.getRowNum(), "BMO Membership is required !!");
         }
         final var deliveryMode = ImportHandlerUtils.readAsString(MentorShipConstants.MENTORSHIP_DELIVERY_MODE_COL, row);
-        final var jgpID = ImportHandlerUtils.readAsString(MentorShipConstants.JGP_ID_COL, row);
-        final var participant = null == jgpID ? null : this.participantService.findOneParticipantByJGPID(jgpID).orElse(null);
-        if (Objects.isNull(participant)){
-            rowErrorMap.put(row, "Participant can not be found by Id");
-        }
         final var businessSituation = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_SITUATION_COL, row);
-        if (null == rowErrorMap.get(row) && null == businessSituation){
-            rowErrorMap.put(row, "Business Situation is required !!");
+        if (null == rowErrorMap.get(row.getRowNum()) && null == businessSituation){
+            rowErrorMap.put(row.getRowNum(), "Business Situation is required !!");
         }
         final var didHireMoreEmployees = ImportHandlerUtils.readAsString(MentorShipConstants.LOAN_MADE_HIRE_MORE_COL, row);
         Integer numberOfMoreEmployees = null;
         if ("YES".equalsIgnoreCase(didHireMoreEmployees)){
             numberOfMoreEmployees = DataValidator.validateTemplateIntegerValue(MentorShipConstants.NEW_EMPLOYEES_18_35_COL, row, "number of new employees", rowErrorMap, true);
-            if ((null == numberOfMoreEmployees || numberOfMoreEmployees < 1) && null == rowErrorMap.get(row)){
-                rowErrorMap.put(row, "New hires 18-35 must be greater than 0");
+            if ((null == numberOfMoreEmployees || numberOfMoreEmployees < 1) && null == rowErrorMap.get(row.getRowNum())){
+                rowErrorMap.put(row.getRowNum(), "New hires 18-35 must be greater than 0");
             }
         }
 
@@ -136,8 +153,8 @@ public class MentorshipImportHandler implements ImportHandler {
         Double revenueIncreaseDouble = null;
         if ("YES".equalsIgnoreCase(didRevenueIncrease)){
             revenueIncreaseDouble = DataValidator.validateTemplateDoubleValue(MentorShipConstants.REVENUE_INCREASE_PERCENT_COL, row, "revenue increase", rowErrorMap, true);
-            if ((null == revenueIncreaseDouble || revenueIncreaseDouble < 1) &&  null == rowErrorMap.get(row)){
-                rowErrorMap.put(row, "Revenue increase must be greater than 0");
+            if ((null == revenueIncreaseDouble || revenueIncreaseDouble < 1) &&  null == rowErrorMap.get(row.getRowNum())){
+                rowErrorMap.put(row.getRowNum(), "Revenue increase must be greater than 0");
             }
         }
 
@@ -159,45 +176,37 @@ public class MentorshipImportHandler implements ImportHandler {
         final var smeCovered = ImportHandlerUtils.readAsString(MentorShipConstants.SME_SESSIONS_COVERED_COL, row);
         final var businessGaps = ImportHandlerUtils.readAsString(MentorShipConstants.IDENTIFIED_BUSINESS_GAPS, row);
         if (null == businessGaps){
-            rowErrorMap.put(row, "Business Gaps must be provided!!");
+            rowErrorMap.put(row.getRowNum(), "Business Gaps must be provided!!");
         } else if (businessGaps.split(",").length < 3) {
-            rowErrorMap.put(row, "At least 3 Business Gaps must be provided !!");
+            rowErrorMap.put(row.getRowNum(), "At least 3 Business Gaps must be provided !!");
         }
         final var businessGapsAgreedAction = ImportHandlerUtils.readAsString(MentorShipConstants.AGREED_ACTION_FOR_GAP_1, row);
         final var additionalSupport = ImportHandlerUtils.readAsString(MentorShipConstants.ADDITIONAL_SUPPORT_NEEDED, row);
 
-        statuses.add(status);
-
-        var mentorShipData = MentorshipRequestDto.builder()
+        return MentorshipRequestDto.builder()
                 .mentorShipDate(mentorShipDate).mentorShipOrganization(mentorShipOrg).bmoMemberShip(bmoMembership)
                 .mentorShipDeliveryMode(deliveryMode).businessSituation(businessSituation)
                 .newHiresBecauseOfLoan(Objects.nonNull(numberOfMoreEmployees) ? numberOfMoreEmployees : 0)
                 .revenueIncreaseDueToTraining(revenueIncrease).usefulTrainingTopics(usefulTopics).supportNeededAreas(areasNeedingSupport)
                 .msmeSessionsCovered(msmeCovered).smeSessionsCovered(smeCovered).identifiedBusinessGaps(String.join(",", businessGaps))
                 .agreedActionForGapOne(businessGapsAgreedAction).additionalNeededSupport(additionalSupport)
+                .partner(Objects.nonNull(userService.currentUser()) ? userService.currentUser().getPartner() : null)
+                .document(this.document).rowIndex(row.getRowNum()).createdBy(userService.currentUser())
+                .participantRequestDto(getParticipantDto(row))
                 .build();
-
-
-        if (Objects.nonNull(participant)) {
-            this.participantDtoMap.put(participant.getId(), getParticipantDto(row));
-        }
-
-
-        return new Mentorship(Objects.nonNull(userService.currentUser()) ? userService.currentUser().getPartner() : null,
-                participant, this.document, row.getRowNum(), userService.currentUser(), mentorShipData);
     }
 
-    private ParticipantDto getParticipantDto(Row row){
+    private ParticipantRequestDto getParticipantDto(Row row){
         final var participantName = ImportHandlerUtils.readAsString(MentorShipConstants.PARTICIPANT_NAME_COL, row);
-        if (null == participantName && null == rowErrorMap.get(row)){
-            rowErrorMap.put(row, "Participant Name Is Required !!");
+        if (null == participantName && null == rowErrorMap.get(row.getRowNum())){
+            rowErrorMap.put(row.getRowNum(), "Participant Name Is Required !!");
         }
         final var businessName = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_NAME_COL, row);
 
         final var jgpId = ImportHandlerUtils.readAsString(MentorShipConstants.JGP_ID_COL, row);
         final var phoneNumber = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_PHONE_NUMBER_COL, row);
-        if (null == phoneNumber && null == rowErrorMap.get(row)){
-            rowErrorMap.put(row, "Phone Number Is Required !!");
+        if (null == phoneNumber && null == rowErrorMap.get(row.getRowNum())){
+            rowErrorMap.put(row.getRowNum(), "Phone Number Is Required !!");
         }
         var gender = ImportHandlerUtils.readAsString(MentorShipConstants.MENTEE_GENDER_COL, row);
         gender = ParticipantValidator.validateGender(gender, row, rowErrorMap);
@@ -213,13 +222,13 @@ public class MentorshipImportHandler implements ImportHandler {
         final var financier = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_FINANCIER_COL, row);
         ParticipantValidator.validateFinanciers(financier, row, rowErrorMap);
         var businessLocation = DataValidator.validateCountyName(MentorShipConstants.BUSINESS_COUNTY_LOCATION_COL, row, rowErrorMap);
-        if (null == businessLocation && null == rowErrorMap.get(row)){
-            rowErrorMap.put(row, "Business Location Is Required !!");
+        if (null == businessLocation && null == rowErrorMap.get(row.getRowNum())){
+            rowErrorMap.put(row.getRowNum(), "Business Location Is Required !!");
             businessLocation = CommonUtil.KenyanCounty.UNKNOWN;
         }
         final var businessLocationSubCounty = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_SUB_COUNTY_LOCATION_COL, row);
-        if (null == businessLocationSubCounty && null == rowErrorMap.get(row)){
-            rowErrorMap.put(row, "Business Location SubCounty Is Required !!");
+        if (null == businessLocationSubCounty && null == rowErrorMap.get(row.getRowNum())){
+            rowErrorMap.put(row.getRowNum(), "Business Location SubCounty Is Required !!");
         }
 
         final var businessLocationDoubleLatitude = DataValidator.validateTemplateDoubleValue(MentorShipConstants.GEO_LOCATION_LATITUDE, row, "location latitude", rowErrorMap, false);
@@ -231,108 +240,205 @@ public class MentorshipImportHandler implements ImportHandler {
         if (StringUtils.isNotBlank(industrySector) && OTHER.equals(industrySector.toUpperCase(Locale.ROOT))){
             industrySector =ImportHandlerUtils.readAsString(MentorShipConstants.OTHER_BUSINESS_CATEGORY_COL, row);
         }
-        if (null == industrySector && null == rowErrorMap.get(row)){
-            rowErrorMap.put(row, "Business Category Is Required !!");
+        if (null == industrySector && null == rowErrorMap.get(row.getRowNum())){
+            rowErrorMap.put(row.getRowNum(), "Business Category Is Required !!");
         }
 
         final var businessSegment = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_SEGMENT, row);
-        if (null == businessSegment && null == rowErrorMap.get(row)){
-            rowErrorMap.put(row, "Business Segment Is Required !!");
+        if (null == businessSegment && null == rowErrorMap.get(row.getRowNum())){
+            rowErrorMap.put(row.getRowNum(), "Business Segment Is Required !!");
         }
 
 
-        return ParticipantDto.builder()
-                .phoneNumber(phoneNumber).businessLocation(businessLocation.getCountyName()).businessName(businessName)
+        return ParticipantRequestDto.builder()
+                .phoneNumber(phoneNumber).businessLocation(null != businessLocation ? businessLocation.getCountyName() : null).businessName(businessName)
                 .ownerGender(gender).ownerAge(age).industrySector(industrySector).jgpId(jgpId)
-                .locationCountyCode(businessLocation.getCountyCode())
+                .locationCountyCode(null != businessLocation ? businessLocation.getCountyCode() : null)
                 .locationSubCounty(businessLocationSubCounty).locationLatitude(businessLocationLatitude)
                 .locationLongitude(businessLocationLongitude).businessSegment(businessSegment)
-                .participantName(participantName).businessFinancier(financier)
+                .participantName(participantName).businessFinancier(financier).rowIndex(row.getRowNum())
                 .personWithDisability(personWithDisability).disabilityType(personWithDisabilityType).build();
     }
 
-
-    public Count importEntity() {
-        Sheet mentorShipSheet = workbook.getSheet(TemplatePopulateImportConstants.MENTOR_SHIP_SHEET_NAME);
-        int successCount = 0;
-        int errorCount = 0;
-        int progressLevel = 0;
-        String errorMessage = "";
-        var loanDataSize = mentorshipDataList.size();
-        try {
-            importProgressService.resetEveryThingToZero(this.documentImportProgressUUId);
-        } catch (ExecutionException e) {
-            log.error(e.getMessage());
+    /**
+     * Processes all chunks of TA data asynchronously.
+     * Steps: 1) Validate chunks in parallel, 2) Store to database in parallel, 3) Write results to workbook sequentially
+     * @return CompletableFuture containing count of total, success and failure records
+     */
+    @Async
+    public CompletableFuture<Count> processChunks() {
+        // Early return if no data to process
+        if (mentorshipDataList.isEmpty()) {
+            log.warn("No Mentorship data to process");
+            return CompletableFuture.completedFuture(Count.instance(0, 0, 0));
         }
-        updateImportProgress(this.documentImportProgressUUId, true, loanDataSize);
-        for (int i = 0; i < loanDataSize; i++) {
-            final var mentorshipData = mentorshipDataList.get(i);
-            Row row = mentorShipSheet.getRow(mentorshipData.getRowIndex());
-            Cell errorReportCell = row.createCell(MentorShipConstants.FAILURE_COL);
-            Cell statusCell = row.createCell(MentorShipConstants.STATUS_COL);
-            if (null == rowErrorMap.get(row) && Objects.isNull(mentorshipData.getParticipant())){
-                rowErrorMap.put(row, "Can not associate mentorship Data data to a participant !!");
-            }
+        final var mentorshipDataSize = mentorshipDataList.size();
+
+        final var existingParticipants = participantService.findParticipantsByJGPIDs(
+                mentorshipDataList.stream()
+                        .map(MentorshipRequestDto::participantRequestDto)
+                        .map(ParticipantRequestDto::jgpId)
+                        .filter(Objects::nonNull)
+                        .distinct()
+                        .toList()
+        );
+
+        // 1. Split the mentorshipDataList into smaller chunks
+        final var chunks = Lists.partition(mentorshipDataList, CHUNK_SIZE);
+        log.info("Processing {} records in {} chunks", mentorshipDataList.size(), chunks.size());
+
+        // 2. Validate each chunk asynchronously
+        currentStepProgress.set(0); // Reset counter
+        importProgressService.resetEveryThingToZero(documentImportProgressUUId);
+        importProgressService.updateTotal(documentImportProgressUUId, mentorshipDataSize);
+        importProgressService.updateStepAndSendProgress(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_VALIDATING_STEP);
+
+        final var validatedFutures = chunks.stream()
+                .map(chunk -> CompletableFuture.supplyAsync(() -> validateSingleChunk(chunk), IMPORT_EXECUTOR))
+                .toList();
+
+        CompletableFuture.allOf(validatedFutures.toArray(new CompletableFuture[0])).join();
+
+        // Wait for UI to sync before moving to next step
+        sleep(log);
+
+        // STORING DATA STEP
+        currentStepProgress.set(0); // Reset counter
+        importProgressService.resetEveryThingToZero(documentImportProgressUUId);
+        importProgressService.updateTotal(documentImportProgressUUId, mentorshipDataSize);
+        importProgressService.updateStepAndSendProgress(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_STORING_STEP);
+
+        // 3. Storing Mentorship data - process in parallel, collect results
+        final var storingFutures = chunks.stream()
+                .map(chunk -> CompletableFuture.supplyAsync(() -> storeDataWithoutWritingToWorkbook(chunk, existingParticipants), IMPORT_EXECUTOR))
+                .toList();
+
+        CompletableFuture.allOf(storingFutures.toArray(new CompletableFuture[0])).join();
+
+        // Wait for all futures to complete and collect results
+        final var allResults = storingFutures.stream()
+                .map(CompletableFuture::join)
+                .flatMap(List::stream)
+                .toList();
+
+        // Wait for UI to sync before moving to next step
+        sleep(log);
+
+        // 4. Write results to workbook sequentially (not thread-safe)
+        currentStepProgress.set(0); // Reset counter
+        importProgressService.resetEveryThingToZero(documentImportProgressUUId);
+        importProgressService.updateTotal(documentImportProgressUUId, mentorshipDataSize);
+        importProgressService.updateStepAndSendProgress(documentImportProgressUUId, TemplatePopulateImportConstants.EXCEL_UPLOAD_STATUS_STEP);
+        setReportHeaders(mentorShipSheet, MentorShipConstants.STATUS_COL, MentorShipConstants.FAILURE_COL);
+
+        // Count successes and failures while writing results
+        long successCount = allResults.stream().filter(ExcelTemplateProcessingResult::success).count();
+        long failureCount = allResults.size() - successCount;
+
+        for (var result : allResults) {
+            writeResultToWorkbook(result, MentorShipConstants.STATUS_COL, MentorShipConstants.FAILURE_COL);
+            int processedRows = currentStepProgress.incrementAndGet();
+            updateProgressInBulk(importProgressService, documentImportProgressUUId, processedRows);
+        }
+        // Final progress update
+        importProgressService.sendProgressUpdate(documentImportProgressUUId, currentStepProgress.get());
+
+        log.info("Finished Import - Total: {}, Success: {}, Failed: {} at {}",
+                mentorshipDataList.size(), successCount, failureCount, LocalDateTime.now(ZoneId.systemDefault()));
+
+        return CompletableFuture.completedFuture(Count.instance(mentorshipDataList.size(), (int) successCount, (int) failureCount));
+    }
+
+    /**
+     * Associates a participant to the given mentorshipDataDto based on the provided participant map.
+     *
+     * @param mentorshipDataDto      the mentorshipDataDto
+     * @param participantMap a map of participants keyed by their JGP IDs
+     * @return the mentorship object with the associated participant
+     */
+    private Mentorship associateParticipantToMentorshipData(MentorshipRequestDto mentorshipDataDto, Map<String, Participant> participantMap) {
+        final var participantDto = mentorshipDataDto.participantRequestDto();
+        final var mentorshipData = new Mentorship(mentorshipDataDto);
+        final var participant = this.participantService.createOrUpdateParticipant(participantDto, participantMap, this.updateParticipantInfo);
+        if (Objects.isNull(participant)) {
+            rowErrorMap.put(mentorshipDataDto.rowIndex(), PARTICIPANT_ASSOCIATION_ERROR);
+        }
+        mentorshipData.setParticipant(participant);
+        final var partner = Objects.nonNull(currentPartnerId) ? partnerService.findPartnerById(currentPartnerId) : null;
+        if (Objects.isNull(partner)) {
+            rowErrorMap.put(mentorshipDataDto.rowIndex(), PARTNER_ASSOCIATION_ERROR);
+        }
+        mentorshipData.setPartner(partner);
+        return mentorshipData;
+    }
+
+    /**
+     * Validates a single chunk of MentorshipData.
+     *
+     * @param chunk the list of MentorshipData to validate
+     * @return a list of valid MentorshipData
+     */
+    private List<MentorshipRequestDto> validateSingleChunk(List<MentorshipRequestDto> chunk) {
+        List<MentorshipRequestDto> validData = new ArrayList<>();
+        for (MentorshipRequestDto mentorshipData : chunk) {
             try {
-                String status = statuses.get(i);
-                progressLevel = getProgressLevel(status);
-
-                final var validationError = rowErrorMap.get(row);
-                if (null != validationError){
-                    throw new InvalidDataException(validationError);
-                }
-                if (progressLevel == 0) {
-                    this.saveMentorshipData(mentorshipData);
-                    progressLevel = 1;
-                }
-                statusCell.setCellValue(TemplatePopulateImportConstants.STATUS_CELL_IMPORTED);
-                statusCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.LIGHT_GREEN));
-                successCount++;
+                //ParticipantValidator.validateParticipant(mentorshipData.participantRequestDto(), rowErrorMap);
+                validData.add(mentorshipData);
+                int processedRows = currentStepProgress.incrementAndGet();
+                updateProgressInBulk(importProgressService, documentImportProgressUUId, processedRows);
             } catch (RuntimeException ex) {
-                errorCount++;
-                log.error("Problem occurred When Uploading Mentoring Data: {}", ex.getMessage());
-                errorMessage = ImportHandlerUtils.getErrorMessage(ex);
-                writeGroupErrorMessage(errorMessage, progressLevel, statusCell, errorReportCell);
-            }finally {
-                updateImportProgress(this.documentImportProgressUUId, false, 0);
-                try {
-                    this.importProgressService.sendProgressUpdate(this.documentImportProgressUUId);
-                } catch (JsonProcessingException | ExecutionException e) {
-                    log.error("Problem Updating Progress: {}", e.getMessage());
-                }
+                log.error("Problem occurred when validating mentorship: {}", ex.getMessage());
+                var errorMessage = ImportHandlerUtils.getErrorMessage(ex);
+                rowErrorMap.put(mentorshipData.rowIndex(), errorMessage);
             }
         }
-        setReportHeaders(mentorShipSheet);
-        log.info("Finished Import Finished := {}", LocalDateTime.now(ZoneId.systemDefault()));
-        return Count.instance(loanDataSize, successCount, errorCount);
+        // Final progress update for the chunk
+        importProgressService.sendProgressUpdate(documentImportProgressUUId, currentStepProgress.get());
+        return validData;
     }
 
-    private void writeGroupErrorMessage(String errorMessage, int progressLevel, Cell statusCell, Cell errorReportCell) {
-        String status = "";
-        if (progressLevel == 0) {
-            status = TemplatePopulateImportConstants.STATUS_CREATION_FAILED;
-        } else if (progressLevel == 1) {
-            status = TemplatePopulateImportConstants.STATUS_MEETING_FAILED;
+    private List<ExcelTemplateProcessingResult> storeDataWithoutWritingToWorkbook(List<MentorshipRequestDto> chunk, Map<String, Participant> participantMap) {
+        List<ExcelTemplateProcessingResult> results = new ArrayList<>();
+        for (MentorshipRequestDto mentorshipData : chunk) {
+            var result = storeSingleDataWithoutWritingToWorkbook(mentorshipData, participantMap);
+            results.add(result);
+            int processedRows = currentStepProgress.incrementAndGet();
+            updateProgressInBulk(importProgressService, documentImportProgressUUId, processedRows);
         }
-        statusCell.setCellValue(status);
-        statusCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.RED));
-        errorReportCell.setCellValue(errorMessage);
-    }
-
-    private void setReportHeaders(Sheet bmpSheet) {
-        ImportHandlerUtils.writeString(MentorShipConstants.STATUS_COL, bmpSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX),
-                TemplatePopulateImportConstants.STATUS_COL_REPORT_HEADER);
-        ImportHandlerUtils.writeString(MentorShipConstants.FAILURE_COL, bmpSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX),
-                TemplatePopulateImportConstants.FAILURE_COL_REPORT_HEADER);
+        // Final progress update for the chunk
+        importProgressService.sendProgressUpdate(documentImportProgressUUId, currentStepProgress.get());
+        return results;
     }
 
 
-    private int getProgressLevel(String status) {
-        if (status == null || status.equals(TemplatePopulateImportConstants.STATUS_CREATION_FAILED)) {
-            return 0;
-        } else if (status.equals(TemplatePopulateImportConstants.STATUS_MEETING_FAILED)) {
-            return 1;
+    /**
+     * Stores data to database without writing to workbook (thread-safe for parallel execution)
+     */
+    private ExcelTemplateProcessingResult storeSingleDataWithoutWritingToWorkbook(MentorshipRequestDto mentorshipData, Map<String, Participant> participantMap) {
+        Row row = mentorShipSheet.getRow(mentorshipData.rowIndex());
+
+        try {
+            final var dataWithParticipant = associateParticipantToMentorshipData(mentorshipData, participantMap);
+            final var validationError = rowErrorMap.get(mentorshipData.rowIndex());
+            if (Objects.nonNull(validationError)) {
+                throw new InvalidDataException(validationError);
+            }
+            this.mentorshipService.createMentorship(dataWithParticipant);
+            return new ExcelTemplateProcessingResult(row, true, null);
+        } catch (RuntimeException ex) {
+            log.error("Problem occurred when uploading Mentorship: {}", ex.getMessage());
+            var errorMessage = ImportHandlerUtils.getErrorMessage(ex);
+            return new ExcelTemplateProcessingResult(row, false, errorMessage);
         }
-        return 0;
+    }
+
+    @PreDestroy
+    public void cleanup() {
+        try {
+            workbook.close();
+        } catch (IOException e) {
+            log.error("Error while closing workbook", e);
+        }
+        IMPORT_EXECUTOR.shutdown();
     }
 }

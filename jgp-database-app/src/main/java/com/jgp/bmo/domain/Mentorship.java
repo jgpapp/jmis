@@ -9,8 +9,11 @@ import com.jgp.shared.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,10 +24,18 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "mentor_ships")
-@Getter
+@SequenceGenerator(name = "mentor_ships_seq", sequenceName = "mentor_ships_seq", allocationSize = 1)
 public class Mentorship extends BaseEntity {
+
+    @Override
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mentor_ships_seq")
+    public Long getId() {
+        return super.getId();
+    }
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "partner_id")
@@ -96,11 +107,9 @@ public class Mentorship extends BaseEntity {
     public Mentorship() {
     }
 
-    public Mentorship(Partner partner, Participant participant, Document document, Integer rowIndex, AppUser createdBy, MentorshipRequestDto dto) {
-        this.partner = partner;
-        this.participant = participant;
-        this.rowIndex = rowIndex;
-        this.setCreatedBy(createdBy);
+    public Mentorship(MentorshipRequestDto dto) {
+        this.rowIndex = dto.rowIndex();
+        this.setCreatedBy(dto.createdBy());
         this.isDataApproved = Boolean.FALSE;
         this.mentorShipDate = dto.mentorShipDate();
         this.mentorShipOrganization = dto.mentorShipOrganization();
@@ -116,7 +125,7 @@ public class Mentorship extends BaseEntity {
         this.identifiedBusinessGaps = dto.identifiedBusinessGaps();
         this.agreedActionForGapOne = dto.agreedActionForGapOne();
         this.additionalNeededSupport = dto.additionalNeededSupport();
-        this.document = document;
+        this.document = dto.document();
     }
 
     public void approveData(Boolean approval, AppUser user){

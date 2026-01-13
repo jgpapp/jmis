@@ -7,11 +7,13 @@ import org.springframework.data.domain.Pageable;
 
 public interface PartnerService {
 
-    Partner createPartner(PartnerDto partnerDto);
+    void createPartner(PartnerDto partnerDto);
+
+    Partner findPartnerById(Long partnerId);
 
     void updatePartner(Long userId, PartnerDto partnerDto);
 
-    PartnerDto findPartnerById(Long userId);
+    PartnerDto findPartnerDtoById(Long userId);
 
     Page<PartnerDto> getAllPartners(Pageable pageable);
 

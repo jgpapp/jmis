@@ -13,8 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Collection;
-
 public interface BulkImportWorkbookService {
 
     Long importWorkbook(ImportRequestDto importRequestDto);
@@ -22,8 +20,6 @@ public interface BulkImportWorkbookService {
     void importFileToDirectory(GlobalEntityType entityType, ResourceType resourceType, MultipartFile fileDetail);
 
     void deleteFileFromDbAndDirectory(@NotNull Long importDocumentId, final boolean deleteAssociatedData);
-
-    Collection<ImportData> getImports(GlobalEntityType type);
 
     Page<ImportData> getImports(@NotNull GlobalEntityType type, Long partnerId, Pageable pageable);
 
