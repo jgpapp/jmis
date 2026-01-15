@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -258,4 +259,15 @@ public abstract class CommonUtil {
         return new ImmutablePair<>(LocalDate.now(ZoneId.systemDefault()).minusMonths(6), dateToday);
     }
 
+    public static DateTimeFormatter getStandardDateFormatter(String dateFormat, ZoneId zoneId) {
+        return DateTimeFormatter.ofPattern(dateFormat).withZone(zoneId);
+    }
+
+    public static DateTimeFormatter getNairobiDateFormatter(String dateFormat) {
+        return getStandardDateFormatter(dateFormat, ZoneId.of("Africa/Nairobi"));
+    }
+
+    public static DateTimeFormatter getNairobiISODATEDateFormatter() {
+        return getStandardDateFormatter("yyyy-MM-dd", ZoneId.of("Africa/Nairobi"));
+    }
 }

@@ -68,7 +68,7 @@ export class OutcomeMonitoringComponent implements OnDestroy, OnInit {
             next: (response) => {
               this.newMonitoringData = response.content;
               this.dataSource = new MatTableDataSource(this.newMonitoringData);
-              this.totalItems = response.page.totalElements;
+              this.totalItems = response.totalElements;
             },
             error: (error) => { }
           });

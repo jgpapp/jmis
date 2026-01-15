@@ -17,7 +17,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Table(name = "permission", uniqueConstraints = {
         @UniqueConstraint(columnNames = { "code" }, name = "UNIQUE_PERMISSION")
 })
-@SequenceGenerator(name = "permission_seq", sequenceName = "permission_seq", allocationSize = 1)
+@SequenceGenerator(name = "permission_seq", sequenceName = "permission_seq", allocationSize = 50)
 public class Permission extends BaseEntity {
 
     @Override

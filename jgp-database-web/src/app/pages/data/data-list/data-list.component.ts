@@ -61,7 +61,7 @@ export class DataListComponent implements OnDestroy{
         next: (response) => {
           this.bmoClientsData = response.content;
           this.dataSource = new MatTableDataSource(this.bmoClientsData);
-          this.totalItems = response.page.totalElements;
+          this.totalItems = response.totalElements;
         },
         error: (error) => { }
       });

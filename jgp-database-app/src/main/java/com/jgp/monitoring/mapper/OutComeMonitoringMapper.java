@@ -86,7 +86,7 @@ public interface OutComeMonitoringMapper {
     @Mapping(target = "businessOpportunities", expression = "java(outComeMonitoring.getBusinessOpportunities())")
     @Mapping(target = "marketChallenges", expression = "java(outComeMonitoring.getMarketChallenges())")
     @Mapping(target = "uploadedBy", expression = "java(null != outComeMonitoring.getCreatedBy() ? outComeMonitoring.getCreatedBy().getUserFullName() : null)")
-    @Mapping(target = "dateUploaded", expression = "java(null != outComeMonitoring.getDateCreated() ? outComeMonitoring.getDateCreated() : null)")
+    @Mapping(target = "dateUploaded", expression = "java(null != outComeMonitoring.getDateCreated() ? com.jgp.util.CommonUtil.getNairobiISODATEDateFormatter().format(outComeMonitoring.getDateCreated()) : null)")
     @Mapping(target = "approvedBy", expression = "java(null != outComeMonitoring.getApprovalBy() ? outComeMonitoring.getApprovalBy().getUserFullName() : null)")
     @Mapping(target = "dateApproved", expression = "java(null != outComeMonitoring.getDateApproved() ? outComeMonitoring.getDateApproved() : null)")
     OutComeMonitoringResponseDto toDto(OutComeMonitoring outComeMonitoring);

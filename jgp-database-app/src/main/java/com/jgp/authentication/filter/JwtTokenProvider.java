@@ -3,10 +3,12 @@ package com.jgp.authentication.filter;
 import com.jgp.authentication.domain.AppUser;
 import com.jgp.authentication.domain.Role;
 import com.jgp.authentication.exception.UserNotAuthenticatedException;
+import com.jgp.util.CommonUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneId;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -63,7 +65,7 @@ public class JwtTokenProvider {
                     .build()
                     .parseSignedClaims(token);
             return false; // Token is valid and not expired
-        } catch (Exception _) {
+        } catch (Exception e) {
             return true; // Token is expired
         }
     }
@@ -114,7 +116,7 @@ public class JwtTokenProvider {
                 .claim("user_partner_type", Objects.isNull(user.getPartner()) ? null : user.getPartner().getType())
                 .claim("user_partner_id", Objects.isNull(user.getPartner()) ? null : user.getPartner().getId())
                 .claim("user_position", user.getDesignation())
-                .claim("user_registration", user.getDateCreated().format(DateTimeFormatter.ofPattern("MMM, yyyy")))
+                .claim("user_registration", CommonUtil.getNairobiDateFormatter("MMM, yyyy").format(user.getDateCreated()))
                 .claim("user_roles", user.getRoles().stream().map(Role::getRoleName).collect(Collectors.toSet()))
                 .claim("user_permissions", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet()))
                 .claim("force_change_password", user.forceChangePassword(jgpPasswordLifeSpanInMonths))

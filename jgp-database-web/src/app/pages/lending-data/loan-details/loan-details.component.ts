@@ -63,7 +63,7 @@ export class LoanDetailsComponent {
                   next: (response) => {
                     this.loanTransactions = response.content;
                     this.dataSource = new MatTableDataSource(this.loanTransactions);
-                    this.totalItems = response.page.totalElements;
+                    this.totalItems = response.totalElements;
                   },
                   error: (error) => { }
                 });

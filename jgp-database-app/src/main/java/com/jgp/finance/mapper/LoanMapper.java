@@ -29,9 +29,9 @@ public interface LoanMapper {
     @Mapping(target = "loanAmountApplied", ignore = true)
     @Mapping(target = "loanAmountApproved", ignore = true)
     @Mapping(target = "dateRecordedByPartner", ignore = true)
-    @Mapping(target = "dateAddedToDB", expression = "java(null != loan.getDateCreated() ? loan.getDateCreated() : null)")
+    @Mapping(target = "dateAddedToDB", expression = "java(null != loan.getDateCreated() ? com.jgp.util.CommonUtil.getNairobiISODATEDateFormatter().format(loan.getDateCreated()) : null)")
     @Mapping(target = "uploadedBy", expression = "java(null != loan.getCreatedBy() ? loan.getCreatedBy().getUserFullName() : null)")
-    @Mapping(target = "dateUploaded", expression = "java(null != loan.getDateCreated() ? loan.getDateCreated() : null)")
+    @Mapping(target = "dateUploaded", expression = "java(null != loan.getDateCreated() ? com.jgp.util.CommonUtil.getNairobiISODATEDateFormatter().format(loan.getDateCreated()) : null)")
     @Mapping(target = "approvedBy", expression = "java(null != loan.getApprovalBy() ? loan.getApprovalBy().getUserFullName() : null)")
     @Mapping(target = "dateApproved", expression = "java(null != loan.getDateApproved() ? loan.getDateApproved() : null)")
     LoanResponseDto toDto(Loan loan);

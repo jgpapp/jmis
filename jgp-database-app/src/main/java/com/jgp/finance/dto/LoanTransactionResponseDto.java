@@ -17,12 +17,9 @@ public record LoanTransactionResponseDto(
         Integer loanDuration,
         String uploadedBy,
 
-        LocalDate dateUploaded,
+        String dateUploaded,
 
         String approvedBy,
 
         LocalDate dateApproved) {
-    /*public LoanTransactionResponseDto(String transactionType, LocalDate transactionDate, BigDecimal amount) {
-        this(null, transactionType, transactionDate, amount, null, null, null, null, null, null, null, null, null);
-    }*/
 }

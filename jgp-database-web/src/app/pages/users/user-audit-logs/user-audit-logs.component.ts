@@ -104,7 +104,7 @@ export class UserAuditLogsComponent {
             next: (response) => {
               this.userLogs = response.content;
               this.dataSource = new MatTableDataSource(this.userLogs);
-              this.totalItems = response.page.totalElements;
+              this.totalItems = response.totalElements;
             },
             error: (error) => { }
           });

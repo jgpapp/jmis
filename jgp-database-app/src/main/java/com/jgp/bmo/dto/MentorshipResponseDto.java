@@ -30,7 +30,7 @@ public record MentorshipResponseDto(
 
          String uploadedBy,
 
-         LocalDate dateUploaded,
+         String dateUploaded,
 
          String approvedBy,
 

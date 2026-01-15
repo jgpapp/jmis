@@ -28,7 +28,7 @@ import java.time.ZoneId;
 @Getter
 @Entity
 @Table(name = "ta_participants_data")
-@SequenceGenerator(name = "ta_participants_data_seq", sequenceName = "ta_participants_data_seq", allocationSize = 1)
+@SequenceGenerator(name = "ta_participants_data_seq", sequenceName = "ta_participants_data_seq", allocationSize = 50)
 public class TAData extends BaseEntity {
 
     @Override

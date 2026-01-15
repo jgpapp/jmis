@@ -68,7 +68,7 @@ export class MentorShipComponent implements OnDestroy, OnInit {
               next: (response) => {
                 this.newMentorShipData = response.content;
                 this.dataSource = new MatTableDataSource(this.newMentorShipData);
-              this.totalItems = response.page.totalElements;
+              this.totalItems = response.totalElements;
             },
             error: (error) => { }
           });

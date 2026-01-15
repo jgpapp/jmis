@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 @Getter
 @Entity
 @Table(name = "data_summary", uniqueConstraints = @UniqueConstraint(columnNames = {"partner_id", "gender_category", "data_year", "data_month"}))
-@SequenceGenerator(name = "data_summary_seq", sequenceName = "data_summary_seq", allocationSize = 1)
+@SequenceGenerator(name = "data_summary_seq", sequenceName = "data_summary_seq", allocationSize = 50)
 public class DataSummary extends BaseEntity {
 
     @Override

@@ -31,6 +31,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -57,6 +59,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -194,16 +197,15 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ImportData> getImportById(Long importDocumentId) {
         Objects.requireNonNull(importDocumentId, IMPORT_DOCUMENT_ID_CANNOT_BE_NULL);
 
         final ImportDocument importDocument = fetchImportDocument(importDocumentId);
         if (Objects.isNull(importDocument)) {
-            return Page.empty();
+            return new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 1), 0);
         }
-
-        final ImportData importData = this.importDocumentMapper.toDto(importDocument);
-        return new PageImpl<>(List.of(importData));
+        return new PageImpl<>(List.of(this.importDocumentMapper.toDto(importDocument)), PageRequest.of(0, 1), 1);
     }
 
     @Override
@@ -466,8 +468,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
      * @return the fetched ImportDocument, or null if not found or deleted
      */
     private ImportDocument fetchImportDocument(Long importDocumentId) {
-        return this.importDocumentRepository.findById(importDocumentId)
-                .filter(doc -> Boolean.FALSE.equals(doc.getIsDeleted()))
+        return this.importDocumentRepository.findByIdWithRelations(importDocumentId)
                 .orElse(null);
     }
 
@@ -483,7 +484,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                 LocalDateTime.now(ZoneId.systemDefault()),
                 entityType.getValue(),
                 0,
-                this.securityContext.getAuthenticatedUserIfPresent().getPartner()
+                this.securityContext.getAuthenticatedUserIfPresent()
         );
     }
 

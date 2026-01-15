@@ -53,9 +53,10 @@ export class ClientsComponent implements OnInit, OnDestroy{
     this.subs.add = this.clientService.getAvailableClients(this.searchText, this.pageIndex, this.pageSize)
       .subscribe({
         next: (response) => {
+          console.log(response);
           this.participants = response.content;
           this.dataSource = new MatTableDataSource(this.participants);
-          this.totalItems = response.page.totalElements;
+          this.totalItems = response.totalElements;
         },
         error: (error) => { }
       });

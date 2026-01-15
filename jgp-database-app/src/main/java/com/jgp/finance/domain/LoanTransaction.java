@@ -28,7 +28,7 @@ import java.time.ZoneId;
 @Getter
 @Entity
 @Table(name = "loan_transactions")
-@SequenceGenerator(name = "loan_transactions_seq", sequenceName = "loan_transactions_seq", allocationSize = 1)
+@SequenceGenerator(name = "loan_transactions_seq", sequenceName = "loan_transactions_seq", allocationSize = 50)
 public class LoanTransaction extends BaseEntity implements Comparable<LoanTransaction> {
 
     @Override

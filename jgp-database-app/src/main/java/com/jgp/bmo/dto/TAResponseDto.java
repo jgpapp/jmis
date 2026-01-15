@@ -32,11 +32,11 @@ public record TAResponseDto(
 
          LocalDate dateRecordedByPartner,
 
-         LocalDate dateRecordedToJGPDB,
+         String dateRecordedToJGPDB,
 
          String uploadedBy,
 
-         LocalDate dateUploaded,
+         String dateUploaded,
 
          String approvedBy,
 

@@ -28,7 +28,7 @@ import java.time.ZoneId;
 @Getter
 @Entity
 @Table(name = "mentor_ships")
-@SequenceGenerator(name = "mentor_ships_seq", sequenceName = "mentor_ships_seq", allocationSize = 1)
+@SequenceGenerator(name = "mentor_ships_seq", sequenceName = "mentor_ships_seq", allocationSize = 50)
 public class Mentorship extends BaseEntity {
 
     @Override
