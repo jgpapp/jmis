@@ -21,7 +21,7 @@ import java.time.ZoneId;
 @Table(name = "system_user_access_logs", uniqueConstraints = {
         @UniqueConstraint(name = "uk_username_login_date_login_hour", columnNames = {"username", "login_date", "login_hour"})
 })
-@SequenceGenerator(name = "system_user_access_logs_seq", sequenceName = "system_user_access_logs_seq", allocationSize = 1)
+@SequenceGenerator(name = "system_user_access_logs_seq", sequenceName = "system_user_access_logs_seq", allocationSize = 50)
 public class SystemUserAccessLog extends BaseEntity {
 
     @Override

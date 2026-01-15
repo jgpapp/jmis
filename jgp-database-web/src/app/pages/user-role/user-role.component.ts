@@ -46,6 +46,8 @@ export class UserRoleComponent implements OnInit, OnDestroy{
   public displayedColumns = ['roleName', 'description'];
   public dataSource: any;
 
+  totalItems = 0;
+
   userRoles: any
   subs = new SubscriptionsContainer();
   constructor(public dialog: MatDialog, private userRoleServive: UserRoleService, public authService: AuthService) { }
@@ -56,6 +58,7 @@ export class UserRoleComponent implements OnInit, OnDestroy{
         next: (response) => {
           this.userRoles = response;
           this.dataSource = new MatTableDataSource(this.userRoles);
+          this.totalItems = this.userRoles.length;
         },
         error: (error) => { }
       });

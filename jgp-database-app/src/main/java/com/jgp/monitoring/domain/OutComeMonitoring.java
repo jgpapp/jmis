@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Getter
 @Entity
 @Table(name = "outcome_monitoring")
-@SequenceGenerator(name = "outcome_monitoring_seq", sequenceName = "outcome_monitoring_seq", allocationSize = 1)
+@SequenceGenerator(name = "outcome_monitoring_seq", sequenceName = "outcome_monitoring_seq", allocationSize = 50)
 public class OutComeMonitoring extends BaseEntity {
 
     @Override

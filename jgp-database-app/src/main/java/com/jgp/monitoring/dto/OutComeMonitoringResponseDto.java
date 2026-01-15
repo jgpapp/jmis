@@ -79,7 +79,7 @@ public record OutComeMonitoringResponseDto(
         String businessOpportunities,
         String marketChallenges,
         String uploadedBy,
-        LocalDate dateUploaded,
+        String dateUploaded,
         String approvedBy,
         LocalDate dateApproved
 ) implements Serializable {}

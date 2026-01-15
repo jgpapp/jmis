@@ -15,8 +15,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.Instant;
 import java.util.Objects;
 
 @Setter
@@ -28,9 +27,9 @@ public class BaseEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    private LocalDate dateCreated = LocalDate.now();
+    private Instant dateCreated = Instant.now();
 
-    private LocalDate lastModified;
+    private Instant lastModified;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_id")
@@ -45,12 +44,12 @@ public class BaseEntity implements Serializable {
 
     @PrePersist
     public void setDateCreated() {
-        this.dateCreated = LocalDate.now(ZoneId.systemDefault());
+        this.dateCreated = Instant.now();
     }
 
     @PreUpdate
     public void setLastModified() {
-        this.lastModified = LocalDate.now(ZoneId.systemDefault());
+        this.lastModified = Instant.now();
     }
 
     @Override

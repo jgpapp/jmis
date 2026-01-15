@@ -22,7 +22,7 @@ import java.util.Objects;
 @Getter
 @Entity
 @Table(name = "partners", uniqueConstraints = { @UniqueConstraint(columnNames = { "partner_name" }, name = "NAME_UNIQUE")})
-@SequenceGenerator(name = "partners_seq", sequenceName = "partners_seq", allocationSize = 1)
+@SequenceGenerator(name = "partners_seq", sequenceName = "partners_seq", allocationSize = 50)
 public class Partner extends BaseEntity {
 
     @Override

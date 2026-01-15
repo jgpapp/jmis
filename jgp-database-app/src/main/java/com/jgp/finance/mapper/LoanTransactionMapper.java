@@ -23,7 +23,7 @@ public interface LoanTransactionMapper {
     @Mapping(target = "pipeLineSource", expression = "java(null != loanTransaction.getLoan() ? loanTransaction.getLoan().getPipeLineSource() : null)")
     @Mapping(target = "loanDuration", expression = "java(null != loanTransaction.getLoan() ? loanTransaction.getLoan().getLoanDuration() : null)")
     @Mapping(target = "uploadedBy", expression = "java(null != loanTransaction.getCreatedBy() ? loanTransaction.getCreatedBy().getUserFullName() : null)")
-    @Mapping(target = "dateUploaded", expression = "java(null != loanTransaction.getDateCreated() ? loanTransaction.getDateCreated() : null)")
+    @Mapping(target = "dateUploaded", expression = "java(null != loanTransaction.getDateCreated() ? com.jgp.util.CommonUtil.getNairobiISODATEDateFormatter().format(loanTransaction.getDateCreated()) : null)")
     @Mapping(target = "approvedBy", expression = "java(null != loanTransaction.getApprovalBy() ? loanTransaction.getApprovalBy().getUserFullName() : null)")
     @Mapping(target = "dateApproved", expression = "java(null != loanTransaction.getDateApproved() ? loanTransaction.getDateApproved() : null)")
      LoanTransactionResponseDto toDto(LoanTransaction loanTransaction);

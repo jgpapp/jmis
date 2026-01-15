@@ -26,6 +26,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ import java.util.stream.Collectors;
 @Getter
 @Entity
 @Table(name = "users", uniqueConstraints = { @UniqueConstraint(columnNames = { "email_address" }, name = "EMAIL_UNIQUE")})
-@SequenceGenerator(name = "users_seq", sequenceName = "users_seq", allocationSize = 1)
+@SequenceGenerator(name = "users_seq", sequenceName = "users_seq", allocationSize = 50)
 public class AppUser extends BaseEntity implements PlatformUser {
 
 
@@ -142,7 +143,7 @@ public class AppUser extends BaseEntity implements PlatformUser {
         if(!Objects.equals(userDto.cellPhone(), this.cellPhone)){
             this.cellPhone = userDto.cellPhone();
         }
-        this.setLastModified(LocalDate.now(ZoneId.systemDefault()));
+        this.setLastModified(Instant.now());
     }
 
     public boolean forceChangePassword(final Integer passwordLifeSpan) {

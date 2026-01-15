@@ -71,7 +71,7 @@ export class LendingDataComponent implements OnDestroy, OnInit {
           next: (response) => {
             this.newLoansData = response.content;
             this.dataSource = new MatTableDataSource(this.newLoansData);
-          this.totalItems = response.page.totalElements;
+          this.totalItems = response.totalElements;
         },
         error: (error) => { }
       });

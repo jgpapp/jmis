@@ -25,7 +25,7 @@ public interface MentorshipMapper {
     @Mapping(target = "msmeSessionsCovered", expression = "java(null != mentorship.getMsmeSessionsCovered() ? mentorship.getMsmeSessionsCovered() : null)")
     @Mapping(target = "smeSessionsCovered", expression = "java(null != mentorship.getSmeSessionsCovered() ? mentorship.getSmeSessionsCovered() : null)")
     @Mapping(target = "uploadedBy", expression = "java(null != mentorship.getCreatedBy() ? mentorship.getCreatedBy().getUserFullName() : null)")
-    @Mapping(target = "dateUploaded", expression = "java(null != mentorship.getDateCreated() ? mentorship.getDateCreated() : null)")
+    @Mapping(target = "dateUploaded", expression = "java(null != mentorship.getDateCreated() ? com.jgp.util.CommonUtil.getNairobiISODATEDateFormatter().format(mentorship.getDateCreated()) : null)")
     @Mapping(target = "approvedBy", expression = "java(null != mentorship.getApprovalBy() ? mentorship.getApprovalBy().getUserFullName() : null)")
     @Mapping(target = "dateApproved", expression = "java(null != mentorship.getDateApproved() ? mentorship.getDateApproved() : null)")
     MentorshipResponseDto toDto(Mentorship mentorship);

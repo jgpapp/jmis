@@ -33,7 +33,7 @@ public record LoanResponseDto(
 
          LocalDate dateRecordedByPartner,
 
-         LocalDate dateAddedToDB,
+         String dateAddedToDB,
 
          LocalDate dateDisbursed,
 
@@ -43,7 +43,7 @@ public record LoanResponseDto(
 
          String uploadedBy,
 
-         LocalDate dateUploaded,
+         String dateUploaded,
 
          String approvedBy,
 

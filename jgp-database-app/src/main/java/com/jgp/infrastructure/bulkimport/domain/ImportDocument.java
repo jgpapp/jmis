@@ -1,6 +1,7 @@
 
 package com.jgp.infrastructure.bulkimport.domain;
 
+import com.jgp.authentication.domain.AppUser;
 import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.patner.domain.Partner;
 import com.jgp.shared.domain.BaseEntity;
@@ -20,11 +21,12 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Objects;
 
 @Getter
 @Entity
 @Table(name = "import_document")
-@SequenceGenerator(name = "import_document_seq", sequenceName = "import_document_seq", allocationSize = 1)
+@SequenceGenerator(name = "import_document_seq", sequenceName = "import_document_seq", allocationSize = 50)
 public class ImportDocument extends BaseEntity {
 
     @Override
@@ -68,18 +70,18 @@ public class ImportDocument extends BaseEntity {
     }
 
     public static ImportDocument instance(final Document document, final LocalDateTime importTime, final Integer entityType,
-            final Integer totalRecords, Partner partner) {
+            final Integer totalRecords, AppUser currentUser) {
         final Integer successCount = 0;
         final Integer failureCount = 0;
         final LocalDateTime endTime = LocalDateTime.now(ZoneId.systemDefault());
 
         return new ImportDocument(document, importTime, endTime, false, entityType, totalRecords, successCount,
-                failureCount, partner);
+                failureCount, currentUser);
     }
 
     private ImportDocument(final Document document, final LocalDateTime importTime, final LocalDateTime endTime, Boolean completed,
             final Integer entityType, final Integer totalRecords, final Integer successCount,
-            final Integer failureCount, Partner partner) {
+            final Integer failureCount, AppUser currentUser) {
         this.document = document;
         this.importTime = importTime;
         this.endTime = endTime;
@@ -88,7 +90,8 @@ public class ImportDocument extends BaseEntity {
         this.totalRecords = totalRecords;
         this.successCount = successCount;
         this.failureCount = failureCount;
-        this.partner = partner;
+        this.partner = Objects.nonNull(currentUser) ? currentUser.getPartner() : null;
+        setCreatedBy(currentUser);
     }
 
     public void update(final LocalDateTime endTime, final Integer totalCount, final Integer successCount, final Integer errorCount) {

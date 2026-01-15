@@ -13,16 +13,40 @@ import java.util.List;
 public interface ImportDocumentMapper {
 
     @Mapping(target = "importId", expression = "java(importDocument.getId())")
-    @Mapping(target = "documentId", expression = "java(null != importDocument.getDocument() ? importDocument.getDocument().getId() : null)")
-    @Mapping(target = "name", expression = "java(null != importDocument.getDocument() ? importDocument.getDocument().getName() : null)")
+    @Mapping(target = "documentId", expression = "java(getDocumentId(importDocument))")
+    @Mapping(target = "name", expression = "java(getDocumentName(importDocument))")
     @Mapping(target = "importTime", expression = "java(importDocument.getImportTime())")
     @Mapping(target = "endTime", expression = "java(importDocument.getEndTime())")
     @Mapping(target = "completed", expression = "java(importDocument.getCompleted())")
-    @Mapping(target = "createdBy", expression = "java(null != importDocument.getCreatedBy() ? importDocument.getCreatedBy().getId() : null)")
+    @Mapping(target = "createdBy", expression = "java(getCreatedById(importDocument))")
     @Mapping(target = "totalRecords", expression = "java(importDocument.getTotalRecords())")
     @Mapping(target = "successCount", expression = "java(importDocument.getSuccessCount())")
     @Mapping(target = "failureCount", expression = "java(importDocument.getFailureCount())")
     ImportData toDto(ImportDocument importDocument);
 
     List<ImportData> toDto(List<ImportDocument> importDocuments);
+
+    default Long getDocumentId(ImportDocument importDocument) {
+        try {
+            return importDocument.getDocument() != null ? importDocument.getDocument().getId() : null;
+        } catch (Exception _) {
+            return null;
+        }
+    }
+
+    default String getDocumentName(ImportDocument importDocument) {
+        try {
+            return importDocument.getDocument() != null ? importDocument.getDocument().getName() : null;
+        } catch (Exception _) {
+            return null;
+        }
+    }
+
+    default Long getCreatedById(ImportDocument importDocument) {
+        try {
+            return importDocument.getCreatedBy() != null ? importDocument.getCreatedBy().getId() : null;
+        } catch (Exception _) {
+            return null;
+        }
+    }
 }

@@ -86,7 +86,7 @@ export class SystemResourcesComponent {
                 next: (response) => {
                   this.documents = response.content;
                   this.dataSource = new MatTableDataSource(this.documents);
-                  this.totalItems = response.page.totalElements;
+                  this.totalItems = response.totalElements;
                 },
                 error: (error) => { }
               });

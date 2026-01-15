@@ -156,9 +156,11 @@ export class DataUploaderComponent implements OnDestroy {
           next: (response) => {
             this.documents = response.content;
             this.dataSource = new MatTableDataSource(this.documents);
-            this.totalItems = response.page.totalElements;
+            this.totalItems = response.totalElements;
           },
-          error: (error) => { }
+          error: (error) => { 
+            console.error(error);
+          }
         });
       }
   }
@@ -173,7 +175,7 @@ export class DataUploaderComponent implements OnDestroy {
           next: (response) => {
             this.documents = response.content;
             this.dataSource = new MatTableDataSource(this.documents);
-            this.totalItems = response.page.totalElements;
+            this.totalItems = response.totalElements;
           },
           error: (error) => { }
         });
@@ -274,7 +276,7 @@ export class DataUploaderComponent implements OnDestroy {
           this.importDocumentId = response.message;
           this.entityType = this.legalFormType;
           this.getAvailableDocuments();
-          this.gs.openSnackBar('Upload initiated successfully', 'Dismiss');
+          this.gs.openSnackBar('Upload was successful !!', 'Dismiss');
         
         // Reset form after successful upload initiation
         this.resetUploadForm();
@@ -308,7 +310,6 @@ export class DataUploaderComponent implements OnDestroy {
               this.dataUploadService.downloadFileFromAPIResponse(response);
           },
         error: (error) => {
-          console.error('Error downloading template:', error);
           this.gs.openSnackBar('Error downloading template', "Dismiss");
         }
       });

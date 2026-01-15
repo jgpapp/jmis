@@ -23,7 +23,7 @@ import java.util.Set;
 @Getter
 @Entity
 @Table(name = "user_roles", uniqueConstraints = { @UniqueConstraint(columnNames = { "role_name" }, name = "UNIQUE_ROLE") })
-@SequenceGenerator(name = "user_roles_seq", sequenceName = "user_roles_seq", allocationSize = 1)
+@SequenceGenerator(name = "user_roles_seq", sequenceName = "user_roles_seq", allocationSize = 50)
 public class Role extends BaseEntity {
 
     @Override

@@ -17,7 +17,7 @@ import java.time.ZoneId;
 @Getter
 @Entity
 @Table(name = "user_audit_logs")
-@SequenceGenerator(name = "user_audit_logs_seq", sequenceName = "user_audit_logs_seq", allocationSize = 1)
+@SequenceGenerator(name = "user_audit_logs_seq", sequenceName = "user_audit_logs_seq", allocationSize = 50)
 public class UserAuditLog extends BaseEntity {
 
     @Override

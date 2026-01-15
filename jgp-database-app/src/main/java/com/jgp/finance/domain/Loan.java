@@ -38,7 +38,7 @@ import java.util.Set;
 @Getter
 @Entity
 @Table(name = "loans")
-@SequenceGenerator(name = "loans_seq", sequenceName = "loans_seq", allocationSize = 1)
+@SequenceGenerator(name = "loans_seq", sequenceName = "loans_seq", allocationSize = 50)
 public class Loan extends BaseEntity {
 
     @Override

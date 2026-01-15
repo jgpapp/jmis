@@ -6,6 +6,8 @@ import com.jgp.infrastructure.documentmanagement.command.DocumentCommand;
 import com.jgp.shared.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.SequenceGenerator;
@@ -18,7 +20,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Getter
 @Entity
 @Table(name = "jgp_document")
-@SequenceGenerator(name = "jgp_document_seq", sequenceName = "jgp_document_seq", allocationSize = 1)
+@SequenceGenerator(name = "jgp_document_seq", sequenceName = "jgp_document_seq", allocationSize = 50)
 public class Document extends BaseEntity {
 
     @Override
@@ -52,6 +54,7 @@ public class Document extends BaseEntity {
     private String location;
 
     @Column(name = "import_entity_type")
+    @Enumerated(EnumType.STRING)
     private GlobalEntityType globalEntityType;
 
 

@@ -23,7 +23,7 @@ import java.util.Objects;
 @Getter
 @Entity
 @Table(name = "participants")
-@SequenceGenerator(name = "participants_seq", sequenceName = "participants_seq", allocationSize = 1)
+@SequenceGenerator(name = "participants_seq", sequenceName = "participants_seq", allocationSize = 50)
 public class Participant extends BaseEntity {
 
     @Override
