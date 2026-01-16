@@ -31,6 +31,12 @@ RUN rm -rf ./*
 # Copy the build output to Nginx's HTML directory
 COPY --from=build --chown=nginx:nginx /app/dist/jgp-database-web/browser /usr/share/nginx/html
 
+# Copy env.template.js to the HTML directory
+COPY --chown=nginx:nginx public/env.template.js /usr/share/nginx/html/env.template.js
+
+# Copy the Nginx TEMPLATE config
+COPY nginx.template.conf /etc/nginx/nginx.template.conf
+
 # Copy the Nginx TEMPLATE config
 COPY nginx.template.conf /etc/nginx/nginx.template.conf
 

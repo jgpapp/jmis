@@ -9,16 +9,19 @@ OUTPUT_FILE="/usr/share/nginx/html/env.js"
 
 # Export the environment variables required by envsubst
 # Docker Compose will set these variables
-export JGP_APP_BASE_URL
-export JGP_APP_BASE_WEBSOCKET_URL
+# export JGP_APP_BASE_URL
+# export JGP_APP_BASE_WEBSOCKET_URL
 # Add other exports here
 # export ANOTHER_VAR
 
-echo "Substituting environment variables into ${OUTPUT_FILE}..."
+#echo "Substituting environment variables into ${OUTPUT_FILE}..."
+
+echo "Copying env.js..."
+cp "$TEMPLATE_FILE" "$OUTPUT_FILE"
 
 # Use envsubst to replace placeholders in the template and create the final env.js
 # The single quotes around the variables list prevent shell expansion before envsubst runs
-envsubst '${JGP_APP_BASE_URL} ${JGP_APP_BASE_WEBSOCKET_URL}' < "$TEMPLATE_FILE" > "$OUTPUT_FILE"
+# envsubst '${JGP_APP_BASE_URL} ${JGP_APP_BASE_WEBSOCKET_URL}' < "$TEMPLATE_FILE" > "$OUTPUT_FILE"
 # Add other variables like '${ANOTHER_VAR}' inside the single quotes if needed
 
 echo "Substitution complete. env.js content:"

@@ -47,8 +47,6 @@ services:
     networks:
       - jgp-app-network
     environment:
-      - JGP_APP_BASE_URL=${JGP_APP_BASE_URL:-http://localhost:8082}
-      - JGP_APP_BASE_WEBSOCKET_URL=${JGP_APP_BASE_WEBSOCKET_URL}
       - SERVER_NAME=${SERVER_NAME:-somedomain.com}
       - SSL_CERT_PATH=${SSL_CERT_PATH:-/etc/path/fullchain.pem}
       - SSL_KEY_PATH=${SSL_KEY_PATH:-/etc/path/privkey.pem}
