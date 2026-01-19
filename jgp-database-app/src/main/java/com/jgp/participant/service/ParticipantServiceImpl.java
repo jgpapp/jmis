@@ -95,7 +95,9 @@ public class ParticipantServiceImpl implements ParticipantService {
                 }
                 return existingParticipant;
             }
-            return this.participantRepository.save(new Participant(participantRequestDto));
+            var newParticipant  = this.participantRepository.save(new Participant(participantRequestDto));
+            existingParticipants.put(participantRequestDto.jgpId(), newParticipant);
+            return newParticipant;
         } catch (Exception e) {
             log.error("Error in createOrUpdateParticipant: {}", e.getMessage());
         }
