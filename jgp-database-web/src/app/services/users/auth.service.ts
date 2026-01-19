@@ -44,6 +44,7 @@ export class AuthService {
         this.redirectUrl = null; // Reset redirect URL after successful login
       }),
       catchError(error => {
+        console.error('Login failed:', error);
         return throwError(() => new Error(error.error.detail || 'Login failed'));
       })
     );
