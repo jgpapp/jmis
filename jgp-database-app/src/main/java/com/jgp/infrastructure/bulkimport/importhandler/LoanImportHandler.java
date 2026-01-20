@@ -17,7 +17,6 @@ import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.dto.ParticipantRequestDto;
 import com.jgp.participant.service.ParticipantService;
-import com.jgp.patner.domain.Partner;
 import com.jgp.patner.service.PartnerService;
 import com.jgp.shared.validator.DataValidator;
 import com.jgp.shared.validator.LoanValidator;

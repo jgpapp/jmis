@@ -75,9 +75,9 @@ public class TAImportHandler implements ImportHandler {
         this.workbook = bulkImportEvent.workbook();
         this.taSheet = workbook.getSheet(TemplatePopulateImportConstants.BMO_SHEET_NAME);
         this.taDataList = new ArrayList<>();
+        this.updateParticipantInfo = bulkImportEvent.updateParticipantInfo();
         this.rowErrorMap = new ConcurrentHashMap<>();
         this.documentImportProgressUUId = bulkImportEvent.importProgressUUID();
-        this.updateParticipantInfo = bulkImportEvent.updateParticipantInfo();
         this.document = bulkImportEvent.document();
         this.currentPartnerId = getCurrentPartnerId(userService);
         readExcelFile();

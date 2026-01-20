@@ -6,6 +6,7 @@ import com.jgp.finance.dto.LoanResponseDto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -16,6 +17,7 @@ public record ParticipantRequestDto(
         String businessName,
 
         @NotNull(message = "JGP Id is required !!")
+        @Size(min = 5, max = 13, message = "JGP Id must be between 5 and 13 characters !!")
         String jgpId,
 
         String phoneNumber,

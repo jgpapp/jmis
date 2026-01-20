@@ -8,7 +8,6 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 
 import java.nio.charset.StandardCharsets;
-import java.time.ZoneId;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +16,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Objects;
 import java.util.function.Function;
@@ -65,7 +63,7 @@ public class JwtTokenProvider {
                     .build()
                     .parseSignedClaims(token);
             return false; // Token is valid and not expired
-        } catch (Exception e) {
+        } catch (Exception _) {
             return true; // Token is expired
         }
     }
