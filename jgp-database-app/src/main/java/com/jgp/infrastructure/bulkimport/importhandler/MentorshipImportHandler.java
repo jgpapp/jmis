@@ -71,10 +71,10 @@ public class MentorshipImportHandler implements ImportHandler {
         this.workbook = bulkImportEvent.workbook();
         this.mentorShipSheet = this.workbook.getSheet(TemplatePopulateImportConstants.MENTOR_SHIP_SHEET_NAME);
         this.mentorshipDataList = new ArrayList<>();
+        this.document = bulkImportEvent.document();
         this.rowErrorMap = new ConcurrentHashMap<>();
         this.documentImportProgressUUId = bulkImportEvent.importProgressUUID();
         this.updateParticipantInfo = bulkImportEvent.updateParticipantInfo();
-        this.document = bulkImportEvent.document();
         this.currentPartnerId = getCurrentPartnerId(userService);
         readExcelFile();
         return processChunks();
@@ -204,6 +204,9 @@ public class MentorshipImportHandler implements ImportHandler {
         final var businessName = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_NAME_COL, row);
 
         final var jgpId = ImportHandlerUtils.readAsString(MentorShipConstants.JGP_ID_COL, row);
+        if (null == jgpId || jgpId.length() < 5 || jgpId.length() > 13){
+            rowErrorMap.put(row.getRowNum(), "JGP Id must be between 5 and 13 characters !!");
+        }
         final var phoneNumber = ImportHandlerUtils.readAsString(MentorShipConstants.BUSINESS_PHONE_NUMBER_COL, row);
         if (null == phoneNumber && null == rowErrorMap.get(row.getRowNum())){
             rowErrorMap.put(row.getRowNum(), "Phone Number Is Required !!");

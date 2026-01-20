@@ -6,21 +6,17 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Optional;
 
-import com.jgp.dashboard.dto.DashboardSearchCriteria;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  *
@@ -193,13 +189,6 @@ public abstract class CommonUtil {
         }
     }
 
-    public static boolean isStringValueLengthNotValid(String stringValue, int min, int max) {
-        if (null == stringValue) {
-            return false;
-        }
-        final var strLength = stringValue.length();
-        return strLength < min || strLength > max;
-    }
 
     public static String sanitizeString(String input) {
         if (input == null) {
@@ -215,12 +204,6 @@ public abstract class CommonUtil {
         // Step 3: Replace all sequences of spaces with a single space
         // Using regex: \\s+ matches one or more whitespace characters
         return nonAlphabetsReplaced.replaceAll("\\s+", " ");
-    }
-
-    public static boolean stringDoesNotContainOnlyDigits(String input) {
-        return !Pattern.compile(".*\\d.*")
-                .matcher(input)
-                .matches();
     }
 
     public static String defaultToOtherIfStringIsNull(String value) {
@@ -239,19 +222,6 @@ public abstract class CommonUtil {
         } else {
             return Pair.of(0, 0); // Default case
         }
-    }
-
-    public static MapSqlParameterSource getCommonMapSqlParameterSource(DashboardSearchCriteria dashboardSearchCriteria) {
-        LocalDate fromDate = dashboardSearchCriteria.fromDate();
-        LocalDate toDate = dashboardSearchCriteria.toDate();
-        if (Objects.isNull(fromDate) || Objects.isNull(toDate)) {
-            fromDate = getDefaultQueryDates().getLeft();
-            toDate = getDefaultQueryDates().getRight();
-        }
-        MapSqlParameterSource parameters = new MapSqlParameterSource("fromDate", fromDate);
-        parameters.addValue("toDate", toDate);
-        return parameters;
-
     }
 
     public static Pair<LocalDate, LocalDate> getDefaultQueryDates() {

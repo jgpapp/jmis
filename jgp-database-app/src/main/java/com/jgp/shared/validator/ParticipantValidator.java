@@ -87,9 +87,5 @@ public class ParticipantValidator {
             rowErrorMap.put(participantRequestDto.rowIndex(), firstViolation.getMessage());
         }
 
-        if (null == rowErrorMap.get(participantRequestDto.rowIndex()) && CommonUtil.isStringValueLengthNotValid(participantRequestDto.jgpId(), 5, 11)){
-            rowErrorMap.put(participantRequestDto.rowIndex(), "JGP ID must be 5-11 characters !!");
-            }
-
     }
 }
