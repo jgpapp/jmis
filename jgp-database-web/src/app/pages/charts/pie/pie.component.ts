@@ -7,6 +7,7 @@ import { ContentHeaderComponent } from '../../../theme/components/content-header
 
 @Component({
     selector: 'app-pie',
+    standalone: true,
     imports: [
         FlexLayoutModule,
         MatCardModule,

@@ -11,6 +11,7 @@ import com.jgp.dashboard.dto.HighLevelSummaryDto;
 import com.jgp.dashboard.dto.PartnerYearlyDataDto;
 import com.jgp.dashboard.dto.PerformanceSummaryDto;
 import com.jgp.dashboard.dto.TaTypeTrainedBusinessDto;
+import com.jgp.dashboard.dto.TimeScaledPart;
 import com.jgp.infrastructure.bulkimport.event.DataApprovedEvent;
 import com.jgp.monitoring.domain.predicate.OutComeMonitoringSearchCriteria;
 import com.jgp.participant.domain.ParticipantRepository;
@@ -126,6 +127,54 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     @Cacheable(value = "loanDisbursedByGenderSummary", key = "#dashboardSearchCriteria")
     public List<DataPointDto> getLoanDisbursedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria) {
+        final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
+        LocalDate fromDate = dashboardSearchCriteria.fromDate();
+        LocalDate toDate = dashboardSearchCriteria.toDate();
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
+        }
+        var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
+            parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
+            loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
+            parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
+            loanWhereClause = String.format("%s%s", loanWhereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        var sqlQuery = String.format(DataPointMapper.LOANS_DISBURSED_BY_GENDER_SCHEMA, loanWhereClause);
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
+    public List<DataPointDto> getLoanDisbursedByTimeScale(DashboardSearchCriteria dashboardSearchCriteria) {
+        final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
+        LocalDate fromDate = dashboardSearchCriteria.fromDate();
+        LocalDate toDate = dashboardSearchCriteria.toDate();
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = CommonUtil.getDefaultQueryDates().getLeft();
+            toDate = CommonUtil.getDefaultQueryDates().getRight();
+        }
+        var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
+            parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
+            loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
+        }
+        if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
+            parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
+            loanWhereClause = String.format("%s%s", loanWhereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
+        }
+        var sqlQuery = String.format(DataPointMapper.LOANS_DISBURSED_BY_GENDER_SCHEMA, loanWhereClause);
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
+    public List<DataPointDto> getBusinessesTrainedByTimeScale(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
@@ -1891,6 +1940,44 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
             }
             return dataPoints;
         }
+    }
+
+    private String getTimeScaledSqlCore(TimeScaledPart part) {
+
+        return switch (part.timeScale()){
+            case "MONTHLY" -> """
+                    SELECT
+                        TO_CHAR(DATE_TRUNC('month', %s), 'FMMonth-YYYY') AS dataKey,
+                        %s(%s) AS dataValue, 0 AS percentage
+                    FROM
+                        %s %s
+                    GROUP BY
+                        DATE_TRUNC('month', %s)
+                    ORDER BY
+                        DATE_TRUNC('month', %s) ASC;""".formatted(part.dateField(), part.aggregationFunction(), part.aggregatedColumn(), part.entity(), part.whereClause(), part.dateField(), part.dateField());
+            case "WEEKLY" -> """
+                    SELECT
+                        TO_CHAR(DATE_TRUNC('week', %s), 'Mon DD') || ' - ' ||
+                        TO_CHAR(DATE_TRUNC('week', %s) + INTERVAL '6 days', 'Mon DD') AS dataKey,
+                        %s(%s) AS dataValue, 0 AS percentage
+                    FROM
+                        %s %s
+                    GROUP BY
+                        DATE_TRUNC('week', %s)
+                    ORDER BY
+                        DATE_TRUNC('week', %s) ASC;""".formatted(part.dateField(), part.dateField(), part.aggregationFunction(), part.aggregatedColumn(), part.entity(), part.whereClause(), part.dateField(), part.dateField());
+            default -> """
+                    SELECT
+                        %s AS dataKey,
+                        %s(%s) AS dataValue, 0 AS percentage
+                    FROM
+                        %s %s
+                    GROUP BY
+                        %s
+                    ORDER BY
+                        %s ASC;""".formatted(part.dateField(), part.aggregationFunction(), part.aggregatedColumn(), part.entity(), part.whereClause(), part.dateField(), part.dateField());
+        };
+
     }
 
 }

@@ -10,6 +10,7 @@ import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-conta
 
 @Component({
     selector: 'app-analytics',
+    standalone: true,
     imports: [
         MatCardModule,
         NgxChartsModule

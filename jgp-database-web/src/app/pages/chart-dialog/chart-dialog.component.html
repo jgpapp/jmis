@@ -2,148 +2,88 @@
   <button mat-icon-button class="close-button" (click)="onCloseClick()" fxFlex="4%">
     <mat-icon class="close-icon" color="warn">close</mat-icon>
   </button>
-<div fxLayout="column" fxLayoutAlign="center center" fxFlex="88%" class="chart-props" id="chartDiv">
-<h1 mat-dialog-title fxFlex="10%" fxFlexAlign="center center">{{data.chartTitle}}</h1>
-<div mat-dialog-content fxLayout="row" fxFlex="100%" class="chart-props" #chartContainer>
-  <div class="chart-props" fxFlex="100%" #chartContainer>
-  @if (data.chartType === 'app-pie-chart') {
-      <app-pie-chart 
-      [data]="data.chartData" 
-      [showLegend]="true" 
-      [colorScheme]="data.chartSColorScheme" 
-      [showLabels]="data.chartShowLabels" 
-      [explodeSlices]="data.chartExplodeSlices" 
-      [doughnut]="data.chartIsDoughnut" 
-      [chartFormatLabel]="data.chartFormatLabel"
-      [labelFormatting]="data.labelFormatting"
-      /> 
-  }
-  @if (data.chartType === 'kenyan-county-map') {
-    <app-kenyan-map
-    [mapWidth]="950" 
-    [mapHeight]="950" 
-    [countyData]="data.chartData" 
-    [countyDataToBePicked]="data.countyDataToBePicked"
-    [kenyanMapChartContainer]="chartContainerRef"  />
-  }
-  @if (data.chartType === 'kenyan-leaflet-map') {
-    <app-ke-leaflet-map 
-      [countyDataSummary]="data.chartData"
-      [measureField]="data.countyDataToBePicked"
-    />
-  }
-  @if (data.chartType === 'ngx-charts-bar-vertical') {
-    <ngx-charts-bar-vertical
-    [scheme]="data.chartSColorScheme"
-    [results]="data.chartData"
-    [gradient]="data.chartGradient"
-    [xAxis]="data.chartShowXAxis"
-    [yAxis]="data.chartShowYAxis"
-    [legend]="data.chartShowLegend"
-    [showXAxisLabel]="data.chartShowXAxisLabel"
-    [showYAxisLabel]="data.chartShowYAxisLabel"
-    [xAxisLabel]="data.chartXAxisLabel"
-    [yAxisLabel]="data.chartYAxisLabel"
-    [dataLabelFormatting]="data.chartFormatLabel"
-    [showDataLabel]="true"
-    (select)="onSelect($event)"
-/> 
-  }
-  @if (data.chartType === 'ngx-charts-bar-vertical-2d') {
-    <ngx-charts-bar-vertical-2d
-      [scheme]="data.chartSColorScheme"
-      [results]="data.chartData"
-      [gradient]="data.chartGradient"
-      [xAxis]="data.chartShowXAxis"
-      [yAxis]="data.chartShowYAxis"
-      [legend]="data.chartShowLegend"
-      [showXAxisLabel]="data.chartShowXAxisLabel"
-      [showYAxisLabel]="data.chartShowYAxisLabel"
-      [xAxisLabel]="data.chartXAxisLabel"
-      [yAxisLabel]="data.chartYAxisLabel"
-      [dataLabelFormatting]="data.chartFormatLabel"
-      [showDataLabel]="true"
-      (select)="onSelect($event)"
-  />   
-  }
+  <div fxLayout="column" fxLayoutAlign="center center" fxFlex="88%" class="chart-props" id="chartDiv">
+    <h1 mat-dialog-title fxFlex="10%" fxFlexAlign="center center" class="card-chart-header bg-primary">
+      {{data.chartTitle}}</h1>
+    <div mat-dialog-content fxLayout="row" fxFlex="100%" class="chart-props" #chartContainer>
+      <div class="chart-props" fxFlex="100%" #chartContainer>
+        @if (data.chartType === 'app-pie-chart') {
+        <app-pie-chart [data]="data.chartData" [showLegend]="true" [colorScheme]="data.chartSColorScheme"
+          [showLabels]="data.chartShowLabels" [explodeSlices]="data.chartExplodeSlices"
+          [doughnut]="data.chartIsDoughnut" [chartFormatLabel]="data.chartFormatLabel"
+          [labelFormatting]="data.labelFormatting" />
+        }
+        @if (data.chartType === 'kenyan-county-map') {
+        <app-kenyan-map [mapWidth]="950" [mapHeight]="950" [countyData]="data.chartData"
+          [countyDataToBePicked]="data.countyDataToBePicked" [kenyanMapChartContainer]="chartContainerRef" />
+        }
+        @if (data.chartType === 'kenyan-leaflet-map') {
+        <app-ke-leaflet-map [countyDataSummary]="data.chartData" [measureField]="data.countyDataToBePicked" />
+        }
+        @if (data.chartType === 'ngx-charts-bar-vertical') {
+        <ngx-charts-bar-vertical [scheme]="data.chartSColorScheme" [results]="data.chartData"
+          [gradient]="data.chartGradient" [xAxis]="data.chartShowXAxis" [yAxis]="data.chartShowYAxis"
+          [legend]="data.chartShowLegend" [showXAxisLabel]="data.chartShowXAxisLabel"
+          [showYAxisLabel]="data.chartShowYAxisLabel" [xAxisLabel]="data.chartXAxisLabel"
+          [yAxisLabel]="data.chartYAxisLabel" [dataLabelFormatting]="data.chartFormatLabel" [showDataLabel]="true"
+          (select)="onSelect($event)" />
+        }
+        @if (data.chartType === 'ngx-charts-bar-vertical-2d') {
+        <ngx-charts-bar-vertical-2d [scheme]="data.chartSColorScheme" [results]="data.chartData"
+          [gradient]="data.chartGradient" [xAxis]="data.chartShowXAxis" [yAxis]="data.chartShowYAxis"
+          [legend]="data.chartShowLegend" [showXAxisLabel]="data.chartShowXAxisLabel"
+          [showYAxisLabel]="data.chartShowYAxisLabel" [xAxisLabel]="data.chartXAxisLabel"
+          [yAxisLabel]="data.chartYAxisLabel" [dataLabelFormatting]="data.chartFormatLabel" [showDataLabel]="true"
+          (select)="onSelect($event)" />
+        }
 
-  @if (data.chartType === 'ngx-charts-bar-horizontal-2d') {
-    <ngx-charts-bar-horizontal-2d
-      [scheme]="data.chartSColorScheme"
-      [results]="data.chartData"
-      [gradient]="data.chartGradient"
-      [xAxis]="data.chartShowXAxis"
-      [yAxis]="data.chartShowYAxis"
-      [legend]="data.chartShowLegend"
-      [showXAxisLabel]="data.chartShowXAxisLabel"
-      [showYAxisLabel]="data.chartShowYAxisLabel"
-      [xAxisLabel]="data.chartXAxisLabel"
-      [yAxisLabel]="data.chartYAxisLabel"
-      [dataLabelFormatting]="data.chartFormatLabel"
-      [showDataLabel]="true"
-      (select)="onSelect($event)"
-  />   
-  }
-  @if (data.chartType === 'ngx-charts-bar-horizontal') {
-    <ngx-charts-bar-horizontal
-    [scheme]="data.chartSColorScheme"
-    [results]="data.chartData"
-    [gradient]="data.chartGradient"
-    [xAxis]="data.chartShowXAxis"
-    [yAxis]="data.chartShowYAxis"
-    [legend]="data.chartShowLegend"
-    [showXAxisLabel]="data.chartShowXAxisLabel"
-    [showYAxisLabel]="data.chartShowYAxisLabel"
-    [xAxisLabel]="data.chartXAxisLabel"
-    [yAxisLabel]="data.chartYAxisLabel"
-    [dataLabelFormatting]="data.chartFormatLabel"
-    [showDataLabel]="true"
-    (select)="onSelect($event)"
-/>  
-  }
+        @if (data.chartType === 'ngx-charts-bar-horizontal-2d') {
+        <ngx-charts-bar-horizontal-2d [scheme]="data.chartSColorScheme" [results]="data.chartData"
+          [gradient]="data.chartGradient" [xAxis]="data.chartShowXAxis" [yAxis]="data.chartShowYAxis"
+          [legend]="data.chartShowLegend" [showXAxisLabel]="data.chartShowXAxisLabel"
+          [showYAxisLabel]="data.chartShowYAxisLabel" [xAxisLabel]="data.chartXAxisLabel"
+          [yAxisLabel]="data.chartYAxisLabel" [dataLabelFormatting]="data.chartFormatLabel" [showDataLabel]="true"
+          (select)="onSelect($event)" />
+        }
+        @if (data.chartType === 'ngx-charts-bar-horizontal') {
+        <ngx-charts-bar-horizontal [scheme]="data.chartSColorScheme" [results]="data.chartData"
+          [gradient]="data.chartGradient" [xAxis]="data.chartShowXAxis" [yAxis]="data.chartShowYAxis"
+          [legend]="data.chartShowLegend" [showXAxisLabel]="data.chartShowXAxisLabel"
+          [showYAxisLabel]="data.chartShowYAxisLabel" [xAxisLabel]="data.chartXAxisLabel"
+          [yAxisLabel]="data.chartYAxisLabel" [dataLabelFormatting]="data.chartFormatLabel" [showDataLabel]="true"
+          (select)="onSelect($event)" />
+        }
 
-  @if (data.chartType === 'ngx-charts-bar-horizontal-stacked') {
-    <ngx-charts-bar-horizontal-stacked
-    [scheme]="data.chartSColorScheme"
-    [results]="data.chartData"
-    [gradient]="data.chartGradient"
-    [xAxis]="data.chartShowXAxis"
-    [yAxis]="data.chartShowYAxis"
-    [legend]="data.chartShowLegend"
-    [showXAxisLabel]="data.chartShowXAxisLabel"
-    [showYAxisLabel]="data.chartShowYAxisLabel"
-    [xAxisLabel]="data.chartXAxisLabel"
-    [yAxisLabel]="data.chartYAxisLabel"
-    (select)="onSelect($event)"
-/>  
-  }
+        @if (data.chartType === 'ngx-charts-bar-horizontal-stacked') {
+        <ngx-charts-bar-horizontal-stacked [scheme]="data.chartSColorScheme" [results]="data.chartData"
+          [gradient]="data.chartGradient" [xAxis]="data.chartShowXAxis" [yAxis]="data.chartShowYAxis"
+          [legend]="data.chartShowLegend" [showXAxisLabel]="data.chartShowXAxisLabel"
+          [showYAxisLabel]="data.chartShowYAxisLabel" [xAxisLabel]="data.chartXAxisLabel"
+          [yAxisLabel]="data.chartYAxisLabel" (select)="onSelect($event)" />
+        }
 
-  @if (data.chartType === 'ngx-charts-line-chart') {
-    <ngx-charts-line-chart
-    [scheme]="data.chartSColorScheme"
-    [results]="data.chartData"
-    [gradient]="data.chartGradient"
-    [xAxis]="data.chartShowXAxis"
-    [yAxis]="data.chartShowYAxis"
-    [legend]="data.chartShowLegend"
-    [showXAxisLabel]="data.chartShowXAxisLabel"
-    [showYAxisLabel]="data.chartShowYAxisLabel"
-    [xAxisLabel]="data.chartXAxisLabel"
-    [yAxisLabel]="data.chartYAxisLabel"
-    [autoScale]="data.chartAutoScale"
-    [roundDomains]="data.chartRoundDomains" 
-    (select)="onSelect($event)"
-/>  
-  }
+        @if (data.chartType === 'ngx-charts-line-chart') {
+        <ngx-charts-line-chart [scheme]="data.chartSColorScheme" [results]="data.chartData"
+          [gradient]="data.chartGradient" [xAxis]="data.chartShowXAxis" [yAxis]="data.chartShowYAxis"
+          [legend]="data.chartShowLegend" [showXAxisLabel]="data.chartShowXAxisLabel"
+          [showYAxisLabel]="data.chartShowYAxisLabel" [xAxisLabel]="data.chartXAxisLabel"
+          [yAxisLabel]="data.chartYAxisLabel" [autoScale]="data.chartAutoScale" [roundDomains]="data.chartRoundDomains"
+          (select)="onSelect($event)" />
+        }
 
-</div>     
-</div>
-</div>
-<div fxLayout="row" fxLayoutAlign="center center" fxFlex="8%" fxLayoutGap="2%">
-  <button mat-raised-button color="primary" (click)="exportAsPDF()">Export As PDF</button>
-  @if (data.chartType !== 'kenyan-leaflet-map') {
+        @if (data.chartType === 'ngx-charts-tree-map') {
+        <ngx-charts-tree-map [scheme]="data.chartSColorScheme" [results]="data.chartData"
+          [gradient]="data.chartGradient" [animations]="true" />
+        }
+
+      </div>
+    </div>
+  </div>
+  <div fxLayout="row" fxLayoutAlign="center center" fxFlex="8%" fxLayoutGap="2%">
+    <button mat-raised-button color="primary" (click)="exportAsPDF()">Export As PDF</button>
+    @if (data.chartType !== 'kenyan-leaflet-map') {
     <button mat-raised-button color="primary" (click)="downloadChart()">Export As Image (PNG)</button>
-  }
-  
-</div>
+    }
+
+  </div>
 </div>

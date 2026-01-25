@@ -225,8 +225,11 @@ public abstract class CommonUtil {
     }
 
     public static Pair<LocalDate, LocalDate> getDefaultQueryDates() {
-        final var dateToday = LocalDate.now();
-        return new ImmutablePair<>(LocalDate.now(ZoneId.systemDefault()).minusMonths(6), dateToday);
+        return new ImmutablePair<>(LocalDate.now(ZoneId.systemDefault()).minusMonths(6), LocalDate.now());
+    }
+
+    public static Pair<LocalDate, LocalDate> getTodayMinusCustomMonthsDates(long months) {
+        return new ImmutablePair<>(LocalDate.now(ZoneId.systemDefault()).minusMonths(months), LocalDate.now());
     }
 
     public static DateTimeFormatter getStandardDateFormatter(String dateFormat, ZoneId zoneId) {

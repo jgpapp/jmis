@@ -23,6 +23,10 @@ public interface DashboardService {
 
     List<DataPointDto> getLoanDisbursedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
+    List<DataPointDto> getLoanDisbursedByTimeScale(DashboardSearchCriteria dashboardSearchCriteria);
+
+    List<DataPointDto> getBusinessesTrainedByTimeScale(DashboardSearchCriteria dashboardSearchCriteria);
+
     List<CountyDataSummaryResponseDto> getCountySummary(DashboardSearchCriteria dashboardSearchCriteria);
 
     List<DataPointDto> getLoanedBusinessesByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);

@@ -26,6 +26,7 @@ import { SubscriptionsContainer } from '../../theme/utils/subscriptions-containe
 
 @Component({
     selector: 'app-dashboard',
+    standalone: true,
     imports: [
         MatTableModule,
         MatPaginatorModule,

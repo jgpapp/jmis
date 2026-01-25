@@ -9,13 +9,14 @@ import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-conta
 
 @Component({
     selector: 'app-tiles',
+    standalone: true,
     imports: [
         FlexLayoutModule,
         MatCardModule,
         MatIconModule
     ],
     templateUrl: './tiles.component.html',
-    styleUrl: './tiles.component.scss'
+    styleUrl: './tiles.component.scss',
 })
 export class TilesComponent implements OnInit, OnDestroy, OnChanges {
 

@@ -15,6 +15,7 @@ import { KeLeafletMapComponent } from '../ke-leaflet-map/ke-leaflet-map.componen
 
 @Component({
     selector: 'app-chart-dialog',
+    standalone: true,
     imports: [
     PieChartComponent,
     FlexLayoutModule,

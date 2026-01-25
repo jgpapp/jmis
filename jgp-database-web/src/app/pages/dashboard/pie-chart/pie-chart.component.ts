@@ -6,6 +6,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
     selector: 'app-pie-chart',
+    standalone: true,
     imports: [
         FlexLayoutModule,
         MatCardModule,
@@ -15,6 +16,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     templateUrl: './pie-chart.component.html',
     styleUrl: './pie-chart.component.scss',
     encapsulation: ViewEncapsulation.None
+
 })
 export class PieChartComponent {
 

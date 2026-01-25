@@ -25,6 +25,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
     selector: 'app-lending-data',
+    standalone: true,
     imports: [
         ContentHeaderComponent,
         FlexLayoutModule,
