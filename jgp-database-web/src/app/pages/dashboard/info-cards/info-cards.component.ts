@@ -11,6 +11,7 @@ import { CountySummaryDto } from '../dto/county-summary-dto';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 import { A11yModule } from "@angular/cdk/a11y";
 import { PieChartComponent } from '../pie-chart/pie-chart.component';
+import { ParticipantTrendsComponent } from '../participant-trends/participant-trends.component';
 
 @Component({
     selector: 'app-info-cards',
@@ -22,7 +23,8 @@ import { PieChartComponent } from '../pie-chart/pie-chart.component';
     MatIconModule,
     NgxChartsModule,
     MatDialogModule,
-    A11yModule
+    A11yModule,
+    ParticipantTrendsComponent
 ],
     templateUrl: './info-cards.component.html',
     styleUrl: './info-cards.component.scss'

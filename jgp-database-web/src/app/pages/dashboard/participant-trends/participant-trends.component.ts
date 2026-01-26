@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input, SimpleChanges } from '@angular/core';
 import { MatCardModule } from "@angular/material/card";
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { MatFormFieldModule } from "@angular/material/form-field";
@@ -10,7 +10,25 @@ import { forkJoin, merge, skip } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Dates } from '@services/dates';
 import { DashboardService } from '@services/dashboard/dashboard.service';
-import { Chart } from 'chart.js';
+import { 
+  Chart, 
+  BarController, 
+  BarElement, 
+  CategoryScale, 
+  LinearScale, 
+  Tooltip, 
+  Legend 
+} from 'chart.js';
+
+// Register Chart.js components
+Chart.register(
+  BarController,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend
+);
 
 
 @Component({
@@ -29,23 +47,33 @@ import { Chart } from 'chart.js';
   styleUrl: './participant-trends.component.scss'
 })
 export class ParticipantTrendsComponent {
-selectedDashboardMode: string = 'Day';
- /** Chart.js chart */
-  chart: any;
-  /** Substitute for resolver */
-  hideOutput = true;
 
-constructor(
-  private route: ActivatedRoute, 
-  private dateUtils: Dates,
-private dashboardService: DashboardService) {
-  
-  
-}
+  @Input('dashBoardFilters') dashBoardFilters: any;
+  selectedDashboardMode: string = 'DAILY';
+  /** Chart.js chart */
+    chart: any;
+    /** Substitute for resolver */
+    hideOutput = true;
 
-ngOnInit() {
-    this.getChartData();
+  constructor(
+    private route: ActivatedRoute, 
+    private dateUtils: Dates,
+  private dashboardService: DashboardService) {
+    
+    
   }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['dashBoardFilters']) {
+      this.dashBoardFilters = changes['dashBoardFilters']['currentValue']
+      this.getChartData();
+    }
+    
+  }
+
+  ngOnInit() {
+      this.getChartData();
+    }
 
   /**
    * Subscribes to value changes of officeID and timescale controls,
@@ -55,36 +83,36 @@ ngOnInit() {
     merge(this.selectedDashboardMode).pipe(skip(1))
       .subscribe(() => {
         switch (this.selectedDashboardMode) {
-          case 'Day':
-            const clientsByDay = this.homeService.getClientTrendsByDay(officeId);
-            const loansByDay = this.homeService.getLoanTrendsByDay(officeId);
-            forkJoin({clientsByDay: clientsByDay, loansByDay: loansByDay}).subscribe((data: any[]) => {
-              const dayLabels = this.getLabels(timescale);
-              const clientCounts = this.getCounts(data[0], dayLabels, timescale, 'client');
-              const loanCounts = this.getCounts(data[1], dayLabels, timescale, 'loan');
-              this.setChart(dayLabels, clientCounts, loanCounts);
+          case 'DAILY':
+            const trainedParticipantsByDay = this.dashboardService.getBusinessesTrainedByTimeScale(this.dashBoardFilters, this.selectedDashboardMode);
+            const disbursedLoansByDay = this.dashboardService.getLoanDisbursedByTimeScale(this.dashBoardFilters, this.selectedDashboardMode);
+            forkJoin({trainedParticipantsByDay, disbursedLoansByDay}).subscribe((data: any) => {
+              const dayLabels = this.getLabels(data.trainedParticipantsByDay);
+              const businessesTrained = this.getCounts(data.trainedParticipantsByDay, dayLabels);
+              const disbursedLoans = this.getCounts(data.disbursedLoansByDay, dayLabels);
+              this.setChart(dayLabels, businessesTrained, disbursedLoans);
               this.hideOutput = false;
             });
             break;
-          case 'Week':
-            const clientsByWeek = this.homeService.getClientTrendsByWeek(officeId);
-            const loansByWeek = this.homeService.getLoanTrendsByWeek(officeId);
-            forkJoin({clientsByWeek: clientsByWeek, loansByWeek: loansByWeek}).subscribe((data: any[]) => {
-              const weekLabels = this.getLabels(timescale);
-              const clientCounts = this.getCounts(data[0], weekLabels, timescale, 'client');
-              const loanCounts = this.getCounts(data[1], weekLabels, timescale, 'loan');
-              this.setChart(weekLabels, clientCounts, loanCounts);
+          case 'WEEKLY':
+            const trainedParticipantsByWeek = this.dashboardService.getBusinessesTrainedByTimeScale(this.dashBoardFilters, this.selectedDashboardMode);
+            const disbursedLoansByWeek = this.dashboardService.getLoanDisbursedByTimeScale(this.dashBoardFilters, this.selectedDashboardMode);
+            forkJoin({trainedParticipantsByWeek, disbursedLoansByWeek}).subscribe((data: any) => {
+              const weekLabels = this.getLabels(data.trainedParticipantsByWeek);
+              const businessesTrained = this.getCounts(data.trainedParticipantsByWeek, weekLabels);
+              const disbursedLoans = this.getCounts(data.disbursedLoansByWeek, weekLabels);
+              this.setChart(weekLabels, businessesTrained, disbursedLoans);
               this.hideOutput = false;
             });
             break;
-          case 'Month':
-            const clientsByMonth = this.homeService.getClientTrendsByMonth(officeId);
-            const loansByMonth = this.homeService.getLoanTrendsByMonth(officeId);
-            forkJoin({clientsByMonth: clientsByMonth, loansByMonth: loansByMonth}).subscribe((data: any[]) => {
-              const monthLabels = this.getLabels(timescale);
-              const clientCounts = this.getCounts(data[0], monthLabels, timescale, 'client');
-              const loanCounts = this.getCounts(data[1], monthLabels, timescale, 'loan');
-              this.setChart(monthLabels, clientCounts, loanCounts);
+          case 'MONTHLY':
+            const trainedParticipantsByMonth = this.dashboardService.getBusinessesTrainedByTimeScale(this.dashBoardFilters, this.selectedDashboardMode);
+            const disbursedLoansByMonth = this.dashboardService.getLoanDisbursedByTimeScale(this.dashBoardFilters, this.selectedDashboardMode);
+            forkJoin({trainedParticipantsByMonth, disbursedLoansByMonth}).subscribe((data: any) => {
+              const monthLabels = this.getLabels(data.trainedParticipantsByMonth);
+              const businessesTrained = this.getCounts(data.trainedParticipantsByMonth, monthLabels);
+              const disbursedLoans = this.getCounts(data.disbursedLoansByMonth, monthLabels);
+              this.setChart(monthLabels, businessesTrained, disbursedLoans);
               this.hideOutput = false;
             });
             break;
@@ -94,100 +122,23 @@ ngOnInit() {
 
   /**
    * Gets Abscissa Labels.
-   * @param {string} timescale User's timescale choice.
+   * @param {string} data User's timescale choice.
    */
-  getLabels(timescale: string) {
-    const date = new Date();
-    const labelsArray = [];
-    switch (timescale) {
-      case 'Day':
-        while (labelsArray.length < 12) {
-          date.setDate(date.getDate() - 1);
-          const transformedDate = this.dateUtils.formatDate(date, 'd/M');
-          labelsArray.push(transformedDate);
-        }
-        break;
-      case 'Week':
-        /** 1st January of present year */
-        const onejan = new Date(date.getFullYear(), 0, 1);
-        while (labelsArray.length < 12) {
-          date.setDate(date.getDate() - 7);
-          /** Gets current week number */
-          const weekNumber = Math.ceil(
-            (((date.getTime() - onejan.getTime()) / 86400000) + onejan.getDay() + 1) / 7
-          );
-          labelsArray.push(weekNumber);
-        }
-        break;
-      case 'Month':
-        while (labelsArray.length < 12) {
-          const transformedDate = this.dateUtils.formatDate(date, 'MMMM');
-          labelsArray.push(transformedDate);
-          date.setMonth(date.getMonth() - 1);
-        }
-        break;
-    }
-    return labelsArray.reverse();
+  getLabels(data: any) {
+    return data.map((entry: any) => entry.name);
   }
 
   /**
    * Get bar heights for clients/loans trends.
-   * @param {any[]} response API response array.
+   * @param {any[]} data API response array.
    * @param {any[]} labels Abscissa Labels.
-   * @param {string} timescale User's timescale choice.
-   * @param {string} type 'client' or 'loan'.
    */
-  getCounts(response: any[], labels: any[], timescale: string, type: string) {
+  getCounts(data: any[], labels: any[]) {
     let counts: number[]  = [];
-    switch (timescale) {
-      case 'Day':
-        labels.forEach((label: any) => {
-          const day = response.find((entry: any) => {
-            const transformedDate = this.dateUtils.formatDate(entry.days, 'd/M');
-            return transformedDate === label;
-          });
-          counts = this.updateCount(day, counts, type);
+    labels.forEach((label: any) => {
+          const dataKey = data.find((entry: any) => entry.name === label);
+          counts.push(dataKey ? dataKey.value : 0);
         });
-        break;
-      case 'Week':
-        labels.forEach((label: any) => {
-          const week = response.find((entry: any) => {
-            return entry.Weeks === label;
-          });
-          counts = this.updateCount(week, counts, type);
-        });
-        break;
-      case 'Month':
-        labels.forEach((label: any) => {
-          const month = response.find((entry: any) => {
-            return entry.Months === label;
-          });
-          counts = this.updateCount(month, counts, type);
-        });
-        break;
-    }
-    return counts;
-  }
-
-  /**
-   * Updates the counts array.
-   * @param {any} span Time span.
-   * @param {any[]} counts Counts.
-   * @param {string} type 'client' or 'loan'
-   */
-  updateCount(span: any, counts: any[], type: string) {
-    if (span) {
-      switch (type) {
-        case 'client':
-          counts.push(span.count);
-        break;
-        case 'loan':
-          counts.push(span.lcount);
-        break;
-      }
-    } else {
-      counts.push(0);
-    }
     return counts;
   }
 
@@ -195,25 +146,25 @@ ngOnInit() {
    * Creates an instance of Chart.js multi-bar chart.
    * Refer: https://www.chartjs.org/docs/latest/charts/bar.html for configuration details.
    * @param {any[]} labels Abscissa Labels.
-   * @param {number[]} clientCounts Clients Ordinate.
-   * @param {number[]} loanCounts Loans Ordinate.
+   * @param {number[]} businessesTrained Businesses Trained Ordinate.
+   * @param {number[]} disbursedLoans Loans Ordinate.
    */
-  setChart(labels: any[], clientCounts: number[], loanCounts: number[]) {
+  setChart(labels: any[], businessesTrained: number[], disbursedLoans: number[]) {
     if (!this.chart) {
-      this.chart = new Chart('client-trends-bar', {
+      this.chart = new Chart('participant-trends-bar', {
         type: 'bar',
         data: {
           labels: labels,
           datasets: [
             {
-              label: 'New Clients',
+              label: 'Bu Businesses Trained',
               backgroundColor: 'dodgerblue',
-              data: clientCounts
+              data: businessesTrained
             },
             {
               label: 'Loans Disbursed',
               backgroundColor: 'green',
-              data: loanCounts
+              data: disbursedLoans
             }
           ]
         },
@@ -229,8 +180,8 @@ ngOnInit() {
       });
     } else {
       this.chart.data.labels = labels;
-      this.chart.data.datasets[0].data = clientCounts;
-      this.chart.data.datasets[1].data = loanCounts;
+      this.chart.data.datasets[0].data = businessesTrained;
+      this.chart.data.datasets[1].data = disbursedLoans;
       this.chart.update();
     }
   }

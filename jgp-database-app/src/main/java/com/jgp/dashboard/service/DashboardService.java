@@ -23,9 +23,9 @@ public interface DashboardService {
 
     List<DataPointDto> getLoanDisbursedByGenderSummary(DashboardSearchCriteria dashboardSearchCriteria);
 
-    List<DataPointDto> getLoanDisbursedByTimeScale(DashboardSearchCriteria dashboardSearchCriteria);
+    List<DataPointDto> getLoanDisbursedByTimeScale(DashboardSearchCriteria dashboardSearchCriteria, String timeScale);
 
-    List<DataPointDto> getBusinessesTrainedByTimeScale(DashboardSearchCriteria dashboardSearchCriteria);
+    List<DataPointDto> getBusinessesTrainedByTimeScale(DashboardSearchCriteria dashboardSearchCriteria, String timeScale);
 
     List<CountyDataSummaryResponseDto> getCountySummary(DashboardSearchCriteria dashboardSearchCriteria);
 

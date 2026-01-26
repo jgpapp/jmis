@@ -1,6 +1,7 @@
 package com.jgp.dashboard.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public record DataSummaryDto(
         String genderCategory,
@@ -8,7 +9,8 @@ public record DataSummaryDto(
         Integer businessesLoaned,
         BigDecimal amountDisbursed,
         BigDecimal outStandingAmount,
-        Integer dataYear,
-        Integer dataMonth
+        BigDecimal amountRepaid,
+        LocalDate summaryDate
 ) {
+
 }

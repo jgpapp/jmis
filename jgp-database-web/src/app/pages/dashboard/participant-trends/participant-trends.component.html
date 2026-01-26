@@ -9,12 +9,12 @@
   <mat-card-content>
     <!-- Structural directives like *ngIf break the canvas -->
     <div [ngStyle]="{'display': (hideOutput) ? 'none' : 'block'}">
-      <canvas id="client-trends-bar" width="800" height="465"></canvas>
+      <canvas id="participant-trends-bar" width="800" height="465"></canvas>
     </div>
     <mat-button-toggle-group [(ngModel)]="selectedDashboardMode" id='timescale' appearance="legacy">
-      <mat-button-toggle value="Day">Day</mat-button-toggle>
-      <mat-button-toggle value="Week">Week</mat-button-toggle>
-      <mat-button-toggle value="Month">Month</mat-button-toggle>
+      <mat-button-toggle value="DAILY">Day</mat-button-toggle>
+      <mat-button-toggle value="WEEKLY">Week</mat-button-toggle>
+      <mat-button-toggle value="MONTHLY">Month</mat-button-toggle>
     </mat-button-toggle-group>
   </mat-card-content>
 

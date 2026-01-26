@@ -94,6 +94,36 @@ public class DashboardController {
         return new ResponseEntity<>(this.dashboardService.getLoanDisbursedByGenderSummary(searchCriteria), HttpStatus.OK);
     }
 
+    @GetMapping("loans-disbursed-by-time-scale")
+    public ResponseEntity<List<DataPointDto>> getLoanDisbursedByTimeScale(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                           @RequestParam(value = "county-code", required = false) String countyCode,
+                                                                           @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                           @RequestParam(value = "to-date", required = false) LocalDate toDate,
+                                                                          @RequestParam(value = "timeScale") String timeScale){
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getLoanDisbursedByTimeScale(searchCriteria, timeScale), HttpStatus.OK);
+    }
+
+    @GetMapping("businesses-trained-by-time-scale")
+    public ResponseEntity<List<DataPointDto>> getBusinessesTrainedByTimeScale(@RequestParam(value = "partner-id", required = false) Long partnerId,
+                                                                               @RequestParam(value = "county-code", required = false) String countyCode,
+                                                                               @RequestParam(value = "from-date", required = false) LocalDate fromDate,
+                                                                               @RequestParam(value = "to-date", required = false) LocalDate toDate,
+                                                                              @RequestParam(value = "timeScale") String timeScale){
+        final var searchCriteria = DashboardSearchCriteria.builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .partnerId(partnerId)
+                .countyCode(countyCode)
+                .build();
+        return new ResponseEntity<>(this.dashboardService.getBusinessesTrainedByTimeScale(searchCriteria, timeScale), HttpStatus.OK);
+    }
+
     @GetMapping("loaned-businesses-by-gender")
     public ResponseEntity<List<DataPointDto>> getLoanedBusinessesByGenderSummary(@RequestParam(value = "partner-id", required = false) Long partnerId,
                                                                                @RequestParam(value = "county-code", required = false) String countyCode,

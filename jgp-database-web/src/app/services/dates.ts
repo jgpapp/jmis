@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import moment from 'moment';
 
 @Injectable({
@@ -7,7 +7,8 @@ import moment from 'moment';
 })
 export class Dates {
 
-  constructor(private datePipe: DatePipe) {}
+  private datePipe = inject(DatePipe);
+
 
   public formatDate(timestamp: any, dateFormat: string): string | null {
     return this.datePipe.transform(timestamp, dateFormat);
