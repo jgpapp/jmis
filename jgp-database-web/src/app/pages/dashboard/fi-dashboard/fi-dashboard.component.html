@@ -64,7 +64,7 @@
         @if(isFinancialDashboard()){
         <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
             <mat-card>
-                <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                     <mat-card-title>{{loansDisbursedByGenderChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
@@ -88,7 +88,7 @@
         @if(isFinancialDashboard()){
         <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
             <mat-card>
-                <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                     <mat-card-title>{{loansDisbursedByPipelineChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
@@ -115,7 +115,7 @@
             <mat-icon>open_in_full</mat-icon>
           </button>
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center"  class="card-chart-header bg-primary">                
                 <mat-card-title>{{loanDisbursedByProductByGenderChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -146,7 +146,7 @@
         @if(isFinancialDashboard()){
         <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
             <mat-card>
-                <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                     <mat-card-title>{{loansDisbursedByStatusChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
@@ -177,7 +177,7 @@
         @if(isFinancialDashboard()){
         <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
             <mat-card>
-                <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                     <mat-card-title>{{loansDisbursedBySectorChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
@@ -204,7 +204,7 @@
             <mat-icon>open_in_full</mat-icon>
           </button>
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                 <mat-card-title>{{loanedBusinessesByGenderChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -230,7 +230,7 @@
         @if(isFinancialDashboard()){
         <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
             <mat-card>
-                <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                     <mat-card-title>{{accessedVSOutStandingAmountByGenderChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
@@ -260,7 +260,7 @@
         @if(isFinancialDashboard()){
         <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
             <mat-card>
-                <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                     <mat-card-title>{{loansDisbursedBySegmentChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
@@ -284,7 +284,7 @@
         @if (displayChart) {
         <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
             <mat-card>
-                <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                     <mat-card-title>{{topFourCountiesloansDisbursedChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
@@ -308,7 +308,7 @@
                 <mat-icon>open_in_full</mat-icon>
               </button>
             <mat-card>
-                <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                     <mat-card-title>{{loansDisbursedByProductChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
@@ -342,7 +342,7 @@
         @if(isFinancialDashboard()){
         <div fxFlex="100" fxFlex.gt-sm="50" fxFlex.gt-md="50" class="p-2"> 
             <mat-card>
-                <mat-card-header fxLayoutAlign="space-between center">                
+                <mat-card-header fxLayoutAlign="space-between center" class="card-chart-header bg-primary">                
                     <mat-card-title>Loans Disbursed (KES)</mat-card-title>
                     <button mat-raised-button color="primary" (click)="gs.exportToExcel(accessedLoanDataDataSource, displayedColumns, 'ACCESSED_LOANS')"><mat-icon>download</mat-icon> Excel</button>
                 </mat-card-header>
@@ -382,7 +382,7 @@
     @if(isFinancialDashboard()){
         <div fxFlex="100" fxFlex.gt-sm="50" fxFlex.gt-md="50" class="p-2"> 
             <mat-card>
-                <mat-card-header fxLayoutAlign="space-between center">                
+                <mat-card-header fxLayoutAlign="space-between center" class="card-chart-header bg-primary">                
                     <mat-card-title>Number of Loans by Partner</mat-card-title>
                     <button mat-raised-button color="primary" (click)="gs.exportToExcel(accessedLoanCountDataDataSource, displayedColumns, 'ACCESSED_LOANS_COUNT')"><mat-icon>download</mat-icon> Excel</button>
                 </mat-card-header>

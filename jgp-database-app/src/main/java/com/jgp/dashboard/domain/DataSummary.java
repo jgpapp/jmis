@@ -1,6 +1,5 @@
 package com.jgp.dashboard.domain;
 
-import com.jgp.dashboard.dto.DataSummaryDto;
 import com.jgp.patner.domain.Partner;
 import com.jgp.shared.domain.BaseEntity;
 import jakarta.persistence.Column;
@@ -18,6 +17,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Getter
 @Entity
@@ -50,35 +50,13 @@ public class DataSummary extends BaseEntity {
     @Column(name = "out_standing_amount")
     private BigDecimal outStandingAmount;
 
-    @Column(name = "data_year")
-    private Integer dataYear;
+    @Column(name = "amount_repaid")
+    private BigDecimal amountRepaid;
 
-    @Column(name = "data_month")
-    private Integer dataMonth;
+    @Column(name = "summary_date")
+    private LocalDate summaryDate;
 
     public DataSummary() {
-    }
-
-    private DataSummary(String genderCategory, Integer businessesTrained, Integer businessesLoaned, BigDecimal amountDisbursed, BigDecimal outStandingAmount, Integer dataYear, Integer dataMonth, Partner partner) {
-        this.genderCategory = genderCategory;
-        this.businessesTrained = businessesTrained;
-        this.businessesLoaned = businessesLoaned;
-        this.amountDisbursed = amountDisbursed;
-        this.outStandingAmount = outStandingAmount;
-        this.dataYear = dataYear;
-        this.dataMonth = dataMonth;
-        this.partner = partner;
-    }
-
-    public static DataSummary createDataSummary(DataSummaryDto dto, Partner partner){
-        return new DataSummary(dto.genderCategory(), dto.businessesTrained(), dto.businessesLoaned(), dto.amountDisbursed(), dto.outStandingAmount(), dto.dataYear(), dto.dataMonth(), partner);
-    }
-
-    public void updateDataSummary(DataSummaryDto dto){
-        this.businessesTrained = dto.businessesTrained();
-        this.businessesLoaned = dto.businessesLoaned();
-        this.amountDisbursed = dto.amountDisbursed();
-        this.outStandingAmount = dto.outStandingAmount();
     }
 
     @Override
@@ -92,8 +70,7 @@ public class DataSummary extends BaseEntity {
         return new EqualsBuilder()
                 .appendSuper(super.equals(o)).append(getId(), countySummary.getId())
                 .append(getGenderCategory(), countySummary.getGenderCategory())
-                .append(getDataYear(), countySummary.getDataYear())
-                .append(getDataMonth(), countySummary.getDataMonth())
+                .append(getSummaryDate(), countySummary.getSummaryDate())
                 .append(getPartner(), countySummary.getPartner())
                 .isEquals();
     }
@@ -101,6 +78,6 @@ public class DataSummary extends BaseEntity {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .appendSuper(super.hashCode()).append(getId()).append(getGenderCategory()).append(getDataYear()).append(getDataMonth()).append(getPartner()).toHashCode();
+                .appendSuper(super.hashCode()).append(getId()).append(getGenderCategory()).append(getSummaryDate()).append(getPartner()).toHashCode();
     }
 }

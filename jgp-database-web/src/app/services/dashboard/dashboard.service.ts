@@ -80,6 +80,14 @@ export class DashboardService {
       return this.httpClient.get(`/reports/mentorship-by-given-field?${this.getDashBoardQueryParams(dashBoardFilters)}&given-field=${givenField}`);
     }
 
+    getLoanDisbursedByTimeScale(dashBoardFilters: any = undefined, timeScale: string): Observable<any> {
+      return this.httpClient.get(`/reports/loans-disbursed-by-time-scale?${this.getDashBoardQueryParams(dashBoardFilters)}&timeScale=${timeScale}`);
+    }
+
+    getBusinessesTrainedByTimeScale(dashBoardFilters: any = undefined, timeScale: string): Observable<any> {
+      return this.httpClient.get(`/reports/businesses-trained-by-time-scale?${this.getDashBoardQueryParams(dashBoardFilters)}&timeScale=${timeScale}`);
+    }
+
     getLoansDisbursedByStatusSummary(dashBoardFilters: any = undefined): Observable<any> {
       return this.httpClient.get(`/reports/loans-disbursed-by-quality?${this.getDashBoardQueryParams(dashBoardFilters)}`);
     }

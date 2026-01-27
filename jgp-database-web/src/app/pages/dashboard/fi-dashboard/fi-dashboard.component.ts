@@ -7,9 +7,7 @@ import { AuthService } from '@services/users/auth.service';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { MatIconModule } from '@angular/material/icon';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
-import { PieChartComponent } from '../pie-chart/pie-chart.component';
 import { HighLevelSummaryDto } from '../dto/highLevelSummaryDto';
-import { PerformanceSummaryComponent } from "../performance-summary/performance-summary.component";
 import { GlobalService } from '@services/shared/global.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -29,8 +27,6 @@ import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-conta
     MatCardModule,
     MatIconModule,
     NgxChartsModule,
-    PieChartComponent,
-    PerformanceSummaryComponent,
     MatButtonModule,
     MatTableModule,
     MatButtonToggleModule,

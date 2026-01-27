@@ -12,11 +12,11 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UserService } from '@services/users/user.service';
 import { GlobalService } from '@services/shared/global.service';
 import { AuthService } from '@services/users/auth.service';
-import { Subject, takeUntil } from 'rxjs';
 import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({
     selector: 'app-change-password',
+    standalone: true,
     imports: [
         RouterModule,
         FlexLayoutModule,

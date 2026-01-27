@@ -18,6 +18,7 @@ import { ContentHeaderComponent } from '../../theme/components/content-header/co
 
 @Component({
     selector: 'app-chat',
+    standalone: true,
     imports: [
         DatePipe,
         FormsModule,

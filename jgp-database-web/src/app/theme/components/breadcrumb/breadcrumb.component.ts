@@ -8,6 +8,7 @@ import { Settings, SettingsService } from '@services/settings.service';
 
 @Component({
     selector: 'app-breadcrumb',
+    standalone: true,
     imports: [
         FlexLayoutModule,
         MatIconModule,

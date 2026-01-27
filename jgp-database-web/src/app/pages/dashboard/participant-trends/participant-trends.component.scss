@@ -1,0 +1,14 @@
+.card {
+  width: 100%;
+  padding: 0;
+  
+  #timescale {
+    margin: 2% 35%;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+mat-button-toggle-group {
+  display: flex !important;
+}

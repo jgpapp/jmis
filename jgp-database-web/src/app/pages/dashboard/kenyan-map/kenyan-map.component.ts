@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 
 @Component({
     selector: 'app-kenyan-map',
+    standalone: true,
     imports: [],
     templateUrl: './kenyan-map.component.html',
     styleUrl: './kenyan-map.component.scss'

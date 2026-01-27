@@ -3,23 +3,28 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
-import { PieChartComponent } from "../pie-chart/pie-chart.component"; 
 import { multi, single } from '@data/charts.data';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DashboardTypeFilter } from '../../../dto/dashboard-type-filter';
 import { CountySummaryDto } from '../dto/county-summary-dto';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
+import { A11yModule } from "@angular/cdk/a11y";
+import { PieChartComponent } from '../pie-chart/pie-chart.component';
+import { ParticipantTrendsComponent } from '../participant-trends/participant-trends.component';
 
 @Component({
     selector: 'app-info-cards',
+    standalone: true,
     imports: [
     FlexLayoutModule,
+    PieChartComponent,
     MatCardModule,
     MatIconModule,
     NgxChartsModule,
-    PieChartComponent,
-    MatDialogModule
+    MatDialogModule,
+    A11yModule,
+    ParticipantTrendsComponent
 ],
     templateUrl: './info-cards.component.html',
     styleUrl: './info-cards.component.scss'
@@ -197,10 +202,13 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   public mentorshipDeliveryModeSummaryYAxisLabel: string = 'Count';
   public mentorshipDeliveryModeSummaryChartTitle: string = 'Delivery Mode Distribution';
 
-  public trainedAndTookLoanCountSummary: any[];
+  public trainedAndTookLoanCountSummary2: any[];
   public trainedAndTookLoanCountSummaryShowGridLines: boolean = true;
   public trainedAndTookLoanCountSummaryRoundDomains: boolean = true;
   public trainedAndTookLoanCountSummaryShowLegend: boolean = false;
+  public trainedAndTookLoanCountSummaryChartTitle2: string = 'Businesses Trained And Taken Loan';
+
+  public trainedAndTookLoanCountSummary: any[];
   public trainedAndTookLoanCountSummaryChartTitle: string = 'Businesses Trained And Taken Loan';
 
   public mentorshipByDisabilitySummary: any[];
@@ -312,6 +320,7 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   @ViewChild('mentorshipByGenderCategoryContentDiv', { static: false }) mentorshipByGenderCategoryContentDiv!: ElementRef;
   @ViewChild('loanedBusinessesByGenderContentDiv', { static: false }) loanedBusinessesByGenderContentDiv!: ElementRef;
   @ViewChild('loansDisbursedByPipelineContentDiv', { static: false }) loansDisbursedByPipelineContentDiv!: ElementRef;
+  @ViewChild('trainedAndTookLoanCountSummaryContentDiv', { static: false }) trainedAndTookLoanCountSummaryContentDiv!: ElementRef;
   @ViewChild('mentorshipGenderSummaryContentDiv', { static: false }) mentorshipGenderSummaryContentDiv!: ElementRef;
   @ViewChild('countyTrainedBusinessesMapContentDiv', { static: false }) countyTrainedBusinessesMapContentDiv!: ElementRef;
   @ViewChild('countyMentorshipMapContentDiv', { static: false }) countyMentorshipMapContentDiv!: ElementRef;
@@ -387,6 +396,8 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       this.getRefugeeBusinessOwnersTrainedByGenderSummary();
     } else if (this.dashboardTypeFilter.isGeneralSummaryDashBoard) {
       this.getParticipantCountForTrainedAndTookLoanSummary();
+      this.getLoansDisbursedByStatusSummary();
+      this.getParticipantsEmployeesSummary();
     }
     this.getCountySummary();
     
@@ -898,6 +909,19 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       chartShowYAxisLabel: this.loansDisbursedByPipelineShowYAxisLabel,
       chartYAxisLabel: this.loansDisbursedByPipelineYAxisLabel,
       chartXAxisLabel: this.loansDisbursedByPipelineXAxisLabel,
+      chartFormatLabel: this.valueFormatting,
+    };
+    this.dashBoardService.openExpandedChartDialog(this.dialog, data);
+  }
+
+  expandTrainedAndTookLoanCountSummary(){
+    const data = { 
+      content: this.trainedAndTookLoanCountSummaryContentDiv.nativeElement.cloneNode(true),
+      chartType: 'ngx-charts-tree-map',
+      chartData: this.trainedAndTookLoanCountSummary,
+      chartSColorScheme: this.chartSColorScheme,
+      chartTitle: this.trainedAndTookLoanCountSummaryChartTitle,
+      chartGradient: this.gradient,
       chartFormatLabel: this.valueFormatting,
     };
     this.dashBoardService.openExpandedChartDialog(this.dialog, data);

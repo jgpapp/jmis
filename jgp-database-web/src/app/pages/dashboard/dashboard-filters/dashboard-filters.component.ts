@@ -1,5 +1,5 @@
 import { Component, EventEmitter, input, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -18,6 +18,7 @@ import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-conta
 
 @Component({
     selector: 'app-dashboard-filters',
+    standalone: true,
     imports: [
         FlexLayoutModule,
         ReactiveFormsModule,

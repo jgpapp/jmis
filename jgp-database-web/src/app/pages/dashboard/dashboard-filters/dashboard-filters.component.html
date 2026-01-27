@@ -1,7 +1,7 @@
 
     <form [formGroup]="dashFilterForm" fxLayout="row wrap" fxLayoutAlign="center center"> 
         
-
+        @if(!dashboardTypeFilter.isGeneralSummaryDashBoard){
         <mat-form-field appearance="outline" fxFlex="100" [fxFlex.xl]="fieldFlex" [fxFlex.lg]="fieldFlex" fxFlex.md="33.3" fxFlex.sm="50" class="px-2">
             <mat-label>Select County</mat-label>
             <mat-select formControlName="selectedCountyCode" (selectionChange)="filterFormChanged()">
@@ -11,6 +11,7 @@
                   }
             </mat-select>
         </mat-form-field>
+        }
 
         @if(dashboardTypeFilter.isMonitoringDashBoard){
             <mat-form-field appearance="outline" fxFlex="100" [fxFlex.xl]="fieldFlex" [fxFlex.lg]="fieldFlex" fxFlex.md="20" fxFlex.sm="50" class="px-2">

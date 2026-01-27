@@ -13,6 +13,7 @@ import { apiPrefixInterceptor } from './util/api-prefix.interceptor';
 import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
 import { AuthService } from '@services/users/auth.service';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
+import { DatePipe } from '@angular/common';
 
 export function tokenGetter() {
   return inject(AuthService).getAccessToken();
@@ -34,6 +35,7 @@ export const appConfig: ApplicationConfig = {
       },
     },
     JwtHelperService,
+    DatePipe,
    // importProvidersFrom(InMemoryWebApiModule.forRoot(UsersData, { delay: 1000 })),
     importProvidersFrom(CalendarModule.forRoot({
       provide: DateAdapter,

@@ -11,7 +11,9 @@ import com.jgp.dashboard.dto.HighLevelSummaryDto;
 import com.jgp.dashboard.dto.PartnerYearlyDataDto;
 import com.jgp.dashboard.dto.PerformanceSummaryDto;
 import com.jgp.dashboard.dto.TaTypeTrainedBusinessDto;
+import com.jgp.dashboard.dto.TimeScaledPart;
 import com.jgp.infrastructure.bulkimport.event.DataApprovedEvent;
+import com.jgp.infrastructure.core.domain.JdbcSupport;
 import com.jgp.monitoring.domain.predicate.OutComeMonitoringSearchCriteria;
 import com.jgp.participant.domain.ParticipantRepository;
 import com.jgp.patner.domain.Partner;
@@ -69,9 +71,9 @@ public class DashboardServiceImpl implements DashboardService {
     private static final String TRAINING_PARTNER_PARAM = "trainingPartner";
     private static final String DATA_VALUE_PARAM = "dataValue";
     private static final String DATA_PERCENTAGE_VALUE_PARAM = "percentage";
-    private static final String LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM = "WHERE lt.transaction_date between :fromDate and :toDate  and l.data_is_approved = true and lt.is_approved = true and l.is_deleted = false and lt.is_deleted = false ";
-    private static final String BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM = "WHERE bpd.date_partner_recorded between :fromDate and :toDate and bpd.data_is_approved = true and bpd.is_deleted = false ";
-    private static final String MENTORSHIP_WHERE_CLAUSE_BY_MENTORSHIP_DATE_PARAM = "WHERE m.mentor_ship_date between :fromDate and :toDate and m.is_approved = true and m.is_deleted = false ";
+    private static final String LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM = "WHERE lt.transaction_date between :fromDate and :toDate  and l.data_is_approved = true and lt.is_approved = true ";
+    private static final String BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM = "WHERE bpd.date_partner_recorded between :fromDate and :toDate and bpd.data_is_approved = true  ";
+    private static final String MENTORSHIP_WHERE_CLAUSE_BY_MENTORSHIP_DATE_PARAM = "WHERE m.mentor_ship_date between :fromDate and :toDate and m.is_approved = true ";
     private static final String LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and l.partner_id = :partnerId ";
     private static final String BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and bpd.partner_id = :partnerId ";
     private static final String MENTORSHIP_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and m.partner_id = :partnerId ";
@@ -86,6 +88,8 @@ public class DashboardServiceImpl implements DashboardService {
     private static final String VALUE_PARAM = "value";
     private static final String TOTAL_PARAM_PARAM = "%s Totals";
 
+    private static final String DATA_SUMMARY_WHERE_CLAUSE_BY_SUMMARY_DATE_PARAM = "WHERE ds.summary_date between :fromDate and :toDate ";
+    private static final String DATA_SUMMARY_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and ds.partner_id = :partnerId ";
 
     @Override
     @Cacheable(value = "highLevelSummary", key = "#dashboardSearchCriteria")
@@ -145,6 +149,71 @@ public class DashboardServiceImpl implements DashboardService {
             loanWhereClause = String.format("%s%s", loanWhereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
         }
         var sqlQuery = String.format(DataPointMapper.LOANS_DISBURSED_BY_GENDER_SCHEMA, loanWhereClause);
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
+    public List<DataPointDto> getLoanDisbursedByTimeScale(DashboardSearchCriteria dashboardSearchCriteria, String timeScale) {
+        final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
+        LocalDate fromDate = dashboardSearchCriteria.fromDate();
+        LocalDate toDate = dashboardSearchCriteria.toDate();
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = CommonUtil.getTodayMinusCustomMonthsDates(1).getLeft();
+            toDate = CommonUtil.getTodayMinusCustomMonthsDates(1).getRight();
+        }
+        fromDate = CommonUtil.getTimeScaledDataRestrictedDates(timeScale, fromDate, toDate).getLeft();
+        toDate = CommonUtil.getTimeScaledDataRestrictedDates(timeScale, fromDate, toDate).getRight();
+
+        var loanWhereClause = DATA_SUMMARY_WHERE_CLAUSE_BY_SUMMARY_DATE_PARAM;
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
+            parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
+            loanWhereClause = String.format(DATA_SUMMARY_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
+        }
+        final var timeScaledPart = TimeScaledPart.builder()
+                .timeScale(timeScale)
+                .dateField("ds.summary_date")
+                .aggregationFunction("SUM")
+                .aggregatedColumn("ds.amount_disbursed")
+                .whereClause(loanWhereClause)
+                .entity("data_summary ds")
+                .build();
+
+        final var sqlQuery = getTimeScaledSqlQuery(timeScaledPart);
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
+    }
+
+    @Override
+    public List<DataPointDto> getBusinessesTrainedByTimeScale(DashboardSearchCriteria dashboardSearchCriteria, String timeScale) {
+        final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
+        LocalDate fromDate = dashboardSearchCriteria.fromDate();
+        LocalDate toDate = dashboardSearchCriteria.toDate();
+        if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
+            fromDate = CommonUtil.getTodayMinusCustomMonthsDates(1).getLeft();
+            toDate = CommonUtil.getTodayMinusCustomMonthsDates(1).getRight();
+        }
+
+        fromDate = CommonUtil.getTimeScaledDataRestrictedDates(timeScale, fromDate, toDate).getLeft();
+        toDate = CommonUtil.getTimeScaledDataRestrictedDates(timeScale, fromDate, toDate).getRight();
+
+        var bpdWhereClause = DATA_SUMMARY_WHERE_CLAUSE_BY_SUMMARY_DATE_PARAM;
+        MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
+        parameters.addValue(TO_DATE_PARAM, toDate);
+        if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
+            parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
+            bpdWhereClause = String.format(DATA_SUMMARY_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, bpdWhereClause);
+        }
+        final var timeScaledPart = TimeScaledPart.builder()
+                .timeScale(timeScale)
+                .dateField("ds.summary_date")
+                .aggregationFunction("SUM")
+                .aggregatedColumn("ds.businesses_trained")
+                .whereClause(bpdWhereClause)
+                .entity("data_summary ds")
+                .build();
+
+        final var sqlQuery = getTimeScaledSqlQuery(timeScaledPart);
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
     }
 
@@ -1114,10 +1183,10 @@ public class DashboardServiceImpl implements DashboardService {
         final var performanceSummaryMapper = new PerformanceSummaryMapper();
         final var today = LocalDate.now(ZoneId.systemDefault());
         final var thisYear = Objects.nonNull(year) ? Integer.parseInt(year) : today.getYear();
-        var whereClause = Objects.nonNull(year) ? "where ds.data_year = :fromYear " : "where ds.data_year between :fromYear and :toYear ";
+        var whereClause = "where ds.summary_date between :fromDate and :toDate ";
         var parameters = new MapSqlParameterSource();
-        parameters.addValue("fromYear", (thisYear - 3));
-        parameters.addValue("toYear", thisYear);
+        parameters.addValue(FROM_DATE_PARAM, LocalDate.parse(thisYear + "-01-01"));
+        parameters.addValue(TO_DATE_PARAM, LocalDate.parse(thisYear + "-12-31"));
 
         if (Objects.nonNull(partnerId)) {
             parameters.addValue(PARTNER_ID_PARAM, partnerId);
@@ -1148,7 +1217,7 @@ public class DashboardServiceImpl implements DashboardService {
     private static final class PerformanceSummaryMapper implements ResultSetExtractor<List<PerformanceSummaryDto>> {
 
         public static final String PERFORMANCE_SUMMARY_SCHEMA = """
-                 SELECT p.partner_name as partnerName, ds.data_year as dataYear, ds.data_month as dataMonth,\s
+                 SELECT p.partner_name as partnerName, EXTRACT(YEAR FROM ds.summary_date) as dataYear, EXTRACT(MONTH FROM ds.summary_date)as dataMonth,\s
                  ds.gender_category as genderCategory, sum(ds.businesses_trained) as businessesTrained,\s
                  sum(ds.businesses_loaned) as businessesLoaned, sum(ds.amount_disbursed) as amountDisbursed,\s
                  sum(ds.out_standing_amount) as outStandingAmount\s
@@ -1859,21 +1928,22 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
 
         public static final String COUNTY_SUMMARY_SCHEMA = """
                 with highLevelSummary as (
-                                     select cl.gender_category as genderCategory, count(bpd.*) as businessesTrained,
+                                     select cl.gender_category as genderCategory, bpd.date_partner_recorded as summaryDate, count(bpd.*) as businessesTrained,
                                      0 as businessesLoaned, 0 as amountDisbursed,
-                                     0 as outStandingAmount from ta_participants_data bpd\s
+                                     0 as outStandingAmount, 0 as amountRepaid from ta_participants_data bpd\s
                                      inner join participants cl on cl.id = bpd.participant_id %s
-                                     group by 1
+                                     group by 1, 2
                                      union
-                                     select cl.gender_category as genderCategory, 0 as businessesTrained, count(distinct l.*) as businessesLoaned,
-                                     sum(lt.amount) as amountDisbursed, sum(lt.out_standing_amount) as outStandingAmount\s
+                                     select cl.gender_category as genderCategory, lt.transaction_date as summaryDate, 0 as businessesTrained, count(distinct l.*) as businessesLoaned,
+                                     sum(lt.amount) as amountDisbursed, sum(lt.out_standing_amount) as outStandingAmount,\s
+                                     sum(l.loan_amount_repaid) as amountRepaid
                                      from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
                                      inner join participants cl on cl.id = l.participant_id %s\s
-                                     group by 1
+                                     group by 1, 2
                                      )
-                                     select genderCategory, sum(businessesTrained) as businessesTrained, sum(businessesLoaned) as businessesLoaned,
-                                     sum(amountDisbursed) as amountDisbursed, sum(outStandingAmount) as outStandingAmount
-                                     from highLevelSummary group by 1;
+                                     select genderCategory, summaryDate, sum(businessesTrained) as businessesTrained, sum(businessesLoaned) as businessesLoaned,
+                                     sum(amountDisbursed) as amountDisbursed, sum(outStandingAmount) as outStandingAmount, sum(amountRepaid) as amountRepaid
+                                     from highLevelSummary group by 1, 2;
                \s""";
 
 
@@ -1881,16 +1951,56 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
         public List<DataSummaryDto> extractData(ResultSet rs) throws SQLException, DataAccessException {
             var dataPoints = new ArrayList<DataSummaryDto>();
             while (rs.next()){
+                final var summaryDate = JdbcSupport.getLocalDate(rs, "summaryDate");
                 final var genderCategory = rs.getString(GENDER_CATEGORY_PARAM);
                 final var businessesTrained = rs.getInt(BUSINESSES_TRAINED);
                 final var businessesLoaned = rs.getInt(BUSINESSES_LOANED);
                 final var amountDisbursed = rs.getBigDecimal(AMOUNT_DISBURSED);
                 final var outStandingAmount = rs.getBigDecimal(OUT_STANDING_AMOUNT);
+                final var amountRepaid = rs.getBigDecimal("amountRepaid");
 
-                dataPoints.add(new DataSummaryDto(genderCategory, businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount, 2025, 2));
+                dataPoints.add(new DataSummaryDto(genderCategory, businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount, amountRepaid, summaryDate));
             }
             return dataPoints;
         }
+    }
+
+    private String getTimeScaledSqlQuery(TimeScaledPart part) {
+
+        return switch (part.timeScale()){
+            case CommonUtil.MONTHLY_TIME_SCALE -> """
+                    SELECT
+                        TO_CHAR(DATE_TRUNC('month', %s), 'FMMonth-YYYY') AS dataKey,
+                        %s(%s) AS dataValue, 0 AS percentage
+                    FROM
+                        %s %s
+                    GROUP BY
+                        DATE_TRUNC('month', %s)
+                    ORDER BY
+                        DATE_TRUNC('month', %s) ASC;""".formatted(part.dateField(), part.aggregationFunction(), part.aggregatedColumn(), part.entity(), part.whereClause(), part.dateField(), part.dateField());
+            case CommonUtil.WEEKLY_TIME_SCALE -> """
+                    SELECT
+                        TO_CHAR(DATE_TRUNC('week', %s), 'Mon DD') || ' - ' ||
+                        TO_CHAR(DATE_TRUNC('week', %s) + INTERVAL '6 days', 'Mon DD') AS dataKey,
+                        %s(%s) AS dataValue, 0 AS percentage
+                    FROM
+                        %s %s
+                    GROUP BY
+                        DATE_TRUNC('week', %s)
+                    ORDER BY
+                        DATE_TRUNC('week', %s) ASC;""".formatted(part.dateField(), part.dateField(), part.aggregationFunction(), part.aggregatedColumn(), part.entity(), part.whereClause(), part.dateField(), part.dateField());
+            default -> """
+                    SELECT
+                        %s AS dataKey,
+                        %s(%s) AS dataValue, 0 AS percentage
+                    FROM
+                        %s %s
+                    GROUP BY
+                        1
+                    ORDER BY
+                        1 ASC;""".formatted(part.dateField(), part.aggregationFunction(), part.aggregatedColumn(), part.entity(), part.whereClause());
+        };
+
     }
 
 }

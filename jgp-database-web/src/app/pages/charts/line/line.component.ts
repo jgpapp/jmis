@@ -8,6 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
     selector: 'app-line',
+    standalone: true,
     imports: [
         FlexLayoutModule,
         MatCardModule,
