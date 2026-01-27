@@ -19,6 +19,7 @@ import {
   Tooltip, 
   Legend 
 } from 'chart.js';
+import { MatButtonModule } from '@angular/material/button';
 
 // Register Chart.js components
 Chart.register(
@@ -40,6 +41,7 @@ Chart.register(
     MatFormFieldModule,
     MatSelectModule,
     MatButtonToggleModule,
+    MatButtonModule,
     FormsModule,
     CommonModule
 ],
@@ -49,7 +51,7 @@ Chart.register(
 export class ParticipantTrendsComponent {
 
   @Input('dashBoardFilters') dashBoardFilters: any;
-  selectedDashboardMode: string = 'DAILY';
+  private _selectedDashboardMode: string = 'DAILY';
   /** Chart.js chart */
     chart: any;
     /** Substitute for resolver */
@@ -71,6 +73,16 @@ export class ParticipantTrendsComponent {
     
   }
 
+
+get selectedDashboardMode(): string {
+  return this._selectedDashboardMode;
+}
+
+set selectedDashboardMode(value: string) {
+  this._selectedDashboardMode = value;
+  this.getChartData();
+}
+
   ngOnInit() {
       this.getChartData();
     }
@@ -80,6 +92,7 @@ export class ParticipantTrendsComponent {
    * Fetches data accordingly and sets charts based on fetched data.
    */
   getChartData() {
+    console.log('Fetching participant trends data for timescale:', this.selectedDashboardMode);
     merge(this.selectedDashboardMode).pipe(skip(1))
       .subscribe(() => {
         switch (this.selectedDashboardMode) {
@@ -91,7 +104,7 @@ export class ParticipantTrendsComponent {
               const businessesTrained = this.getCounts(data.trainedParticipantsByDay, dayLabels);
               const disbursedLoans = this.getCounts(data.disbursedLoansByDay, dayLabels);
               this.setChart(dayLabels, businessesTrained, disbursedLoans);
-              this.hideOutput = false;
+              this.hideOutput = dayLabels.length === 0;
             });
             break;
           case 'WEEKLY':
@@ -102,7 +115,7 @@ export class ParticipantTrendsComponent {
               const businessesTrained = this.getCounts(data.trainedParticipantsByWeek, weekLabels);
               const disbursedLoans = this.getCounts(data.disbursedLoansByWeek, weekLabels);
               this.setChart(weekLabels, businessesTrained, disbursedLoans);
-              this.hideOutput = false;
+              this.hideOutput = weekLabels.length === 0;
             });
             break;
           case 'MONTHLY':
@@ -113,7 +126,7 @@ export class ParticipantTrendsComponent {
               const businessesTrained = this.getCounts(data.trainedParticipantsByMonth, monthLabels);
               const disbursedLoans = this.getCounts(data.disbursedLoansByMonth, monthLabels);
               this.setChart(monthLabels, businessesTrained, disbursedLoans);
-              this.hideOutput = false;
+              this.hideOutput = monthLabels.length === 0;
             });
             break;
         }
@@ -157,7 +170,7 @@ export class ParticipantTrendsComponent {
           labels: labels,
           datasets: [
             {
-              label: 'Bu Businesses Trained',
+              label: 'Businesses Trained',
               backgroundColor: 'dodgerblue',
               data: businessesTrained
             },

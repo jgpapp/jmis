@@ -336,7 +336,7 @@ export class DashboardComponent implements OnInit {
       }
       return 25;
     }else if(this.currentDashBoardTypeFilters.isGeneralSummaryDashBoard){
-        return 25; 
+        return 33.3; 
     }else {
       return 20;
     }

@@ -396,6 +396,8 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
       this.getRefugeeBusinessOwnersTrainedByGenderSummary();
     } else if (this.dashboardTypeFilter.isGeneralSummaryDashBoard) {
       this.getParticipantCountForTrainedAndTookLoanSummary();
+      this.getLoansDisbursedByStatusSummary();
+      this.getParticipantsEmployeesSummary();
     }
     this.getCountySummary();
     
