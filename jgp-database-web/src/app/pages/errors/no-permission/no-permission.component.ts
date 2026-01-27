@@ -8,6 +8,7 @@ import { ContentHeaderComponent } from '../../../theme/components/content-header
 
 @Component({
     selector: 'app-no-permission',
+    standalone: true,
     imports: [
         RouterModule,
         FlexLayoutModule,

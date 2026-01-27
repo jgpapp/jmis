@@ -52,7 +52,7 @@
         @if(isTADashboard()){
         <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
             <mat-card>
-                <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                     <mat-card-title>{{taTrainedBySectorChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
@@ -82,7 +82,7 @@
     @if(isTADashboard()){
         <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
             <mat-card>
-                <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                     <mat-card-title>{{taTrainedBySegmentChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
@@ -106,7 +106,7 @@
     @if(isTADashboard()){
         <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
             <mat-card>
-                <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                     <mat-card-title>{{businessesTainedByGenderChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
@@ -130,7 +130,7 @@
         @if (displayChart) {
         <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
             <mat-card>
-                <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                     <mat-card-title>{{topFourCountiesBusinessesTrainedChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
@@ -152,7 +152,7 @@
     <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button"> 
           
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                 <mat-card-title>{{employeesSummaryChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -182,7 +182,7 @@
     @if(isTADashboard()){
         <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button"> 
             <mat-card>
-                <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                     <mat-card-title>{{refugeeBusinessesTainedByGenderChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
@@ -206,7 +206,7 @@
     @if(isTADashboard()){
         <div fxFlex="100" fxFlex.xl="25" fxFlex.lg="25" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button"> 
             <mat-card>
-                <mat-card-header fxLayoutAlign="center center">                
+                <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                     <mat-card-title>{{disabledBusinessesTainedByGenderChartTitle}}</mat-card-title>
                 </mat-card-header>
                 <div class="w-100 h-300p">
@@ -233,7 +233,7 @@
             <mat-icon>open_in_full</mat-icon>
           </button>
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                 <mat-card-title>{{TANeedsByGenderChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -267,7 +267,7 @@
         @if(isTADashboard()){
             <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
                 <mat-card>
-                    <mat-card-header fxLayoutAlign="space-between center">                
+                    <mat-card-header fxLayoutAlign="space-between center" class="card-chart-header bg-primary">                
                         <mat-card-title>Number of refugees and PLWD benefitted from JGP technical Assistance</mat-card-title>
                         <button mat-raised-button color="primary" (click)="gs.exportToExcel(refugeesAndPlwdtrainedBusinessesCountDataPerGenderSource, refugeesAndPlwdDisplayedColumnsTrainedPerGender, 'BUSINESSES_TRAINED_PLWD')"><mat-icon>download</mat-icon> Excel</button>
                     </mat-card-header>
@@ -292,7 +292,7 @@
         @if(isTADashboard()){
             <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
                 <mat-card>
-                    <mat-card-header fxLayoutAlign="space-between center">                
+                    <mat-card-header fxLayoutAlign="space-between center" class="card-chart-header bg-primary">                
                         <mat-card-title>Businesses Trained By TA Type</mat-card-title>
                         <button mat-raised-button color="primary" (click)="gs.exportToExcel(trainedBusinessesCountDataPerTaTypeSource, displayedColumnsTrainedPerTaType, 'BUSINESSES_TRAINED_TA_TYPE')"><mat-icon>download</mat-icon> Excel</button>
                     </mat-card-header>
@@ -332,7 +332,7 @@
     @if(isTADashboard()){
         <div fxFlex="100" fxFlex.gt-sm="100" fxFlex.gt-md="100" class="p-2"> 
             <mat-card>
-                <mat-card-header fxLayoutAlign="space-between center">                
+                <mat-card-header fxLayoutAlign="space-between center" class="card-chart-header bg-primary">                
                     <mat-card-title>Businesses Trained By Partner</mat-card-title>
                     <button mat-raised-button color="primary" (click)="gs.exportToExcel(trainedBusinessesCountDataDataSource, displayedColumns, 'BUSINESSES_TRAINED')"><mat-icon>download</mat-icon> Excel</button>
                 </mat-card-header>

@@ -5,6 +5,7 @@ import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
 
 @Component({
     selector: 'app-content-header',
+    standalone: true,
     imports: [
         NgClass,
         MatIconModule,

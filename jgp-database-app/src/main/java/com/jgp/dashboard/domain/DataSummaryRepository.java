@@ -9,13 +9,33 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 
 @Repository
 public interface DataSummaryRepository extends JpaRepository<DataSummary, Long>, JpaSpecificationExecutor<DataSummary>, QuerydslPredicateExecutor<DataSummary> {
 
     @Transactional
     @Modifying
-    @Query(value = "DELETE FROM data_summary WHERE  partner_id = :partnerId AND data_year = :dataYear AND data_month = :dataMonth", nativeQuery = true)
-    void deleteDataSummary(@Param("partnerId") Long partnerId, @Param("dataYear") Integer dataYear, @Param("dataMonth") Integer dataMonth);
+    @Query(value = "DELETE FROM data_summary WHERE  partner_id = :partnerId AND summary_date BETWEEN :startDate AND :endDate", nativeQuery = true)
+    void deleteDataSummary(@Param("partnerId") Long partnerId, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+    @Transactional
+    @Modifying
+    @Query(value = """
+            INSERT INTO data_summary (partner_id, gender_category, summary_date, businesses_trained, businesses_loaned, amount_disbursed, out_standing_amount, amount_repaid) 
+            VALUES (:partnerId, :genderCategory, :summaryDate, :businessesTrained, :businessesLoaned, :amountDisbursed, :outStandingAmount, :amountRepaid) 
+            ON CONFLICT (partner_id, gender_category, summary_date) 
+                        DO UPDATE set businesses_trained = EXCLUDED.businesses_trained, businesses_loaned = EXCLUDED.businesses_loaned, 
+                                    amount_disbursed = EXCLUDED.amount_disbursed, out_standing_amount = EXCLUDED.out_standing_amount, 
+                                    amount_repaid = EXCLUDED.amount_repaid
+            """, nativeQuery = true)
+    void upsertDataSummary(
+            @Param("partnerId") Long partnerId, @Param("genderCategory") String genderCategory,
+            @Param("summaryDate") LocalDate summaryDate, @Param("businessesTrained") Integer businessesTrained,
+            @Param("businessesLoaned") Integer businessesLoaned, @Param("amountDisbursed") BigDecimal amountDisbursed,
+            @Param("outStandingAmount") BigDecimal outStandingAmount, @Param("amountRepaid") BigDecimal amountRepaid
+    );
 
 }

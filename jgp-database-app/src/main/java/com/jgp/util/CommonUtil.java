@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -33,6 +34,10 @@ public abstract class CommonUtil {
     public static final String NO_FILE_TO_UPLOAD = "No File To Upload Was Found!";
 
     public static final String STATUS_CELL_IMPORTED = "Imported";
+
+    public static final String DAILY_TIME_SCALE = "DAILY";
+    public static final String WEEKLY_TIME_SCALE = "WEEKLY";
+    public static final String MONTHLY_TIME_SCALE = "MONTHLY";
 
     @Value("${jgp.dashboard.default.view.period.in.months}")
     private Integer jgpDashboardDefaultViewPeriodInMonths;
@@ -225,8 +230,22 @@ public abstract class CommonUtil {
     }
 
     public static Pair<LocalDate, LocalDate> getDefaultQueryDates() {
-        final var dateToday = LocalDate.now();
-        return new ImmutablePair<>(LocalDate.now(ZoneId.systemDefault()).minusMonths(6), dateToday);
+        return new ImmutablePair<>(LocalDate.now(ZoneId.systemDefault()).minusMonths(6), LocalDate.now());
+    }
+
+    public static Pair<LocalDate, LocalDate> getTodayMinusCustomMonthsDates(long months) {
+        return new ImmutablePair<>(LocalDate.now(ZoneId.systemDefault()).minusMonths(months), LocalDate.now());
+    }
+
+    public static Pair<LocalDate, LocalDate> getTimeScaledDataRestrictedDates(String timeScale, LocalDate fromDate, LocalDate toDate) {
+        if (DAILY_TIME_SCALE.equals(timeScale) && fromDate.plusDays(7).isBefore(toDate)) {
+            return new ImmutablePair<>(fromDate, fromDate.plusDays(7));
+        } else if (WEEKLY_TIME_SCALE.equals(timeScale) && fromDate.plusMonths(2).isBefore(toDate)) {
+            return new ImmutablePair<>(fromDate, fromDate.plusMonths(2));
+        } else if (MONTHLY_TIME_SCALE.equals(timeScale) && fromDate.plusMonths(6).isBefore(toDate)) {
+            return new ImmutablePair<>(fromDate, fromDate.plusMonths(6));
+        }
+        return new ImmutablePair<>(fromDate, toDate);
     }
 
     public static DateTimeFormatter getStandardDateFormatter(String dateFormat, ZoneId zoneId) {
@@ -239,5 +258,23 @@ public abstract class CommonUtil {
 
     public static DateTimeFormatter getNairobiISODATEDateFormatter() {
         return getStandardDateFormatter("yyyy-MM-dd", ZoneId.of("Africa/Nairobi"));
+    }
+
+
+    public static Pair<LocalDate, LocalDate> getMinMaxDates(Set<LocalDate> dates) {
+        if (dates == null || dates.isEmpty()) {
+            return null;
+        }
+        LocalDate minDate = LocalDate.MAX;
+        LocalDate maxDate = LocalDate.MIN;
+        for (LocalDate date : dates) {
+            if (date.isBefore(minDate)) {
+                minDate = date;
+            }
+            if (date.isAfter(maxDate)) {
+                maxDate = date;
+            }
+        }
+        return new ImmutablePair<>(minDate, maxDate);
     }
 }

@@ -4,6 +4,7 @@ import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 
 @Component({
     selector: 'app-blank',
+    standalone: true,
     imports: [
         FlexLayoutModule,
         ContentHeaderComponent

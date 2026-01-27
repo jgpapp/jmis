@@ -1,127 +1,13 @@
 <div fxLayout="row wrap" #resizedDiv>
 
-    @if(dashboardTypeFilter.isFinancialDashboard){
-    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByGenderContentDiv> 
-        <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByGenderDoughnut()">
-            <mat-icon>open_in_full</mat-icon>
-          </button>
-        <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
-                <mat-card-title>{{loansDisbursedByGenderChartTitle}}</mat-card-title>
-            </mat-card-header>
-            <div class="w-100 h-300p">
-                @if (loansDisbursedByGender && loansDisbursedByGender.length > 0) {
-                <app-pie-chart 
-                [data]="loansDisbursedByGender" 
-                [showLegend]="loansDisbursedByGenderShowLegend" 
-                [colorScheme]="chartSColorScheme" 
-                [showLabels]="loansDisbursedByGenderShowLabels" 
-                [explodeSlices]="loansDisbursedByGenderExplodeSlices" 
-                [doughnut]="loansDisbursedByGenderDoughnut"
-                />
-            } @else {
-                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
-            }        
-            </div>
-        </mat-card>
-    </div> 
-}
+    @if(dashboardTypeFilter.isGeneralSummaryDashBoard || dashboardTypeFilter.isFinancialDashboard){
 
-@if(dashboardTypeFilter.isGeneralSummaryDashBoard){
-    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByGenderContentDiv> 
-        <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByGenderDoughnut()">
-            <mat-icon>open_in_full</mat-icon>
-          </button>
-        <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
-                <mat-card-title>{{trainedAndTookLoanCountSummaryChartTitle}}</mat-card-title>
-            </mat-card-header>
-            <div class="w-100 h-300p">
-                @if (trainedAndTookLoanCountSummary && trainedAndTookLoanCountSummary.length > 0) {
-                <ngx-charts-pie-grid
-                    [results]="trainedAndTookLoanCountSummary"
-                    [scheme]="chartSColorScheme"
-                    (select)="onSelect($event)"
-                    (activate)="onActivate($event)"
-                    (deactivate)="onDeactivate($event)"
-                />
-            } @else {
-                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
-            }        
-            </div>
-        </mat-card>
-    </div> 
-}
-    
-
-@if(dashboardTypeFilter.isFinancialDashboard){
-    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByPipelineContentDiv> 
-        <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByPipelineBarChart()">
-            <mat-icon>open_in_full</mat-icon>
-          </button>
-        <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
-                <mat-card-title>{{loansDisbursedByPipelineChartTitle}}</mat-card-title>
-            </mat-card-header>
-            <div class="w-100 h-300p">
-                @if (loansDisbursedByPipeline && loansDisbursedByPipeline.length > 0) {
-            <ngx-charts-bar-horizontal
-                    [scheme]="chartSColorScheme"
-                    [results]="loansDisbursedByPipeline"
-                    [gradient]="gradient"
-                    [xAxis]="loansDisbursedByPipelineShowXAxis"
-                    [yAxis]="loansDisbursedByPipelineShowYAxis"
-                    [legend]="loansDisbursedByPipelineShowLegend"
-                    [showXAxisLabel]="loansDisbursedByPipelineShowXAxisLabel"
-                    [showYAxisLabel]="loansDisbursedByPipelineShowYAxisLabel"
-                    [xAxisLabel]="loansDisbursedByPipelineXAxisLabel"
-                    [yAxisLabel]="loansDisbursedByPipelineYAxisLabel"
-                    [dataLabelFormatting]="valueFormatting"
-                    [showDataLabel]="true"
-                    (select)="onSelect($event)"
-                />
-        } @else {
-            <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
-        }         
-            </div>
-        </mat-card>
-    </div> 
-}
-
-@if(dashboardTypeFilter.isMentorShipDashboard){
-    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #mentorshipGenderSummaryContentDiv> 
-        <button mat-icon-button class="top-right-button" (click)="expandMentorshipGenderSummaryPieChart()">
-            <mat-icon>open_in_full</mat-icon>
-          </button>
-        <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
-                <mat-card-title>{{mentorshipGenderSummaryChartTitle}}</mat-card-title>
-            </mat-card-header>
-            <div class="w-100 h-300p">
-                @if (mentorshipGenderSummary && mentorshipGenderSummary.length > 0) {
-                <app-pie-chart 
-            [data]="mentorshipGenderSummary" 
-            [showLegend]="mentorshipGenderSummaryShowLegend" 
-            [colorScheme]="chartSColorScheme" 
-            [showLabels]="mentorshipGenderSummaryShowLabels" 
-            [explodeSlices]="mentorshipGenderSummaryExplodeSlices" 
-            [doughnut]="mentorshipGenderSummaryDoughnut" 
-            />
-        } @else {
-            <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
-        }         
-            </div>
-        </mat-card>
-    </div> 
-}
-
-@if(dashboardTypeFilter.isFinancialDashboard){
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByStatusContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByStatusBarChart()">
             <mat-icon>open_in_full</mat-icon>
           </button>
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                 <mat-card-title>{{loansDisbursedByStatusChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -148,14 +34,137 @@
         </mat-card>
     </div> 
 }
-    
-@if(dashboardTypeFilter.isFinancialDashboard){
+
+@if(dashboardTypeFilter.isTADashboard || dashboardTypeFilter.isGeneralSummaryDashBoard){
+ <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #employeesSummaryContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandEmployeesSummaryBarChart()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
+                <mat-card-title>{{employeesSummaryChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (employeesSummary && employeesSummary.length > 0) {
+                <ngx-charts-bar-horizontal
+                    [scheme]="chartSColorScheme"
+                    [results]="employeesSummary"
+                    [gradient]="gradient"
+                    [xAxis]="employeesSummaryShowXAxis"
+                    [yAxis]="employeesSummaryShowYAxis"
+                    [legend]="employeesSummaryShowLegend"
+                    [showXAxisLabel]="employeesSummaryShowXAxisLabel"
+                    [showYAxisLabel]="employeesSummaryShowYAxisLabel"
+                    [xAxisLabel]="employeesSummaryYAxisLabel"
+                    [yAxisLabel]="employeesSummaryXAxisLabel"
+                    [showDataLabel]="true"
+                    (select)="onSelect($event)"
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }          
+            </div>
+        </mat-card>
+    </div>  
+}
+
+    @if(dashboardTypeFilter.isGeneralSummaryDashBoard){
+        <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #trainedAndTookLoanCountSummaryContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandTrainedAndTookLoanCountSummary()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
+                <mat-card-title>{{trainedAndTookLoanCountSummaryChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (trainedAndTookLoanCountSummary && trainedAndTookLoanCountSummary.length > 0) {
+                <ngx-charts-tree-map 
+                [results]="trainedAndTookLoanCountSummary" 
+                [scheme]="chartSColorScheme"
+                [animations]="true"
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }        
+            </div>
+        </mat-card>
+    </div> 
+
+     <div fxFlex="100" fxFlex.xl="100" fxFlex.lg="100" fxFlex.md="100" fxFlex.sm="100" class="p-2 container-for-top-right-button" #trainedAndTookLoanCountSummaryContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandTrainedAndTookLoanCountSummary()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <app-participant-trends [dashBoardFilters]="dashBoardFilters" />
+    </div> 
+}
+
+
+
+    @if(dashboardTypeFilter.isFinancialDashboard){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByGenderContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByGenderDoughnut()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
+                <mat-card-title>{{loansDisbursedByGenderChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (loansDisbursedByGender && loansDisbursedByGender.length > 0) {
+                <app-pie-chart 
+                [data]="loansDisbursedByGender" 
+                [showLegend]="loansDisbursedByGenderShowLegend" 
+                [colorScheme]="chartSColorScheme" 
+                [showLabels]="loansDisbursedByGenderShowLabels" 
+                [explodeSlices]="loansDisbursedByGenderExplodeSlices" 
+                [doughnut]="loansDisbursedByGenderDoughnut"
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }        
+            </div>
+        </mat-card>
+    </div> 
+
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByPipelineContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByPipelineBarChart()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
+                <mat-card-title>{{loansDisbursedByPipelineChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (loansDisbursedByPipeline && loansDisbursedByPipeline.length > 0) {
+            <ngx-charts-bar-horizontal
+                    [scheme]="chartSColorScheme"
+                    [results]="loansDisbursedByPipeline"
+                    [gradient]="gradient"
+                    [xAxis]="loansDisbursedByPipelineShowXAxis"
+                    [yAxis]="loansDisbursedByPipelineShowYAxis"
+                    [legend]="loansDisbursedByPipelineShowLegend"
+                    [showXAxisLabel]="loansDisbursedByPipelineShowXAxisLabel"
+                    [showYAxisLabel]="loansDisbursedByPipelineShowYAxisLabel"
+                    [xAxisLabel]="loansDisbursedByPipelineXAxisLabel"
+                    [yAxisLabel]="loansDisbursedByPipelineYAxisLabel"
+                    [dataLabelFormatting]="valueFormatting"
+                    [showDataLabel]="true"
+                    (select)="onSelect($event)"
+                />
+        } @else {
+            <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+        }         
+            </div>
+        </mat-card>
+    </div> 
+
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedBySegmentContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedBySegmentDoughnut()">
             <mat-icon>open_in_full</mat-icon>
         </button>
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                 <mat-card-title>{{loansDisbursedBySegmentChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -174,43 +183,13 @@
             </div>
         </mat-card>
     </div>
-}
 
-
-@if(dashboardTypeFilter.isTADashboard){
-    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #businessesTainedByGenderContentDiv> 
-        <button mat-icon-button class="top-right-button" (click)="expandBusinessesTainedByGenderDoughnut()">
-            <mat-icon>open_in_full</mat-icon>
-          </button>
-        <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
-                <mat-card-title>{{businessesTainedByGenderChartTitle}}</mat-card-title>
-            </mat-card-header>
-            <div class="w-100 h-300p">
-                @if (businessesTainedByGender && businessesTainedByGender.length > 0) {
-                <app-pie-chart 
-                [data]="businessesTainedByGender" 
-                [showLegend]="businessesTainedByGenderShowLegend" 
-                [colorScheme]="chartSColorScheme" 
-                [showLabels]="businessesTainedByGenderShowLabels" 
-                [explodeSlices]="businessesTainedByGenderExplodeSlices" 
-                [doughnut]="businessesTainedByGenderDoughnut"
-                />
-            } @else {
-                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
-            }        
-            </div>
-        </mat-card>
-    </div> 
-}
-
-@if(dashboardTypeFilter.isFinancialDashboard){
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loanDisbursedByProductByGenderContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandLoanDisbursedByProductByGenderBarChart()">
             <mat-icon>open_in_full</mat-icon>
           </button>
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                 <mat-card-title>{{loanDisbursedByProductByGenderChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -236,15 +215,13 @@
             </div>
         </mat-card>
     </div> 
-}
-
-@if(dashboardTypeFilter.isFinancialDashboard){
+    
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loanedBusinessesByGenderContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandLoanedBusinessesByGenderDoughnut()">
             <mat-icon>open_in_full</mat-icon>
           </button>
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                 <mat-card-title>{{loanedBusinessesByGenderChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -263,48 +240,13 @@
             </div>
         </mat-card>
     </div> 
-}
-    
-@if(dashboardTypeFilter.isTADashboard){
-    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #taTrainedBySectorContentDiv> 
-        <button mat-icon-button class="top-right-button" (click)="expandTaTrainedBySectorBarChart()">
-            <mat-icon>open_in_full</mat-icon>
-          </button>
-        <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
-                <mat-card-title>{{taTrainedBySectorChartTitle}}</mat-card-title>
-            </mat-card-header>
-            <div class="w-100 h-300p">
-                @if (taTrainedBySector && taTrainedBySector.length > 0) {
-                <ngx-charts-bar-horizontal
-                    [scheme]="chartSColorScheme"
-                    [results]="taTrainedBySector"
-                    [gradient]="gradient"
-                    [xAxis]="taTrainedBySectorShowXAxis"
-                    [yAxis]="taTrainedBySectorShowYAxis"
-                    [legend]="taTrainedBySectorShowLegend"
-                    [showXAxisLabel]="taTrainedBySectorShowXAxisLabel"
-                    [showYAxisLabel]="taTrainedBySectorShowYAxisLabel"
-                    [xAxisLabel]="taTrainedBySectorYAxisLabel"
-                    [yAxisLabel]="taTrainedBySectorXAxisLabel"
-                    [showDataLabel]="true"
-                    (select)="onSelect($event)"
-                />
-            } @else {
-                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
-            }          
-            </div>
-        </mat-card>
-    </div>  
-}
 
-@if(dashboardTypeFilter.isFinancialDashboard){
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #accessedVSOutStandingAmountContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandAccessedVSOutStandingAmountBarChart()">
             <mat-icon>open_in_full</mat-icon>
           </button>
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                 <mat-card-title>{{accessedVSOutStandingAmountChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -332,43 +274,13 @@
             </div>
         </mat-card>
     </div> 
-}
 
-@if(dashboardTypeFilter.isTADashboard){
-    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #taTrainedBySegmentContentDiv> 
-        <button mat-icon-button class="top-right-button" (click)="expandTaTrainedBySegmentPieChart()">
-            <mat-icon>open_in_full</mat-icon>
-          </button>
-        <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
-                <mat-card-title>{{taTrainedBySegmentChartTitle}}</mat-card-title>
-            </mat-card-header>
-            <div class="w-100 h-300p">
-                @if (taTrainedBySegment && taTrainedBySegment.length > 0) {
-                <app-pie-chart 
-            [data]="taTrainedBySegment" 
-            [showLegend]="taTrainedBySegmentShowLegend" 
-            [colorScheme]="chartSColorScheme" 
-            [showLabels]="taTrainedBySegmentShowLabels" 
-            [explodeSlices]="taTrainedBySegmentExplodeSlices" 
-            [doughnut]="taTrainedBySegmentDoughnut" 
-            />
-        } @else {
-            <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
-        }         
-            </div>
-        </mat-card>
-    </div>  
-}
-
-
-@if(dashboardTypeFilter.isFinancialDashboard){
-    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #accessedVSOutStandingAmountByGenderContentDiv> 
+     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #accessedVSOutStandingAmountByGenderContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandAccessedVSOutStandingAmountByGenderBarChart()">
             <mat-icon>open_in_full</mat-icon>
           </button>
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                 <mat-card-title>{{accessedVSOutStandingAmountByGenderChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -395,15 +307,14 @@
             </div>
         </mat-card>
     </div> 
-}
 
-@if(dashboardTypeFilter.isFinancialDashboard){
+    
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedBySectorContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedBySectorDoughnut()">
             <mat-icon>open_in_full</mat-icon>
           </button>
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                 <mat-card-title>{{loansDisbursedBySectorChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -422,12 +333,11 @@
             </div>
         </mat-card>
     </div> 
-}
 
-@if(dashboardTypeFilter.isFinancialDashboard && displayChart){
+    @if(displayChart){
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                 <mat-card-title>{{topFourPartnersloansDisbursedChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -445,51 +355,10 @@
     </div> 
 }
 
-@if(dashboardTypeFilter.isTADashboard){
-    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #countyTrainedBusinessesMapContentDiv> 
-        <button mat-icon-button class="top-right-button" (click)="expandCountyTrainedBusinessesMap()">
-            <mat-icon>open_in_full</mat-icon>
-          </button>
-        <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
-                <mat-card-title>Training By County</mat-card-title>
-            </mat-card-header>
-            <div class="w-100 h-300p">
-                @if (countySummary && countySummary.length > 0) {
-                <img matListItemAvatar [src]="keMapImage" class="map-place-holder-img">
-            } @else {
-                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
-            }        
-            </div>
-        </mat-card>
-    </div>
-}
-
-@if(dashboardTypeFilter.isTADashboard && displayChart){
+@if(displayChart){
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
-                <mat-card-title>{{topFourCountiesBusinessesTrainedChartTitle}}</mat-card-title>
-            </mat-card-header>
-            <div class="w-100 h-300p">
-                @if (topFourCountiesBusinessesTrained && topFourCountiesBusinessesTrained.length > 0) {
-                <ngx-charts-tree-map 
-                [results]="topFourCountiesBusinessesTrained" 
-                [scheme]="chartSColorScheme"
-                [animations]="true"
-                />
-            } @else {
-                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
-            }      
-            </div>
-        </mat-card>
-    </div> 
-}
-
-@if(dashboardTypeFilter.isFinancialDashboard && displayChart){
-    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
-        <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                 <mat-card-title>{{topFourCountiesloansDisbursedChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -507,28 +376,28 @@
     </div> 
 }
 
-@if(dashboardTypeFilter.isTADashboard){
-    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #employeesSummaryContentDiv> 
-        <button mat-icon-button class="top-right-button" (click)="expandEmployeesSummaryBarChart()">
+<div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByProductContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByProductBarChart()">
             <mat-icon>open_in_full</mat-icon>
           </button>
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
-                <mat-card-title>{{employeesSummaryChartTitle}}</mat-card-title>
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
+                <mat-card-title>{{loansDisbursedByProductChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
-                @if (employeesSummary && employeesSummary.length > 0) {
+                @if (loansDisbursedByProduct && loansDisbursedByProduct.length > 0) {
                 <ngx-charts-bar-horizontal
                     [scheme]="chartSColorScheme"
-                    [results]="employeesSummary"
+                    [results]="loansDisbursedByProduct"
                     [gradient]="gradient"
-                    [xAxis]="employeesSummaryShowXAxis"
-                    [yAxis]="employeesSummaryShowYAxis"
-                    [legend]="employeesSummaryShowLegend"
-                    [showXAxisLabel]="employeesSummaryShowXAxisLabel"
-                    [showYAxisLabel]="employeesSummaryShowYAxisLabel"
-                    [xAxisLabel]="employeesSummaryYAxisLabel"
-                    [yAxisLabel]="employeesSummaryXAxisLabel"
+                    [xAxis]="loansDisbursedByProductShowXAxis"
+                    [yAxis]="loansDisbursedByProductShowYAxis"
+                    [legend]="loansDisbursedByProductShowLegend"
+                    [showXAxisLabel]="loansDisbursedByProductShowXAxisLabel"
+                    [showYAxisLabel]="loansDisbursedByProductShowYAxisLabel"
+                    [xAxisLabel]="loansDisbursedByProductYAxisLabel"
+                    [yAxisLabel]="loansDisbursedByProductXAxisLabel"
+                    [dataLabelFormatting]="valueFormatting"
                     [showDataLabel]="true"
                     (select)="onSelect($event)"
                 />
@@ -538,15 +407,60 @@
             </div>
         </mat-card>
     </div>  
+
+    
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #countyLendingMapContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandCountyLendingMap()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
+                <mat-card-title>Lending By County</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (countySummary && countySummary.length > 0) {
+                <img matListItemAvatar [src]="keMapImage" class="map-place-holder-img">
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }        
+            </div>
+        </mat-card>
+    </div>
 }
 
+
 @if(dashboardTypeFilter.isMentorShipDashboard){
-    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #mentorshipDeliveryModeSummaryContentDiv> 
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #mentorshipGenderSummaryContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandMentorshipGenderSummaryPieChart()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
+                <mat-card-title>{{mentorshipGenderSummaryChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (mentorshipGenderSummary && mentorshipGenderSummary.length > 0) {
+                <app-pie-chart 
+            [data]="mentorshipGenderSummary" 
+            [showLegend]="mentorshipGenderSummaryShowLegend" 
+            [colorScheme]="chartSColorScheme" 
+            [showLabels]="mentorshipGenderSummaryShowLabels" 
+            [explodeSlices]="mentorshipGenderSummaryExplodeSlices" 
+            [doughnut]="mentorshipGenderSummaryDoughnut" 
+            />
+        } @else {
+            <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+        }         
+            </div>
+        </mat-card>
+    </div> 
+
+     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #mentorshipDeliveryModeSummaryContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandMentorshipDeliveryModeSummaryBarChart()">
             <mat-icon>open_in_full</mat-icon>
           </button>
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                 <mat-card-title>{{mentorshipDeliveryModeSummaryChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -571,15 +485,14 @@
             </div>
         </mat-card>
     </div>  
-}
 
-@if(dashboardTypeFilter.isMentorShipDashboard){
+    
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #mentorshipBusiCategoryByCountySummaryContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandMentorshipBusiCategoryByCountySummaryBarChart()">
             <mat-icon>open_in_full</mat-icon>
           </button>
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                 <mat-card-title>{{mentorshipBusiCategoryByCountySummaryChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -604,15 +517,14 @@
             </div>
         </mat-card>
     </div>  
-}
 
-@if(dashboardTypeFilter.isMentorShipDashboard){
+
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #mentorshipByGenderCategoryContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandMentorshipByGenderCategoryContentDivDoughnut()">
             <mat-icon>open_in_full</mat-icon>
           </button>
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                 <mat-card-title>{{mentorshipByGenderCategoryChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -631,15 +543,14 @@
             </div>
         </mat-card>
     </div> 
-}
 
-@if(dashboardTypeFilter.isMentorShipDashboard){
+    
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #mentorshipByDisabilitySummaryContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandMentorshipByDisabilitySummaryBarChart()">
             <mat-icon>open_in_full</mat-icon>
           </button>
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center"  class="card-chart-header bg-primary">                
                 <mat-card-title>{{mentorshipByDisabilitySummaryChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -664,15 +575,13 @@
             </div>
         </mat-card>
     </div>  
-}
-
-@if(dashboardTypeFilter.isMentorShipDashboard){
+    
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #countyMentorshipMapContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandCountyMentorshipMap()">
             <mat-icon>open_in_full</mat-icon>
           </button>
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                 <mat-card-title>Mentorship By County</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -686,13 +595,136 @@
     </div>
 }
 
+
+
 @if(dashboardTypeFilter.isTADashboard){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #businessesTainedByGenderContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandBusinessesTainedByGenderDoughnut()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
+                <mat-card-title>{{businessesTainedByGenderChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (businessesTainedByGender && businessesTainedByGender.length > 0) {
+                <app-pie-chart 
+                [data]="businessesTainedByGender" 
+                [showLegend]="businessesTainedByGenderShowLegend" 
+                [colorScheme]="chartSColorScheme" 
+                [showLabels]="businessesTainedByGenderShowLabels" 
+                [explodeSlices]="businessesTainedByGenderExplodeSlices" 
+                [doughnut]="businessesTainedByGenderDoughnut"
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }        
+            </div>
+        </mat-card>
+    </div> 
+
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #taTrainedBySectorContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandTaTrainedBySectorBarChart()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
+                <mat-card-title>{{taTrainedBySectorChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (taTrainedBySector && taTrainedBySector.length > 0) {
+                <ngx-charts-bar-horizontal
+                    [scheme]="chartSColorScheme"
+                    [results]="taTrainedBySector"
+                    [gradient]="gradient"
+                    [xAxis]="taTrainedBySectorShowXAxis"
+                    [yAxis]="taTrainedBySectorShowYAxis"
+                    [legend]="taTrainedBySectorShowLegend"
+                    [showXAxisLabel]="taTrainedBySectorShowXAxisLabel"
+                    [showYAxisLabel]="taTrainedBySectorShowYAxisLabel"
+                    [xAxisLabel]="taTrainedBySectorYAxisLabel"
+                    [yAxisLabel]="taTrainedBySectorXAxisLabel"
+                    [showDataLabel]="true"
+                    (select)="onSelect($event)"
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }          
+            </div>
+        </mat-card>
+    </div>  
+
+    
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #taTrainedBySegmentContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandTaTrainedBySegmentPieChart()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
+                <mat-card-title>{{taTrainedBySegmentChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (taTrainedBySegment && taTrainedBySegment.length > 0) {
+                <app-pie-chart 
+            [data]="taTrainedBySegment" 
+            [showLegend]="taTrainedBySegmentShowLegend" 
+            [colorScheme]="chartSColorScheme" 
+            [showLabels]="taTrainedBySegmentShowLabels" 
+            [explodeSlices]="taTrainedBySegmentExplodeSlices" 
+            [doughnut]="taTrainedBySegmentDoughnut" 
+            />
+        } @else {
+            <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+        }         
+            </div>
+        </mat-card>
+    </div>  
+
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #countyTrainedBusinessesMapContentDiv> 
+        <button mat-icon-button class="top-right-button" (click)="expandCountyTrainedBusinessesMap()">
+            <mat-icon>open_in_full</mat-icon>
+          </button>
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
+                <mat-card-title>Training By County</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (countySummary && countySummary.length > 0) {
+                <img matListItemAvatar [src]="keMapImage" class="map-place-holder-img">
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }        
+            </div>
+        </mat-card>
+    </div>
+
+    @if(displayChart){
+    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2"> 
+        <mat-card>
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
+                <mat-card-title>{{topFourCountiesBusinessesTrainedChartTitle}}</mat-card-title>
+            </mat-card-header>
+            <div class="w-100 h-300p">
+                @if (topFourCountiesBusinessesTrained && topFourCountiesBusinessesTrained.length > 0) {
+                <ngx-charts-tree-map 
+                [results]="topFourCountiesBusinessesTrained" 
+                [scheme]="chartSColorScheme"
+                [animations]="true"
+                />
+            } @else {
+                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
+            }      
+            </div>
+        </mat-card>
+    </div> 
+}
+    
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #refugeeBusinessesTainedByGenderContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandRefugeeBusinessesTainedByGenderPieChart()">
             <mat-icon>open_in_full</mat-icon>
           </button>
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                 <mat-card-title>{{refugeeBusinessesTainedByGenderChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -711,15 +743,14 @@
             </div>
         </mat-card>
     </div> 
-}
 
-@if(dashboardTypeFilter.isTADashboard){
+    
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #disabledBusinessesTainedByGenderContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandDisabledBusinessesTainedByGenderPieChart()">
             <mat-icon>open_in_full</mat-icon>
           </button>
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center"  class="card-chart-header bg-primary">                
                 <mat-card-title>{{disabledBusinessesTainedByGenderChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -738,16 +769,14 @@
             </div>
         </mat-card>
     </div> 
-}
 
-
-@if(dashboardTypeFilter.isTADashboard){
+    
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #taNeedsByGenderContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandTANeedsByGenderBarChart()">
             <mat-icon>open_in_full</mat-icon>
           </button>
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                 <mat-card-title>{{TANeedsByGenderChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -773,15 +802,14 @@
             </div>
         </mat-card>
     </div>
-}
 
-@if(dashboardTypeFilter.isTADashboard){
+    
     <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #trainingByPartnerByGenderContentDiv> 
         <button mat-icon-button class="top-right-button" (click)="expandTrainingByPartnerByGenderBarChart()">
             <mat-icon>open_in_full</mat-icon>
           </button>
         <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
+            <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">                
                 <mat-card-title>{{trainingByPartnerByGenderChartTitle}}</mat-card-title>
             </mat-card-header>
             <div class="w-100 h-300p">
@@ -809,61 +837,6 @@
     </div> 
 }
 
-
-@if(dashboardTypeFilter.isFinancialDashboard){
-    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #loansDisbursedByProductContentDiv> 
-        <button mat-icon-button class="top-right-button" (click)="expandLoansDisbursedByProductBarChart()">
-            <mat-icon>open_in_full</mat-icon>
-          </button>
-        <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
-                <mat-card-title>{{loansDisbursedByProductChartTitle}}</mat-card-title>
-            </mat-card-header>
-            <div class="w-100 h-300p">
-                @if (loansDisbursedByProduct && loansDisbursedByProduct.length > 0) {
-                <ngx-charts-bar-horizontal
-                    [scheme]="chartSColorScheme"
-                    [results]="loansDisbursedByProduct"
-                    [gradient]="gradient"
-                    [xAxis]="loansDisbursedByProductShowXAxis"
-                    [yAxis]="loansDisbursedByProductShowYAxis"
-                    [legend]="loansDisbursedByProductShowLegend"
-                    [showXAxisLabel]="loansDisbursedByProductShowXAxisLabel"
-                    [showYAxisLabel]="loansDisbursedByProductShowYAxisLabel"
-                    [xAxisLabel]="loansDisbursedByProductYAxisLabel"
-                    [yAxisLabel]="loansDisbursedByProductXAxisLabel"
-                    [dataLabelFormatting]="valueFormatting"
-                    [showDataLabel]="true"
-                    (select)="onSelect($event)"
-                />
-            } @else {
-                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
-            }          
-            </div>
-        </mat-card>
-    </div>  
-}
-
-@if(dashboardTypeFilter.isFinancialDashboard){
-    <div fxFlex="100" fxFlex.xl="33.3" fxFlex.lg="33.3" fxFlex.md="33.3" fxFlex.sm="50" class="p-2 container-for-top-right-button" #countyLendingMapContentDiv> 
-        <button mat-icon-button class="top-right-button" (click)="expandCountyLendingMap()">
-            <mat-icon>open_in_full</mat-icon>
-          </button>
-        <mat-card>
-            <mat-card-header fxLayoutAlign="center center">                
-                <mat-card-title>Lending By County</mat-card-title>
-            </mat-card-header>
-            <div class="w-100 h-300p">
-                @if (countySummary && countySummary.length > 0) {
-                <img matListItemAvatar [src]="keMapImage" class="map-place-holder-img">
-            } @else {
-                <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
-            }        
-            </div>
-        </mat-card>
-    </div>
-}
-
 </div>
 
 <!-- Template for no data placeholder -->
@@ -872,4 +845,3 @@
       <p>No data available to display</p>
     </div>
   </ng-template>
-

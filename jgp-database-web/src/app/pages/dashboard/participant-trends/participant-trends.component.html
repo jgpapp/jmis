@@ -1,0 +1,19 @@
+<mat-card class="card">
+
+  <mat-card-header fxLayoutAlign="center center" class="card-chart-header bg-primary">
+      Participant Trends
+  </mat-card-header>
+
+  <mat-card-content>
+    <!-- Structural directives like *ngIf break the canvas -->
+    <div [ngStyle]="{'display': (hideOutput) ? 'none' : 'block'}">
+      <canvas id="participant-trends-bar" width="800" height="465"></canvas>
+    </div>
+    <mat-button-toggle-group [(ngModel)]="selectedDashboardMode" id='timescale'>
+      <mat-button-toggle value="DAILY">Daily</mat-button-toggle>
+      <mat-button-toggle value="WEEKLY">Weekly</mat-button-toggle>
+      <mat-button-toggle value="MONTHLY">Monthly</mat-button-toggle>
+    </mat-button-toggle-group>
+  </mat-card-content>
+
+</mat-card>

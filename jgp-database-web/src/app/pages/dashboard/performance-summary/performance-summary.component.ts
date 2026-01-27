@@ -42,6 +42,7 @@ interface PerformanceSummaryFlatNode {
 
 @Component({
     selector: 'app-performance-summary',
+    standalone: true,
     imports: [
         MatTableModule,
         MatIconModule,

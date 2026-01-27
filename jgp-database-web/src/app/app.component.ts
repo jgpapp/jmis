@@ -7,7 +7,8 @@ import { Settings, SettingsService } from '@services/settings.service';
     selector: 'app-root',
     imports: [RouterOutlet, NgClass],
     templateUrl: './app.component.html',
-    styleUrl: './app.component.scss'
+    styleUrl: './app.component.scss',
+    standalone: true
 })
 export class AppComponent {
   settingsService = inject(SettingsService);
