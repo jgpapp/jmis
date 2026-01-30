@@ -79,11 +79,14 @@
             </mat-card-header>
             <div class="w-100 h-300p">
                 @if (trainedAndTookLoanCountSummary && trainedAndTookLoanCountSummary.length > 0) {
-                <ngx-charts-tree-map 
-                [results]="trainedAndTookLoanCountSummary" 
-                [scheme]="chartSColorScheme"
-                [animations]="true"
-                />
+                <app-pie-chart 
+            [data]="trainedAndTookLoanCountSummary" 
+            [showLegend]="trainedAndTookLoanCountSummaryShowLegend" 
+            [colorScheme]="chartSColorScheme" 
+            [showLabels]="trainedAndTookLoanCountSummaryShowLabels" 
+            [explodeSlices]="trainedAndTookLoanCountSummaryExplodeSlices" 
+            [doughnut]="trainedAndTookLoanCountSummaryDoughnut" 
+            />
             } @else {
                 <ng-container *ngTemplateOutlet="noDataPlaceholder"></ng-container>
             }        

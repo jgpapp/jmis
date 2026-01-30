@@ -158,8 +158,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = CommonUtil.getTodayMinusCustomMonthsDates(1).getLeft();
-            toDate = CommonUtil.getTodayMinusCustomMonthsDates(1).getRight();
+            fromDate = CommonUtil.getTodayMinusCustomMonthsDates(7).getLeft();
+            toDate = CommonUtil.getTodayMinusCustomMonthsDates(7).getRight();
         }
         fromDate = CommonUtil.getTimeScaledDataRestrictedDates(timeScale, fromDate, toDate).getLeft();
         toDate = CommonUtil.getTimeScaledDataRestrictedDates(timeScale, fromDate, toDate).getRight();
@@ -180,7 +180,7 @@ public class DashboardServiceImpl implements DashboardService {
                 .entity("data_summary ds")
                 .build();
 
-        final var sqlQuery = getTimeScaledSqlQuery(timeScaledPart);
+        final var sqlQuery = getTimeScaledSummarySqlQuery(timeScaledPart);
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
     }
 
@@ -190,8 +190,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
         LocalDate toDate = dashboardSearchCriteria.toDate();
         if (Objects.isNull(fromDate) || Objects.isNull(toDate)){
-            fromDate = CommonUtil.getTodayMinusCustomMonthsDates(1).getLeft();
-            toDate = CommonUtil.getTodayMinusCustomMonthsDates(1).getRight();
+            fromDate = CommonUtil.getTodayMinusCustomMonthsDates(7).getLeft();
+            toDate = CommonUtil.getTodayMinusCustomMonthsDates(7).getRight();
         }
 
         fromDate = CommonUtil.getTimeScaledDataRestrictedDates(timeScale, fromDate, toDate).getLeft();
@@ -213,7 +213,7 @@ public class DashboardServiceImpl implements DashboardService {
                 .entity("data_summary ds")
                 .build();
 
-        final var sqlQuery = getTimeScaledSqlQuery(timeScaledPart);
+        final var sqlQuery = getTimeScaledSummarySqlQuery(timeScaledPart);
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
     }
 
@@ -1928,22 +1928,30 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
 
         public static final String COUNTY_SUMMARY_SCHEMA = """
                 with highLevelSummary as (
-                                     select cl.gender_category as genderCategory, bpd.date_partner_recorded as summaryDate, count(bpd.*) as businessesTrained,
+                                     select cl.gender_category as genderCategory, bpd.date_partner_recorded as summaryDate, 
+                                     EXTRACT(YEAR FROM bpd.date_partner_recorded)::VARCHAR as summaryYear,\
+                                      TO_CHAR(DATE_TRUNC('month', bpd.date_partner_recorded), 'FMMonth-YYYY') as summaryMonth,\
+                                      TO_CHAR(DATE_TRUNC('week', bpd.date_partner_recorded), 'Mon DD') || ' - ' || TO_CHAR(DATE_TRUNC('week', bpd.date_partner_recorded) + INTERVAL '6 days', 'Mon DD') as summaryWeek,
+                                     count(bpd.*) as businessesTrained,
                                      0 as businessesLoaned, 0 as amountDisbursed,
                                      0 as outStandingAmount, 0 as amountRepaid from ta_participants_data bpd\s
                                      inner join participants cl on cl.id = bpd.participant_id %s
-                                     group by 1, 2
+                                     group by 1, 2, 3, 4, 5
                                      union
-                                     select cl.gender_category as genderCategory, lt.transaction_date as summaryDate, 0 as businessesTrained, count(distinct l.*) as businessesLoaned,
+                                     select cl.gender_category as genderCategory, lt.transaction_date as summaryDate, 
+                                     EXTRACT(YEAR FROM lt.transaction_date)::VARCHAR as summaryYear,\
+                                      TO_CHAR(DATE_TRUNC('month', lt.transaction_date), 'FMMonth-YYYY') as summaryMonth,\
+                                      TO_CHAR(DATE_TRUNC('week', lt.transaction_date), 'Mon DD') || ' - ' || TO_CHAR(DATE_TRUNC('week', lt.transaction_date) + INTERVAL '6 days', 'Mon DD') as summaryWeek,
+                                     0 as businessesTrained, count(distinct l.*) as businessesLoaned,
                                      sum(lt.amount) as amountDisbursed, sum(lt.out_standing_amount) as outStandingAmount,\s
                                      sum(l.loan_amount_repaid) as amountRepaid
                                      from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
                                      inner join participants cl on cl.id = l.participant_id %s\s
-                                     group by 1, 2
+                                     group by 1, 2, 3, 4, 5
                                      )
-                                     select genderCategory, summaryDate, sum(businessesTrained) as businessesTrained, sum(businessesLoaned) as businessesLoaned,
+                                     select genderCategory, summaryYear, summaryMonth, summaryWeek, summaryDate, sum(businessesTrained) as businessesTrained, sum(businessesLoaned) as businessesLoaned,
                                      sum(amountDisbursed) as amountDisbursed, sum(outStandingAmount) as outStandingAmount, sum(amountRepaid) as amountRepaid
-                                     from highLevelSummary group by 1, 2;
+                                     from highLevelSummary group by 1, 2, 3, 4, 5;
                \s""";
 
 
@@ -1952,6 +1960,9 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
             var dataPoints = new ArrayList<DataSummaryDto>();
             while (rs.next()){
                 final var summaryDate = JdbcSupport.getLocalDate(rs, "summaryDate");
+                final var summaryWeek = rs.getString("summaryWeek");
+                final var summaryMonth = rs.getString("summaryMonth");
+                final var summaryYear = rs.getString( "summaryYear");
                 final var genderCategory = rs.getString(GENDER_CATEGORY_PARAM);
                 final var businessesTrained = rs.getInt(BUSINESSES_TRAINED);
                 final var businessesLoaned = rs.getInt(BUSINESSES_LOANED);
@@ -1959,47 +1970,38 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
                 final var outStandingAmount = rs.getBigDecimal(OUT_STANDING_AMOUNT);
                 final var amountRepaid = rs.getBigDecimal("amountRepaid");
 
-                dataPoints.add(new DataSummaryDto(genderCategory, businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount, amountRepaid, summaryDate));
+                dataPoints.add(new DataSummaryDto(genderCategory, businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount,
+                        amountRepaid, summaryDate, summaryWeek, summaryMonth, summaryYear));
             }
             return dataPoints;
         }
     }
 
-    private String getTimeScaledSqlQuery(TimeScaledPart part) {
+    private String getTimeScaledSummarySqlQuery(TimeScaledPart part) {
 
-        return switch (part.timeScale()){
-            case CommonUtil.MONTHLY_TIME_SCALE -> """
-                    SELECT
-                        TO_CHAR(DATE_TRUNC('month', %s), 'FMMonth-YYYY') AS dataKey,
-                        %s(%s) AS dataValue, 0 AS percentage
-                    FROM
-                        %s %s
-                    GROUP BY
-                        DATE_TRUNC('month', %s)
-                    ORDER BY
-                        DATE_TRUNC('month', %s) ASC;""".formatted(part.dateField(), part.aggregationFunction(), part.aggregatedColumn(), part.entity(), part.whereClause(), part.dateField(), part.dateField());
-            case CommonUtil.WEEKLY_TIME_SCALE -> """
-                    SELECT
-                        TO_CHAR(DATE_TRUNC('week', %s), 'Mon DD') || ' - ' ||
-                        TO_CHAR(DATE_TRUNC('week', %s) + INTERVAL '6 days', 'Mon DD') AS dataKey,
-                        %s(%s) AS dataValue, 0 AS percentage
-                    FROM
-                        %s %s
-                    GROUP BY
-                        DATE_TRUNC('week', %s)
-                    ORDER BY
-                        DATE_TRUNC('week', %s) ASC;""".formatted(part.dateField(), part.dateField(), part.aggregationFunction(), part.aggregatedColumn(), part.entity(), part.whereClause(), part.dateField(), part.dateField());
-            default -> """
-                    SELECT
-                        %s AS dataKey,
-                        %s(%s) AS dataValue, 0 AS percentage
-                    FROM
-                        %s %s
-                    GROUP BY
-                        1
-                    ORDER BY
-                        1 ASC;""".formatted(part.dateField(), part.aggregationFunction(), part.aggregatedColumn(), part.entity(), part.whereClause());
+        String groupByColumn = switch (part.timeScale()) {
+            case CommonUtil.YEARLY_TIME_SCALE -> "summary_year";
+            case CommonUtil.MONTHLY_TIME_SCALE -> "summary_month";
+            case CommonUtil.WEEKLY_TIME_SCALE -> "summary_week";
+            default -> "summary_date";
         };
+
+        return """
+            SELECT
+                %s AS dataKey,
+                %s(%s) AS dataValue, 0 AS percentage
+            FROM
+                %s %s
+            GROUP BY
+                1
+            ORDER BY
+                1 ASC;""".formatted(
+                groupByColumn,
+                part.aggregationFunction(),
+                part.aggregatedColumn(),
+                part.entity(),
+                part.whereClause()
+        );
 
     }
 

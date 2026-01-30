@@ -6,6 +6,7 @@ import com.jgp.infrastructure.core.domain.JdbcSupport;
 import com.jgp.patner.domain.PartnerRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -18,9 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -68,8 +72,9 @@ public class DataSummaryServiceImpl implements DataSummaryService {
                     monthEndDate
             );
             for (var dto: dataIncludingMissingDates){
-                this.countySummaryRepository.upsertDataSummary(partnerId, dto.genderCategory(), dto.summaryDate(),
-                        dto.businessesTrained(), dto.businessesLoaned(), dto.amountDisbursed(), dto.outStandingAmount(), dto.amountRepaid());
+                this.countySummaryRepository.upsertDataSummary(partnerId, dto.genderCategory(), dto.businessesTrained(),
+                        dto.businessesLoaned(), dto.amountDisbursed(), dto.outStandingAmount(), dto.amountRepaid(),
+                        dto.summaryDate(), dto.summaryWeek(), dto.summaryMonth(), dto.summaryYear());
             }
 
             // Move to the next month
@@ -121,9 +126,12 @@ public class DataSummaryServiceImpl implements DataSummaryService {
         while (!datePointer.isAfter(toDate)) {
             var summariesForDate = summariesByDate.get(datePointer);
             if (summariesForDate == null || summariesForDate.isEmpty()) {
+
+                var summaryData = getSummaryWeekMonthAndYear(datePointer);
                 completeDataSummaries.add(
-                        new DataSummaryDto("na", 0, 0, java.math.BigDecimal.ZERO,
-                                java.math.BigDecimal.ZERO, java.math.BigDecimal.ZERO, datePointer)
+                        new DataSummaryDto("no data", 0, 0, java.math.BigDecimal.ZERO,
+                                java.math.BigDecimal.ZERO, java.math.BigDecimal.ZERO, datePointer,
+                                summaryData.summaryWeek(), summaryData.summaryMonth(), summaryData.summaryYear())
                 );
             } else {
                 completeDataSummaries.addAll(summariesForDate);
@@ -137,22 +145,30 @@ public class DataSummaryServiceImpl implements DataSummaryService {
 
         public static final String COUNTY_SUMMARY_SCHEMA = """
                 with highLevelSummary as (
-                                     select p.gender_category as genderCategory, bpd.date_partner_recorded as summaryDate, count(distinct p.id) as businessesTrained,
+                                     select p.gender_category as genderCategory, bpd.date_partner_recorded as summaryDate,\
+                                     EXTRACT(YEAR FROM bpd.date_partner_recorded)::VARCHAR as summaryYear,\
+                                     TO_CHAR(DATE_TRUNC('month', bpd.date_partner_recorded), 'FMMonth-YYYY') as summaryMonth,\
+                                     TO_CHAR(DATE_TRUNC('week', bpd.date_partner_recorded), 'Mon DD') || ' - ' || TO_CHAR(DATE_TRUNC('week', bpd.date_partner_recorded) + INTERVAL '6 days', 'Mon DD') as summaryWeek,
+                                     count(distinct p.id) as businessesTrained,
                                      0 as businessesLoaned, 0 as amountDisbursed,
-                                     0 as outStandingAmount, 0 as amountRepaid from ta_participants_data bpd\s
+                                     0 as outStandingAmount, 0 as amountRepaid from ta_participants_data bpd\
                                      inner join participants p on p.id = bpd.participant_id %s
-                                     group by 1, 2
+                                     group by 1, 2, 3, 4, 5
                                      union
-                                     select p.gender_category as genderCategory, lt.transaction_date as summaryDate, 0 as businessesTrained, count(l.id) as businessesLoaned,
+                                     select p.gender_category as genderCategory, lt.transaction_date as summaryDate,\
+                                     EXTRACT(YEAR FROM lt.transaction_date)::VARCHAR as summaryYear,\
+                                     TO_CHAR(DATE_TRUNC('month', lt.transaction_date), 'FMMonth-YYYY') as summaryMonth,\
+                                     TO_CHAR(DATE_TRUNC('week', lt.transaction_date), 'Mon DD') || ' - ' || TO_CHAR(DATE_TRUNC('week', lt.transaction_date) + INTERVAL '6 days', 'Mon DD') as summaryWeek,
+                                     0 as businessesTrained, count(l.id) as businessesLoaned,
                                      sum(lt.amount) as amountDisbursed, sum(lt.out_standing_amount) as outStandingAmount,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       \s
                                      sum(l.loan_amount_repaid) as amountRepaid from loan_transactions lt\s
                                      inner join loans l on lt.loan_id = l.id\s
                                      inner join participants p on p.id = l.participant_id %s\s
-                                     group by 1, 2
+                                     group by 1, 2, 3, 4, 5
                                      )
-                                     select genderCategory, summaryDate, sum(businessesTrained) as businessesTrained, sum(businessesLoaned) as businessesLoaned,
+                                     select genderCategory, summaryYear, summaryMonth, summaryWeek, summaryDate, sum(businessesTrained) as businessesTrained, sum(businessesLoaned) as businessesLoaned,
                                      sum(amountDisbursed) as amountDisbursed, sum(outStandingAmount) as outStandingAmount, sum(amountRepaid) as amountRepaid
-                                     from highLevelSummary group by 1, 2;
+                                     from highLevelSummary group by 1, 2, 3, 4, 5 order by 5;
                \s""";
 
 
@@ -161,6 +177,9 @@ public class DataSummaryServiceImpl implements DataSummaryService {
             var dataPoints = new ArrayList<DataSummaryDto>();
             while (rs.next()){
                 final var summaryDate = JdbcSupport.getLocalDate(rs, "summaryDate");
+                final var summaryWeek = rs.getString("summaryWeek");
+                final var summaryMonth = rs.getString("summaryMonth");
+                final var summaryYear = rs.getString( "summaryYear");
                 final var genderCategory = rs.getString("genderCategory");
                 final var businessesTrained = rs.getInt("businessesTrained");
                 final var businessesLoaned = rs.getInt("businessesLoaned");
@@ -170,11 +189,33 @@ public class DataSummaryServiceImpl implements DataSummaryService {
 
                 dataPoints.add(
                         new DataSummaryDto(genderCategory, businessesTrained, businessesLoaned, amountDisbursed,
-                                outStandingAmount, amountRepaid, summaryDate)
+                                outStandingAmount, amountRepaid, summaryDate, summaryWeek, summaryMonth, summaryYear)
                 );
             }
             return dataPoints;
         }
+    }
+
+    @Builder
+    record SummaryWeekMonthAndYear(String summaryWeek, String summaryMonth, String summaryYear){}
+
+    private SummaryWeekMonthAndYear getSummaryWeekMonthAndYear(LocalDate summaryDate){
+        // Get the start of the week (Monday)
+        WeekFields weekFields = WeekFields.ISO;
+        LocalDate weekStart = summaryDate.with(weekFields.dayOfWeek(), 1);
+        // Get the end of the week (Sunday)
+        LocalDate weekEnd = weekStart.plusDays(6);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd", Locale.ENGLISH);
+        String start = weekStart.format(formatter);
+        String end = weekEnd.format(formatter);
+
+        DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("MMMM-yyyy", Locale.ENGLISH);
+        return SummaryWeekMonthAndYear.builder()
+                .summaryYear("%d".formatted(summaryDate.getYear()))
+                .summaryMonth(summaryDate.format(monthFormatter))
+                .summaryWeek("%s - %s".formatted(start, end))
+                .build();
     }
 
 }

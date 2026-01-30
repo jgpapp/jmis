@@ -10,7 +10,10 @@ public record DataSummaryDto(
         BigDecimal amountDisbursed,
         BigDecimal outStandingAmount,
         BigDecimal amountRepaid,
-        LocalDate summaryDate
+        LocalDate summaryDate,
+        String summaryWeek,
+        String summaryMonth,
+        String summaryYear
 ) {
 
 }

@@ -129,6 +129,17 @@ set selectedDashboardMode(value: string) {
               this.hideOutput = monthLabels.length === 0;
             });
             break;
+            case 'YEARLY':
+            const trainedParticipantsByYear = this.dashboardService.getBusinessesTrainedByTimeScale(this.dashBoardFilters, this.selectedDashboardMode);
+            const disbursedLoansByYear = this.dashboardService.getLoanDisbursedByTimeScale(this.dashBoardFilters, this.selectedDashboardMode);
+            forkJoin({trainedParticipantsByYear, disbursedLoansByYear}).subscribe((data: any) => {
+              const yearLabels = this.getLabels(data.trainedParticipantsByYear);
+              const businessesTrained = this.getCounts(data.trainedParticipantsByYear, yearLabels);
+              const disbursedLoans = this.getCounts(data.disbursedLoansByYear, yearLabels);
+              this.setChart(yearLabels, businessesTrained, disbursedLoans);
+              this.hideOutput = yearLabels.length === 0;
+            });
+            break;
         }
     });
   }

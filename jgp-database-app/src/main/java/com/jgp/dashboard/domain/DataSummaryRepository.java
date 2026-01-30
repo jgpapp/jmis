@@ -24,8 +24,10 @@ public interface DataSummaryRepository extends JpaRepository<DataSummary, Long>,
     @Transactional
     @Modifying
     @Query(value = """
-            INSERT INTO data_summary (partner_id, gender_category, summary_date, businesses_trained, businesses_loaned, amount_disbursed, out_standing_amount, amount_repaid) 
-            VALUES (:partnerId, :genderCategory, :summaryDate, :businessesTrained, :businessesLoaned, :amountDisbursed, :outStandingAmount, :amountRepaid) 
+            INSERT INTO data_summary (partner_id, gender_category, summary_date, businesses_trained, businesses_loaned, amount_disbursed, 
+            out_standing_amount, amount_repaid, summary_week, summary_month, summary_year) 
+            VALUES (:partnerId, :genderCategory, :summaryDate, :businessesTrained, :businessesLoaned, :amountDisbursed, :outStandingAmount, :amountRepaid, 
+            :summaryWeek, :summaryMonth, :summaryYear)
             ON CONFLICT (partner_id, gender_category, summary_date) 
                         DO UPDATE set businesses_trained = EXCLUDED.businesses_trained, businesses_loaned = EXCLUDED.businesses_loaned, 
                                     amount_disbursed = EXCLUDED.amount_disbursed, out_standing_amount = EXCLUDED.out_standing_amount, 
@@ -33,9 +35,11 @@ public interface DataSummaryRepository extends JpaRepository<DataSummary, Long>,
             """, nativeQuery = true)
     void upsertDataSummary(
             @Param("partnerId") Long partnerId, @Param("genderCategory") String genderCategory,
-            @Param("summaryDate") LocalDate summaryDate, @Param("businessesTrained") Integer businessesTrained,
-            @Param("businessesLoaned") Integer businessesLoaned, @Param("amountDisbursed") BigDecimal amountDisbursed,
-            @Param("outStandingAmount") BigDecimal outStandingAmount, @Param("amountRepaid") BigDecimal amountRepaid
-    );
+            @Param("businessesTrained") Integer businessesTrained, @Param("businessesLoaned") Integer businessesLoaned,
+            @Param("amountDisbursed") BigDecimal amountDisbursed, @Param("outStandingAmount") BigDecimal outStandingAmount,
+            @Param("amountRepaid") BigDecimal amountRepaid, @Param("summaryDate") LocalDate summaryDate,
+            @Param("summaryWeek") String summaryWeek, @Param("summaryMonth") String summaryMonth,
+            @Param("summaryYear") String summaryYear
+            );
 
 }

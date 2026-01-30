@@ -2,6 +2,7 @@ package com.jgp.participant.domain;
 
 import com.jgp.participant.dto.ParticipantRequestDto;
 import com.jgp.shared.domain.BaseEntity;
+import com.jgp.shared.domain.DataStatus;
 import com.jgp.util.CommonUtil;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -123,6 +124,10 @@ public class Participant extends BaseEntity {
     @Column(name = "pre_payment", scale = 4, precision = 19, nullable = false)
     private BigDecimal prePayment;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "data_status")
+    private DataStatus dataStatus;
+
     public Participant() {
     }
 
@@ -153,6 +158,7 @@ public class Participant extends BaseEntity {
         this.participantName = dto.participantName();
         this.businessFinancier = dto.businessFinancier();
         this.disabilityType = dto.disabilityType();
+        this.dataStatus = DataStatus.PENDING_APPROVAL;
     }
 
     public void updateParticipant(ParticipantRequestDto dto){
@@ -267,10 +273,6 @@ public class Participant extends BaseEntity {
         this.isActive = Boolean.TRUE;
     }
 
-    public void updatePrePaidAmount(BigDecimal newAmount){
-        this.prePayment = newAmount;
-    }
-
     public void incrementPrePaidAmount(BigDecimal additionalAmount){
         this.prePayment = Objects.nonNull(this.prePayment) ? this.prePayment.add(additionalAmount) : additionalAmount;
     }
@@ -279,7 +281,7 @@ public class Participant extends BaseEntity {
         Participant.Gender genderEnum = null;
         try {
             genderEnum = StringUtils.isBlank(genderString) ? Participant.Gender.OTHER : Participant.Gender.valueOf(genderString.toUpperCase());
-        }catch (Exception e){
+        }catch (Exception _){
             genderEnum = Participant.Gender.OTHER;
         }
         return genderEnum;
