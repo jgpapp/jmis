@@ -4,9 +4,10 @@ import com.jgp.dashboard.domain.DataSummaryRepository;
 import com.jgp.dashboard.dto.DataSummaryDto;
 import com.jgp.infrastructure.core.domain.JdbcSupport;
 import com.jgp.patner.domain.PartnerRepository;
+import com.jgp.shared.domain.DataStatus;
+import com.jgp.util.CommonUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -19,12 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
-import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -40,8 +38,9 @@ public class DataSummaryServiceImpl implements DataSummaryService {
     private static final String PARTNER_ID_PARAM = "partnerId";
     private static final String FROM_DATE_PARAM = "fromDate";
     private static final String TO_DATE_PARAM = "toDate";
-    private static final String LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM = "WHERE l.date_disbursed between :fromDate and :toDate  and l.data_is_approved = true and lt.is_deleted = false and l.is_deleted = false ";
-    private static final String BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM = "WHERE bpd.date_partner_recorded between :fromDate and :toDate and bpd.data_is_approved = true and bpd.is_deleted = false ";
+    private static final String DATA_STATUS_PARAM = "dataStatus";
+    private static final String LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM = "WHERE l.date_disbursed between :fromDate and :toDate  and l.data_status = :dataStatus ";
+    private static final String BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM = "WHERE bpd.date_partner_recorded between :fromDate and :toDate and bpd.data_status = :dataStatus ";
     private static final String LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and l.partner_id = :partnerId ";
     private static final String BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and bpd.partner_id = :partnerId ";
 
@@ -67,14 +66,13 @@ public class DataSummaryServiceImpl implements DataSummaryService {
             LocalDate monthEndDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
 
             final var dataIncludingMissingDates = fillMissingDatesWithDefaultValues(
+                    partnerId,
                     getDataSummaryForDateRangeAndPartner(partnerId, monthStartDate, monthEndDate),
                     monthStartDate,
                     monthEndDate
             );
             for (var dto: dataIncludingMissingDates){
-                this.countySummaryRepository.upsertDataSummary(partnerId, dto.genderCategory(), dto.businessesTrained(),
-                        dto.businessesLoaned(), dto.amountDisbursed(), dto.outStandingAmount(), dto.amountRepaid(),
-                        dto.summaryDate(), dto.summaryWeek(), dto.summaryMonth(), dto.summaryYear());
+                this.countySummaryRepository.upsertDataSummary(dto);
             }
 
             // Move to the next month
@@ -97,6 +95,7 @@ public class DataSummaryServiceImpl implements DataSummaryService {
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
 
         if (Objects.nonNull(partnerId)) {
             parameters.addValue(PARTNER_ID_PARAM, partnerId);
@@ -104,7 +103,7 @@ public class DataSummaryServiceImpl implements DataSummaryService {
             loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
         }
         var sqlQuery = String.format(DataSummaryDataMapper.COUNTY_SUMMARY_SCHEMA, bpdWhereClause, loanWhereClause);
-        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, new DataSummaryDataMapper());
+        return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, new DataSummaryDataMapper(partnerId));
     }
 
     /**
@@ -115,7 +114,7 @@ public class DataSummaryServiceImpl implements DataSummaryService {
      * @param toDate        the end date of the range
      * @return a complete list of DataSummaryDto objects with missing dates filled in
      */
-    private List<DataSummaryDto> fillMissingDatesWithDefaultValues(List<DataSummaryDto> dataSummaries, LocalDate fromDate, LocalDate toDate) {
+    private List<DataSummaryDto> fillMissingDatesWithDefaultValues(Long partnerId, List<DataSummaryDto> dataSummaries, LocalDate fromDate, LocalDate toDate) {
         // Group existing summaries by date for O(1) lookup
         var summariesByDate = dataSummaries.stream()
                 .collect(Collectors.groupingBy(DataSummaryDto::summaryDate));
@@ -127,12 +126,28 @@ public class DataSummaryServiceImpl implements DataSummaryService {
             var summariesForDate = summariesByDate.get(datePointer);
             if (summariesForDate == null || summariesForDate.isEmpty()) {
 
-                var summaryData = getSummaryWeekMonthAndYear(datePointer);
+                var summaryData = CommonUtil.getSummaryWeekMonthAndYear(datePointer);
                 completeDataSummaries.add(
-                        new DataSummaryDto("no data", 0, 0, java.math.BigDecimal.ZERO,
-                                java.math.BigDecimal.ZERO, java.math.BigDecimal.ZERO, datePointer,
-                                summaryData.summaryWeek(), summaryData.summaryMonth(), summaryData.summaryYear())
+                        DataSummaryDto.builder()
+                                .partnerId(partnerId)
+                                .yearNumber(summaryData.yearNumber())
+                                .monthNumber(summaryData.monthNumber())
+                                .weekNumber(summaryData.weekNumber())
+                                .summaryMonth(summaryData.summaryMonth())
+                                .summaryQuarter(summaryData.summaryQuarter())
+                                .quarterNumber(summaryData.quarterNumber())
+                                .genderCategory("no data")
+                                .businessesTrained(0)
+                                .businessesLoaned(0)
+                                .amountDisbursed(java.math.BigDecimal.ZERO)
+                                .outStandingAmount(java.math.BigDecimal.ZERO)
+                                .amountRepaid(java.math.BigDecimal.ZERO)
+                                .summaryDate(datePointer)
+                                .summaryWeek(summaryData.summaryWeek())
+                                .summaryYear(summaryData.summaryYear())
+                                .build()
                 );
+
             } else {
                 completeDataSummaries.addAll(summariesForDate);
             }
@@ -143,33 +158,32 @@ public class DataSummaryServiceImpl implements DataSummaryService {
 
     private static final class DataSummaryDataMapper implements ResultSetExtractor<List<DataSummaryDto>> {
 
+        private final Long partnerId;
         public static final String COUNTY_SUMMARY_SCHEMA = """
                 with highLevelSummary as (
                                      select p.gender_category as genderCategory, bpd.date_partner_recorded as summaryDate,\
-                                     EXTRACT(YEAR FROM bpd.date_partner_recorded)::VARCHAR as summaryYear,\
-                                     TO_CHAR(DATE_TRUNC('month', bpd.date_partner_recorded), 'FMMonth-YYYY') as summaryMonth,\
-                                     TO_CHAR(DATE_TRUNC('week', bpd.date_partner_recorded), 'Mon DD') || ' - ' || TO_CHAR(DATE_TRUNC('week', bpd.date_partner_recorded) + INTERVAL '6 days', 'Mon DD') as summaryWeek,
                                      count(distinct p.id) as businessesTrained,
                                      0 as businessesLoaned, 0 as amountDisbursed,
                                      0 as outStandingAmount, 0 as amountRepaid from ta_participants_data bpd\
                                      inner join participants p on p.id = bpd.participant_id %s
-                                     group by 1, 2, 3, 4, 5
+                                     group by 1, 2
                                      union
                                      select p.gender_category as genderCategory, lt.transaction_date as summaryDate,\
-                                     EXTRACT(YEAR FROM lt.transaction_date)::VARCHAR as summaryYear,\
-                                     TO_CHAR(DATE_TRUNC('month', lt.transaction_date), 'FMMonth-YYYY') as summaryMonth,\
-                                     TO_CHAR(DATE_TRUNC('week', lt.transaction_date), 'Mon DD') || ' - ' || TO_CHAR(DATE_TRUNC('week', lt.transaction_date) + INTERVAL '6 days', 'Mon DD') as summaryWeek,
                                      0 as businessesTrained, count(l.id) as businessesLoaned,
                                      sum(lt.amount) as amountDisbursed, sum(lt.out_standing_amount) as outStandingAmount,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       \s
                                      sum(l.loan_amount_repaid) as amountRepaid from loan_transactions lt\s
                                      inner join loans l on lt.loan_id = l.id\s
                                      inner join participants p on p.id = l.participant_id %s\s
-                                     group by 1, 2, 3, 4, 5
+                                     group by 1, 2
                                      )
-                                     select genderCategory, summaryYear, summaryMonth, summaryWeek, summaryDate, sum(businessesTrained) as businessesTrained, sum(businessesLoaned) as businessesLoaned,
+                                     select genderCategory, summaryDate, sum(businessesTrained) as businessesTrained, sum(businessesLoaned) as businessesLoaned,
                                      sum(amountDisbursed) as amountDisbursed, sum(outStandingAmount) as outStandingAmount, sum(amountRepaid) as amountRepaid
-                                     from highLevelSummary group by 1, 2, 3, 4, 5 order by 5;
+                                     from highLevelSummary group by 1, 2 order by 2;
                \s""";
+
+        private DataSummaryDataMapper(Long partnerId) {
+            this.partnerId = partnerId;
+        }
 
 
         @Override
@@ -177,9 +191,6 @@ public class DataSummaryServiceImpl implements DataSummaryService {
             var dataPoints = new ArrayList<DataSummaryDto>();
             while (rs.next()){
                 final var summaryDate = JdbcSupport.getLocalDate(rs, "summaryDate");
-                final var summaryWeek = rs.getString("summaryWeek");
-                final var summaryMonth = rs.getString("summaryMonth");
-                final var summaryYear = rs.getString( "summaryYear");
                 final var genderCategory = rs.getString("genderCategory");
                 final var businessesTrained = rs.getInt("businessesTrained");
                 final var businessesLoaned = rs.getInt("businessesLoaned");
@@ -187,35 +198,30 @@ public class DataSummaryServiceImpl implements DataSummaryService {
                 final var outStandingAmount = rs.getBigDecimal("outStandingAmount");
                 final var amountRepaid = rs.getBigDecimal("amountRepaid");
 
+                var summaryData = CommonUtil.getSummaryWeekMonthAndYear(summaryDate);
                 dataPoints.add(
-                        new DataSummaryDto(genderCategory, businessesTrained, businessesLoaned, amountDisbursed,
-                                outStandingAmount, amountRepaid, summaryDate, summaryWeek, summaryMonth, summaryYear)
+                        DataSummaryDto.builder()
+                                .partnerId(this.partnerId)
+                                .yearNumber(summaryData.yearNumber())
+                                .monthNumber(summaryData.monthNumber())
+                                .weekNumber(summaryData.weekNumber())
+                                .summaryMonth(summaryData.summaryMonth())
+                                .summaryQuarter(summaryData.summaryQuarter())
+                                .quarterNumber(summaryData.quarterNumber())
+                                .genderCategory(genderCategory)
+                                .businessesTrained(businessesTrained)
+                                .businessesLoaned(businessesLoaned)
+                                .amountDisbursed(amountDisbursed)
+                                .outStandingAmount(outStandingAmount)
+                                .amountRepaid(amountRepaid)
+                                .summaryDate(summaryDate)
+                                .summaryWeek(summaryData.summaryWeek())
+                                .summaryYear(summaryData.summaryYear())
+                                .build()
                 );
             }
             return dataPoints;
         }
-    }
-
-    @Builder
-    record SummaryWeekMonthAndYear(String summaryWeek, String summaryMonth, String summaryYear){}
-
-    private SummaryWeekMonthAndYear getSummaryWeekMonthAndYear(LocalDate summaryDate){
-        // Get the start of the week (Monday)
-        WeekFields weekFields = WeekFields.ISO;
-        LocalDate weekStart = summaryDate.with(weekFields.dayOfWeek(), 1);
-        // Get the end of the week (Sunday)
-        LocalDate weekEnd = weekStart.plusDays(6);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd", Locale.ENGLISH);
-        String start = weekStart.format(formatter);
-        String end = weekEnd.format(formatter);
-
-        DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("MMMM-yyyy", Locale.ENGLISH);
-        return SummaryWeekMonthAndYear.builder()
-                .summaryYear("%d".formatted(summaryDate.getYear()))
-                .summaryMonth(summaryDate.format(monthFormatter))
-                .summaryWeek("%s - %s".formatted(start, end))
-                .build();
     }
 
 }

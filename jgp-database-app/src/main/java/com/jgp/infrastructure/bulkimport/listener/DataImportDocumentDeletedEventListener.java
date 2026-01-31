@@ -29,7 +29,7 @@ public class DataImportDocumentDeletedEventListener {
 
     @EventListener
     @Async
-    public void handleDataUploadedEvent(DataImportDocumentDeletedEvent event) {
+    public void handleDataImportDocumentDeletedEvent(DataImportDocumentDeletedEvent event) {
         final var document = event.document();
         if (Objects.nonNull(document) && event.deleteAssociatedData()) {
             final var documentImportType = document.getGlobalEntityType();
@@ -43,28 +43,28 @@ public class DataImportDocumentDeletedEventListener {
                             .stream()
                             .map(BaseEntity::getId)
                             .toList();
-                    this.loanService.approvedTransactionsLoans(loanTransactionIds, Boolean.FALSE);
+                    this.loanService.deleteTransactionsLoans(loanTransactionIds);
                 }
                 case GlobalEntityType.TA_IMPORT_TEMPLATE -> {
                     final var bmoClientDataIds = this.bmoClientDataService.findByDocumentId(document.getId())
                             .stream()
                             .map(BaseEntity::getId)
                             .toList();
-                    this.bmoClientDataService.approvedBMOParticipantsData(bmoClientDataIds, Boolean.FALSE);
+                    this.bmoClientDataService.deleteBMOParticipantsDataByIds(bmoClientDataIds);
                 }
                 case GlobalEntityType.MENTORSHIP_IMPORT_TEMPLATE -> {
                     final var mentorshipIds = this.mentorshipService.findByDocumentId(document.getId())
                             .stream()
                             .map(BaseEntity::getId)
                             .toList();
-                    this.mentorshipService.approvedMentorShipData(mentorshipIds, Boolean.FALSE);
+                    this.mentorshipService.deleteMentorShipDataByIds(mentorshipIds);
                 }
                 case GlobalEntityType.MONITORING_IMPORT_TEMPLATE -> {
                     final var outComeMonitoringIds = this.outComeMonitoringService.findByDocumentId(document.getId())
                             .stream()
                             .map(BaseEntity::getId)
                             .toList();
-                    this.outComeMonitoringService.approvedOutComeMonitoringData(outComeMonitoringIds, Boolean.FALSE);
+                    this.outComeMonitoringService.deleteOutComeMonitoringDataByIds(outComeMonitoringIds);
                 }
                 default -> {
                     return;

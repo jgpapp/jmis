@@ -92,7 +92,6 @@ set selectedDashboardMode(value: string) {
    * Fetches data accordingly and sets charts based on fetched data.
    */
   getChartData() {
-    console.log('Fetching participant trends data for timescale:', this.selectedDashboardMode);
     merge(this.selectedDashboardMode).pipe(skip(1))
       .subscribe(() => {
         switch (this.selectedDashboardMode) {

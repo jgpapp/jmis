@@ -26,6 +26,7 @@ import { TopInfoContentComponent } from '../theme/components/top-info-content/to
 
 @Component({
     selector: 'app-pages',
+    standalone: true,
     imports: [
         RouterOutlet,
         FormsModule,

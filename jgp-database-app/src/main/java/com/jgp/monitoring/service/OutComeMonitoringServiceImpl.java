@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -48,11 +49,11 @@ public class OutComeMonitoringServiceImpl implements OutComeMonitoringService {
         }
         var currentUser = this.platformSecurityContext.getAuthenticatedUserIfPresent();
 
-        if (Boolean.TRUE.equals(approval)) {
+        if (Objects.nonNull(approval)) {
             int count = 0;
             var mentorshipsToSave = new ArrayList<OutComeMonitoring>();
             for (OutComeMonitoring outComeMonitoring : outComeMonitoringData) {
-                outComeMonitoring.approveData(true, currentUser);
+                outComeMonitoring.approveData(approval, currentUser);
                 mentorshipsToSave.add(outComeMonitoring);
                 count++;
                 if (count % 20 == 0) { // Flush and clear the session every 20 entities
@@ -62,12 +63,16 @@ public class OutComeMonitoringServiceImpl implements OutComeMonitoringService {
                 }
             }
             this.outComeMonitoringRepository.saveAllAndFlush(mentorshipsToSave);
-        }else {
-            rejectAndDeleteOutComeMonitoringData(outComeMonitoringData);
         }
     }
 
-    private void rejectAndDeleteOutComeMonitoringData(List<OutComeMonitoring> outComeMonitoringList){
+    @Override
+    public void deleteOutComeMonitoringDataByIds(List<Long> dataIds) {
+        var outComeMonitoringData = this.outComeMonitoringRepository.findAllById(dataIds);
+        deleteOutComeMonitoringData(outComeMonitoringData);
+    }
+
+    private void deleteOutComeMonitoringData(List<OutComeMonitoring> outComeMonitoringList){
         int count = 0;
         var outComeMonitoringToDelete = new ArrayList<OutComeMonitoring>();
         for (OutComeMonitoring bmo : outComeMonitoringList) {

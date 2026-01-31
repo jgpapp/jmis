@@ -11,7 +11,7 @@ public record LoanSearchCriteria(
         Long participantId,
         Loan.LoanStatus status,
         Loan.LoanQuality quality,
-        Boolean approvedByPartner,
+        String dataStatus,
         LocalDate disbursedFromDate,
         LocalDate disbursedToDate
 ) {

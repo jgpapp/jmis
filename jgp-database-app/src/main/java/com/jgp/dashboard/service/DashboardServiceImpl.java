@@ -18,6 +18,7 @@ import com.jgp.monitoring.domain.predicate.OutComeMonitoringSearchCriteria;
 import com.jgp.participant.domain.ParticipantRepository;
 import com.jgp.patner.domain.Partner;
 import com.jgp.patner.domain.PartnerRepository;
+import com.jgp.shared.domain.DataStatus;
 import com.jgp.util.CommonUtil;
 
 import java.math.BigDecimal;
@@ -43,6 +44,7 @@ import com.jgp.dashboard.dto.SeriesDataPointDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.dao.DataAccessException;
@@ -67,13 +69,14 @@ public class DashboardServiceImpl implements DashboardService {
     private static final String PARTNER_ID_PARAM = "partnerId";
     private static final String FROM_DATE_PARAM = "fromDate";
     private static final String TO_DATE_PARAM = "toDate";
+    private static final String DATA_STATUS_PARAM = "dataStatus";
     private static final String COUNTY_CODE_PARAM = "countyCode";
     private static final String TRAINING_PARTNER_PARAM = "trainingPartner";
     private static final String DATA_VALUE_PARAM = "dataValue";
     private static final String DATA_PERCENTAGE_VALUE_PARAM = "percentage";
-    private static final String LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM = "WHERE lt.transaction_date between :fromDate and :toDate  and l.data_is_approved = true and lt.is_approved = true ";
-    private static final String BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM = "WHERE bpd.date_partner_recorded between :fromDate and :toDate and bpd.data_is_approved = true  ";
-    private static final String MENTORSHIP_WHERE_CLAUSE_BY_MENTORSHIP_DATE_PARAM = "WHERE m.mentor_ship_date between :fromDate and :toDate and m.is_approved = true ";
+    private static final String LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM = "WHERE lt.transaction_date between :fromDate and :toDate  and l.data_status = :dataStatus and lt.data_status = :dataStatus ";
+    private static final String BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM = "WHERE bpd.date_partner_recorded between :fromDate and :toDate and bpd.data_status = :dataStatus  ";
+    private static final String MENTORSHIP_WHERE_CLAUSE_BY_MENTORSHIP_DATE_PARAM = "WHERE m.mentor_ship_date between :fromDate and :toDate and m.data_status = :dataStatus ";
     private static final String LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and l.partner_id = :partnerId ";
     private static final String BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and bpd.partner_id = :partnerId ";
     private static final String MENTORSHIP_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and m.partner_id = :partnerId ";
@@ -88,6 +91,7 @@ public class DashboardServiceImpl implements DashboardService {
     private static final String VALUE_PARAM = "value";
     private static final String TOTAL_PARAM_PARAM = "%s Totals";
 
+    private static final String SUMMARY_DATE_PARAM = "summary_date";
     private static final String DATA_SUMMARY_WHERE_CLAUSE_BY_SUMMARY_DATE_PARAM = "WHERE ds.summary_date between :fromDate and :toDate ";
     private static final String DATA_SUMMARY_WHERE_CLAUSE_BY_PARTNER_ID_PARAM = "%s and ds.partner_id = :partnerId ";
 
@@ -106,6 +110,7 @@ public class DashboardServiceImpl implements DashboardService {
         var mentorShipWhereClause = MENTORSHIP_WHERE_CLAUSE_BY_MENTORSHIP_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
 
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())) {
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
@@ -140,6 +145,7 @@ public class DashboardServiceImpl implements DashboardService {
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
@@ -153,6 +159,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "loanDisbursedByTimeScale", key = "T(String).valueOf(#dashboardSearchCriteria) + '-' + T(String).valueOf(#timeScale) ")
     public List<DataPointDto> getLoanDisbursedByTimeScale(DashboardSearchCriteria dashboardSearchCriteria, String timeScale) {
         final var rm = new DataPointMapper(DECIMAL_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -185,6 +192,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @Cacheable(value = "businessesTrainedByTimeScale", key = "T(String).valueOf(#dashboardSearchCriteria) + '-' + T(String).valueOf(#timeScale) ")
     public List<DataPointDto> getBusinessesTrainedByTimeScale(DashboardSearchCriteria dashboardSearchCriteria, String timeScale) {
         final var rm = new DataPointMapper(INTEGER_DATA_POINT_TYPE);
         LocalDate fromDate = dashboardSearchCriteria.fromDate();
@@ -229,6 +237,7 @@ public class DashboardServiceImpl implements DashboardService {
         }
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
 
         var bpdWhereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
@@ -267,6 +276,8 @@ public class DashboardServiceImpl implements DashboardService {
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
@@ -292,6 +303,8 @@ public class DashboardServiceImpl implements DashboardService {
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
@@ -317,6 +330,8 @@ public class DashboardServiceImpl implements DashboardService {
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
@@ -342,6 +357,8 @@ public class DashboardServiceImpl implements DashboardService {
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.countyCode())) {
             parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
             loanWhereClause = String.format("%s%s", loanWhereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
@@ -363,6 +380,8 @@ public class DashboardServiceImpl implements DashboardService {
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
@@ -384,6 +403,8 @@ public class DashboardServiceImpl implements DashboardService {
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             whereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
@@ -406,6 +427,8 @@ public class DashboardServiceImpl implements DashboardService {
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             whereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
@@ -436,6 +459,8 @@ public class DashboardServiceImpl implements DashboardService {
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             whereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
@@ -466,6 +491,8 @@ public class DashboardServiceImpl implements DashboardService {
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             whereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
@@ -497,6 +524,8 @@ public class DashboardServiceImpl implements DashboardService {
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             whereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
@@ -528,6 +557,8 @@ public class DashboardServiceImpl implements DashboardService {
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             whereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
@@ -559,6 +590,8 @@ public class DashboardServiceImpl implements DashboardService {
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
@@ -585,6 +618,8 @@ public class DashboardServiceImpl implements DashboardService {
         var loanWhereClause = MENTORSHIP_WHERE_CLAUSE_BY_MENTORSHIP_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             loanWhereClause = String.format(MENTORSHIP_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
@@ -612,6 +647,8 @@ public class DashboardServiceImpl implements DashboardService {
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
@@ -674,6 +711,8 @@ public class DashboardServiceImpl implements DashboardService {
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             whereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
@@ -705,6 +744,8 @@ public class DashboardServiceImpl implements DashboardService {
         var whereClause = MENTORSHIP_WHERE_CLAUSE_BY_MENTORSHIP_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             whereClause = String.format(MENTORSHIP_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
@@ -731,6 +772,8 @@ public class DashboardServiceImpl implements DashboardService {
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             whereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
@@ -761,6 +804,8 @@ public class DashboardServiceImpl implements DashboardService {
         var whereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             whereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
@@ -784,9 +829,11 @@ public class DashboardServiceImpl implements DashboardService {
             fromDate = CommonUtil.getDefaultQueryDates().getLeft();
             toDate = CommonUtil.getDefaultQueryDates().getRight();
         }
-        var whereClause = "WHERE mon.survey_date between :fromDate and :toDate  and mon.is_approved = true and mon.is_deleted = false ";
+        var whereClause = "WHERE mon.survey_date between :fromDate and :toDate  and mon.data_status = :dataStatus ";
         var parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(searchCriteria.partner())){
             parameters.addValue("partner", searchCriteria.partner());
             whereClause = String.format("%s and mon.partner = :partner ", whereClause);
@@ -836,6 +883,8 @@ public class DashboardServiceImpl implements DashboardService {
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             whereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
@@ -867,6 +916,8 @@ public class DashboardServiceImpl implements DashboardService {
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             whereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
@@ -897,6 +948,8 @@ public class DashboardServiceImpl implements DashboardService {
         var whereClause = MENTORSHIP_WHERE_CLAUSE_BY_MENTORSHIP_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             whereClause = String.format(MENTORSHIP_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
@@ -923,6 +976,8 @@ public class DashboardServiceImpl implements DashboardService {
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             whereClause = String.format(BMO_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
@@ -952,6 +1007,8 @@ public class DashboardServiceImpl implements DashboardService {
         var whereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             whereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, whereClause);
@@ -969,6 +1026,7 @@ public class DashboardServiceImpl implements DashboardService {
     public List<SeriesDataPointDto> getLastThreeYearsAccessedLoanPerPartnerSummary(DashboardSearchCriteria dashboardSearchCriteria) {
         final var rm = new SeriesDataPointMapper();
         MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
         var whereClause = "";
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
@@ -978,7 +1036,7 @@ public class DashboardServiceImpl implements DashboardService {
             parameters.addValue(COUNTY_CODE_PARAM, dashboardSearchCriteria.countyCode());
             whereClause = String.format("%s%s", whereClause, WHERE_CLAUSE_BY_COUNTY_CODE_PARAM);
         }
-        whereClause = String.format("%s  and l.data_is_approved = true and lt.is_approved = true and l.is_deleted = false and lt.is_deleted = false", whereClause);
+        whereClause = String.format("%s  and l.data_status = :dataStatus and lt.data_status = :dataStatus", whereClause);
         var sqlQuery = String.format(SeriesDataPointMapper.ACCESSED_AMOUNT_BY_PARTNER_BY_YEAR_SCHEMA, whereClause);
 
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, rm);
@@ -996,6 +1054,8 @@ public class DashboardServiceImpl implements DashboardService {
         }
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         var whereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
@@ -1022,6 +1082,8 @@ public class DashboardServiceImpl implements DashboardService {
         }
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         var whereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
@@ -1048,6 +1110,8 @@ public class DashboardServiceImpl implements DashboardService {
         }
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
@@ -1078,6 +1142,8 @@ public class DashboardServiceImpl implements DashboardService {
         }
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         var whereClause = BMO_WHERE_CLAUSE_BY_PARTNER_RECORDED_DATE_PARAM;
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
@@ -1110,6 +1176,8 @@ public class DashboardServiceImpl implements DashboardService {
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
@@ -1136,6 +1204,8 @@ public class DashboardServiceImpl implements DashboardService {
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
+
         if (Objects.nonNull(dashboardSearchCriteria.partnerId())){
             parameters.addValue(PARTNER_ID_PARAM, dashboardSearchCriteria.partnerId());
             loanWhereClause = String.format(LOAN_WHERE_CLAUSE_BY_PARTNER_ID_PARAM, loanWhereClause);
@@ -1161,6 +1231,7 @@ public class DashboardServiceImpl implements DashboardService {
         var loanWhereClause = LOAN_WHERE_CLAUSE_BY_DISBURSED_DATE_PARAM;
         MapSqlParameterSource parameters = new MapSqlParameterSource(FROM_DATE_PARAM, fromDate);
         parameters.addValue(TO_DATE_PARAM, toDate);
+        parameters.addValue(DATA_STATUS_PARAM, DataStatus.APPROVED.name());
 
         if (Objects.nonNull(partnerId)) {
             parameters.addValue(PARTNER_ID_PARAM, partnerId);
@@ -1183,15 +1254,17 @@ public class DashboardServiceImpl implements DashboardService {
         final var performanceSummaryMapper = new PerformanceSummaryMapper();
         final var today = LocalDate.now(ZoneId.systemDefault());
         final var thisYear = Objects.nonNull(year) ? Integer.parseInt(year) : today.getYear();
-        var whereClause = "where ds.summary_date between :fromDate and :toDate ";
+        var whereClause = DATA_SUMMARY_WHERE_CLAUSE_BY_SUMMARY_DATE_PARAM;
         var parameters = new MapSqlParameterSource();
         parameters.addValue(FROM_DATE_PARAM, LocalDate.parse(thisYear + "-01-01"));
         parameters.addValue(TO_DATE_PARAM, LocalDate.parse(thisYear + "-12-31"));
 
         if (Objects.nonNull(partnerId)) {
             parameters.addValue(PARTNER_ID_PARAM, partnerId);
-            whereClause = "and ds.partner_id = :partnerId ";
+            whereClause = DATA_SUMMARY_WHERE_CLAUSE_BY_PARTNER_ID_PARAM.formatted(whereClause);
         }
+        whereClause = "%s and ds.gender_category <> :genderCategory".formatted(whereClause);
+        parameters.addValue(GENDER_CATEGORY_PARAM, "no data");
         var sqlQuery = String.format(PerformanceSummaryMapper.PERFORMANCE_SUMMARY_SCHEMA, whereClause);
         return this.namedParameterJdbcTemplate.query(sqlQuery, parameters, performanceSummaryMapper);
     }
@@ -1217,13 +1290,14 @@ public class DashboardServiceImpl implements DashboardService {
     private static final class PerformanceSummaryMapper implements ResultSetExtractor<List<PerformanceSummaryDto>> {
 
         public static final String PERFORMANCE_SUMMARY_SCHEMA = """
-                 SELECT p.partner_name as partnerName, EXTRACT(YEAR FROM ds.summary_date) as dataYear, EXTRACT(MONTH FROM ds.summary_date)as dataMonth,\s
+                 SELECT p.partner_name as partnerName, ds.summary_year as dataYear, ds.summary_month as dataMonth,\s
+                 ds.year_number as yearNumber, ds.month_number as monthNumber,\s
                  ds.gender_category as genderCategory, sum(ds.businesses_trained) as businessesTrained,\s
                  sum(ds.businesses_loaned) as businessesLoaned, sum(ds.amount_disbursed) as amountDisbursed,\s
                  sum(ds.out_standing_amount) as outStandingAmount\s
                  FROM data_summary ds \s
                  inner join partners p on ds.partner_id = p.id\s
-                 %s group by 1, 2, 3, 4 order by 2, 3;
+                 %s group by 1, 2, 3, 4, 5, 6 order by 4, 5;
                 """;
 
         @Override
@@ -1235,23 +1309,27 @@ public class DashboardServiceImpl implements DashboardService {
                 final var genderCategory = rs.getString(GENDER_CATEGORY_PARAM);
                 final var amountDisbursed = rs.getBigDecimal(AMOUNT_DISBURSED);
                 final var outStandingAmount = rs.getBigDecimal(OUT_STANDING_AMOUNT);
-                final var year = rs.getInt("dataYear");
-                final var month = rs.getInt("dataMonth");
+                final var year = rs.getString("dataYear");
+                final var month = rs.getString("dataMonth");
                 final var partner = rs.getString(PARTNER_NAME_PARAM);
-                final var quarter = getQuarterFromMonth(month);
-                dataPoints.add(new PerformanceSummaryDto(year, month, genderCategory, partner, quarter, StringUtils.capitalize(genderCategory)+" Totals", businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount, new ArrayList<>()));
+                final var quarter = CommonUtil.getYearQuarterFromMonth(rs.getInt("monthNumber"));
+                dataPoints.add(
+                        PerformanceSummaryDto.builder()
+                                .summaryMonth(month)
+                                .summaryQuarter(quarter.getRight())
+                                .summaryYear(year)
+                                .genderCategory(genderCategory)
+                                .category(StringUtils.capitalize(genderCategory)+" Totals")
+                                .partner(partner)
+                                .amountDisbursed(amountDisbursed)
+                                .businessesLoaned(businessesLoaned)
+                                .businessesTrained(businessesTrained)
+                                .outStandingAmount(outStandingAmount)
+                                .children(new ArrayList<>())
+                                .build()
+                );
             }
             return groupAndSummarizeByPartner(dataPoints);
-        }
-
-        private static String getQuarterFromMonth(Integer month) {
-            return switch (month){
-                case 1, 2, 3 -> "Qtr 1";
-                case 4, 5, 6 -> "Qtr 2";
-                case 7, 8, 9 -> "Qtr 3";
-                case 10, 11, 12 -> "Qtr 4";
-                default -> "";
-            };
         }
 
         public List<PerformanceSummaryDto> groupAndSummarizeByPartner(List<PerformanceSummaryDto> dataSummary) {
@@ -1283,19 +1361,15 @@ public class DashboardServiceImpl implements DashboardService {
                                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                         // Create a parent PerformanceSummaryDto for this year
-                        return new PerformanceSummaryDto(
-                                null,
-                                null,
-                                null,
-                                null,
-                                partner,
-                                String.format(TOTAL_PARAM_PARAM, partner),
-                                totalBusinessesTrained,
-                                totalBusinessesLoaned,
-                                totalAmountDisbursed,
-                                totalOutstandingAmount,
-                                children
-                        );
+                        return PerformanceSummaryDto.builder()
+                                .summaryQuarter(partner)
+                                .category(String.format(TOTAL_PARAM_PARAM, partner))
+                                .amountDisbursed(totalAmountDisbursed)
+                                .businessesLoaned(totalBusinessesLoaned)
+                                .businessesTrained(totalBusinessesTrained)
+                                .outStandingAmount(totalOutstandingAmount)
+                                .children(children)
+                                .build();
                     }).toList();
 
             for (PerformanceSummaryDto dto: perPartnerSummary) {
@@ -1309,13 +1383,13 @@ public class DashboardServiceImpl implements DashboardService {
 
         public List<PerformanceSummaryDto> groupAndSummarizeByYear(List<PerformanceSummaryDto> partnerDataSummary) {
             // Group the data by year
-            Map<Integer, List<PerformanceSummaryDto>> groupedByYear = partnerDataSummary.stream()
-                    .collect(Collectors.groupingBy(PerformanceSummaryDto::year));
+            Map<String, List<PerformanceSummaryDto>> groupedByYear = partnerDataSummary.stream()
+                    .collect(Collectors.groupingBy(PerformanceSummaryDto::summaryYear));
 
             // Process each group
             var yearlySummary =  groupedByYear.entrySet().stream()
                     .map(entry -> {
-                        Integer year = entry.getKey();
+                        var year = entry.getKey();
                         List<PerformanceSummaryDto> children = entry.getValue();
 
                         // Calculate the totals for this year
@@ -1336,19 +1410,15 @@ public class DashboardServiceImpl implements DashboardService {
                                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                         // Create a parent PerformanceSummaryDto for this year
-                        return new PerformanceSummaryDto(
-                                year,
-                                null,
-                                null,
-                                null,
-                                null,
-                                String.format("Year %d Totals", year),
-                                totalBusinessesTrained,
-                                totalBusinessesLoaned,
-                                totalAmountDisbursed,
-                                totalOutstandingAmount,
-                                children
-                        );
+                        return PerformanceSummaryDto.builder()
+                                .summaryYear(year)
+                                .category("Year %s Totals".formatted(year))
+                                .amountDisbursed(totalAmountDisbursed)
+                                .businessesLoaned(totalBusinessesLoaned)
+                                .businessesTrained(totalBusinessesTrained)
+                                .outStandingAmount(totalOutstandingAmount)
+                                .children(children)
+                                .build();
                     }).toList();
 
             for (PerformanceSummaryDto dto: yearlySummary) {
@@ -1363,7 +1433,7 @@ public class DashboardServiceImpl implements DashboardService {
         public List<PerformanceSummaryDto> groupAndSummarizeYearDataPerQuarter(List<PerformanceSummaryDto> singleYearlyDataSummary) {
             // Group the data by year
                 Map<String, List<PerformanceSummaryDto>> groupedByQuarter = singleYearlyDataSummary.stream()
-                        .collect(Collectors.groupingBy(PerformanceSummaryDto::quarter));
+                        .collect(Collectors.groupingBy(PerformanceSummaryDto::summaryQuarter));
 
             // Process each group
             var quarterlySummary = groupedByQuarter.entrySet().stream()
@@ -1389,19 +1459,15 @@ public class DashboardServiceImpl implements DashboardService {
                                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                         // Create a parent PerformanceSummaryDto for this year
-                        return new PerformanceSummaryDto(
-                                null,
-                                null,
-                                null,
-                                null,
-                                quarter,
-                                String.format(TOTAL_PARAM_PARAM, quarter),
-                                totalBusinessesTrained,
-                                totalBusinessesLoaned,
-                                totalAmountDisbursed,
-                                totalOutstandingAmount,
-                                children
-                        );
+                        return PerformanceSummaryDto.builder()
+                                .summaryQuarter(quarter)
+                                .category(TOTAL_PARAM_PARAM.formatted(quarter))
+                                .amountDisbursed(totalAmountDisbursed)
+                                .businessesLoaned(totalBusinessesLoaned)
+                                .businessesTrained(totalBusinessesTrained)
+                                .outStandingAmount(totalOutstandingAmount)
+                                .children(children)
+                                .build();
                     }).toList();
 
             for (PerformanceSummaryDto dto: quarterlySummary) {
@@ -1415,8 +1481,8 @@ public class DashboardServiceImpl implements DashboardService {
 
         public List<PerformanceSummaryDto> groupAndSummarizeYearDataPerMonth(List<PerformanceSummaryDto> singleQuarterDataSummary) {
             // Group the data by year
-            Map<Integer, List<PerformanceSummaryDto>> groupedByQuarter = singleQuarterDataSummary.stream()
-                    .collect(Collectors.groupingBy(PerformanceSummaryDto::month));
+            Map<String, List<PerformanceSummaryDto>> groupedByQuarter = singleQuarterDataSummary.stream()
+                    .collect(Collectors.groupingBy(PerformanceSummaryDto::summaryMonth));
 
             // Process each group
             return groupedByQuarter.entrySet().stream()
@@ -1442,21 +1508,14 @@ public class DashboardServiceImpl implements DashboardService {
                                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                         // Create a parent PerformanceSummaryDto for this year
-                        var monthEnum = Month.of(theMonth);
-                        var monthName = Objects.nonNull(monthEnum) ? StringUtils.capitalize(monthEnum.name().toLowerCase(Locale.getDefault())) : "";
-                        return new PerformanceSummaryDto(
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                String.format(TOTAL_PARAM_PARAM, monthName),
-                                totalBusinessesTrained,
-                                totalBusinessesLoaned,
-                                totalAmountDisbursed,
-                                totalOutstandingAmount,
-                                children
-                        );
+                        return PerformanceSummaryDto.builder()
+                                .category(TOTAL_PARAM_PARAM.formatted(theMonth))
+                                .amountDisbursed(totalAmountDisbursed)
+                                .businessesLoaned(totalBusinessesLoaned)
+                                .businessesTrained(totalBusinessesTrained)
+                                .outStandingAmount(totalOutstandingAmount)
+                                .children(children)
+                                .build();
                     }).toList();
         }
     }
@@ -1929,29 +1988,23 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
         public static final String COUNTY_SUMMARY_SCHEMA = """
                 with highLevelSummary as (
                                      select cl.gender_category as genderCategory, bpd.date_partner_recorded as summaryDate, 
-                                     EXTRACT(YEAR FROM bpd.date_partner_recorded)::VARCHAR as summaryYear,\
-                                      TO_CHAR(DATE_TRUNC('month', bpd.date_partner_recorded), 'FMMonth-YYYY') as summaryMonth,\
-                                      TO_CHAR(DATE_TRUNC('week', bpd.date_partner_recorded), 'Mon DD') || ' - ' || TO_CHAR(DATE_TRUNC('week', bpd.date_partner_recorded) + INTERVAL '6 days', 'Mon DD') as summaryWeek,
                                      count(bpd.*) as businessesTrained,
                                      0 as businessesLoaned, 0 as amountDisbursed,
                                      0 as outStandingAmount, 0 as amountRepaid from ta_participants_data bpd\s
                                      inner join participants cl on cl.id = bpd.participant_id %s
-                                     group by 1, 2, 3, 4, 5
+                                     group by 1, 2
                                      union
                                      select cl.gender_category as genderCategory, lt.transaction_date as summaryDate, 
-                                     EXTRACT(YEAR FROM lt.transaction_date)::VARCHAR as summaryYear,\
-                                      TO_CHAR(DATE_TRUNC('month', lt.transaction_date), 'FMMonth-YYYY') as summaryMonth,\
-                                      TO_CHAR(DATE_TRUNC('week', lt.transaction_date), 'Mon DD') || ' - ' || TO_CHAR(DATE_TRUNC('week', lt.transaction_date) + INTERVAL '6 days', 'Mon DD') as summaryWeek,
                                      0 as businessesTrained, count(distinct l.*) as businessesLoaned,
                                      sum(lt.amount) as amountDisbursed, sum(lt.out_standing_amount) as outStandingAmount,\s
                                      sum(l.loan_amount_repaid) as amountRepaid
                                      from loan_transactions lt inner join loans l on lt.loan_id = l.id\s
                                      inner join participants cl on cl.id = l.participant_id %s\s
-                                     group by 1, 2, 3, 4, 5
+                                     group by 1, 2
                                      )
-                                     select genderCategory, summaryYear, summaryMonth, summaryWeek, summaryDate, sum(businessesTrained) as businessesTrained, sum(businessesLoaned) as businessesLoaned,
+                                     select genderCategory, summaryDate, sum(businessesTrained) as businessesTrained, sum(businessesLoaned) as businessesLoaned,
                                      sum(amountDisbursed) as amountDisbursed, sum(outStandingAmount) as outStandingAmount, sum(amountRepaid) as amountRepaid
-                                     from highLevelSummary group by 1, 2, 3, 4, 5;
+                                     from highLevelSummary group by 1, 2;
                \s""";
 
 
@@ -1960,9 +2013,6 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
             var dataPoints = new ArrayList<DataSummaryDto>();
             while (rs.next()){
                 final var summaryDate = JdbcSupport.getLocalDate(rs, "summaryDate");
-                final var summaryWeek = rs.getString("summaryWeek");
-                final var summaryMonth = rs.getString("summaryMonth");
-                final var summaryYear = rs.getString( "summaryYear");
                 final var genderCategory = rs.getString(GENDER_CATEGORY_PARAM);
                 final var businessesTrained = rs.getInt(BUSINESSES_TRAINED);
                 final var businessesLoaned = rs.getInt(BUSINESSES_LOANED);
@@ -1970,8 +2020,26 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
                 final var outStandingAmount = rs.getBigDecimal(OUT_STANDING_AMOUNT);
                 final var amountRepaid = rs.getBigDecimal("amountRepaid");
 
-                dataPoints.add(new DataSummaryDto(genderCategory, businessesTrained, businessesLoaned, amountDisbursed, outStandingAmount,
-                        amountRepaid, summaryDate, summaryWeek, summaryMonth, summaryYear));
+                var summaryData = CommonUtil.getSummaryWeekMonthAndYear(summaryDate);
+                dataPoints.add(
+                        DataSummaryDto.builder()
+                                .yearNumber(summaryData.yearNumber())
+                                .monthNumber(summaryData.monthNumber())
+                                .weekNumber(summaryData.weekNumber())
+                                .summaryMonth(summaryData.summaryMonth())
+                                .summaryQuarter(summaryData.summaryQuarter())
+                                .quarterNumber(summaryData.quarterNumber())
+                                .genderCategory(genderCategory)
+                                .businessesTrained(businessesTrained)
+                                .businessesLoaned(businessesLoaned)
+                                .amountDisbursed(amountDisbursed)
+                                .outStandingAmount(outStandingAmount)
+                                .amountRepaid(amountRepaid)
+                                .summaryDate(summaryDate)
+                                .summaryWeek(summaryData.summaryWeek())
+                                .summaryYear(summaryData.summaryYear())
+                                .build()
+                );
             }
             return dataPoints;
         }
@@ -1979,11 +2047,11 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
 
     private String getTimeScaledSummarySqlQuery(TimeScaledPart part) {
 
-        String groupByColumn = switch (part.timeScale()) {
-            case CommonUtil.YEARLY_TIME_SCALE -> "summary_year";
-            case CommonUtil.MONTHLY_TIME_SCALE -> "summary_month";
-            case CommonUtil.WEEKLY_TIME_SCALE -> "summary_week";
-            default -> "summary_date";
+        final var groupAndOrderByColumns = switch (part.timeScale()) {
+            case CommonUtil.YEARLY_TIME_SCALE -> new ImmutablePair<>("summary_year", "year_number") ;
+            case CommonUtil.MONTHLY_TIME_SCALE -> new ImmutablePair<>("summary_month", "month_number") ;
+            case CommonUtil.WEEKLY_TIME_SCALE -> new ImmutablePair<>("summary_week", "week_number") ;
+            default -> new ImmutablePair<>(SUMMARY_DATE_PARAM, SUMMARY_DATE_PARAM) ;
         };
 
         return """
@@ -1993,14 +2061,17 @@ private static final class SeriesDataPointMapper implements ResultSetExtractor<L
             FROM
                 %s %s
             GROUP BY
-                1
+                1%s
             ORDER BY
-                1 ASC;""".formatted(
-                groupByColumn,
+                %s ASC;""".formatted(
+                groupAndOrderByColumns.getLeft(),
                 part.aggregationFunction(),
                 part.aggregatedColumn(),
                 part.entity(),
-                part.whereClause()
+                part.whereClause(),
+                SUMMARY_DATE_PARAM.equals(groupAndOrderByColumns.getLeft()) ? "" : ", %s".formatted(groupAndOrderByColumns.getRight()),
+                groupAndOrderByColumns.getRight()
+
         );
 
     }

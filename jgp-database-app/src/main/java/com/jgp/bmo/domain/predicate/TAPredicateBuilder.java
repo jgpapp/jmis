@@ -2,6 +2,7 @@ package com.jgp.bmo.domain.predicate;
 
 import com.jgp.bmo.domain.QTAData;
 import com.jgp.bmo.dto.TAParticipantSearchCriteria;
+import com.jgp.shared.domain.DataStatus;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import org.springframework.stereotype.Component;
@@ -25,8 +26,6 @@ public class TAPredicateBuilder {
 
         List<Predicate> predicateList = new ArrayList<>();
 
-        predicateList.add(qbmoParticipantData.isDeleted.isFalse());
-
         if (null != searchCriteria.participantId()) {
             predicateList.add(qbmoParticipantData.participant.id.eq(searchCriteria.participantId()));
         }
@@ -35,13 +34,13 @@ public class TAPredicateBuilder {
             predicateList.add(qbmoParticipantData.partner.id.eq(searchCriteria.partnerId()));
         }
 
-        if (null != searchCriteria.approvedByPartner()) {
-            predicateList.add(qbmoParticipantData.isDataApprovedByPartner.eq(searchCriteria.approvedByPartner()));
+        if (null != DataStatus.getDataStatus(searchCriteria.dataStatus())) {
+            predicateList.add(qbmoParticipantData.dataStatus.eq(DataStatus.getDataStatus(searchCriteria.dataStatus())));
+        }else {
+            predicateList.add(qbmoParticipantData.dataStatus.eq(DataStatus.APPROVED));
         }
 
-        if (!predicateList.isEmpty()) {
-            builder.orAllOf(predicateList.toArray(new Predicate[0]));
-        }
+        builder.orAllOf(predicateList.toArray(new Predicate[0]));
 
         return builder;
     }

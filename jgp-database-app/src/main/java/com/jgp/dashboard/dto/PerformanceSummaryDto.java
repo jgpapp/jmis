@@ -1,14 +1,19 @@
 package com.jgp.dashboard.dto;
 
+import lombok.Builder;
+
 import java.math.BigDecimal;
 import java.util.List;
 
+@Builder
 public record PerformanceSummaryDto(
-        Integer year,
-        Integer month,
+        String summaryYear,
+        Integer yearNumber,
+        String summaryMonth,
+        Integer monthNumber,
+        String summaryQuarter,
         String genderCategory,
         String partner,
-        String quarter,
         String category,
         Integer businessesTrained,
         Integer businessesLoaned,

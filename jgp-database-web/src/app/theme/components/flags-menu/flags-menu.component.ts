@@ -5,6 +5,7 @@ import { MatMenuModule } from '@angular/material/menu';
 
 @Component({
     selector: 'app-flags-menu',
+    standalone: true,
     imports: [
         MatButtonModule,
         MatIconModule,

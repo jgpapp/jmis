@@ -12,7 +12,6 @@ import { MatCardModule } from '@angular/material/card';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatSort } from '@angular/material/sort';
-import { Subject, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { GlobalService } from '@services/shared/global.service';
 import { AuthService } from '@services/users/auth.service';
@@ -23,6 +22,7 @@ import { SubscriptionsContainer } from '../../theme/utils/subscriptions-containe
 
 @Component({
     selector: 'app-outcome-monitoring',
+    standalone: true,
     imports: [
         ContentHeaderComponent,
         FlexLayoutModule,
@@ -63,7 +63,7 @@ export class OutcomeMonitoringComponent implements OnDestroy, OnInit {
       getOutComeMonitoringDataRecords() {
         const partnerId = this.authService.currentUser()?.partnerId;
         if (partnerId) {
-          this.subs.add = this.monitoringService.getOutComeMonitoringDataRecords(this.pageIndex, this.pageSize, false)
+          this.subs.add = this.monitoringService.getOutComeMonitoringDataRecords(this.pageIndex, this.pageSize, 'PENDING_APPROVAL')
           .subscribe({
             next: (response) => {
               this.newMonitoringData = response.content;

@@ -269,8 +269,9 @@ public class Participant extends BaseEntity {
         }
     }
 
-    public void activateParticipant(){
+    public void activateParticipant(boolean isApproved) {
         this.isActive = Boolean.TRUE;
+        this.dataStatus = isApproved ? DataStatus.APPROVED : DataStatus.REJECTED;
     }
 
     public void incrementPrePaidAmount(BigDecimal additionalAmount){

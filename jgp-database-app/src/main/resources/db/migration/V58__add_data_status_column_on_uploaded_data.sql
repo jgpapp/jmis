@@ -28,3 +28,4 @@ ALTER TABLE ta_participants_data DROP COLUMN data_is_approved;
 ALTER TABLE loans DROP COLUMN data_is_approved;
 ALTER TABLE loan_transactions DROP COLUMN is_approved;
 ALTER TABLE outcome_monitoring DROP COLUMN is_approved;
+
