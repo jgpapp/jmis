@@ -10,7 +10,7 @@ import com.jgp.bmo.mapper.MentorshipMapper;
 import com.jgp.infrastructure.bulkimport.event.DataApprovedEvent;
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.domain.ParticipantRepository;
-import com.jgp.participant.dto.ParticipantRequestDto;
+import com.jgp.shared.domain.DataStatus;
 import com.jgp.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -47,34 +46,21 @@ public class MentorshipServiceImpl implements MentorshipService {
         this.mentorshipRepository.save(mentorship);
     }
 
-    @Transactional
-    @Override
-    public void saveMentorshipWithParticipant(Mentorship mentorship, Boolean updateParticipantInfo, Map<Long, ParticipantRequestDto> participantDtoMap) {
-        Participant participant = mentorship.getParticipant();
-        ParticipantRequestDto participantRequestDto = participantDtoMap.get(participant.getId());
-        if (Boolean.TRUE.equals(updateParticipantInfo)) {
-            participant.updateParticipant(participantRequestDto);
-        }
-        participant.updateBusinessLocation(participantRequestDto);
-        this.participantRepository.save(participant);
-        this.mentorshipRepository.save(mentorship);
-    }
-
     @Override
     public void approvedMentorShipData(List<Long> dataIds, Boolean approval) {
         var mentorshipData = this.mentorshipRepository.findAllById(dataIds);
         var currentUser = this.platformSecurityContext.getAuthenticatedUserIfPresent();
         var currentUserPartner = Objects.nonNull(currentUser) ? currentUser.getPartner() : null;
         if (dataIds.isEmpty() && Objects.nonNull(currentUserPartner)) {
-            mentorshipData = this.mentorshipRepository.findAll(this.mentorshipPredicateBuilder.buildPredicateForSearchMentorshipData(new MentorshipSearchCriteria(currentUserPartner.getId(), null, false)), Pageable.unpaged()).getContent();
+            mentorshipData = this.mentorshipRepository.findAll(this.mentorshipPredicateBuilder.buildPredicateForSearchMentorshipData(new MentorshipSearchCriteria(currentUserPartner.getId(), null, DataStatus.PENDING_APPROVAL.name())), Pageable.unpaged()).getContent();
         }
 
-        if (Boolean.TRUE.equals(approval)) {
+        if (Objects.nonNull(approval)) {
             int count = 0;
             var mentorshipsToSave = new ArrayList<Mentorship>();
             Set<LocalDate> dataDates = new HashSet<>();
             for (Mentorship mentorship : mentorshipData) {
-                mentorship.approveData(true, currentUser);
+                mentorship.approveData(approval, currentUser);
                 mentorshipsToSave.add(mentorship);
                 count++;
                 if (count % 20 == 0) { // Flush and clear the session every 20 entities
@@ -85,15 +71,19 @@ public class MentorshipServiceImpl implements MentorshipService {
                 dataDates.add(mentorship.getMentorShipDate());
             }
             this.mentorshipRepository.saveAllAndFlush(mentorshipsToSave);
-            if (Objects.nonNull(currentUserPartner)) {
+            if (Boolean.TRUE.equals(approval) && Objects.nonNull(currentUserPartner)) {
                 this.applicationContext.publishEvent(new DataApprovedEvent(Set.of(currentUserPartner.getId()), dataDates));
             }
-        }else {
-            rejectAndDeleteMentorshipData(mentorshipData);
         }
     }
 
-    private void rejectAndDeleteMentorshipData(List<Mentorship> mentorships){
+    @Override
+    public void deleteMentorShipDataByIds(List<Long> dataIds) {
+        var mentorshipData = this.mentorshipRepository.findAllById(dataIds);
+        deleteMentorshipData(mentorshipData);
+    }
+
+    private void deleteMentorshipData(List<Mentorship> mentorships){
         int count = 0;
         var mentorshipsToDelete = new ArrayList<Mentorship>();
         for (Mentorship mentorship : mentorships) {

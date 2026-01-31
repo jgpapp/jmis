@@ -14,6 +14,8 @@ public interface TADataService {
 
     void approvedBMOParticipantsData(List<Long> dataIds, Boolean approval);
 
+    void deleteBMOParticipantsDataByIds(List<Long> dataIds);
+
     Page<TAResponseDto> getBMODataRecords(TAParticipantSearchCriteria searchCriteria, Pageable pageable);
 
     TAResponseDto findBMODataById(Long bmoId);

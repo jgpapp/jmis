@@ -92,7 +92,6 @@ set selectedDashboardMode(value: string) {
    * Fetches data accordingly and sets charts based on fetched data.
    */
   getChartData() {
-    console.log('Fetching participant trends data for timescale:', this.selectedDashboardMode);
     merge(this.selectedDashboardMode).pipe(skip(1))
       .subscribe(() => {
         switch (this.selectedDashboardMode) {
@@ -127,6 +126,17 @@ set selectedDashboardMode(value: string) {
               const disbursedLoans = this.getCounts(data.disbursedLoansByMonth, monthLabels);
               this.setChart(monthLabels, businessesTrained, disbursedLoans);
               this.hideOutput = monthLabels.length === 0;
+            });
+            break;
+            case 'YEARLY':
+            const trainedParticipantsByYear = this.dashboardService.getBusinessesTrainedByTimeScale(this.dashBoardFilters, this.selectedDashboardMode);
+            const disbursedLoansByYear = this.dashboardService.getLoanDisbursedByTimeScale(this.dashBoardFilters, this.selectedDashboardMode);
+            forkJoin({trainedParticipantsByYear, disbursedLoansByYear}).subscribe((data: any) => {
+              const yearLabels = this.getLabels(data.trainedParticipantsByYear);
+              const businessesTrained = this.getCounts(data.trainedParticipantsByYear, yearLabels);
+              const disbursedLoans = this.getCounts(data.disbursedLoansByYear, yearLabels);
+              this.setChart(yearLabels, businessesTrained, disbursedLoans);
+              this.hideOutput = yearLabels.length === 0;
             });
             break;
         }

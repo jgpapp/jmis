@@ -5,9 +5,13 @@ import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.WeekFields;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Optional;
 
+import com.jgp.dashboard.dto.SummaryWeekMonthAndYearDto;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +42,7 @@ public abstract class CommonUtil {
     public static final String DAILY_TIME_SCALE = "DAILY";
     public static final String WEEKLY_TIME_SCALE = "WEEKLY";
     public static final String MONTHLY_TIME_SCALE = "MONTHLY";
+    public static final String YEARLY_TIME_SCALE = "YEARLY";
 
     @Value("${jgp.dashboard.default.view.period.in.months}")
     private Integer jgpDashboardDefaultViewPeriodInMonths;
@@ -233,8 +238,8 @@ public abstract class CommonUtil {
         return new ImmutablePair<>(LocalDate.now(ZoneId.systemDefault()).minusMonths(6), LocalDate.now());
     }
 
-    public static Pair<LocalDate, LocalDate> getTodayMinusCustomMonthsDates(long months) {
-        return new ImmutablePair<>(LocalDate.now(ZoneId.systemDefault()).minusMonths(months), LocalDate.now());
+    public static Pair<LocalDate, LocalDate> getTodayMinusCustomMonthsDates(long days) {
+        return new ImmutablePair<>(LocalDate.now(ZoneId.systemDefault()).minusDays(days), LocalDate.now());
     }
 
     public static Pair<LocalDate, LocalDate> getTimeScaledDataRestrictedDates(String timeScale, LocalDate fromDate, LocalDate toDate) {
@@ -244,6 +249,8 @@ public abstract class CommonUtil {
             return new ImmutablePair<>(fromDate, fromDate.plusMonths(2));
         } else if (MONTHLY_TIME_SCALE.equals(timeScale) && fromDate.plusMonths(6).isBefore(toDate)) {
             return new ImmutablePair<>(fromDate, fromDate.plusMonths(6));
+        }else if (YEARLY_TIME_SCALE.equals(timeScale) && fromDate.plusYears(3).isBefore(toDate)) {
+            return new ImmutablePair<>(fromDate, fromDate.plusYears(3));
         }
         return new ImmutablePair<>(fromDate, toDate);
     }
@@ -276,5 +283,41 @@ public abstract class CommonUtil {
             }
         }
         return new ImmutablePair<>(minDate, maxDate);
+    }
+
+    public static Pair<Integer, String> getYearQuarterFromMonth(Integer month) {
+        return switch (month){
+            case 1, 2, 3 -> new ImmutablePair<>(1, "Qtr 1");
+            case 4, 5, 6 -> new ImmutablePair<>(2, "Qtr 2");
+            case 7, 8, 9 -> new ImmutablePair<>(3, "Qtr 3");
+            case 10, 11, 12 -> new ImmutablePair<>(4, "Qtr 4");
+            default -> new ImmutablePair<>(0, "Unknown");
+        };
+    }
+
+
+    public static SummaryWeekMonthAndYearDto getSummaryWeekMonthAndYear(LocalDate summaryDate){
+        // Get the start of the week (Monday)
+        WeekFields weekFields = WeekFields.ISO;
+        LocalDate weekStart = summaryDate.with(weekFields.dayOfWeek(), 1);
+        // Get the end of the week (Sunday)
+        LocalDate weekEnd = weekStart.plusDays(6);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd", Locale.ENGLISH);
+        String start = weekStart.format(formatter);
+        String end = weekEnd.format(formatter);
+
+        final var quarter = CommonUtil.getYearQuarterFromMonth(summaryDate.getMonthValue());
+        DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("MMMM-yyyy", Locale.ENGLISH);
+        return SummaryWeekMonthAndYearDto.builder()
+                .summaryYear("%d".formatted(summaryDate.getYear()))
+                .yearNumber(summaryDate.getYear())
+                .summaryQuarter(quarter.getRight())
+                .quarterNumber(quarter.getLeft())
+                .summaryMonth(summaryDate.format(monthFormatter))
+                .monthNumber(summaryDate.getMonthValue())
+                .summaryWeek("%s - %s".formatted(start, end))
+                .weekNumber(summaryDate.get(weekFields.weekOfWeekBasedYear()))
+                .build();
     }
 }

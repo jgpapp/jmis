@@ -6,6 +6,7 @@ import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.participant.domain.Participant;
 import com.jgp.patner.domain.Partner;
 import com.jgp.shared.domain.BaseEntity;
+import com.jgp.shared.domain.DataStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -111,9 +112,6 @@ public class Loan extends BaseEntity {
     @Column(name = "unique_values")
     private String uniqueValues;
 
-    @Column(name = "data_is_approved")
-    private boolean isDataApprovedByPartner;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "approval_by_id")
     private AppUser approvalBy;
@@ -127,6 +125,10 @@ public class Loan extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "upload_doc_id")
     private Document document;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "data_status")
+    private DataStatus dataStatus;
 
     private transient Integer rowIndex;
 
@@ -150,10 +152,10 @@ public class Loan extends BaseEntity {
         this.loanAmountRepaid = dto.loanAmountRepaid();
         this.loanerType = dto.loanerType();
         this.loanProduct = dto.loanProduct();
-        this.isDataApprovedByPartner = false;
         this.setCreatedBy(dto.createdBy());
         this.document = dto.document();
         this.addLoanTransaction(dto.loanTransaction());
+        this.dataStatus = DataStatus.PENDING_APPROVAL;
     }
 
     public void addLoanTransaction(LoanTransaction loanTransaction){
@@ -163,10 +165,10 @@ public class Loan extends BaseEntity {
         }
     }
 
-    public void approveData(Boolean approval, AppUser user){
-        this.isDataApprovedByPartner = approval;
+    public void approveData(boolean approval, AppUser user){
         this.approvalBy = user;
         this.dateApproved = LocalDate.now(ZoneId.systemDefault());
+        this.dataStatus = approval ? DataStatus.APPROVED : DataStatus.REJECTED;
     }
 
     @Getter

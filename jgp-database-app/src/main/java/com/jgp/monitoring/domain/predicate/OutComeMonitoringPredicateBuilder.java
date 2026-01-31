@@ -1,6 +1,7 @@
 package com.jgp.monitoring.domain.predicate;
 
 import com.jgp.monitoring.domain.QOutComeMonitoring;
+import com.jgp.shared.domain.DataStatus;
 import com.jgp.util.CommonUtil;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
@@ -25,7 +26,6 @@ public class OutComeMonitoringPredicateBuilder {
 
         List<Predicate> predicateList = new ArrayList<>();
 
-        predicateList.add(qOutComeMonitoring.isDeleted.isFalse());
         if (null != searchCriteria.fromDate() && null != searchCriteria.toDate()) {
             predicateList.add(qOutComeMonitoring.surveyDate.between(searchCriteria.fromDate(), searchCriteria.toDate()));
         }
@@ -49,8 +49,10 @@ public class OutComeMonitoringPredicateBuilder {
         if (null != searchCriteria.region()) {
             predicateList.add(qOutComeMonitoring.region.eq(searchCriteria.region()));
         }
-        if (null != searchCriteria.approved()) {
-            predicateList.add(qOutComeMonitoring.isDataApproved.eq(searchCriteria.approved()));
+        if (null != DataStatus.getDataStatus(searchCriteria.dataStatus())) {
+            predicateList.add(qOutComeMonitoring.dataStatus.eq(DataStatus.getDataStatus(searchCriteria.dataStatus())));
+        }else {
+            predicateList.add(qOutComeMonitoring.dataStatus.eq(DataStatus.APPROVED));
         }
 
         if (null != searchCriteria.participantId()) {

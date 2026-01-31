@@ -23,7 +23,6 @@ import { RouterModule } from '@angular/router';
 import { NoPermissionComponent } from '../errors/no-permission/no-permission.component';
 import { AuthService } from '@services/users/auth.service';
 import { HasPermissionDirective } from '../../directives/has-permission.directive';
-import { Subject, takeUntil } from 'rxjs';
 import { SubscriptionsContainer } from '../../theme/utils/subscriptions-container';
 
 @Component({

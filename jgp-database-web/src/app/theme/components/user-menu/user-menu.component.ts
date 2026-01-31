@@ -10,6 +10,7 @@ import { AuthService } from '@services/users/auth.service';
 
 @Component({
     selector: 'app-user-menu',
+    standalone: true,
     imports: [
         RouterModule,
         FlexLayoutModule,

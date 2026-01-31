@@ -15,7 +15,6 @@ import { GlobalService } from '@services/shared/global.service';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { HasPermissionDirective } from '../../directives/has-permission.directive';
-import { Subject, takeUntil } from 'rxjs';
 import { ConfirmDialogModel } from '../../dto/confirm-dialog-model';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -67,7 +66,7 @@ export class LendingDataComponent implements OnDestroy, OnInit {
   getAvailableNewLendingData() {
     const partnerId = this.authService.currentUser()?.partnerId;
     if (partnerId) {
-      this.subs.add = this.loanService.getLoanTransactions(this.pageIndex, this.pageSize, false, partnerId)
+      this.subs.add = this.loanService.getLoanTransactions(this.pageIndex, this.pageSize, 'PENDING_APPROVAL', partnerId)
         .subscribe({
           next: (response) => {
             this.newLoansData = response.content;
