@@ -13,6 +13,7 @@ import com.jgp.finance.domain.LoanRepository;
 import com.jgp.finance.mapper.LoanTransactionMapper;
 import com.jgp.infrastructure.bulkimport.event.DataApprovedEvent;
 import com.jgp.participant.domain.ParticipantRepository;
+import com.jgp.shared.domain.DataStatus;
 import com.jgp.shared.exception.DataRulesViolationException;
 import com.jgp.shared.exception.ResourceNotFound;
 import com.jgp.util.CommonUtil;
@@ -73,28 +74,28 @@ public class LoanServiceImpl implements LoanService {
         var currentUser = this.platformSecurityContext.getAuthenticatedUserIfPresent();
         var currentUserPartner = Objects.nonNull(currentUser) ? currentUser.getPartner() : null;
         if (transactionsIds.isEmpty() && Objects.nonNull(currentUserPartner)) {
-            loanTransactions =  this.loanTransactionRepository.getLoanTransactions(currentUserPartner.getId(), false, Pageable.unpaged()).getContent();
+            loanTransactions =  this.loanTransactionRepository.getLoanTransactions(currentUserPartner.getId(), DataStatus.PENDING_APPROVAL, Pageable.unpaged()).getContent();
         }
 
-        if (Boolean.TRUE.equals(approval)) {
+        if (Objects.nonNull(approval)) {
             int count = 0;
             var loansToSave = new ArrayList<Loan>();
             Set<LocalDate> dataDates = new HashSet<>();
             for (var loanTransaction : loanTransactions) {
                 var loan = loanTransaction.getLoan();
-                if (!loan.isDataApprovedByPartner()) {
-                    loan.approveData(true, currentUser);
+                if (DataStatus.PENDING_APPROVAL.equals(loan.getDataStatus())) {
+                    loan.approveData(approval, currentUser);
                 }
                 var participant = loan.getParticipant();
-                if (Boolean.FALSE.equals(participant.getIsActive())) {
-                    participant.activateParticipant();
+                if (DataStatus.PENDING_APPROVAL.equals(participant.getDataStatus())) {
+                    participant.activateParticipant(approval);
                 }
                 participant.incrementPrePaidAmount(loanTransaction.getOutStandingAmount().compareTo(BigDecimal.ZERO) < 0 ? loanTransaction.getOutStandingAmount().negate() : BigDecimal.ZERO);
 
 
                 var transaction = loan.getLoanTransactions().stream()
                         .filter(txn -> loanTransaction.getId().equals(txn.getId())).findFirst().orElse(null);
-                if (Objects.nonNull(transaction) && !transaction.isApproved()) {
+                if (Objects.nonNull(transaction) && !DataStatus.APPROVED.equals(transaction.getDataStatus())) {
                     transaction.approveData(approval, currentUser);
                 }
                 loansToSave.add(loan);
@@ -107,15 +108,19 @@ public class LoanServiceImpl implements LoanService {
                 dataDates.add(loan.getDateDisbursed());
             }
             this.loanRepository.saveAllAndFlush(loansToSave);
-            if (Objects.nonNull(currentUserPartner)) {
+            if (Boolean.TRUE.equals(approval) && Objects.nonNull(currentUserPartner)) {
                 this.applicationContext.publishEvent(new DataApprovedEvent(Set.of(currentUserPartner.getId()), dataDates));
             }
-        }else {
-            rejectAndDeleteTransactions(loanTransactions);
         }
     }
 
-    private void rejectAndDeleteTransactions(List<LoanTransaction> transactions){
+    @Override
+    public void deleteTransactionsLoans(List<Long> transactionsIds) {
+        var loanTransactions = this.loanTransactionRepository.findAllById(transactionsIds);
+        deleteTransactions(loanTransactions);
+    }
+
+    private void deleteTransactions(List<LoanTransaction> transactions){
         int count = 0;
         var loanTransactionsToDelete = new ArrayList<LoanTransaction>();
         for (LoanTransaction loanTransaction : transactions) {
@@ -158,14 +163,14 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
-    public Page<LoanTransactionResponseDto> getAvailableLoanTransactions(Long partnerId, Long loanId, Boolean isApproved, Pageable pageable) {
+    public Page<LoanTransactionResponseDto> getAvailableLoanTransactions(Long partnerId, Long loanId, DataStatus dataStatus, Pageable pageable) {
         Page<LoanTransaction> transactions;
         if (Objects.nonNull(loanId)){
             final var loan = this.loanRepository.findById(loanId).orElseThrow(() -> new ResourceNotFound(HttpStatus.NOT_FOUND));
             final var txns = loan.getLoanTransactions().stream().toList();
             transactions = new PageImpl<>(txns, pageable, txns.size());
         }else {
-            transactions =  this.loanTransactionRepository.getLoanTransactions(partnerId, isApproved, pageable);
+            transactions =  this.loanTransactionRepository.getLoanTransactions(partnerId, dataStatus, pageable);
         }
         return new PageImpl<>(this.loanTransactionMapper.toDto(transactions.stream().toList()), pageable, transactions.getTotalElements());
     }

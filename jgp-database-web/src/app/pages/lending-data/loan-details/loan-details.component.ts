@@ -11,13 +11,14 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { HasPermissionDirective } from '../../../directives/has-permission.directive';
-import { map, Observable, Subject, takeUntil } from 'rxjs';
+import { map, Observable} from 'rxjs';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { LoanService } from '@services/data-management/loan.service';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({
     selector: 'app-loan-details',
+    standalone: true,
     imports: [
         MatCardModule,
         ContentHeaderComponent,
@@ -58,7 +59,7 @@ export class LoanDetailsComponent {
           next: (response) => {
             this.loanId = response.id;
             if (this.loanId) {
-              this.subs.add = this.loanService.getLoanTransactions(this.pageIndex, this.pageSize, false, undefined, this.loanId)
+              this.subs.add = this.loanService.getLoanTransactions(this.pageIndex, this.pageSize, 'PENDING_APPROVAL', undefined, this.loanId)
                 .subscribe({
                   next: (response) => {
                     this.loanTransactions = response.content;

@@ -6,6 +6,6 @@ import lombok.Builder;
 public record TAParticipantSearchCriteria(
         Long partnerId,
         Long participantId,
-        Boolean approvedByPartner
+        String dataStatus
 ) {
 }

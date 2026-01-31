@@ -9,14 +9,14 @@ export class BMOClientDataService {
 
     constructor(private httpClient: HttpClient) { }
 
-      getAvailableBMOClientData(page: number, size: number, approvedByPartner: Boolean, partnerId: number | undefined): Observable<any> {
+      getAvailableBMOClientData(page: number, size: number, dataStatus: string, partnerId: number | undefined): Observable<any> {
         const params = new HttpParams()
               .set('pageNumber', page.toString())
               .set('pageSize', size.toString());
         if(partnerId){
-          return this.httpClient.get(`/bmos?partnerId=${partnerId}&approvedByPartner=${approvedByPartner}`, { params });
+          return this.httpClient.get(`/bmos?partnerId=${partnerId}&dataStatus=${dataStatus}`, { params });
         }
-        return this.httpClient.get(`/bmos?approvedByPartner=${approvedByPartner}`, { params });
+        return this.httpClient.get(`/bmos?dataStatus=${dataStatus}`, { params });
       }
 
       approveBMOClientData(bmoIds: number[]): Observable<any> {

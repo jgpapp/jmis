@@ -11,6 +11,7 @@ import { AuthService } from '@services/users/auth.service';
 
 @Component({
     selector: 'app-vertical-menu',
+    standalone: true,
     imports: [
         RouterModule,
         FlexLayoutModule,

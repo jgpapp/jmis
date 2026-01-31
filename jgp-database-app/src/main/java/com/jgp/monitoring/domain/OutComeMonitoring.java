@@ -5,8 +5,11 @@ import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.monitoring.dto.OutComeMonitoringRequestDto;
 import com.jgp.participant.domain.Participant;
 import com.jgp.shared.domain.BaseEntity;
+import com.jgp.shared.domain.DataStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -255,9 +258,6 @@ public class OutComeMonitoring extends BaseEntity {
     @Column(name = "market_challenges")
     private String marketChallenges;
 
-    @Column(name = "is_approved")
-    private boolean isDataApproved;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "approval_by_id")
     private AppUser approvalBy;
@@ -268,6 +268,10 @@ public class OutComeMonitoring extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "upload_doc_id")
     private Document document;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "data_status")
+    private DataStatus dataStatus;
 
     private transient Integer rowIndex;
 
@@ -349,12 +353,13 @@ public class OutComeMonitoring extends BaseEntity {
         this.rowIndex = dto.rowIndex();
         this.document = dto.document();
         this.setCreatedBy(dto.createdBy());
+        this.dataStatus = DataStatus.PENDING_APPROVAL;
     }
 
-    public void approveData(Boolean approval, AppUser user){
-        this.isDataApproved = approval;
+    public void approveData(boolean approval, AppUser user){
         this.approvalBy = user;
         this.dateApproved = LocalDate.now(ZoneId.systemDefault());
+        this.dataStatus = approval ? DataStatus.APPROVED : DataStatus.REJECTED;
     }
 
     @Override

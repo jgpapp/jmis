@@ -1,9 +1,7 @@
 package com.jgp.shared.validator;
 
 import com.jgp.participant.dto.ParticipantRequestDto;
-import com.jgp.util.CommonUtil;
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 

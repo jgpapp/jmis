@@ -114,7 +114,7 @@ public class DataValidator {
                 phoneNumber = String.format("+%s", phoneNumber);
             }
             PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
-            Phonenumber.PhoneNumber phone = phoneNumberUtil.parse(phoneNumber, "KE");
+            Phonenumber.PhoneNumber phone = phoneNumberUtil.parse(phoneNumber, Phonenumber.PhoneNumber.CountryCodeSource.UNSPECIFIED.name());
             if (!phoneNumberUtil.isValidNumber(phone)) {
                 rowErrorMap.put(row.getRowNum(), "Invalid Kenyan phone number provided !!");
                 return phoneNumber;
