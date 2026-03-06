@@ -131,7 +131,7 @@ public class Participant extends BaseEntity {
         this.jgpId = dto.jgpId();
         this.phoneNumber = dto.phoneNumber();
         this.alternativePhoneNumber = dto.alternativePhoneNumber();
-        this.ownerGender = translateGender(dto.ownerGender());
+        this.ownerGender = Gender.fromString(dto.ownerGender());
         this.ownerAge = dto.ownerAge();
         this.businessLocation = dto.businessLocation();
         this.industrySector = dto.industrySector();
@@ -172,7 +172,7 @@ public class Participant extends BaseEntity {
             this.alternativePhoneNumber = dto.alternativePhoneNumber().trim();
         }
         if (StringUtils.isNotBlank(dto.ownerGender())){
-            this.ownerGender = translateGender(dto.ownerGender().trim());
+            this.ownerGender = Gender.fromString(dto.ownerGender());
         }
         if (Objects.nonNull(dto.ownerAge())){
             this.ownerAge = dto.ownerAge();
@@ -275,16 +275,6 @@ public class Participant extends BaseEntity {
         this.prePayment = Objects.nonNull(this.prePayment) ? this.prePayment.add(additionalAmount) : additionalAmount;
     }
 
-    private static Gender translateGender(String genderString){
-        Participant.Gender genderEnum = null;
-        try {
-            genderEnum = StringUtils.isBlank(genderString) ? Participant.Gender.OTHER : Participant.Gender.valueOf(genderString.toUpperCase());
-        }catch (Exception e){
-            genderEnum = Participant.Gender.OTHER;
-        }
-        return genderEnum;
-    }
-
     @Getter
     @RequiredArgsConstructor
     public enum Gender {
@@ -295,6 +285,15 @@ public class Participant extends BaseEntity {
         OTHER("Other");
 
         private final String name;
+
+        public static Gender fromString(String genderString){
+            for (Gender gender : Gender.values()){
+                if (gender.name().equalsIgnoreCase(genderString.trim())) {
+                    return gender;
+                }
+            }
+            return OTHER;
+        }
     }
 
     @Getter
