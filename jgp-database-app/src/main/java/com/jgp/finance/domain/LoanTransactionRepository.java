@@ -1,5 +1,6 @@
 package com.jgp.finance.domain;
 
+import com.jgp.shared.domain.DataStatus;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,8 +18,8 @@ import java.util.List;
 public interface LoanTransactionRepository extends JpaRepository<LoanTransaction, Long>, JpaSpecificationExecutor<LoanTransaction>, QuerydslPredicateExecutor<LoanTransaction> {
 
 
-    @Query("select l from LoanTransaction l where l.loan.partner.id = ?1 and l.isApproved = ?2")
-    Page<LoanTransaction> getLoanTransactions(@NonNull Long partnerId, boolean isApproved, Pageable pageable);
+    @Query("select l from LoanTransaction l where l.loan.partner.id = ?1 and l.dataStatus = ?2")
+    Page<LoanTransaction> getLoanTransactions(@NonNull Long partnerId, DataStatus dataStatus, Pageable pageable);
 
     @Transactional
     @Modifying

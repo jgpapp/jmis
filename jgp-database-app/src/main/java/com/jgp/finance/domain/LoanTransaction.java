@@ -2,6 +2,7 @@ package com.jgp.finance.domain;
 
 import com.jgp.authentication.domain.AppUser;
 import com.jgp.shared.domain.BaseEntity;
+import com.jgp.shared.domain.DataStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -58,9 +59,6 @@ public class LoanTransaction extends BaseEntity implements Comparable<LoanTransa
     @Column(name = "out_standing_amount", scale = 4, precision = 19, nullable = false)
     private BigDecimal outStandingAmount;
 
-    @Column(name = "is_approved")
-    private boolean isApproved;
-
     @Column(name = "is_given_in_tranches")
     private boolean isGivenInTranches;
 
@@ -71,6 +69,10 @@ public class LoanTransaction extends BaseEntity implements Comparable<LoanTransa
     @Column(name = "date_approved")
     private LocalDate dateApproved;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "data_status")
+    private DataStatus dataStatus;
+
     public LoanTransaction() {
     }
 
@@ -80,15 +82,15 @@ public class LoanTransaction extends BaseEntity implements Comparable<LoanTransa
         this.amount = amount;
         this.outStandingAmount = outStandingAmount;
         this.tranchName = tranchName;
-        this.isApproved = false;
         this.setCreatedBy(createdBy);
         this.isGivenInTranches = isGivenInTranches;
+        this.dataStatus = DataStatus.PENDING_APPROVAL;
     }
 
-    public void approveData(Boolean approval, AppUser user){
-        this.isApproved = approval;
+    public void approveData(boolean approval, AppUser user){
         this.approvalBy = user;
         this.dateApproved = LocalDate.now(ZoneId.systemDefault());
+        this.dataStatus = approval ? DataStatus.APPROVED : DataStatus.REJECTED;
     }
 
     @Override

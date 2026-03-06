@@ -15,7 +15,6 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SelectionModel } from '@angular/cdk/collections';
 import { HasPermissionDirective } from '../../../directives/has-permission.directive';
 import { GlobalService } from '@services/shared/global.service';
-import { Subject, takeUntil } from 'rxjs';
 import { ConfirmDialogModel } from '../../../dto/confirm-dialog-model';
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -23,6 +22,7 @@ import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-conta
 
 @Component({
     selector: 'app-data-list',
+    standalone: true,
     imports: [
         ContentHeaderComponent,
         FlexLayoutModule,
@@ -56,7 +56,7 @@ export class DataListComponent implements OnDestroy{
   constructor(private bmoClientDataService: BMOClientDataService, public authService: AuthService, private gs: GlobalService, private dialog: MatDialog) { }
 
   getAvailableBMOClientData() {
-    this.subs.add = this.bmoClientDataService.getAvailableBMOClientData(this.pageIndex, this.pageSize, false, this.authService.currentUser()?.partnerId)
+    this.subs.add = this.bmoClientDataService.getAvailableBMOClientData(this.pageIndex, this.pageSize, 'PENDING_APPROVAL', this.authService.currentUser()?.partnerId)
       .subscribe({
         next: (response) => {
           this.bmoClientsData = response.content;

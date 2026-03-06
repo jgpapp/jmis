@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { ContentHeaderComponent } from '../../theme/components/content-header/content-header.component';
@@ -7,7 +7,6 @@ import { MatSort } from '@angular/material/sort';
 import { RouterModule } from '@angular/router';
 import { NoPermissionComponent } from '../errors/no-permission/no-permission.component';
 import { AuthService } from '@services/users/auth.service';
-import { Subject, takeUntil } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
@@ -18,6 +17,7 @@ import { SubscriptionsContainer } from '../../theme/utils/subscriptions-containe
 
 @Component({
     selector: 'app-clients',
+    standalone: true,
     imports: [
         MatTableModule,
         MatPaginatorModule,
@@ -53,7 +53,6 @@ export class ClientsComponent implements OnInit, OnDestroy{
     this.subs.add = this.clientService.getAvailableClients(this.searchText, this.pageIndex, this.pageSize)
       .subscribe({
         next: (response) => {
-          console.log(response);
           this.participants = response.content;
           this.dataSource = new MatTableDataSource(this.participants);
           this.totalItems = response.totalElements;

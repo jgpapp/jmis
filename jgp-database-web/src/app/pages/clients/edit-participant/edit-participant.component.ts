@@ -12,7 +12,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
-import { map, Subject, takeUntil } from 'rxjs';
+import { map } from 'rxjs';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 import { MatCardModule } from '@angular/material/card';
 import { GlobalService } from '@services/shared/global.service';
@@ -22,6 +22,7 @@ import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-conta
 
 @Component({
     selector: 'app-edit-participant',
+    standalone: true,
     imports: [
         ReactiveFormsModule,
         FlexLayoutModule,

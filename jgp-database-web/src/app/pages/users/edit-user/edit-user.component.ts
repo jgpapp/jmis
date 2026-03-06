@@ -17,7 +17,7 @@ import { GlobalService } from '@services/shared/global.service';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 import { MatCardModule } from '@angular/material/card';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map, Subject, takeUntil } from 'rxjs';
+import { map } from 'rxjs';
 import { UserRoleService } from '@services/users/userroles.service';
 import { UserService } from '@services/users/user.service';
 import { User } from '../../../common/models/user.model';

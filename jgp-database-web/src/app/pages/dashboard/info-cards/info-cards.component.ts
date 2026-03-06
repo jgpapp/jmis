@@ -202,13 +202,11 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
   public mentorshipDeliveryModeSummaryYAxisLabel: string = 'Count';
   public mentorshipDeliveryModeSummaryChartTitle: string = 'Delivery Mode Distribution';
 
-  public trainedAndTookLoanCountSummary2: any[];
-  public trainedAndTookLoanCountSummaryShowGridLines: boolean = true;
-  public trainedAndTookLoanCountSummaryRoundDomains: boolean = true;
-  public trainedAndTookLoanCountSummaryShowLegend: boolean = false;
-  public trainedAndTookLoanCountSummaryChartTitle2: string = 'Businesses Trained And Taken Loan';
-
   public trainedAndTookLoanCountSummary: any[];
+  public trainedAndTookLoanCountSummaryShowLegend: boolean = false;
+  public trainedAndTookLoanCountSummaryShowLabels: boolean = true;
+  public trainedAndTookLoanCountSummaryExplodeSlices: boolean = false;
+  public trainedAndTookLoanCountSummaryDoughnut: boolean = false;
   public trainedAndTookLoanCountSummaryChartTitle: string = 'Businesses Trained And Taken Loan';
 
   public mentorshipByDisabilitySummary: any[];
@@ -914,18 +912,27 @@ export class InfoCardsComponent implements OnInit, AfterViewChecked, OnChanges, 
     this.dashBoardService.openExpandedChartDialog(this.dialog, data);
   }
 
-  expandTrainedAndTookLoanCountSummary(){
+   expandTrainedAndTookLoanCountSummary(){
     const data = { 
       content: this.trainedAndTookLoanCountSummaryContentDiv.nativeElement.cloneNode(true),
-      chartType: 'ngx-charts-tree-map',
+      chartType: 'app-pie-chart',
       chartData: this.trainedAndTookLoanCountSummary,
+      chartShowLegend: this.trainedAndTookLoanCountSummaryShowLegend,
       chartSColorScheme: this.chartSColorScheme,
+      chartShowLabels: this.trainedAndTookLoanCountSummaryShowLabels,
+      chartExplodeSlices: this.trainedAndTookLoanCountSummaryExplodeSlices,
+      chartIsDoughnut: this.trainedAndTookLoanCountSummaryDoughnut,
+      labelFormatting: this.valueFormatting,
       chartTitle: this.trainedAndTookLoanCountSummaryChartTitle,
-      chartGradient: this.gradient,
-      chartFormatLabel: this.valueFormatting,
+      chartFormatLabel: (label: string): string => {
+        // Find the data object by name and return the value instead of name
+        const item = this.trainedAndTookLoanCountSummary.find(data => data.name === label);
+        return item ? `${this.valueFormatting(item.value)}` : label; // If found, return the value; otherwise return the name as fallback
+      }
     };
     this.dashBoardService.openExpandedChartDialog(this.dialog, data);
   }
+
 
   expandMentorshipGenderSummaryPieChart(){
     const data = { 

@@ -9,6 +9,7 @@ import { AuthService } from '@services/users/auth.service';
 
 @Component({
     selector: 'app-sidenav',
+    standalone: true,
     imports: [
         FlexLayoutModule,
         NgScrollbarModule,

@@ -14,8 +14,8 @@ public record OutComeMonitoringSearchCriteria(
         String jgpIntervention,
         String countyCode,
         String region,
-        Boolean approved,
         String partner,
         Long participantId,
-        String summarizingColumn) {
+        String summarizingColumn,
+        String dataStatus) {
 }

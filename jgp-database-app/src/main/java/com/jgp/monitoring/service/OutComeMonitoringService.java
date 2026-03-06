@@ -31,6 +31,13 @@ public interface OutComeMonitoringService {
     void approvedOutComeMonitoringData(List<Long> dataIds, Boolean approval);
 
     /**
+     * Deletes a list of OutComeMonitoring records based on their IDs.
+     *
+     * @param dataIds the list of IDs of the OutComeMonitoring records to delete
+     */
+    void deleteOutComeMonitoringDataByIds(List<Long> dataIds);
+
+    /**
      * Retrieves a paginated list of OutComeMonitoring records based on search criteria.
      *
      * @param searchCriteria the criteria to filter the OutComeMonitoring records

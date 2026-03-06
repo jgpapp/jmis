@@ -16,6 +16,7 @@ import { DashboardService } from '@services/dashboard/dashboard.service';
 
 @Component({
     selector: 'app-client-details',
+    standalone: true,
     imports: [
         MatCardModule,
         ContentHeaderComponent,

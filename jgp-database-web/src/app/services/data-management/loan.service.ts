@@ -9,21 +9,21 @@ export class LoanService {
 
     constructor(private httpClient: HttpClient) { }
 
-      getAvailableLendingData(page: number, size: number, approvedByPartner: Boolean, partnerId: number | undefined): Observable<any> {
+      getAvailableLendingData(page: number, size: number, dataStatus: string, partnerId: number | undefined): Observable<any> {
         const params = new HttpParams()
               .set('pageNumber', page.toString())
               .set('pageSize', size.toString());
         if(partnerId){
-          return this.httpClient.get(`/loans?partnerId=${partnerId}&approvedByPartner=${approvedByPartner}`, { params });
+          return this.httpClient.get(`/loans?partnerId=${partnerId}&dataStatus=${dataStatus}`, { params });
         }
-        return this.httpClient.get(`/loans?approvedByPartner=${approvedByPartner}`, { params });
+        return this.httpClient.get(`/loans?dataStatus=${dataStatus}`, { params });
       }
 
-      getLoanTransactions(page: number, size: number, isApproved: Boolean, partnerId: number | undefined, loanId: number | undefined = undefined): Observable<any> {
+      getLoanTransactions(page: number, size: number, dataStatus: string, partnerId: number | undefined, loanId: number | undefined = undefined): Observable<any> {
         let params = new HttpParams()
               .set('pageNumber', page.toString())
               .set('pageSize', size.toString())
-              .set('isApproved', isApproved.toString());
+              .set('dataStatus', dataStatus);
               if(loanId){
                 params = params.set('loanId', loanId.toString());
               }

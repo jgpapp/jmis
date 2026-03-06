@@ -31,13 +31,13 @@ public class OutComeMonitoringController {
     private final OutComeMonitoringService outComeMonitoringService;
 
     @GetMapping
-    public ResponseEntity<Page<OutComeMonitoringResponseDto>> getOutComeMonitoringDataRecords(@RequestParam(name = "approved", required = false) Boolean approved,
+    public ResponseEntity<Page<OutComeMonitoringResponseDto>> getOutComeMonitoringDataRecords(@RequestParam(name = "dataStatus", required = false) String dataStatus,
                                                                                               @RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
                                                                                               @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
         final var sortedByDateCreated =
                 PageRequest.of(pageNumber, pageSize, Sort.by("dateCreated").descending());
         final var searchCriteria = OutComeMonitoringSearchCriteria.builder()
-                .approved(approved)
+                .dataStatus(dataStatus)
                 .build();
         return new ResponseEntity<>(this.outComeMonitoringService.getOutComeMonitoringDataRecords(searchCriteria, sortedByDateCreated), HttpStatus.OK);
     }

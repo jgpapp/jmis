@@ -17,6 +17,7 @@ import com.jgp.participant.dto.ParticipantRequestDto;
 import com.jgp.participant.dto.ParticipantResponseDto;
 import com.jgp.participant.exception.ParticipantNotFoundException;
 import com.jgp.participant.mapper.ParticipantMapper;
+import com.jgp.shared.domain.DataStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -124,11 +125,11 @@ public class ParticipantServiceImpl implements ParticipantService {
                 .orElseThrow(() -> new ParticipantNotFoundException(participantId));
 
         if (includeAccounts){
-            participant.setLoanResponseDtos(this.loanService.getLoans(LoanSearchCriteria.builder().participantId(participantId).approvedByPartner(true).build(), Pageable.unpaged()).stream().toList());
-            participant.setBmoClientDtos(this.bmoClientDataService.getBMODataRecords(TAParticipantSearchCriteria.builder().approvedByPartner(true).participantId(participantId).build(), Pageable.unpaged()).stream().toList());
-            participant.setMentorshipResponseDtos(this.mentorshipService.getMentorshipDataRecords(MentorshipSearchCriteria.builder().approvedByPartner(true).participantId(participantId).build(), Pageable.unpaged()).stream().toList());
+            participant.setLoanResponseDtos(this.loanService.getLoans(LoanSearchCriteria.builder().participantId(participantId).dataStatus(DataStatus.APPROVED.name()).build(), Pageable.unpaged()).stream().toList());
+            participant.setBmoClientDtos(this.bmoClientDataService.getBMODataRecords(TAParticipantSearchCriteria.builder().dataStatus(DataStatus.APPROVED.name()).participantId(participantId).build(), Pageable.unpaged()).stream().toList());
+            participant.setMentorshipResponseDtos(this.mentorshipService.getMentorshipDataRecords(MentorshipSearchCriteria.builder().dataStatus(DataStatus.APPROVED.name()).participantId(participantId).build(), Pageable.unpaged()).stream().toList());
             participant.setMonitoringResponseDtos(this.outComeMonitoringService.getOutComeMonitoringDataRecords(OutComeMonitoringSearchCriteria.builder()
-                            .approved(true)
+                            .dataStatus(DataStatus.APPROVED.name())
                             .participantId(participantId)
                             .build(), Pageable.unpaged()).stream().toList());
         }
@@ -139,7 +140,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Override
     public Page<Participant> availableParticipants(String searchText, Pageable pageable) {
         final var qParticipant = QParticipant.participant;
-        var isActive = qParticipant.isActive.eq(true).and(qParticipant.isDeleted.isFalse());
+        var isActive = qParticipant.isActive.eq(true);
         if (null != searchText) {
             var partnerNamePredicate = qParticipant.participantName.containsIgnoreCase(searchText);
             var businessNamePredicate = qParticipant.businessName.containsIgnoreCase(searchText);

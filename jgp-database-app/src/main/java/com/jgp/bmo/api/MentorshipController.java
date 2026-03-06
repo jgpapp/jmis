@@ -31,12 +31,12 @@ public class MentorshipController {
     @GetMapping
     public ResponseEntity<Page<MentorshipResponseDto>> getMentorshipDataRecords(@RequestParam(name = "partnerId", required = false) Long partnerId,
                                                                                   @RequestParam(name = "participantId", required = false) Long participantId,
-                                                                                  @RequestParam(name = "approvedByPartner", required = false) Boolean approvedByPartner,
+                                                                                  @RequestParam(name = "dataStatus", required = false) String dataStatus,
                                                                                   @RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
                                                                                   @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
         final var sortedByDateCreated =
                 PageRequest.of(pageNumber, pageSize, Sort.by("dateCreated").descending());
-        return new ResponseEntity<>(this.mentorshipService.getMentorshipDataRecords(new MentorshipSearchCriteria(partnerId, participantId, approvedByPartner), sortedByDateCreated), HttpStatus.OK);
+        return new ResponseEntity<>(this.mentorshipService.getMentorshipDataRecords(new MentorshipSearchCriteria(partnerId, participantId, dataStatus), sortedByDateCreated), HttpStatus.OK);
     }
 
     @GetMapping("{mentorshipId}")

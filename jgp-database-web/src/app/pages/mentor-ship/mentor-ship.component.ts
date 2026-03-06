@@ -12,7 +12,6 @@ import { MatCardModule } from '@angular/material/card';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatSort } from '@angular/material/sort';
-import { Subject, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { GlobalService } from '@services/shared/global.service';
 import { AuthService } from '@services/users/auth.service';
@@ -23,6 +22,7 @@ import { SubscriptionsContainer } from '../../theme/utils/subscriptions-containe
 
 @Component({
     selector: 'app-mentor-ship',
+    standalone: true,
     imports: [
         ContentHeaderComponent,
         FlexLayoutModule,
@@ -63,7 +63,7 @@ export class MentorShipComponent implements OnDestroy, OnInit {
       getAvailableNewMentorShipData() {
         const partnerId = this.authService.currentUser()?.partnerId;
         if (partnerId) {
-          this.subs.add = this.mentorshipService.getAvailableMentorshipData(this.pageIndex, this.pageSize, false, partnerId)
+          this.subs.add = this.mentorshipService.getAvailableMentorshipData(this.pageIndex, this.pageSize, 'PENDING_APPROVAL', partnerId)
             .subscribe({
               next: (response) => {
                 this.newMentorShipData = response.content;

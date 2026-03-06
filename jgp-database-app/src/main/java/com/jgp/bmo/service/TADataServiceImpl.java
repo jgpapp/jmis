@@ -10,6 +10,7 @@ import com.jgp.bmo.mapper.TAMapper;
 import com.jgp.infrastructure.bulkimport.event.DataApprovedEvent;
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.domain.ParticipantRepository;
+import com.jgp.shared.domain.DataStatus;
 import com.jgp.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,18 +53,18 @@ public class TADataServiceImpl implements TADataService {
         var currentUser = this.platformSecurityContext.getAuthenticatedUserIfPresent();
         var currentUserPartner = Objects.nonNull(currentUser) ? currentUser.getPartner() : null;
         if (dataIds.isEmpty() && Objects.nonNull(currentUserPartner)) {
-                bmoData = this.bmoDataRepository.findAll(this.bmoPredicateBuilder.buildPredicateForSearchTAData(new TAParticipantSearchCriteria(currentUserPartner.getId(), null, false)), Pageable.unpaged()).getContent();
+                bmoData = this.bmoDataRepository.findAll(this.bmoPredicateBuilder.buildPredicateForSearchTAData(new TAParticipantSearchCriteria(currentUserPartner.getId(), null, DataStatus.PENDING_APPROVAL.name())), Pageable.unpaged()).getContent();
             }
 
-        if (Boolean.TRUE.equals(approval)) {
+        if (Objects.nonNull(approval)) {
             int count = 0;
             var bmoToSave = new ArrayList<TAData>();
             Set<LocalDate> dataDates = new HashSet<>();
             for (TAData bmo : bmoData) {
-                bmo.approveData(true, currentUser);
+                bmo.approveData(approval, currentUser);
                 var participant = bmo.getParticipant();
-                if (Boolean.FALSE.equals(participant.getIsActive())) {
-                    participant.activateParticipant();
+                if (DataStatus.PENDING_APPROVAL.equals(participant.getDataStatus())) {
+                    participant.activateParticipant(approval);
                 }
                 bmoToSave.add(bmo);
                 count++;
@@ -75,15 +76,19 @@ public class TADataServiceImpl implements TADataService {
                 dataDates.add(bmo.getDateRecordedByPartner());
             }
             this.bmoDataRepository.saveAllAndFlush(bmoToSave);
-            if (Objects.nonNull(currentUserPartner)) {
+            if (Boolean.TRUE.equals(approval) && Objects.nonNull(currentUserPartner)) {
                 this.applicationContext.publishEvent(new DataApprovedEvent(Set.of(currentUserPartner.getId()), dataDates));
             }
-        }else {
-            rejectAndDeleteBMOParticipantsData(bmoData);
         }
     }
 
-    private void rejectAndDeleteBMOParticipantsData(List<TAData> bmoParticipantDataList){
+    @Override
+    public void deleteBMOParticipantsDataByIds(List<Long> dataIds) {
+        var bmoData = this.bmoDataRepository.findAllById(dataIds);
+        deleteBMOParticipantsData(bmoData);
+    }
+
+    private void deleteBMOParticipantsData(List<TAData> bmoParticipantDataList){
         int count = 0;
         var bmoToDelete = new ArrayList<TAData>();
         for (TAData bmo : bmoParticipantDataList) {

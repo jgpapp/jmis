@@ -130,6 +130,12 @@ public class CacheConfig {
                 .addCaches(b -> b.name("participantCountForTrainedAndTookLoanSummary")
                         .expireAfterWrite(1, TimeUnit.HOURS)
                         .entryCapacity(30))
+                .addCaches(b -> b.name("businessesTrainedByTimeScale")
+                        .expireAfterWrite(1, TimeUnit.HOURS)
+                        .entryCapacity(30))
+                .addCaches(b -> b.name("loanDisbursedByTimeScale")
+                        .expireAfterWrite(1, TimeUnit.HOURS)
+                        .entryCapacity(30))
                 .addCaches(b -> b.name("performanceSummary")
                         .expireAfterWrite(1, TimeUnit.HOURS)
                         .entryCapacity(30));

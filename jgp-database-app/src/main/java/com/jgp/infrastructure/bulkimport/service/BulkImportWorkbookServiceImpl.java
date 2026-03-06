@@ -111,7 +111,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
             "lastThreeYearsAccessedLoanAmountPerPartnerYearly", "lastThreeYearsAccessedLoansCountPerPartnerYearly",
             "lastThreeYearsTrainedBusinessesPerPartnerYearly", "taTypeTrainedBusinesses",
             "loansAccessedVsOutStandingByPartnerSummary", "loansAccessedVsOutStandingByGenderSummary",
-            "dataSummary", "dataSummaryMap", "performanceSummary"
+            "dataSummary", "dataSummaryMap", "performanceSummary", "businessesTrainedByTimeScale", "loanDisbursedByTimeScale"
     }, allEntries = true)
     public Long importWorkbook(ImportRequestDto request) {
         validateImportRequest(request);

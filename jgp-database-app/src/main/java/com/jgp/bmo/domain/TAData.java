@@ -7,8 +7,11 @@ import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.participant.domain.Participant;
 import com.jgp.patner.domain.Partner;
 import com.jgp.shared.domain.BaseEntity;
+import com.jgp.shared.domain.DataStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -72,9 +75,6 @@ public class TAData extends BaseEntity {
     @Column(name = "date_recorded_to_jgp")
     private LocalDate dateRecordedToJGPDB;
 
-    @Column(name = "data_is_approved")
-    private Boolean isDataApprovedByPartner;
-
     @Column(name = "ta_needs")
     private String taNeeds;
 
@@ -101,6 +101,10 @@ public class TAData extends BaseEntity {
     @JoinColumn(name = "upload_doc_id")
     private Document document;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "data_status")
+    private DataStatus dataStatus;
+
     private transient Integer rowIndex;
 
     private transient String rowErrorMessage;
@@ -118,7 +122,6 @@ public class TAData extends BaseEntity {
         this.fiBusinessReferred = dto.fiBusinessReferred();
         this.dateRecordedByPartner = dto.dateRecordedByPartner();
         this.dateRecordedToJGPDB = dto.dateRecordedToJGPDB();
-        this.isDataApprovedByPartner = false;
         this.taNeeds = dto.taNeeds();
         this.trainingPartner = dto.trainingPartner();
         this.taDeliveryMode = dto.taDeliveryMode();
@@ -128,12 +131,13 @@ public class TAData extends BaseEntity {
         this.document = dto.document();
         this.rowIndex = dto.rowIndex();
         this.rowErrorMessage = dto.rowErrorMessage();
+        this.dataStatus = DataStatus.PENDING_APPROVAL;
     }
 
-    public void approveData(Boolean approval, AppUser user){
-        this.isDataApprovedByPartner = approval;
+    public void approveData(boolean approval, AppUser user){
         this.approvalBy = user;
         this.dateApproved = LocalDate.now(ZoneId.systemDefault());
+        this.dataStatus = approval ? DataStatus.APPROVED : DataStatus.REJECTED;
     }
 
     @Override

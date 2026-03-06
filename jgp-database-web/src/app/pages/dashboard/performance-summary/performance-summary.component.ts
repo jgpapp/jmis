@@ -7,8 +7,7 @@ import { MatTreeFlattener, MatTreeFlatDataSource } from '@angular/material/tree'
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { GlobalService } from '@services/shared/global.service';
-import { Subject, takeUntil } from 'rxjs';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '@services/users/auth.service';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 

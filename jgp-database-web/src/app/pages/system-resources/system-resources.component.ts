@@ -13,7 +13,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 import { FormBuilder, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { FileUploadComponent } from "../file-upload/file-upload.component";
-import { Subject, Subscription, takeUntil } from 'rxjs';
 import { DataUploadService } from '@services/shared/data-upload.service';
 import { GlobalService } from '@services/shared/global.service';
 import { ConfirmDialogModel } from '../../dto/confirm-dialog-model';

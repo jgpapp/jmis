@@ -16,7 +16,6 @@ import { GlobalService } from '@services/shared/global.service';
 import { Router } from '@angular/router';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 import { MatCardModule } from '@angular/material/card';
-import { Subject, takeUntil } from 'rxjs';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({

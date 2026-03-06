@@ -12,6 +12,7 @@ import { MessagesService } from '@services/messages.service';
 
 @Component({
     selector: 'app-messages',
+    standalone: true,
     imports: [
         FlexLayoutModule,
         MatButtonModule,

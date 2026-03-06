@@ -33,12 +33,12 @@ public class BMOClientController {
     @GetMapping
     public ResponseEntity<Page<TAResponseDto>> getAvailableBMODataRecords(@RequestParam(name = "partnerId", required = false) Long partnerId,
                                                                           @RequestParam(name = "participantId", required = false) Long participantId,
-                                                                          @RequestParam(name = "approvedByPartner", required = false) Boolean approvedByPartner,
+                                                                          @RequestParam(name = "dataStatus", required = false) String dataStatus,
                                                                           @RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
                                                                           @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
         final var sortedByDateCreated =
                 PageRequest.of(pageNumber, pageSize, Sort.by("dateCreated").descending());
-        return new ResponseEntity<>(this.bmoDataService.getBMODataRecords(new TAParticipantSearchCriteria(partnerId, participantId, approvedByPartner), sortedByDateCreated), HttpStatus.OK);
+        return new ResponseEntity<>(this.bmoDataService.getBMODataRecords(new TAParticipantSearchCriteria(partnerId, participantId, dataStatus), sortedByDateCreated), HttpStatus.OK);
     }
 
     @GetMapping("{bmoId}")

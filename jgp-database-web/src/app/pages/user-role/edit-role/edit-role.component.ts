@@ -9,18 +9,16 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { MatSelectModule } from '@angular/material/select';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GlobalService } from '@services/shared/global.service';
 import { UserRoleDto } from '../../../dto/UserRoleDto';
 import { UserRoleService } from '@services/users/userroles.service';
 import { PermissionsService } from '@services/users/permissions.service';
-import { PartnerDto } from '../../../dto/Partner';
-import { PartnerService } from '@services/data-management/partners.service';
 import { ContentHeaderComponent } from '../../../theme/components/content-header/content-header.component';
 import { MatCardModule } from '@angular/material/card';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map, Subject, takeUntil } from 'rxjs';
+import { map } from 'rxjs';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({

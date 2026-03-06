@@ -2,6 +2,7 @@ package com.jgp.bmo.domain.predicate;
 
 import com.jgp.bmo.domain.QMentorship;
 import com.jgp.bmo.dto.MentorshipSearchCriteria;
+import com.jgp.shared.domain.DataStatus;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import org.springframework.stereotype.Component;
@@ -25,8 +26,6 @@ public class MentorshipPredicateBuilder {
 
         List<Predicate> predicateList = new ArrayList<>();
 
-        predicateList.add(qMentorship.isDeleted.isFalse());
-
         if (null != searchCriteria.participantId()) {
             predicateList.add(qMentorship.participant.id.eq(searchCriteria.participantId()));
         }
@@ -35,8 +34,10 @@ public class MentorshipPredicateBuilder {
             predicateList.add(qMentorship.partner.id.eq(searchCriteria.partnerId()));
         }
 
-        if (null != searchCriteria.approvedByPartner()) {
-            predicateList.add(qMentorship.isDataApproved.eq(searchCriteria.approvedByPartner()));
+        if (null != DataStatus.getDataStatus(searchCriteria.dataStatus())) {
+            predicateList.add(qMentorship.dataStatus.eq(DataStatus.getDataStatus(searchCriteria.dataStatus())));
+        }else {
+            predicateList.add(qMentorship.dataStatus.eq(DataStatus.APPROVED));
         }
 
         builder.orAllOf(predicateList.toArray(new Predicate[0]));

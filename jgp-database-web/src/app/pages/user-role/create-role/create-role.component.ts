@@ -18,7 +18,6 @@ import { ContentHeaderComponent } from '../../../theme/components/content-header
 import { MatCardModule } from '@angular/material/card';
 import { PermissionsService } from '@services/users/permissions.service';
 import { UserRoleService } from '@services/users/userroles.service';
-import { Subject, takeUntil } from 'rxjs';
 import { SubscriptionsContainer } from '../../../theme/utils/subscriptions-container';
 
 @Component({

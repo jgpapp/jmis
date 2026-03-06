@@ -8,7 +8,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { PartnerDto } from '../../../dto/Partner';
 import { PartnerService } from '@services/data-management/partners.service';
-import { Subject, takeUntil } from 'rxjs';
 import { GlobalService } from '@services/shared/global.service';
 import { DashboardService } from '@services/dashboard/dashboard.service';
 import { AuthService } from '@services/users/auth.service';

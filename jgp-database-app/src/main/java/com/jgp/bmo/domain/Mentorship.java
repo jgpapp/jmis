@@ -6,8 +6,11 @@ import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.participant.domain.Participant;
 import com.jgp.patner.domain.Partner;
 import com.jgp.shared.domain.BaseEntity;
+import com.jgp.shared.domain.DataStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -88,9 +91,6 @@ public class Mentorship extends BaseEntity {
     @Column(name = "additional_needed_support")
     private String additionalNeededSupport;
 
-    @Column(name = "is_approved")
-    private Boolean isDataApproved;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "approval_by_id")
     private AppUser approvalBy;
@@ -102,6 +102,10 @@ public class Mentorship extends BaseEntity {
     @JoinColumn(name = "upload_doc_id")
     private Document document;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "data_status")
+    private DataStatus dataStatus;
+
     private transient Integer rowIndex;
 
     public Mentorship() {
@@ -110,7 +114,6 @@ public class Mentorship extends BaseEntity {
     public Mentorship(MentorshipRequestDto dto) {
         this.rowIndex = dto.rowIndex();
         this.setCreatedBy(dto.createdBy());
-        this.isDataApproved = Boolean.FALSE;
         this.mentorShipDate = dto.mentorShipDate();
         this.mentorShipOrganization = dto.mentorShipOrganization();
         this.bmoMemberShip = dto.bmoMemberShip();
@@ -126,12 +129,13 @@ public class Mentorship extends BaseEntity {
         this.agreedActionForGapOne = dto.agreedActionForGapOne();
         this.additionalNeededSupport = dto.additionalNeededSupport();
         this.document = dto.document();
+        this.dataStatus = DataStatus.PENDING_APPROVAL;
     }
 
-    public void approveData(Boolean approval, AppUser user){
-        this.isDataApproved = approval;
+    public void approveData(boolean approval, AppUser user){
         this.approvalBy = user;
         this.dateApproved = LocalDate.now(ZoneId.systemDefault());
+        this.dataStatus = approval ? DataStatus.APPROVED : DataStatus.REJECTED;
     }
 
 

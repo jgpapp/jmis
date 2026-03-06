@@ -2,6 +2,7 @@ package com.jgp.finance.domain.predicate;
 
 import com.jgp.finance.domain.QLoan;
 import com.jgp.finance.dto.LoanSearchCriteria;
+import com.jgp.shared.domain.DataStatus;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import org.springframework.stereotype.Component;
@@ -25,8 +26,6 @@ public class LoanPredicateBuilder {
 
         List<Predicate> predicateList = new ArrayList<>();
 
-        predicateList.add(qLoan.isDeleted.isFalse());
-
         if (null != searchCriteria.status()) {
             predicateList.add(qLoan.loanStatus.eq(searchCriteria.status()));
         }
@@ -39,8 +38,10 @@ public class LoanPredicateBuilder {
             predicateList.add(qLoan.participant.id.eq(searchCriteria.participantId()));
         }
 
-        if (null != searchCriteria.approvedByPartner()) {
-            predicateList.add(qLoan.isDataApprovedByPartner.eq(searchCriteria.approvedByPartner()));
+        if (null != DataStatus.getDataStatus(searchCriteria.dataStatus())) {
+            predicateList.add(qLoan.dataStatus.eq(DataStatus.getDataStatus(searchCriteria.dataStatus())));
+        }else {
+            predicateList.add(qLoan.dataStatus.eq(DataStatus.APPROVED));
         }
 
         builder.orAllOf(predicateList.toArray(new Predicate[0]));

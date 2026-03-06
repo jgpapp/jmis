@@ -10,6 +10,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
     selector: 'app-top-info-content',
+    standalone: true,
     imports: [
         FlexLayoutModule,
         MatButtonModule,

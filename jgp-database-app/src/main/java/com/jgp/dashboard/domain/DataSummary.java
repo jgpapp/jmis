@@ -56,6 +56,30 @@ public class DataSummary extends BaseEntity {
     @Column(name = "summary_date")
     private LocalDate summaryDate;
 
+    @Column(name = "summary_week")
+    private String summaryWeek;
+
+    @Column(name = "summary_month")
+    private String summaryMonth;
+
+    @Column(name = "year_quarter")
+    private String yearQuarter;
+
+    @Column(name = "quarter_number")
+    private String quarterNumber;
+
+    @Column(name = "summary_year")
+    private String summaryYear;
+
+    @Column(name = "week_number")
+    private String weekNumber;
+
+    @Column(name = "month_number")
+    private String monthNumber;
+
+    @Column(name = "year_number")
+    private String yearNumber;
+
     public DataSummary() {
     }
 

@@ -9,11 +9,11 @@ export class MonitoringServiceService {
 
    constructor(private httpClient: HttpClient) { }
   
-        getOutComeMonitoringDataRecords(page: number, size: number, approved: Boolean): Observable<any> {
+        getOutComeMonitoringDataRecords(page: number, size: number, dataStatus: string): Observable<any> {
           const params = new HttpParams()
                 .set('pageNumber', page.toString())
                 .set('pageSize', size.toString());
-          return this.httpClient.get(`/monitoring?approved=${approved}`, { params });
+          return this.httpClient.get(`/monitoring?dataStatus=${dataStatus}`, { params });
         }
   
         approvedMonitoringData(monitoringIds: number[]): Observable<any> {
