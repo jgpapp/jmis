@@ -1271,7 +1271,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public void updateAnalyticsData(AnalyticsUpdateRequestDto analyticsUpdateRequestDto) {
-        var partnerIds = Objects.nonNull(analyticsUpdateRequestDto.partnerId()) ? Set.of(analyticsUpdateRequestDto.partnerId()) : this.partnerRepository.findByIsDeletedFalse().stream().map(Partner::getId).collect(Collectors.toSet());
+        var partnerIds = Objects.nonNull(analyticsUpdateRequestDto.partnerId()) ? Set.of(analyticsUpdateRequestDto.partnerId()) : this.partnerRepository.findAllPartners().stream().map(Partner::getId).collect(Collectors.toSet());
         final var dataDates = Set.of(analyticsUpdateRequestDto.fromDate(), analyticsUpdateRequestDto.toDate());
         this.applicationContext.publishEvent(new DataApprovedEvent(partnerIds, dataDates));
     }

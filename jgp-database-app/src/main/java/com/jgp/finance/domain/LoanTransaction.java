@@ -69,10 +69,6 @@ public class LoanTransaction extends BaseEntity implements Comparable<LoanTransa
     @Column(name = "date_approved")
     private LocalDate dateApproved;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "data_status")
-    private DataStatus dataStatus;
-
     public LoanTransaction() {
     }
 
@@ -84,13 +80,13 @@ public class LoanTransaction extends BaseEntity implements Comparable<LoanTransa
         this.tranchName = tranchName;
         this.setCreatedBy(createdBy);
         this.isGivenInTranches = isGivenInTranches;
-        this.dataStatus = DataStatus.PENDING_APPROVAL;
+        this.setDataStatus(DataStatus.PENDING_APPROVAL);
     }
 
     public void approveData(boolean approval, AppUser user){
         this.approvalBy = user;
         this.dateApproved = LocalDate.now(ZoneId.systemDefault());
-        this.dataStatus = approval ? DataStatus.APPROVED : DataStatus.REJECTED;
+        this.setDataStatus(approval ? DataStatus.APPROVED : DataStatus.REJECTED);
     }
 
     @Override

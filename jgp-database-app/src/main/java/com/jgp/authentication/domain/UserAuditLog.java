@@ -1,6 +1,7 @@
 package com.jgp.authentication.domain;
 
 import com.jgp.shared.domain.BaseEntity;
+import com.jgp.shared.domain.DataStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -51,6 +52,7 @@ public class UserAuditLog extends BaseEntity {
         this.resourceId = resourceId;
         this.details = details;
         this.logTime = LocalDateTime.now(ZoneId.systemDefault());
+        this.setDataStatus(DataStatus.APPROVED);
     }
 
 

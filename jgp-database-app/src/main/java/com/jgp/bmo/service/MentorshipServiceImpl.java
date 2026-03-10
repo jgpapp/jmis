@@ -120,7 +120,9 @@ public class MentorshipServiceImpl implements MentorshipService {
 
     @Override
     public MentorshipResponseDto findMentorshipDataById(Long mentorshipId) {
-        return this.mentorshipRepository.findById(mentorshipId).map(this.mentorshipMapper::toDto).orElseThrow(() -> new RuntimeException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
+        return this.mentorshipRepository.findById(mentorshipId)
+                .filter(m -> DataStatus.APPROVED.equals(m.getDataStatus()))
+                .map(this.mentorshipMapper::toDto).orElseThrow(() -> new RuntimeException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
     }
 
     @Override

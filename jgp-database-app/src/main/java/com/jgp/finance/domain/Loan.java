@@ -126,10 +126,6 @@ public class Loan extends BaseEntity {
     @JoinColumn(name = "upload_doc_id")
     private Document document;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "data_status")
-    private DataStatus dataStatus;
-
     private transient Integer rowIndex;
 
     public Loan() {
@@ -155,7 +151,7 @@ public class Loan extends BaseEntity {
         this.setCreatedBy(dto.createdBy());
         this.document = dto.document();
         this.addLoanTransaction(dto.loanTransaction());
-        this.dataStatus = DataStatus.PENDING_APPROVAL;
+        this.setDataStatus(DataStatus.PENDING_APPROVAL);
     }
 
     public void addLoanTransaction(LoanTransaction loanTransaction){
@@ -168,7 +164,7 @@ public class Loan extends BaseEntity {
     public void approveData(boolean approval, AppUser user){
         this.approvalBy = user;
         this.dateApproved = LocalDate.now(ZoneId.systemDefault());
-        this.dataStatus = approval ? DataStatus.APPROVED : DataStatus.REJECTED;
+        this.setDataStatus(approval ? DataStatus.APPROVED : DataStatus.REJECTED);
     }
 
     @Getter

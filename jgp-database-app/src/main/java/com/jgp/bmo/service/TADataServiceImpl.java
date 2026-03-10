@@ -125,7 +125,9 @@ public class TADataServiceImpl implements TADataService {
 
     @Override
     public TAResponseDto findBMODataById(Long bmoId) {
-        return this.bmoDataRepository.findById(bmoId).map(this.taMapper::toDto).orElseThrow(() -> new RuntimeException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
+        return this.bmoDataRepository.findById(bmoId)
+                .filter(t -> DataStatus.APPROVED.equals(t.getDataStatus()))
+                .map(this.taMapper::toDto).orElseThrow(() -> new RuntimeException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
     }
 
     @Override

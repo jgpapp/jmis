@@ -29,10 +29,11 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     void deleteParticipantsByIds(@NonNull List<Long> participantIds);
 
 
-    @Query("SELECT DISTINCT p.locationCountyCode from Participant p")
+    @Query("SELECT DISTINCT p.locationCountyCode from Participant p where p.dataStatus = 'APPROVED'")
     Set<String> getParticipantOperationCounties();
 
-    List<Participant> findByJgpIdInAndIsDeletedFalse(@NonNull Collection<String> jgpIds);
+    @Query("select p from Participant p where p.jgpId in ?1 AND p.dataStatus = 'APPROVED'")
+    List<Participant> findAllByJgpIds(Collection<String> jgpIds);
 
 
 }

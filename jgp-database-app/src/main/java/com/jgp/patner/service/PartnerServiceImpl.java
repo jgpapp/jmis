@@ -7,6 +7,7 @@ import com.jgp.patner.domain.Partner;
 import com.jgp.patner.domain.PartnerRepository;
 import com.jgp.patner.dto.PartnerDto;
 import com.jgp.patner.exception.PartnerNotFoundException;
+import com.jgp.shared.domain.DataStatus;
 import com.jgp.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -37,7 +38,7 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     public Partner findPartnerById(Long partnerId) {
         return this.partnerRepository.findById(partnerId)
-                .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
+                .filter(t -> DataStatus.APPROVED.equals(t.getDataStatus()))
                 .orElseThrow(() -> new PartnerNotFoundException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
     }
 
@@ -46,7 +47,7 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     public void updatePartner(Long partnerId, PartnerDto partnerDto) {
         var currentPartner = this.partnerRepository.findById(partnerId)
-                .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
+                .filter(t -> DataStatus.APPROVED.equals(t.getDataStatus()))
                 .orElseThrow(() -> new PartnerNotFoundException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
         try {
             currentPartner.updatePartner(partnerDto);
@@ -60,14 +61,14 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     public PartnerDto findPartnerDtoById(Long userId) {
         return this.partnerRepository.findById(userId)
-                .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
+                .filter(t -> DataStatus.APPROVED.equals(t.getDataStatus()))
                 .map(p -> new PartnerDto(p.getId(), p.getPartnerName(), p.getType().getName(), p.getType().name()))
                 .orElseThrow(() -> new PartnerNotFoundException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
     }
 
     @Override
     public Page<PartnerDto> getAllPartners(Pageable pageable) {
-        return new PageImpl<>(this.partnerRepository.findAll(pageable).stream().filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).map(p -> new PartnerDto(p.getId(), p.getPartnerName(), p.getType().getName(), p.getType().name())).toList(), pageable, this.partnerRepository.findAll().size());
+        return new PageImpl<>(this.partnerRepository.findAll(pageable).stream().filter(t -> DataStatus.APPROVED.equals(t.getDataStatus())).map(p -> new PartnerDto(p.getId(), p.getPartnerName(), p.getType().getName(), p.getType().name())).toList(), pageable, this.partnerRepository.findAll().size());
     }
 
 }

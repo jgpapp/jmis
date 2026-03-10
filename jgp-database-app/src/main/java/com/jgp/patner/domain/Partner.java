@@ -3,6 +3,7 @@ package com.jgp.patner.domain;
 
 import com.jgp.patner.dto.PartnerDto;
 import com.jgp.shared.domain.BaseEntity;
+import com.jgp.shared.domain.DataStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -44,6 +45,7 @@ public class Partner extends BaseEntity {
     private Partner(String partnerName, PartnerType type) {
         this.partnerName = partnerName;
         this.type = type;
+        this.setDataStatus(DataStatus.APPROVED);
     }
 
     public static Partner createPartner(PartnerDto partnerDto){

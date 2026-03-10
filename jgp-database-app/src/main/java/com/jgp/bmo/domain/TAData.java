@@ -101,10 +101,6 @@ public class TAData extends BaseEntity {
     @JoinColumn(name = "upload_doc_id")
     private Document document;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "data_status")
-    private DataStatus dataStatus;
-
     private transient Integer rowIndex;
 
     private transient String rowErrorMessage;
@@ -131,13 +127,13 @@ public class TAData extends BaseEntity {
         this.document = dto.document();
         this.rowIndex = dto.rowIndex();
         this.rowErrorMessage = dto.rowErrorMessage();
-        this.dataStatus = DataStatus.PENDING_APPROVAL;
+        this.setDataStatus(DataStatus.PENDING_APPROVAL);
     }
 
     public void approveData(boolean approval, AppUser user){
         this.approvalBy = user;
         this.dateApproved = LocalDate.now(ZoneId.systemDefault());
-        this.dataStatus = approval ? DataStatus.APPROVED : DataStatus.REJECTED;
+        this.setDataStatus(approval ? DataStatus.APPROVED : DataStatus.REJECTED);
     }
 
     @Override

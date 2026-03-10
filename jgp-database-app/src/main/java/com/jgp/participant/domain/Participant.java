@@ -124,10 +124,6 @@ public class Participant extends BaseEntity {
     @Column(name = "pre_payment", scale = 4, precision = 19, nullable = false)
     private BigDecimal prePayment;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "data_status")
-    private DataStatus dataStatus;
-
     public Participant() {
     }
 
@@ -158,7 +154,7 @@ public class Participant extends BaseEntity {
         this.participantName = dto.participantName();
         this.businessFinancier = dto.businessFinancier();
         this.disabilityType = dto.disabilityType();
-        this.dataStatus = DataStatus.PENDING_APPROVAL;
+        this.setDataStatus(DataStatus.PENDING_APPROVAL);
     }
 
     public void updateParticipant(ParticipantRequestDto dto){
@@ -271,7 +267,7 @@ public class Participant extends BaseEntity {
 
     public void activateParticipant(boolean isApproved) {
         this.isActive = Boolean.TRUE;
-        this.dataStatus = isApproved ? DataStatus.APPROVED : DataStatus.REJECTED;
+        this.setDataStatus(isApproved ? DataStatus.APPROVED : DataStatus.REJECTED);
     }
 
     public void incrementPrePaidAmount(BigDecimal additionalAmount){

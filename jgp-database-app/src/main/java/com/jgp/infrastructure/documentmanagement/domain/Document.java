@@ -4,6 +4,7 @@ package com.jgp.infrastructure.documentmanagement.domain;
 import com.jgp.infrastructure.bulkimport.data.GlobalEntityType;
 import com.jgp.infrastructure.documentmanagement.command.DocumentCommand;
 import com.jgp.shared.domain.BaseEntity;
+import com.jgp.shared.domain.DataStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -76,6 +77,7 @@ public class Document extends BaseEntity {
         this.description = StringUtils.defaultIfEmpty(description, null);
         this.location = StringUtils.defaultIfEmpty(location, null);
         this.globalEntityType = globalEntityType;
+        this.setDataStatus(DataStatus.APPROVED);
     }
 
     public void update(final DocumentCommand command) {

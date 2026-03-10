@@ -15,10 +15,13 @@ import java.util.Optional;
 public interface ImportDocumentRepository extends JpaRepository<ImportDocument, Long>, JpaSpecificationExecutor<ImportDocument> {
 
     @EntityGraph(attributePaths = {"document", "partner", "createdBy"})
-    @Query("SELECT i FROM ImportDocument i WHERE i.id = :id AND i.isDeleted = false")
+    @Query("SELECT i FROM ImportDocument i WHERE i.id = :id AND i.dataStatus = 'APPROVED'")
     Optional<ImportDocument> findByIdWithRelations(@Param("id") Long importDocumentId);
 
-    Page<ImportDocument> findByPartnerIdAndEntityTypeAndIsDeletedFalse(@NonNull Long partnerId, Integer entityType, Pageable pageable);
+    @Query("select i from ImportDocument i where i.partner.id = ?1 and i.entityType = ?2 AND i.dataStatus = 'APPROVED'")
+    Page<ImportDocument> findByPartnerAndEntityType(@NonNull Long partnerId, Integer entityType, Pageable pageable);
 
-    Page<ImportDocument> findByEntityTypeAndIsDeletedFalse(@NonNull Integer entityType, Pageable pageable);
+    @Query("select i from ImportDocument i where i.entityType = ?1 AND i.dataStatus = 'APPROVED'")
+    Page<ImportDocument> findByEntityType(Integer entityType, Pageable pageable);
+
 }

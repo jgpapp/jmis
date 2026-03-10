@@ -113,7 +113,7 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     @Override
     public Map<String, Participant> findParticipantsByJGPIDs(List<String> jgpIds) {
-        return this.participantRepository.findByJgpIdInAndIsDeletedFalse(jgpIds)
+        return this.participantRepository.findAllByJgpIds(jgpIds)
                 .stream()
                 .collect(Collectors.toMap(Participant::getJgpId, p -> p));
     }

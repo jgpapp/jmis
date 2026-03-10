@@ -9,6 +9,7 @@ import com.jgp.monitoring.dto.OutComeMonitoringResponseDto;
 import com.jgp.monitoring.mapper.OutComeMonitoringMapper;
 import com.jgp.participant.domain.Participant;
 import com.jgp.participant.domain.ParticipantRepository;
+import com.jgp.shared.domain.DataStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -45,7 +46,7 @@ public class OutComeMonitoringServiceImpl implements OutComeMonitoringService {
     public void approvedOutComeMonitoringData(List<Long> dataIds, Boolean approval) {
         var outComeMonitoringData = this.outComeMonitoringRepository.findAllById(dataIds);
         if (dataIds.isEmpty()) {
-            outComeMonitoringData = this.outComeMonitoringRepository.findByIsDeletedFalse().stream().toList();
+            outComeMonitoringData = this.outComeMonitoringRepository.findAllAvailable(DataStatus.PENDING_APPROVAL);
         }
         var currentUser = this.platformSecurityContext.getAuthenticatedUserIfPresent();
 

@@ -49,7 +49,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TAImportHandler implements ImportHandler {
 
     private static final String YES = "YES";
-    private static final String DUPLICATE_ENTRY_ERROR = "unique_bmo_participant_data";
+    private static final String DUPLICATE_ENTRY_ERROR = "unique_ta_participant_data";
     private static final String DUPLICATE_ENTRY_MESSAGE = "Row with same partner/participant/training date already exists!";
     private final AtomicInteger currentStepProgress = new AtomicInteger(0);
 

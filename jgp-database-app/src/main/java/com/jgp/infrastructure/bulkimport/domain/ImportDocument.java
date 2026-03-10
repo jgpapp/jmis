@@ -5,6 +5,7 @@ import com.jgp.authentication.domain.AppUser;
 import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.patner.domain.Partner;
 import com.jgp.shared.domain.BaseEntity;
+import com.jgp.shared.domain.DataStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -92,6 +93,7 @@ public class ImportDocument extends BaseEntity {
         this.failureCount = failureCount;
         this.partner = Objects.nonNull(currentUser) ? currentUser.getPartner() : null;
         setCreatedBy(currentUser);
+        this.setDataStatus(DataStatus.APPROVED);
     }
 
     public void update(final LocalDateTime endTime, final Integer totalCount, final Integer successCount, final Integer errorCount) {

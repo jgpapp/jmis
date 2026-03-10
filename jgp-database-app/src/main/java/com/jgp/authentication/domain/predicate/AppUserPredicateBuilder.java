@@ -2,6 +2,7 @@ package com.jgp.authentication.domain.predicate;
 
 import com.jgp.authentication.domain.QAppUser;
 import com.jgp.authentication.dto.AppUserSearchCriteria;
+import com.jgp.shared.domain.DataStatus;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import org.springframework.stereotype.Component;
@@ -30,7 +31,7 @@ public class AppUserPredicateBuilder {
         BooleanBuilder builder = new BooleanBuilder();
 
         List<Predicate> predicateList = new ArrayList<>();
-        predicateList.add(qAppUser.isDeleted.isFalse());
+        predicateList.add(qAppUser.dataStatus.eq(DataStatus.APPROVED));
 
         predicateList.add(qAppUser.isActive.eq(true));
 

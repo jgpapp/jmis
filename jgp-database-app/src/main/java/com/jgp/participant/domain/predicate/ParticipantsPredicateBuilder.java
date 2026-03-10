@@ -1,6 +1,7 @@
 package com.jgp.participant.domain.predicate;
 
 import com.jgp.participant.domain.QParticipant;
+import com.jgp.shared.domain.DataStatus;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import org.springframework.stereotype.Component;
@@ -23,7 +24,7 @@ public class ParticipantsPredicateBuilder {
         BooleanBuilder builder = new BooleanBuilder();
 
         List<Predicate> predicateList = new ArrayList<>();
-        predicateList.add(qParticipant.isDeleted.isFalse());
+        predicateList.add(qParticipant.dataStatus.eq(DataStatus.APPROVED));
         if (null != searchText) {
             var businessNamePredicate = qParticipant.businessName.likeIgnoreCase("%"+searchText+"%s");
             var jgpPredicate = qParticipant.jgpId.likeIgnoreCase("%"+searchText+"%s");

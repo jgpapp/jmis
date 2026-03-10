@@ -40,7 +40,7 @@ public class PermissionServiceImpl implements PermissionService {
 
         public String permissionSchema() {
             return "select p.code, p.entity_name as entityName, p.action_name as actionName, true as selected"
-                    + " from permission p where p.is_deleted = false order by coalesce(entity_name, ''), p.code";
+                    + " from permission p where p.data_status = 'APPROVED' order by coalesce(entity_name, ''), p.code";
         }
     }
 }
