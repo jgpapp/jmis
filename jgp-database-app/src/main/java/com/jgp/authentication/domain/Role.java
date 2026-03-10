@@ -2,6 +2,7 @@ package com.jgp.authentication.domain;
 
 import com.jgp.authentication.dto.RoleDto;
 import com.jgp.shared.domain.BaseEntity;
+import com.jgp.shared.domain.DataStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -48,6 +49,7 @@ public class Role extends BaseEntity {
     private Role(String roleName, String description) {
         this.roleName = roleName;
         this.description = description;
+        this.setDataStatus(DataStatus.APPROVED);
     }
 
     public static Role createRole(final RoleDto roleDto) {

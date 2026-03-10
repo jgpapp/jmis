@@ -5,6 +5,7 @@ import com.jgp.authentication.dto.UserDtoV2;
 import com.jgp.authentication.exception.NoAuthorizationException;
 import com.jgp.patner.domain.Partner;
 import com.jgp.shared.domain.BaseEntity;
+import com.jgp.shared.domain.DataStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -109,6 +110,7 @@ public class AppUser extends BaseEntity implements PlatformUser {
         this.town = town;
         this.gender = gender;
         this.image = image;
+        this.setDataStatus(DataStatus.APPROVED);
     }
 
     public String getUserFullName(){

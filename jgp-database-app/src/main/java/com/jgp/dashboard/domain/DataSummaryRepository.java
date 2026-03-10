@@ -22,12 +22,12 @@ public interface DataSummaryRepository extends JpaRepository<DataSummary, Long>,
     @Query(value = """
         INSERT INTO data_summary (partner_id, gender_category, summary_date, businesses_trained, 
         businesses_loaned, amount_disbursed, out_standing_amount, amount_repaid, summary_week, 
-        summary_month, summary_year, week_number, year_quarter, quarter_number, month_number, year_number) 
+        summary_month, summary_year, week_number, year_quarter, quarter_number, month_number, year_number, data_status) 
         VALUES (:#{#dto.partnerId}, :#{#dto.genderCategory}, :#{#dto.summaryDate}, :#{#dto.businessesTrained}, 
         :#{#dto.businessesLoaned}, :#{#dto.amountDisbursed}, :#{#dto.outStandingAmount}, :#{#dto.amountRepaid}, 
         :#{#dto.summaryWeek}, :#{#dto.summaryMonth}, :#{#dto.summaryYear}, :#{#dto.weekNumber}, 
-        :#{#dto.summaryQuarter}, :#{#dto.quarterNumber}, :#{#dto.monthNumber}, :#{#dto.yearNumber})
-        ON CONFLICT (partner_id, gender_category, summary_date) 
+        :#{#dto.summaryQuarter}, :#{#dto.quarterNumber}, :#{#dto.monthNumber}, :#{#dto.yearNumber}, :#{#dto.dataStatus})
+        ON CONFLICT (partner_id, gender_category, summary_date) WHERE data_status = 'APPROVED' 
         DO UPDATE SET 
             businesses_trained = EXCLUDED.businesses_trained, 
             businesses_loaned = EXCLUDED.businesses_loaned, 

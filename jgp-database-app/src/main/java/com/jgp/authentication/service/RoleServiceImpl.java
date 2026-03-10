@@ -12,6 +12,7 @@ import com.jgp.authentication.exception.RoleNotFoundException;
 import com.jgp.authentication.mapper.PermissionMapper;
 import com.jgp.authentication.mapper.RoleMapper;
 import com.jgp.infrastructure.core.domain.JdbcSupport;
+import com.jgp.shared.domain.DataStatus;
 import com.jgp.shared.exception.ResourceNotFound;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -53,7 +54,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional
     public void updateRole(Long roleId, RoleDto roleDto) {
-        var role = this.roleRepository.findById(roleId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).orElseThrow(() -> new ResourceNotFound(HttpStatus.NOT_FOUND));
+        var role = this.roleRepository.findById(roleId).filter(t -> DataStatus.APPROVED.equals(t.getDataStatus())).orElseThrow(() -> new ResourceNotFound(HttpStatus.NOT_FOUND));
         role.updateRole(roleDto);
         if (!roleDto.permissions().isEmpty()){
             this.updateRolePermissions(role.getId(), new ArrayList<>(roleDto.permissions()));
@@ -65,7 +66,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional
     public void updateRolePermissions(Long roleId, List<String> permissionCodes) {
-        var role = this.roleRepository.findById(roleId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).orElseThrow(() -> new RoleNotFoundException(roleId));
+        var role = this.roleRepository.findById(roleId).filter(t -> DataStatus.APPROVED.equals(t.getDataStatus())).orElseThrow(() -> new RoleNotFoundException(roleId));
         final Collection<Permission> selectedPermissions = this.permissionRepository.findAllByCodes(permissionCodes);
         role.updatePermissions(new HashSet<>(selectedPermissions));
         this.roleRepository.save(role);
@@ -75,14 +76,14 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional
     public void deleteRole(Long roleId) {
-        var role = this.roleRepository.findById(roleId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).orElseThrow(() -> new RoleNotFoundException(roleId));
-        role.setIsDeleted(true);
+        var role = this.roleRepository.findById(roleId).filter(t -> DataStatus.APPROVED.equals(t.getDataStatus())).orElseThrow(() -> new RoleNotFoundException(roleId));
+        role.setDataStatus(DataStatus.DELETED);
         this.roleRepository.save(role);
     }
 
     @Override
     public Collection<RoleDto> retrieveAllRoles() {
-        return this.roleMapper.toDtoList(this.roleRepository.findByIsDeletedFalse());
+        return this.roleMapper.toDtoList(this.roleRepository.findAllRoles());
     }
 
     @Override
@@ -92,7 +93,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleDto retrieveOne(Long roleId) {
-        return this.roleMapper.toDto(this.roleRepository.findById(roleId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).orElseThrow(() -> new ResourceNotFound(HttpStatus.NOT_FOUND)));
+        return this.roleMapper.toDto(this.roleRepository.findById(roleId).filter(t -> DataStatus.APPROVED.equals(t.getDataStatus())).orElseThrow(() -> new ResourceNotFound(HttpStatus.NOT_FOUND)));
     }
 
     @Override
@@ -102,14 +103,14 @@ public class RoleServiceImpl implements RoleService {
         }
         final var roleRowMapper = new RoleRowMapper();
         final String sql = "select " + RoleRowMapper.ROLES_SCHEMA + " inner join appuser_role"
-                + " ar on ar.role_id = r.id where ar.appuser_id= ? and r.is_deleted = false";
+                + " ar on ar.role_id = r.id where ar.appuser_id= ? and r.data_status = 'APPROVED'";
 
         return this.jdbcTemplate.query(sql, roleRowMapper, appUserId);
     }
 
     @Override
     public Collection<PermissionDto> retrieveRolesPermission(Long roleId) {
-        var role = this.roleRepository.findById(roleId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).orElseThrow(() -> new ResourceNotFound(HttpStatus.NOT_FOUND));
+        var role = this.roleRepository.findById(roleId).filter(t -> DataStatus.APPROVED.equals(t.getDataStatus())).orElseThrow(() -> new ResourceNotFound(HttpStatus.NOT_FOUND));
         return this.permissionMapper.toDtoList(new ArrayList<>(role.getPermissions()));
     }
 

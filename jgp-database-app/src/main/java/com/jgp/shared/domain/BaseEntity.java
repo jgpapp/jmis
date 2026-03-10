@@ -2,6 +2,8 @@ package com.jgp.shared.domain;
 
 import com.jgp.authentication.domain.AppUser;
 import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -39,8 +41,9 @@ public class BaseEntity implements Serializable {
     @JoinColumn(name = "last_modified_by_id")
     private AppUser lastModifiedBy;
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted = false;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "data_status")
+    private DataStatus dataStatus;
 
     @PrePersist
     public void setDateCreated() {

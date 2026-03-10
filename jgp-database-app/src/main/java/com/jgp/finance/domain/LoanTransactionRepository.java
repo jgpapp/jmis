@@ -26,5 +26,8 @@ public interface LoanTransactionRepository extends JpaRepository<LoanTransaction
     @Query(value = "delete from loan_transactions lt where lt.id in ?1", nativeQuery = true)
     void deleteLoanTransactionsByIds(@NonNull List<Long> transactionIds);
 
+    @Query("select l from LoanTransaction l where l.loan.document.id = ?1 and l.dataStatus = 'APPROVED'")
     List<LoanTransaction> findByLoanDocumentId(@NonNull Long loanImportDocId);
+
+
 }

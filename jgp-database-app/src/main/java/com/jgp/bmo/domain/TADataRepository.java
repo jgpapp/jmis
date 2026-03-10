@@ -20,5 +20,8 @@ public interface TADataRepository extends JpaRepository<TAData, Long>, JpaSpecif
     @Query(value = "delete from ta_participants_data b where b.id in ?1", nativeQuery = true)
     void deleteTADataByIds(@NonNull Collection<Long> taIds);
 
+    @Query("select t from TAData t where t.document.id = ?1 and t.dataStatus = 'APPROVED'")
     List<TAData> findByDocumentId(@NonNull Long documentId);
+
+
 }

@@ -1,5 +1,6 @@
 package com.jgp.monitoring.domain;
 
+import com.jgp.shared.domain.DataStatus;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -19,8 +20,11 @@ public interface OutComeMonitoringRepository extends JpaRepository<OutComeMonito
     @Query(value = "delete from outcome_monitoring mon where mon.id in ?1", nativeQuery = true)
     void deleteOutComeMonitoringByIds(@NonNull List<Long> monitoringIds);
 
-    List<OutComeMonitoring> findByIsDeletedFalse();
+    @Query("select o from OutComeMonitoring o where o.dataStatus = ?1")
+    List<OutComeMonitoring> findAllAvailable(DataStatus dataStatus);
 
+
+    @Query("select o from OutComeMonitoring o where o.document.id = ?1 AND o.dataStatus = 'APPROVED'")
     List<OutComeMonitoring> findByDocumentId(@NonNull Long documentId);
 
 

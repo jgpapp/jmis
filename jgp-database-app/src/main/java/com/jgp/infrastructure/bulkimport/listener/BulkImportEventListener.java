@@ -14,6 +14,7 @@ import com.jgp.infrastructure.bulkimport.service.ImportProgressService;
 import com.jgp.infrastructure.documentmanagement.command.DocumentCommand;
 import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.infrastructure.documentmanagement.service.DocumentWritePlatformService;
+import com.jgp.shared.domain.DataStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -88,7 +89,7 @@ public class BulkImportEventListener {
      */
     private ImportDocument fetchImportDocument(Long importId) {
         return this.importRepository.findById(importId)
-                .filter(doc -> Boolean.FALSE.equals(doc.getIsDeleted()))
+                .filter(doc -> DataStatus.APPROVED.equals(doc.getDataStatus()))
                 .orElseThrow(() -> new IllegalArgumentException("Import document not found: " + importId));
     }
 

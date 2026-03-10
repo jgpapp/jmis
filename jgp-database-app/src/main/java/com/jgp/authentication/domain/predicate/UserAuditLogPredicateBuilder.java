@@ -2,6 +2,7 @@ package com.jgp.authentication.domain.predicate;
 
 import com.jgp.authentication.domain.QUserAuditLog;
 import com.jgp.authentication.dto.UserAuditLogSearchCriteria;
+import com.jgp.shared.domain.DataStatus;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import org.springframework.stereotype.Component;
@@ -29,7 +30,7 @@ public class UserAuditLogPredicateBuilder {
         BooleanBuilder builder = new BooleanBuilder();
 
         List<Predicate> predicateList = new ArrayList<>();
-        predicateList.add(qUserAuditLog.isDeleted.isFalse());
+        predicateList.add(qUserAuditLog.dataStatus.eq(DataStatus.APPROVED));
 
         if (null != searchCriteria.userName()) {
             predicateList.add(qUserAuditLog.username.eq(searchCriteria.userName()));

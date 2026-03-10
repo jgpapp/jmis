@@ -18,11 +18,12 @@ public interface SystemUserAccessLogRepository extends JpaRepository<SystemUserA
     @Modifying
     @Transactional
     @Query(value = """
-            INSERT INTO system_user_access_logs (username, ip_address, login_time, login_date, login_hour) 
-            VALUES (?1, ?2, ?3, ?4, ?5) 
-            ON CONFLICT (username, login_date, login_hour) DO UPDATE set last_modified = current_timestamp 
+            INSERT INTO system_user_access_logs (username, ip_address, login_time, login_date, login_hour, data_status) 
+            VALUES (?1, ?2, ?3, ?4, ?5, ?6) 
+            ON CONFLICT (username, login_date, login_hour) WHERE data_status = 'APPROVED' 
+            DO UPDATE set last_modified = current_timestamp 
             """, nativeQuery = true)
-    void saveUserLogin(String username, String ipAddress, LocalTime loginTime, LocalDate loginDate, Integer loginHour);
+    void saveUserLogin(String username, String ipAddress, LocalTime loginTime, LocalDate loginDate, Integer loginHour, String dataStatus);
 
 
 }

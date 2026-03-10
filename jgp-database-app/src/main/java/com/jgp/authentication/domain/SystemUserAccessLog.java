@@ -1,6 +1,7 @@
 package com.jgp.authentication.domain;
 
 import com.jgp.shared.domain.BaseEntity;
+import com.jgp.shared.domain.DataStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -51,6 +52,7 @@ public class SystemUserAccessLog extends BaseEntity {
         this.loginTime = LocalTime.now(ZoneId.systemDefault());
         this.loginDate = LocalDate.now(ZoneId.systemDefault());
         this.loginHour = this.loginTime.getHour();
+        this.setDataStatus(DataStatus.APPROVED);
     }
 
 

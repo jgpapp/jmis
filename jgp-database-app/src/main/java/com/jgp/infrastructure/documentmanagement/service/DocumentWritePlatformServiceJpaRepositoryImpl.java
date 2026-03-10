@@ -10,6 +10,7 @@ import com.jgp.infrastructure.documentmanagement.domain.Document;
 import com.jgp.infrastructure.documentmanagement.domain.DocumentRepository;
 import com.jgp.infrastructure.documentmanagement.exception.ContentManagementException;
 import com.jgp.infrastructure.documentmanagement.exception.DocumentNotFoundException;
+import com.jgp.shared.domain.DataStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -79,7 +80,7 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
 
             String oldLocation = null;
             final Document documentForUpdate = this.documentRepository.findById(documentCommand.getId())
-                    .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
+                    .filter(t -> DataStatus.APPROVED.equals(t.getDataStatus()))
                     .orElseThrow(() -> new DocumentNotFoundException(documentCommand.getParentEntityType(),
                             documentCommand.getParentEntityId(), documentCommand.getId()));
 
@@ -118,7 +119,7 @@ public class DocumentWritePlatformServiceJpaRepositoryImpl implements DocumentWr
 
         validateParentEntityType(documentCommand);
         final Document document = this.documentRepository.findById(documentCommand.getId())
-                .filter(t -> Boolean.FALSE.equals(t.getIsDeleted()))
+                .filter(t -> DataStatus.APPROVED.equals(t.getDataStatus()))
                 .orElseThrow(() -> new DocumentNotFoundException(documentCommand.getParentEntityType(), documentCommand.getParentEntityId(),
                         documentCommand.getId()));
         this.documentRepository.delete(document);

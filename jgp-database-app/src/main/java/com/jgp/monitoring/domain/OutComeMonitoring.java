@@ -269,10 +269,6 @@ public class OutComeMonitoring extends BaseEntity {
     @JoinColumn(name = "upload_doc_id")
     private Document document;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "data_status")
-    private DataStatus dataStatus;
-
     private transient Integer rowIndex;
 
     public OutComeMonitoring() {
@@ -353,13 +349,13 @@ public class OutComeMonitoring extends BaseEntity {
         this.rowIndex = dto.rowIndex();
         this.document = dto.document();
         this.setCreatedBy(dto.createdBy());
-        this.dataStatus = DataStatus.PENDING_APPROVAL;
+        this.setDataStatus(DataStatus.PENDING_APPROVAL);
     }
 
     public void approveData(boolean approval, AppUser user){
         this.approvalBy = user;
         this.dateApproved = LocalDate.now(ZoneId.systemDefault());
-        this.dataStatus = approval ? DataStatus.APPROVED : DataStatus.REJECTED;
+        this.setDataStatus(approval ? DataStatus.APPROVED : DataStatus.REJECTED);
     }
 
     @Override

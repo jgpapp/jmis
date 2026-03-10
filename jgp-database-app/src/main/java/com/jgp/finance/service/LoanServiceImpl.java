@@ -53,7 +53,7 @@ public class LoanServiceImpl implements LoanService {
     @Transactional
     @Override
     public void createOrUpdateLoan(Loan loan) {
-        final var existingLoanOptional = null != loan.getLoanNumber() ? this.loanRepository.findByParticipantAndLoanNumber(loan.getParticipant(), loan.getLoanNumber()) : Optional.<Loan>empty();
+        final var existingLoanOptional = null != loan.getLoanNumber() ? this.loanRepository.findByParticipantAndLoanNumber(loan.getParticipant().getId(), loan.getLoanNumber()) : Optional.<Loan>empty();
         if (existingLoanOptional.isPresent()){
             var existingLoan = existingLoanOptional.get();
             var loanTransaction = loan.getLoanTransactions().stream().findFirst().orElse(null);

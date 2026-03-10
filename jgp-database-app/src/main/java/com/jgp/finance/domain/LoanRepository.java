@@ -1,6 +1,5 @@
 package com.jgp.finance.domain;
 
-import com.jgp.participant.domain.Participant;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -16,7 +15,9 @@ import java.util.Optional;
 @Repository
 public interface LoanRepository extends JpaRepository<Loan, Long> , JpaSpecificationExecutor<Loan>, QuerydslPredicateExecutor<Loan> {
 
-    Optional<Loan> findByParticipantAndLoanNumber(Participant participant, String loanNumber);
+    @Query("select l from Loan l where l.participant.id = ?1 and l.loanNumber = ?2 and l.dataStatus = 'APPROVED'")
+    Optional<Loan> findByParticipantAndLoanNumber(Long participantId, String loanNumber);
+
 
     @Transactional
     @Modifying

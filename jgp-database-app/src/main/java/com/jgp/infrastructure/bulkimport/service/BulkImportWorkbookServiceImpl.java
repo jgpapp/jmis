@@ -21,6 +21,7 @@ import com.jgp.infrastructure.documentmanagement.exception.InvalidEntityTypeForD
 import com.jgp.infrastructure.documentmanagement.mapper.ImportDocumentMapper;
 import com.jgp.infrastructure.documentmanagement.service.DocumentWritePlatformService;
 import com.jgp.infrastructure.documentmanagement.service.DocumentWritePlatformServiceJpaRepositoryImpl;
+import com.jgp.shared.domain.DataStatus;
 import com.jgp.shared.dto.ApiResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -187,9 +188,9 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
         Objects.requireNonNull(pageable, "Pageable cannot be null");
 
         final Page<ImportDocument> imports = Objects.nonNull(partnerId)
-                ? this.importDocumentRepository.findByPartnerIdAndEntityTypeAndIsDeletedFalse(
+                ? this.importDocumentRepository.findByPartnerAndEntityType(
                 partnerId, type.getValue(), pageable)
-                : this.importDocumentRepository.findByEntityTypeAndIsDeletedFalse(
+                : this.importDocumentRepository.findByEntityType(
                 type.getValue(), pageable);
 
         final List<ImportData> importDataList = this.importDocumentMapper.toDto(imports.getContent());
@@ -457,7 +458,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
      */
     private Document fetchDocument(Long documentId) {
         return this.documentRepository.findById(documentId)
-                .filter(doc -> Boolean.FALSE.equals(doc.getIsDeleted()))
+                .filter(doc -> DataStatus.APPROVED.equals(doc.getDataStatus()))
                 .orElseThrow(() -> new IllegalStateException("Document not found: " + documentId));
     }
 
@@ -493,7 +494,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
      * @param importDocument the import document to mark as deleted
      */
     private void markImportDocumentAsDeleted(ImportDocument importDocument) {
-        importDocument.setIsDeleted(true);
+        importDocument.setDataStatus(DataStatus.DELETED);
         this.importDocumentRepository.save(importDocument);
     }
 
@@ -504,7 +505,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     private void deleteDocumentFile(Document document) {
         if (Objects.nonNull(document.getLocation())) {
             this.contentRepository.deleteFile(document.getLocation());
-            document.setIsDeleted(true);
+            document.setDataStatus(DataStatus.DELETED);
             this.documentRepository.save(document);
         }
     }
@@ -590,7 +591,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                         d.location, d.file_name, d.type \
                         from import_document i \
                         inner join jgp_document d on i.document_id = d.id \
-                        where d.id = ? and i.is_deleted = false""";
+                        where d.id = ? and i.data_status = 'APPROVED'""";
 
         @Override
         public DocumentData mapRow(ResultSet resultSet, int rowNum) throws SQLException {

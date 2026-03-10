@@ -6,6 +6,7 @@ import com.jgp.authentication.domain.UserAuditLog;
 import com.jgp.authentication.domain.UserAuditLogRepository;
 import com.jgp.authentication.domain.predicate.UserAuditLogPredicateBuilder;
 import com.jgp.authentication.dto.UserAuditLogSearchCriteria;
+import com.jgp.shared.domain.DataStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -36,7 +37,8 @@ public class UserAuditLogServiceImpl implements UserAuditLogService {
     public void logUserLogin(String username, String ipAddress) throws DataIntegrityViolationException {
         synchronized (this) {
             final var userLogin = new SystemUserAccessLog(username, ipAddress);
-            this.systemUserAccessLogRepository.saveUserLogin(userLogin.getUsername(), userLogin.getIpAddress(), userLogin.getLoginTime(), userLogin.getLoginDate(), userLogin.getLoginHour());
+            this.systemUserAccessLogRepository.saveUserLogin(userLogin.getUsername(), userLogin.getIpAddress(), userLogin.getLoginTime(),
+                    userLogin.getLoginDate(), userLogin.getLoginHour(), DataStatus.APPROVED.name());
         }
     }
 

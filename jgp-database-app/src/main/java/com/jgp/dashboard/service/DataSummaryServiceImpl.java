@@ -52,7 +52,7 @@ public class DataSummaryServiceImpl implements DataSummaryService {
     public void updateDataSummary(LocalDate startDate, LocalDate endDate, Long partnerId) {
         log.info("Started Updating summary between  {} and {}", startDate, endDate);
 
-        var partner = this.partnerRepository.findById(partnerId).filter(t -> Boolean.FALSE.equals(t.getIsDeleted())).orElse(null);
+        var partner = this.partnerRepository.findById(partnerId).filter(t -> DataStatus.APPROVED.equals(t.getDataStatus())).orElse(null);
         if (Objects.isNull(partner)) {
             log.error("Partner with ID {} not found.", partnerId);
             return;
@@ -145,6 +145,7 @@ public class DataSummaryServiceImpl implements DataSummaryService {
                                 .summaryDate(datePointer)
                                 .summaryWeek(summaryData.summaryWeek())
                                 .summaryYear(summaryData.summaryYear())
+                                .dataStatus(DataStatus.APPROVED.name())
                                 .build()
                 );
 

@@ -7,6 +7,6 @@ import java.util.Collection;
 
 public interface PermissionRepository extends JpaRepository<Permission, Long> {
 
-    @Query("SELECT p FROM Permission p WHERE p.code IN ?1 AND p.isDeleted = false")
+    @Query("SELECT p FROM Permission p WHERE p.code IN ?1 AND p.dataStatus = 'APPROVED'")
     Collection<Permission> findAllByCodes(Collection<String> codes);
 }

@@ -22,6 +22,7 @@ public record DataSummaryDto(
         String summaryQuarter,
         int quarterNumber,
         String summaryYear,
-        int yearNumber) {
+        int yearNumber,
+        String dataStatus) {
 
 }
