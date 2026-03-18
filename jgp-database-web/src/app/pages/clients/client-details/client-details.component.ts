@@ -12,7 +12,6 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { HasPermissionDirective } from '../../../directives/has-permission.directive';
-import { DashboardService } from '@services/dashboard/dashboard.service';
 
 @Component({
     selector: 'app-client-details',
@@ -42,10 +41,17 @@ export class ClientDetailsComponent {
   public outcomeMonitoringDisplayedColumns = ['surveyDate', 'surveyLanguage', 'partner', 'region', 'countyName', 'businessSetting', 'dateUploaded', 'uploadedBy', 'dateApproved', 'approvedBy'];
 
   selectedParticipant: Observable<any>;
-  constructor(private activatedRoute: ActivatedRoute, private dashBoardService: DashboardService){}
+  constructor(private activatedRoute: ActivatedRoute){}
 
   ngOnInit(): void {
     this.selectedParticipant = this.activatedRoute.data.pipe(map(data => data['selectedParticipant']));
+    this.selectedParticipant.subscribe(
+      participant => {
+        if(participant){
+          console.log('Selected Participant:', participant);
+        }
+      } 
+    );
   }
 
 }

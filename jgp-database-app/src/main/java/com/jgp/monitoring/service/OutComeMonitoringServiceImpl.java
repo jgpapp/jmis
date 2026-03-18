@@ -39,7 +39,9 @@ public class OutComeMonitoringServiceImpl implements OutComeMonitoringService {
 
     @Override
     public OutComeMonitoringResponseDto findOneById(Long id) {
-        return outComeMonitoringRepository.findById(id).map(outComeMonitoringMapper::toDto).orElse(null);
+        return outComeMonitoringRepository.findById(id)
+                .filter(outComeMonitoring -> DataStatus.APPROVED.equals(outComeMonitoring.getDataStatus()))
+                .map(outComeMonitoringMapper::toDto).orElse(null);
     }
 
     @Override

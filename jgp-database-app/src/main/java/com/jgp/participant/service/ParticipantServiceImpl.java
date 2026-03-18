@@ -30,7 +30,6 @@ import org.springframework.validation.annotation.Validated;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -46,20 +45,6 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final MentorshipService mentorshipService;
     private final OutComeMonitoringService outComeMonitoringService;
 
-    @AuditTrail(operation = UserAuditOperationConstants.CREATE_PARTICIPANT)
-    @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Participant createParticipant(ParticipantRequestDto participantRequestDto) {
-        return this.participantRepository.save(new Participant(participantRequestDto));
-    }
-
-    @Override
-    public List<Participant> createParticipants(List<ParticipantRequestDto> participantRequestDtos) {
-        return participantRepository.saveAll(participantRequestDtos.stream()
-                .map(Participant::new)
-                .toList());
-    }
-
     @AuditTrail(operation = UserAuditOperationConstants.UPDATE_PARTICIPANT, bodyIndex = 1, entityIdIndex = 0)
     @Override
     @Transactional
@@ -68,19 +53,6 @@ public class ParticipantServiceImpl implements ParticipantService {
                 .orElseThrow(() -> new ParticipantNotFoundException(participantId));
         participant.updateParticipant(participantRequestDto);
         this.participantRepository.save(participant);
-    }
-
-    @Transactional
-    @Override
-    public List<Participant> updateParticipants(Map<Long, ParticipantRequestDto> participantUpdates) {
-        var participantIds = participantUpdates.keySet();
-        var participants = this.participantRepository.findAllById(participantIds);
-
-        participants.forEach(participant ->
-                participant.updateParticipant(participantUpdates.get(participant.getId()))
-        );
-
-        return this.participantRepository.saveAll(participants);
     }
 
     //@AuditTrail(operation = UserAuditOperationConstants.CREATE_PARTICIPANT)
@@ -107,11 +79,6 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public Optional<Participant> findOneParticipantByJGPID(String jgpId) {
-        return this.participantRepository.findByJgpId(jgpId);
-    }
-
-    @Override
     public Map<String, Participant> findParticipantsByJGPIDs(List<String> jgpIds) {
         return this.participantRepository.findAllByJgpIds(jgpIds)
                 .stream()
@@ -121,15 +88,15 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Override
     public ParticipantResponseDto findParticipantById(Long participantId, boolean includeAccounts) {
         var participant =  this.participantRepository.findById(participantId)
+                .filter(t -> DataStatus.APPROVED.equals(t.getDataStatus()))
                 .map(this.participantMapper::toDto)
                 .orElseThrow(() -> new ParticipantNotFoundException(participantId));
 
         if (includeAccounts){
-            participant.setLoanResponseDtos(this.loanService.getLoans(LoanSearchCriteria.builder().participantId(participantId).dataStatus(DataStatus.APPROVED.name()).build(), Pageable.unpaged()).stream().toList());
-            participant.setBmoClientDtos(this.bmoClientDataService.getBMODataRecords(TAParticipantSearchCriteria.builder().dataStatus(DataStatus.APPROVED.name()).participantId(participantId).build(), Pageable.unpaged()).stream().toList());
-            participant.setMentorshipResponseDtos(this.mentorshipService.getMentorshipDataRecords(MentorshipSearchCriteria.builder().dataStatus(DataStatus.APPROVED.name()).participantId(participantId).build(), Pageable.unpaged()).stream().toList());
+            participant.setLoanResponseDtos(this.loanService.getLoans(LoanSearchCriteria.builder().participantId(participantId).build(), Pageable.unpaged()).stream().toList());
+            participant.setBmoClientDtos(this.bmoClientDataService.getBMODataRecords(TAParticipantSearchCriteria.builder().participantId(participantId).build(), Pageable.unpaged()).stream().toList());
+            participant.setMentorshipResponseDtos(this.mentorshipService.getMentorshipDataRecords(MentorshipSearchCriteria.builder().participantId(participantId).build(), Pageable.unpaged()).stream().toList());
             participant.setMonitoringResponseDtos(this.outComeMonitoringService.getOutComeMonitoringDataRecords(OutComeMonitoringSearchCriteria.builder()
-                            .dataStatus(DataStatus.APPROVED.name())
                             .participantId(participantId)
                             .build(), Pageable.unpaged()).stream().toList());
         }
@@ -140,7 +107,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Override
     public Page<Participant> availableParticipants(String searchText, Pageable pageable) {
         final var qParticipant = QParticipant.participant;
-        var isActive = qParticipant.isActive.eq(true);
+        var isActive = qParticipant.isActive.eq(true).and(qParticipant.dataStatus.eq(DataStatus.APPROVED));
         if (null != searchText) {
             var partnerNamePredicate = qParticipant.participantName.containsIgnoreCase(searchText);
             var businessNamePredicate = qParticipant.businessName.containsIgnoreCase(searchText);
