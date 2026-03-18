@@ -231,7 +231,7 @@
                 <mat-card-content class="py-3">
                   <div fxLayout="column" class="p-2">
                     <div class="p-2">
-                        <mat-table #table [dataSource]="selectedParticipant.loanDtos" class="mat-elevation-z8">
+                        <mat-table #table [dataSource]="selectedParticipant.loanResponseDtos" class="mat-elevation-z8">
                             <ng-container matColumnDef="partnerName">
                                 <mat-header-cell *matHeaderCellDef> Partner Name </mat-header-cell>
                                 <mat-cell *matCellDef="let element"> {{element.partnerName}} </mat-cell>

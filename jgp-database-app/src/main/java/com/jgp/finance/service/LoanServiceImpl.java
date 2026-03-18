@@ -158,7 +158,9 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     public LoanResponseDto findLoanById(Long loanId) {
-        return this.loanRepository.findById(loanId).map(this.loanMapper::toDto).orElseThrow(() -> new RuntimeException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
+        return this.loanRepository.findById(loanId)
+                .filter(t -> DataStatus.APPROVED.equals(t.getDataStatus()))
+                .map(this.loanMapper::toDto).orElseThrow(() -> new RuntimeException(CommonUtil.NO_RESOURCE_FOUND_WITH_ID));
 
     }
 
@@ -166,8 +168,12 @@ public class LoanServiceImpl implements LoanService {
     public Page<LoanTransactionResponseDto> getAvailableLoanTransactions(Long partnerId, Long loanId, DataStatus dataStatus, Pageable pageable) {
         Page<LoanTransaction> transactions;
         if (Objects.nonNull(loanId)){
-            final var loan = this.loanRepository.findById(loanId).orElseThrow(() -> new ResourceNotFound(HttpStatus.NOT_FOUND));
-            final var txns = loan.getLoanTransactions().stream().toList();
+            final var loan = this.loanRepository.findById(loanId)
+                    .filter(t -> DataStatus.APPROVED.equals(t.getDataStatus()))
+                    .orElseThrow(() -> new ResourceNotFound(HttpStatus.NOT_FOUND));
+            final var txns = loan.getLoanTransactions().stream()
+                    .filter(lt -> dataStatus.equals(lt.getDataStatus()))
+                    .toList();
             transactions = new PageImpl<>(txns, pageable, txns.size());
         }else {
             transactions =  this.loanTransactionRepository.getLoanTransactions(partnerId, dataStatus, pageable);
