@@ -95,7 +95,7 @@ public class MonitoringWorkbookPopulator extends AbstractWorkbookPopulator {
         worksheet.setColumnWidth(MonitoringConstants.MARKET_CHALLENGES_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
 
         writeString(MonitoringConstants.SURVEY_DATE_COL, rowHeader, "Survey Date* (yyyy-MM-dd example:2000-04-20)");
-        setDateColumnFormat(worksheet.getWorkbook(), TemplatePopulateImportConstants.MONITORING_SHEET_NAME, MonitoringConstants.SURVEY_DATE_COL);
+        //setDateColumnFormat(worksheet.getWorkbook(), TemplatePopulateImportConstants.MONITORING_SHEET_NAME, MonitoringConstants.SURVEY_DATE_COL);
         writeString(MonitoringConstants.SURVEY_LANGUAGE_COL, rowHeader, "Survey Language*");
         writeString(MonitoringConstants.CONSENTED_COL, rowHeader, "Consented* (Yes|No)");
         writeString(MonitoringConstants.LOCATION_LATITUDE_COL, rowHeader, "Location Latitude");
